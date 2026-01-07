@@ -1,7 +1,6 @@
 'use client';
 
 import { css } from '../../styled-system/css';
-import { Button } from '@/components/ui';
 import { useCounterStore } from '@/providers/counter-store-provider';
 
 export default function Home() {
@@ -10,8 +9,14 @@ export default function Home() {
   );
 
   return (
-    <div className={css({ fontSize: '2xl', fontWeight: 'bold' })}>
-      <Button>Button</Button>
+    <div
+      className={css({
+        fontSize: '2xl',
+        fontWeight: 'bold',
+        color: 'blue.500',
+        bg: 'bg',
+      })}
+    >
       Hello 🐼!
       <div>
         Count: {count}

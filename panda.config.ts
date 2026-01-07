@@ -1,10 +1,8 @@
-import { green } from '@/theme/colors/green';
-import { red } from '@/theme/colors/red';
-import { mauve } from '@/theme/colors/mauve';
-import { amber } from '@/theme/colors/amber';
+import { blue } from '@/theme/colors/blue';
+import { sub } from '@/theme/colors/sub';
+import { gray } from '@/theme/colors/gray';
 import { animationStyles } from '@/theme/animation-styles';
 import { zIndex } from '@/theme/tokens/z-index';
-import { shadows } from '@/theme/tokens/shadows';
 import { durations } from '@/theme/tokens/durations';
 import { colors } from '@/theme/tokens/colors';
 import { textStyles } from '@/theme/text-styles';
@@ -12,7 +10,6 @@ import { layerStyles } from '@/theme/layer-styles';
 import { keyframes } from '@/theme/keyframes';
 import { globalCss } from '@/theme/global-css';
 import { conditions } from '@/theme/conditions';
-import { slotRecipes, recipes } from '@/theme/recipes';
 import { defineConfig } from '@pandacss/dev';
 
 export default defineConfig({
@@ -32,8 +29,6 @@ export default defineConfig({
   theme: {
     extend: {
       animationStyles: animationStyles,
-      recipes: recipes,
-      slotRecipes: slotRecipes,
       keyframes: keyframes,
       layerStyles: layerStyles,
       textStyles: textStyles,
@@ -46,63 +41,41 @@ export default defineConfig({
 
       semanticTokens: {
         colors: {
+          bg: {
+            value: { base: '#FCFCFD', _dark: '#081221' },
+          },
+          primary: {
+            value: '#317AE4',
+          },
+          'primary-button-text': {
+            value: '#FFFFFF',
+          },
+
           fg: {
             default: {
-              value: {
-                _light: '{colors.gray.12}',
-                _dark: '{colors.gray.12}',
-              },
+              value: { base: '{colors.gray.900}', _dark: '{colors.gray.100}' },
             },
-
             muted: {
-              value: {
-                _light: '{colors.gray.11}',
-                _dark: '{colors.gray.11}',
-              },
+              value: { base: '{colors.gray.600}', _dark: '{colors.gray.400}' },
             },
-
             subtle: {
-              value: {
-                _light: '{colors.gray.10}',
-                _dark: '{colors.gray.10}',
-              },
+              value: '{colors.gray.500}',
             },
           },
 
           border: {
-            value: {
-              _light: '{colors.gray.4}',
-              _dark: '{colors.gray.4}',
-            },
+            value: { base: '{colors.gray.200}', _dark: '{colors.gray.700}' },
           },
 
-          error: {
-            value: {
-              _light: '{colors.red.9}',
-              _dark: '{colors.red.9}',
-            },
-          },
-
-          amber: amber,
-          gray: mauve,
-          red: red,
-          green: green,
+          blue: blue,
+          sub: sub,
+          gray: gray,
         },
 
-        shadows: shadows,
-
         radii: {
-          l1: {
-            value: '{radii.xs}',
-          },
-
-          l2: {
-            value: '{radii.sm}',
-          },
-
-          l3: {
-            value: '{radii.md}',
-          },
+          l1: { value: '{radii.xs}' },
+          l2: { value: '{radii.sm}' },
+          l3: { value: '{radii.md}' },
         },
       },
     },
