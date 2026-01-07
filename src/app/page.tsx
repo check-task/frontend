@@ -18,7 +18,7 @@ export default function Home() {
       })}
     >
       Hello 🐼!
-      <div>
+      <div className={css({ textStyle: 'body2.r' })}>
         Count: {count}
         <hr />
         <button type='button' onClick={incrementCount}>
