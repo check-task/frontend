@@ -3,6 +3,7 @@ import { cva, cx, css } from '../../styled-system/css';
 
 // 공통 스타일 (Input, Textarea 둘 다 적용)
 const baseStyles = {
+  display: 'block',
   p: '0.75rem',
   borderRadius: '0.25rem',
   borderWidth: '0.125rem',
