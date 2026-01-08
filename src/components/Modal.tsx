@@ -95,14 +95,14 @@ export const Modal = ({
             })}
           >
             {/* 제목 */}
-            <h2
+            <div
               className={css({
                 textStyle: 'body1.m',
                 color: 'fg.default',
               })}
             >
               {title}
-            </h2>
+            </div>
 
             {/* 아이콘 영역 */}
             {rightElement && (
