@@ -39,8 +39,7 @@ export default function LoginPage() {
 
           <div
             className={stack({
-              justifyContent: 'space-between',
-              height: '8.25rem',
+              gap: '0.75rem',
             })}
           >
             {/* 입력 폼 */}
@@ -152,7 +151,6 @@ export default function LoginPage() {
             className={css({
               textStyle: 'body2.m',
               color: 'gray.600',
-              height: '8.25rem',
             })}
           >
             아이디와 비밀번호 입력하기 귀찮으시죠?
