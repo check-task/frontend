@@ -8,10 +8,12 @@ export default function LoginPage() {
   return (
     <div
       className={center({
+        minHeight: '100vh',
+        maxHeight: '100vh',
         flexDirection: 'column',
-        justifyContent: 'flex-start',
+        paddingTop: '19.5vh',
+        paddingBottom: '26vh',
         gap: '5rem',
-        marginTop: '12.5rem',
       })}
     >
       {/* 로고 */}
