@@ -1,5 +1,5 @@
 import { css, cx } from 'styled-system/css';
-import { PlusIcon } from '../icons/PlusIcon';
+import { PlusIcon } from './icons/PlusIcon';
 import { center } from 'styled-system/patterns';
 
 const plusButtonStyle = css({
