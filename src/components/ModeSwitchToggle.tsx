@@ -178,7 +178,7 @@ const iconContainerStyle = cva({
     },
     isLightAndExpanded: {
       true: {
-        transform: 'translateX(calc(6.25rem - 0.75rem - 0.75rem - 1.75rem))',
+        transform: 'translateX(calc(6.25rem - 0.75rem - 0.75rem - 1.5rem))',
       },
       false: {
         transform: 'translateX(0)',
