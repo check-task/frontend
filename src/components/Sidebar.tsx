@@ -8,27 +8,75 @@ import { ModeSwitchToggle } from './ModeSwitchToggle';
 import { LogoutButton } from './LogoutButton';
 import { css, cva } from 'styled-system/css';
 import { SidebarCloseButton } from './SidebarCloseButton';
-import { useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
+import { useUIStore } from '@/stores/ui-store';
 
-export const Sidebar = () => {
-  const [isCollapsed, setIsCollapsed] = useState(false);
+interface SidebarProps {
+  initialCollapsed: boolean;
+  initialTheme: 'light' | 'dark';
+}
+
+export const Sidebar = ({ initialCollapsed, initialTheme }: SidebarProps) => {
+  // 서버 초기값을 로컬 상태로 관리
+  const [isCollapsed, setIsCollapsed] = useState(initialCollapsed);
+  const [isHydrated, setIsHydrated] = useState(false);
+
+  // Zustand store에서 액션과 상태 가져오기
+  const storeCollapsed = useUIStore((state) => state.isSidebarCollapsed);
+  const setSidebarCollapsed = useUIStore((state) => state.setSidebarCollapsed);
+  const setTheme = useUIStore((state) => state.setTheme);
+
+  const isInitialized = useRef(false);
+
+  // 클라이언트 hydration 후 Zustand store와 동기화
+  useEffect(() => {
+    if (!isInitialized.current) {
+      // Zustand persist가 쿠키에서 상태를 복원할 때까지 대기
+      const currentState = useUIStore.getState();
+
+      // 서버 초기값으로 store 초기화 (persist가 쿠키 읽기 전)
+      if (currentState.isSidebarCollapsed !== initialCollapsed) {
+        setSidebarCollapsed(initialCollapsed);
+      }
+
+      if (currentState.theme !== initialTheme) {
+        setTheme(initialTheme);
+      }
+
+      isInitialized.current = true;
+      setTimeout(() => {
+        setIsHydrated(true);
+      }, 0);
+    }
+  }, [initialCollapsed, initialTheme, setSidebarCollapsed, setTheme]);
+
+  // Hydration 후에는 Zustand store의 값 사용
+  const isSidebarCollapsed = isHydrated ? storeCollapsed : isCollapsed;
 
   const handleCollapse = () => {
-    setIsCollapsed(true);
+    if (isHydrated) {
+      setSidebarCollapsed(true);
+    } else {
+      setIsCollapsed(true);
+    }
   };
 
   const handleExpand = () => {
-    setIsCollapsed(false);
+    if (isHydrated) {
+      setSidebarCollapsed(false);
+    } else {
+      setIsCollapsed(false);
+    }
   };
 
   return (
-    <div className={sidebarStyleVariant({ collapsed: isCollapsed })}>
+    <div className={sidebarStyleVariant({ collapsed: isSidebarCollapsed })}>
       <div className={headerStyle}>
         <SidebarOpenButton onClick={handleExpand} />
         <div
           style={{
-            opacity: isCollapsed ? 0 : 1,
-            width: isCollapsed ? 0 : 'auto',
+            opacity: isSidebarCollapsed ? 0 : 1,
+            width: isSidebarCollapsed ? 0 : 'auto',
             overflow: 'hidden',
             transition:
               'opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
@@ -39,13 +87,13 @@ export const Sidebar = () => {
       </div>
 
       <div className={contentStyle}>
-        <AssignmentButton collapsed={isCollapsed} />
-        <CompletedAssignmentButton collapsed={isCollapsed} />
-        <MyInfoButton collapsed={isCollapsed} />
-        <ModeSwitchToggle collapsed={isCollapsed} />
+        <AssignmentButton collapsed={isSidebarCollapsed} />
+        <CompletedAssignmentButton collapsed={isSidebarCollapsed} />
+        <MyInfoButton collapsed={isSidebarCollapsed} />
+        <ModeSwitchToggle collapsed={isSidebarCollapsed} />
       </div>
 
-      <LogoutButton collapsed={isCollapsed} />
+      <LogoutButton collapsed={isSidebarCollapsed} />
     </div>
   );
 };
