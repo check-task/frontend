@@ -9,7 +9,7 @@ import Image from 'next/image';
 export default function LoginPage() {
   return (
     <Container.Page>
-      <Image src='/logo.svg' alt='logo' width={260} height={48} />
+      <Image src='/logo.svg' alt='채택 로고' width={260} height={48} />
       <Container.Login>
         <LoginSection
           title='이메일로 로그인하기'
