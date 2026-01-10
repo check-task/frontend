@@ -1,46 +1,61 @@
 import { cva } from 'styled-system/css';
 import { AssignmentIcon } from './icons/AssignmentIcon';
 
-// collapsed: 버튼 축소 여부
 interface AssignmentButtonProps {
   collapsed?: boolean;
 }
 
-export const AssignmentButton = ({
-  // 기본값: 축소
-  collapsed = false,
-}: AssignmentButtonProps) => {
-  const assignmentButtonStyle = cva({
-    base: {
-      display: 'flex',
-      alignItems: 'center',
-      textStyle: 'body1.m',
-      color: 'blue.600',
-      gap: '0.75rem',
-      cursor: 'pointer',
-    },
-  });
+const buttonStyle = cva({
+  base: {
+    display: 'flex',
+    alignItems: 'center',
+    textStyle: 'body1.m',
+    color: 'blue.600',
+    gap: '0.75rem',
+    cursor: 'pointer',
+  },
+});
 
-  const spanStyle = cva({
-    variants: {
-      collapsed: {
-        true: {
-          opacity: 0,
-          w: 0,
-          display: 'none',
-        },
-        false: {
-          opacity: 1,
-          display: 'block',
-        },
+const iconWrapperStyle = cva({
+  base: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 0,
+    w: '1.75rem',
+    h: '1.75rem',
+    ml: '0.4rem',
+  },
+});
+
+const textStyle = cva({
+  base: {
+    transition:
+      'opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+    whiteSpace: 'nowrap',
+  },
+  variants: {
+    collapsed: {
+      true: {
+        opacity: 0,
+        w: 0,
+        overflow: 'hidden',
+      },
+      false: {
+        opacity: 1,
+        w: 'auto',
       },
     },
-  });
+  },
+});
 
-  return (
-    <button className={assignmentButtonStyle({ collapsed })}>
+export const AssignmentButton = ({
+  collapsed = false,
+}: AssignmentButtonProps) => (
+  <button className={buttonStyle()}>
+    <div className={iconWrapperStyle()}>
       <AssignmentIcon />
-      <span className={spanStyle({ collapsed })}>과제</span>
-    </button>
-  );
-};
+    </div>
+    <span className={textStyle({ collapsed })}>과제</span>
+  </button>
+);

@@ -1,43 +1,59 @@
 import { cva } from 'styled-system/css';
 import { MyInfoIcon } from './icons/MyInfoIcon';
 
-// collapsed: 버튼 축소 여부
 interface MyInfoButtonProps {
   collapsed?: boolean;
 }
 
-export const MyInfoButton = ({ collapsed = false }: MyInfoButtonProps) => {
-  const myInfoButtonStyle = cva({
-    base: {
-      display: 'flex',
-      alignItems: 'center',
-      textStyle: 'body1.m',
-      color: 'blue.600',
-      gap: '0.75rem',
-      cursor: 'pointer',
-    },
-  });
+const buttonStyle = cva({
+  base: {
+    display: 'flex',
+    alignItems: 'center',
+    textStyle: 'body1.m',
+    color: 'blue.600',
+    gap: '0.75rem',
+    cursor: 'pointer',
+    ml: '0.4rem',
+  },
+});
 
-  const spanStyle = cva({
-    variants: {
-      collapsed: {
-        true: {
-          opacity: 0,
-          w: 0,
-          display: 'none',
-        },
-        false: {
-          opacity: 1,
-          display: 'block',
-        },
+const iconWrapperStyle = cva({
+  base: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 0,
+    w: '1.75rem',
+    h: '1.75rem',
+  },
+});
+
+const textStyle = cva({
+  base: {
+    transition:
+      'opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+    whiteSpace: 'nowrap',
+  },
+  variants: {
+    collapsed: {
+      true: {
+        opacity: 0,
+        w: 0,
+        overflow: 'hidden',
+      },
+      false: {
+        opacity: 1,
+        w: 'auto',
       },
     },
-  });
+  },
+});
 
-  return (
-    <button className={myInfoButtonStyle({ collapsed })}>
+export const MyInfoButton = ({ collapsed = false }: MyInfoButtonProps) => (
+  <button className={buttonStyle()}>
+    <div className={iconWrapperStyle()}>
       <MyInfoIcon />
-      <span className={spanStyle({ collapsed })}>내 정보</span>
-    </button>
-  );
-};
+    </div>
+    <span className={textStyle({ collapsed })}>내 정보</span>
+  </button>
+);

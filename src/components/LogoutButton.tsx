@@ -15,20 +15,37 @@ export const LogoutButton = ({ collapsed = false }: LogoutButtonProps) => {
       textStyle: 'body3.r',
       color: 'gray.500',
       cursor: 'pointer',
+      ml: '0.4rem',
+    },
+  });
+
+  const iconWrapperStyle = cva({
+    base: {
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      flexShrink: 0,
+      w: '1.25rem',
+      h: '1.25rem',
     },
   });
 
   const spanStyle = cva({
+    base: {
+      transition:
+        'opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+      whiteSpace: 'nowrap',
+    },
     variants: {
       collapsed: {
         true: {
           opacity: 0,
           w: 0,
-          display: 'none',
+          overflow: 'hidden',
         },
         false: {
           opacity: 1,
-          display: 'block',
+          w: 'auto',
         },
       },
     },
@@ -36,7 +53,9 @@ export const LogoutButton = ({ collapsed = false }: LogoutButtonProps) => {
 
   return (
     <button className={logoutButtonStyle({ collapsed })}>
-      <LogoutIcon />
+      <div className={iconWrapperStyle()}>
+        <LogoutIcon />
+      </div>
       <span className={spanStyle({ collapsed })}>로그아웃</span>
     </button>
   );
