@@ -1,12 +1,7 @@
 'use client';
 
-import {
-  type ReactNode,
-  createContext,
-  useState,
-  useContext,
-  useEffect,
-} from 'react';
+import { type ReactNode, createContext, useContext } from 'react';
+import { useUIStore } from '@/stores/ui-store';
 
 type Theme = 'light' | 'dark';
 
@@ -21,31 +16,11 @@ export interface ThemeProviderProps {
   children: ReactNode;
 }
 
+// ThemeProvider - Zustand UI Store를 래핑하는 Context Provider
 export const ThemeProvider = ({ children }: ThemeProviderProps) => {
-  // 초기 상태를 클라이언트에서 data-theme으로부터 읽어옴
-  const [theme, setTheme] = useState<Theme>(() => {
-    // SSR 시에는 'light' 반환
-    if (typeof window === 'undefined') return 'light';
-
-    // 클라이언트에서는 HTML의 data-theme을 읽어옴 (layout.tsx 스크립트가 설정)
-    const htmlTheme = document.documentElement.getAttribute(
-      'data-theme',
-    ) as Theme | null;
-    return htmlTheme === 'dark' ? 'dark' : 'light';
-  });
-
-  // 테마 변경 시에만 HTML과 localStorage 업데이트
-  useEffect(() => {
-    const currentTheme = document.documentElement.getAttribute('data-theme');
-    if (currentTheme !== theme) {
-      document.documentElement.setAttribute('data-theme', theme);
-      localStorage.setItem('theme', theme);
-    }
-  }, [theme]);
-
-  const toggleTheme = () => {
-    setTheme((prev) => (prev === 'light' ? 'dark' : 'light'));
-  };
+  // Zustand store에서 테마 상태와 액션을 가져옴
+  const theme = useUIStore((state) => state.theme);
+  const toggleTheme = useUIStore((state) => state.toggleTheme);
 
   return (
     <ThemeContext.Provider value={{ theme, toggleTheme }}>
