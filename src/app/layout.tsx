@@ -7,6 +7,7 @@ import { css } from '../../styled-system/css';
 import { CounterStoreProvider } from '@/providers/counter-store-provider';
 import { ThemeProvider } from '@/providers/theme-provider';
 import { parseUICookie } from '@/lib/parse-ui-cookie';
+import { HomeButtonBar } from '@/components/HomeButtonBar';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -26,6 +27,8 @@ const layoutContainerStyle = css({
 
 const mainContentStyle = css({
   flex: 1,
+  display: 'flex',
+  flexDirection: 'column',
   overflow: 'auto',
 });
 
@@ -55,7 +58,10 @@ export default async function RootLayout({
                 initialCollapsed={initialUIState.isSidebarCollapsed}
                 initialTheme={initialUIState.theme}
               />
-              <main className={mainContentStyle}>{children}</main>
+              <main className={mainContentStyle}>
+                <HomeButtonBar />
+                {children}
+              </main>
             </div>
           </CounterStoreProvider>
         </ThemeProvider>
