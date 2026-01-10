@@ -1,10 +1,12 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
+import { cookies } from 'next/headers';
 import './globals.css';
 import { Sidebar } from '@/components/Sidebar';
 import { css } from '../../styled-system/css';
 import { CounterStoreProvider } from '@/providers/counter-store-provider';
 import { ThemeProvider } from '@/providers/theme-provider';
+import { parseUICookie } from '@/lib/parse-ui-cookie';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -27,37 +29,32 @@ const mainContentStyle = css({
   overflow: 'auto',
 });
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // 서버에서 쿠키를 읽어 초기 상태 파싱
+  const cookieStore = await cookies();
+  const uiCookie = cookieStore.get('ui-storage');
+  const initialUIState = parseUICookie(uiCookie?.value);
+
   return (
-    <html lang='ko' suppressHydrationWarning>
-      <head>
-        {/* 테마 유지 스크립트 */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              (function() {
-                try {
-                  const theme = localStorage.getItem('theme');
-                  if (theme === 'light' || theme === 'dark') {
-                    document.documentElement.setAttribute('data-theme', theme);
-                  } else {
-                    document.documentElement.setAttribute('data-theme', 'light');
-                  }
-                } catch (e) {}
-              })();
-            `,
-          }}
-        />
-      </head>
+    <html
+      lang='ko'
+      suppressHydrationWarning
+      data-theme={initialUIState.theme}
+      data-sidebar-collapsed={String(initialUIState.isSidebarCollapsed)}
+    >
+      <head />
       <body className={inter.className}>
         <ThemeProvider>
           <CounterStoreProvider>
             <div className={layoutContainerStyle}>
-              <Sidebar />
+              <Sidebar
+                initialCollapsed={initialUIState.isSidebarCollapsed}
+                initialTheme={initialUIState.theme}
+              />
               <main className={mainContentStyle}>{children}</main>
             </div>
           </CounterStoreProvider>
