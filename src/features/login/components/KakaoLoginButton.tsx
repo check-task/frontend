@@ -24,11 +24,11 @@ const ButtonText = styled('span', {
 });
 
 // HTML 버튼 태그의 속성을 사용하기 위해 (예 : onClick)
-interface KakaoButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+interface KakaoLoginButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   children?: React.ReactNode;
 }
 
-export const KakaoButton = ({ ...props }: KakaoButtonProps) => (
+export const KakaoLoginButton = ({ ...props }: KakaoLoginButtonProps) => (
   <Button {...props}>
     <Image src='/kakao-icon.svg' alt='kakaoicon' width={24} height={27} />
     <ButtonText>카카오 로그인</ButtonText>
