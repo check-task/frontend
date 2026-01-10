@@ -5,15 +5,37 @@ import { css } from 'styled-system/css';
 const sidebarOpenButtonStyle = css({
   display: 'flex',
   alignItems: 'center',
-  pl: '0.125rem',
   justifyContent: 'flex-start',
   cursor: 'pointer',
+  flexShrink: 0,
 });
 
-export const SidebarOpenButton = () => {
+const imageWrapperStyle = css({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  flexShrink: 0,
+  w: '1.75rem',
+  h: '1.75rem',
+  ml: '0.4rem',
+});
+
+interface SidebarOpenButtonProps {
+  onClick?: () => void;
+}
+
+export const SidebarOpenButton = ({ onClick }: SidebarOpenButtonProps) => {
   return (
-    <button className={sidebarOpenButtonStyle}>
-      <Image src='/SidebarLogo.svg' alt='Sidebar Logo' width={28} height={28} />
+    <button className={sidebarOpenButtonStyle} onClick={onClick}>
+      <div className={imageWrapperStyle}>
+        <Image
+          src='/SidebarLogo.svg'
+          alt='Sidebar Logo'
+          width={28}
+          height={28}
+          style={{ flexShrink: 0 }}
+        />
+      </div>
     </button>
   );
 };
