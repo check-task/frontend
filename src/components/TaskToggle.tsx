@@ -6,26 +6,34 @@ import { useUIStore } from '@/stores/ui-store';
 
 // Props 정의
 interface TaskToggleProps {
-  // 사이
+  // 개인 팀 과제수
   personalCount?: number;
   teamCount?: number;
+  // 토글 버튼 클릭시 실행되는 콜백 함수(현재 선택된 타입을 전달)
+  onToggle?: (type: 'personal' | 'team') => void;
 }
 
 export function TaskToggle({
   // 기본값
   personalCount = 0,
   teamCount = 0,
+  onToggle,
 }: Omit<TaskToggleProps, 'collapsed'>) {
   // 상태 관리
   const isSidebarCollapsed = useUIStore((state) => state.isSidebarCollapsed);
   // 개인,팀 과제
   const [active, setActive] = useState<'personal' | 'team'>('personal');
 
+  const handlePress = (type: 'personal' | 'team') => {
+    setActive(type); // 상태에 따른 ui 설정
+    onToggle?.(type); // 클릭되었음을 부모에게 알리기
+  };
+
   return (
     <div className={containerStyle({ collapsed: isSidebarCollapsed })}>
       <div
         className={buttonStyle({ active: active === 'personal' })}
-        onClick={() => setActive('personal')}
+        onClick={() => handlePress('personal')}
       >
         <span>개인과제</span>
         <span className={countStyle({ active: active === 'personal' })}>
@@ -34,7 +42,7 @@ export function TaskToggle({
       </div>
       <div
         className={buttonStyle({ active: active === 'team' })}
-        onClick={() => setActive('team')}
+        onClick={() => handlePress('team')}
       >
         <span>팀과제</span>
         <span className={countStyle({ active: active === 'team' })}>
