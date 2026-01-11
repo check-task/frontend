@@ -3,7 +3,7 @@ import { styled } from 'styled-system/jsx';
 import { center, stack, hstack } from 'styled-system/patterns';
 import { Button } from '@/components/Button';
 import { Input } from '@/components/TextField';
-import { KakaoButton } from '@/components/KakaoButton';
+import { KakaoLoginButton } from '@/features/login/components/KakaoLoginButton';
 import Image from 'next/image';
 
 export default function LoginPage() {
@@ -34,7 +34,10 @@ export default function LoginPage() {
           </Container.InputForm>
         </LoginSection>
         <Divider.Big />
-        <LoginSection title='카카오로 간편로그인하기' button={<KakaoButton />}>
+        <LoginSection
+          title='카카오로 간편로그인하기'
+          button={<KakaoLoginButton />}
+        >
           <Text.KakaoDescription>
             아이디와 비밀번호 입력하기 귀찮으시죠?
             <br />
