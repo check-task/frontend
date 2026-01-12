@@ -97,7 +97,10 @@ export const Modal = () => {
       <button
         type='button'
         onClick={handleRightClick}
-        className={css({ cursor: 'pointer', display: 'flex' })}
+        className={css({
+          cursor: 'pointer',
+          display: 'flex',
+        })}
       >
         {headerType === 'withClose' ? <CloseIcon /> : <ModalCheckIcon />}
       </button>
@@ -116,7 +119,7 @@ export const Modal = () => {
         <div className={stack({ gap: '1rem', width: 'full' })}>
           {/* 모달 해더 */}
           <header className={headerRecipe({ type: headerType })}>
-            <div className={css({ textStyle: 'body1.m', color: 'fg.default' })}>
+            <div className={css({ textStyle: 'body1.m', color: 'gray.900' })}>
               {title}
             </div>
             {renderIcon()}
