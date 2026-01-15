@@ -1,9 +1,9 @@
 import { Button } from '@/components/Button';
 import { Divider } from '@/components/Divider';
-import { CheckboxHeader } from '@/features/addassignment/components/CheckboxHeader';
-import { AddAssignmentContent } from '@/features/addassignment/components/AddAssignmentContent';
-import { AddAssignmentTask } from '@/features/addassignment/components/AddAssignmentTask';
-import { AddAssignmentData } from '@/features/addassignment/components/AddAssignmentData';
+import { CheckboxHeader } from '@/features/assignment/create/components/CheckboxHeader';
+import { AddAssignmentContent } from '@/features/assignment/create/components/AddAssignmentContent';
+import { AddAssignmentTask } from '@/features/assignment/create/components/AddAssignmentTask';
+import { AddAssignmentData } from '@/features/assignment/create/components/AddAssignmentData';
 import React from 'react';
 import { css } from 'styled-system/css';
 
