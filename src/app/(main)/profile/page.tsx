@@ -7,6 +7,8 @@ import { ChevronDownIcon } from '@/components/icons/ChevronDownIcon';
 import { PencilIcon } from '@/components/icons/PencilIcon';
 import { CameraIcon } from '@/components/icons/CameraIcon';
 import { Card } from '@/features/profile/components/Card';
+import { NotificationSetting } from '@/features/profile/components/NotificationSetting';
+import { FolderSetting } from '@/features/profile/components/FolderSetting';
 
 // 프로필 설정 페이지
 export default function ProfilePage() {
@@ -65,7 +67,7 @@ export default function ProfilePage() {
 
         <Card type='management'>
           {/* 알림 설정 */}
-          <Setting.Section>
+          <NotificationSetting>
             <Text.SectionTitle>알림 설정</Text.SectionTitle>
             <Setting.Content>
               <Setting.Row>
@@ -81,13 +83,13 @@ export default function ProfilePage() {
                 </StyledButton.Select>
               </Setting.Row>
             </Setting.Content>
-          </Setting.Section>
+          </NotificationSetting>
 
           {/* 구분선 */}
           <Divider type='management' />
 
           {/* 폴더 설정 */}
-          <Setting.Folder>
+          <FolderSetting>
             <Folder.Header>
               <Text.SectionTitle>폴더 설정</Text.SectionTitle>
               <PlusIcon />
@@ -113,7 +115,7 @@ export default function ProfilePage() {
                 </Folder.Item>
               ))}
             </Folder.List>
-          </Setting.Folder>
+          </FolderSetting>
         </Card>
       </Layout.Section>
 
@@ -337,18 +339,6 @@ const Profile = {
 
 // 설정 섹션 스타일
 const Setting = {
-  Section: styled('div', {
-    base: stack.raw({
-      gap: '1.5rem',
-      width: '23.25rem',
-    }),
-  }),
-  Folder: styled('div', {
-    base: stack.raw({
-      width: '26.75rem',
-      gap: '1.5rem',
-    }),
-  }),
   Row: styled('div', {
     base: hstack.raw({
       justifyContent: 'space-between',
