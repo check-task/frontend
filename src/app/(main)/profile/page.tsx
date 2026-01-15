@@ -9,6 +9,7 @@ import { Card } from '@/features/profile/components/Card';
 import { NotificationSetting } from '@/features/profile/components/NotificationSetting';
 import { FolderSetting } from '@/features/profile/components/FolderSetting';
 import { EditProfileButton } from '@/features/profile/components/EditProfileButton';
+import { WithdrawalButton } from '@/features/profile/components/WithdrawalButton';
 
 // 프로필 설정 페이지
 export default function ProfilePage() {
@@ -119,10 +120,7 @@ export default function ProfilePage() {
 
       {/* 푸터 */}
       <Layout.Footer>
-        <StyledButton.UnderlineLink>
-          <Text.WithdrawalLink>회원탈퇴</Text.WithdrawalLink>
-          <Underline color='withdrawal' />
-        </StyledButton.UnderlineLink>
+        <WithdrawalButton />
         <Text.FooterLinks>
           <Text.FooterLink>개인 정보 처리 방침</Text.FooterLink>
           <Divider type='footer' />
