@@ -1,15 +1,15 @@
 import { styled } from '../../../../styled-system/jsx';
 import { hstack, stack } from '../../../../styled-system/patterns';
 import { CloseIcon } from '@/components/icons/CloseIcon';
-import { PlusIcon } from '@/components/icons/PlusIcon';
 import { ChevronDownIcon } from '@/components/icons/ChevronDownIcon';
-import { PencilIcon } from '@/components/icons/PencilIcon';
 import { CameraIcon } from '@/components/icons/CameraIcon';
 import { Card } from '@/features/profile/components/Card';
 import { NotificationSetting } from '@/features/profile/components/NotificationSetting';
 import { FolderSetting } from '@/features/profile/components/FolderSetting';
 import { EditProfileButton } from '@/features/profile/components/EditProfileButton';
 import { WithdrawalButton } from '@/features/profile/components/WithdrawalButton';
+import { AddFolderButton } from '@/features/profile/components/AddFolderButton';
+import { EditFolderButton } from '@/features/profile/components/EditFolderButton';
 
 // 프로필 설정 페이지
 export default function ProfilePage() {
@@ -91,7 +91,7 @@ export default function ProfilePage() {
           <FolderSetting>
             <Folder.Header>
               <Text.SectionTitle>폴더 설정</Text.SectionTitle>
-              <PlusIcon />
+              <AddFolderButton />
             </Folder.Header>
             <Folder.List>
               {[
@@ -106,9 +106,10 @@ export default function ProfilePage() {
                     <Folder.Name>{folder.name}</Folder.Name>
                   </Folder.Info>
                   <Folder.Actions>
-                    <StyledButton.Action>
-                      <PencilIcon />
-                    </StyledButton.Action>
+                    <EditFolderButton
+                      folderName={folder.name}
+                      folderColor={folder.color}
+                    />
                     <CloseIcon />
                   </Folder.Actions>
                 </Folder.Item>
