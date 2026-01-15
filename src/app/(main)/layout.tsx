@@ -37,10 +37,8 @@ export default async function MainLayout({
         initialTheme={initialUIState.theme}
       />
       <main className={mainContentStyle}>
-        <MainContentWrapper>
-          <HomeButtonBar />
-          {children}
-        </MainContentWrapper>
+        <HomeButtonBar />
+        <MainContentWrapper>{children}</MainContentWrapper>
       </main>
       <Modal />
     </div>
