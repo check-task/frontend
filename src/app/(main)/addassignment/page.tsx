@@ -1,8 +1,8 @@
 import { Button } from '@/components/Button';
-import { Checkbox } from '@/components/Checkbox';
 import { PlusButton } from '@/components/PlusButton';
 import { Input } from '@/components/TextField';
 import { FolderColorSelect } from '@/features/addassignment/components/FolderColorSelect';
+import { CheckboxHeader } from '@/features/addassignment/components/CheckboxHeader';
 import React from 'react';
 import { css } from 'styled-system/css';
 
@@ -14,16 +14,7 @@ const page = () => {
         <h1 className={css({ textStyle: 'h3', color: 'gray.900' })}>
           과제 등록
         </h1>
-        <div className={checkboxWrapperStyle}>
-          <div className={checkboxContainerStyle}>
-            <Checkbox />
-            <p>팀프로젝트</p>
-          </div>
-          <div className={checkboxContainerStyle}>
-            <Checkbox />
-            <p>웬투밋 추가</p>
-          </div>
-        </div>
+        <CheckboxHeader />
       </div>
 
       <div className={dividerStyle} />
@@ -92,20 +83,6 @@ const HeaderStyle = css({
   flexDirection: 'column',
   w: 'full',
   gap: '1.25rem',
-});
-
-const checkboxWrapperStyle = css({
-  display: 'flex',
-  alignItems: 'center',
-  gap: '1.75rem',
-});
-
-const checkboxContainerStyle = css({
-  display: 'flex',
-  alignItems: 'center',
-  gap: '0.5rem',
-  textStyle: 'body1.m',
-  color: 'gray.600',
 });
 
 const dividerStyle = css({
