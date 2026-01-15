@@ -1,12 +1,12 @@
 import { styled } from '../../../../styled-system/jsx';
 import { hstack, stack } from '../../../../styled-system/patterns';
-import { cva } from '../../../../styled-system/css';
 import { Button } from '@/components/Button';
 import { CloseIcon } from '@/components/icons/CloseIcon';
 import { PlusIcon } from '@/components/icons/PlusIcon';
 import { ChevronDownIcon } from '@/components/icons/ChevronDownIcon';
 import { PencilIcon } from '@/components/icons/PencilIcon';
 import { CameraIcon } from '@/components/icons/CameraIcon';
+import { Card } from '@/features/profile/components/Card';
 
 // 프로필 설정 페이지
 export default function ProfilePage() {
@@ -16,7 +16,7 @@ export default function ProfilePage() {
         <Text.Title>프로필 설정</Text.Title>
 
         {/* 프로필 카드 */}
-        <div className={cardStyle({ type: 'profile' })}>
+        <Card type='profile'>
           <Profile.ImageSection>
             <Profile.ImageWrapper>
               <Profile.Image />
@@ -56,14 +56,14 @@ export default function ProfilePage() {
               <Underline color='password' />
             </StyledButton.UnderlineLink>
           </Profile.InfoSection>
-        </div>
+        </Card>
       </Layout.Section>
 
       <Layout.Section>
         {/* 과제 관리 섹션 */}
         <Text.Title>과제 관리</Text.Title>
 
-        <div className={cardStyle({ type: 'management' })}>
+        <Card type='management'>
           {/* 알림 설정 */}
           <Setting.Section>
             <Text.SectionTitle>알림 설정</Text.SectionTitle>
@@ -114,7 +114,7 @@ export default function ProfilePage() {
               ))}
             </Folder.List>
           </Setting.Folder>
-        </div>
+        </Card>
       </Layout.Section>
 
       {/* 푸터 */}
@@ -160,23 +160,6 @@ const Layout = {
     }),
   }),
 };
-
-// 카드 스타일
-const cardStyle = cva({
-  base: hstack.raw({
-    borderRadius: '0.75rem',
-    bg: 'gray.0',
-    shadow: '0px 1px 4px 0px rgba(0, 0, 0, 0.16)',
-    alignItems: 'flex-start',
-    width: '100%',
-  }),
-  variants: {
-    type: {
-      profile: { paddingX: '5rem', paddingY: '2.5rem', gap: '5rem' },
-      management: { padding: '2.5rem', justifyContent: 'space-between' },
-    },
-  },
-});
 
 // 텍스트 스타일
 const Text = {
@@ -370,7 +353,7 @@ const Setting = {
     base: hstack.raw({
       justifyContent: 'space-between',
       alignItems: 'center',
-      width: '23.25rem',
+      width: '100%',
       height: '3rem',
     }),
   }),
