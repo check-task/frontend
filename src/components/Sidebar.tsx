@@ -111,6 +111,10 @@ const sidebarStyleVariant = cva({
     bg: 'bg',
     transition: 'width 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
     overflow: 'hidden',
+    position: 'fixed',
+    top: '0',
+    left: '0',
+    zIndex: 10,
   },
   variants: {
     collapsed: {
