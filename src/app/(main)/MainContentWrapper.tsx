@@ -17,9 +17,11 @@ export const MainContentWrapper = ({ children }: MainContentWrapperProps) => {
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        // 사이드바가 접혀있을 때는 전체 화면 기준으로 중앙 정렬하기 위해 사이드바 너비 만큼 왼쪽으로 이동
+        pt: '5.25rem',
+        // 사이드바가 접혀있을 때는 전체 화면 기준으로 중앙 정렬하기 위해 사이드바 너비만큼 왼쪽으로 이동
         // 사이드바가 펼쳐져있을 때는 main 영역 기준으로 중앙 정렬
         marginLeft: isSidebarCollapsed ? '-2.25rem' : '0',
+        transition: 'margin-left 0.3s ease',
       })}
     >
       {children}
