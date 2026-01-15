@@ -1,6 +1,5 @@
 import { styled } from '../../../../styled-system/jsx';
 import { hstack, stack } from '../../../../styled-system/patterns';
-import { CloseIcon } from '@/components/icons/CloseIcon';
 import { ChevronDownIcon } from '@/components/icons/ChevronDownIcon';
 import { CameraIcon } from '@/components/icons/CameraIcon';
 import { Card } from '@/features/profile/components/Card';
@@ -10,6 +9,7 @@ import { EditProfileButton } from '@/features/profile/components/EditProfileButt
 import { WithdrawalButton } from '@/features/profile/components/WithdrawalButton';
 import { AddFolderButton } from '@/features/profile/components/AddFolderButton';
 import { EditFolderButton } from '@/features/profile/components/EditFolderButton';
+import { DeleteFolderButton } from '@/features/profile/components/DeleteFolderButton';
 
 // 프로필 설정 페이지
 export default function ProfilePage() {
@@ -110,7 +110,10 @@ export default function ProfilePage() {
                       folderName={folder.name}
                       folderColor={folder.color}
                     />
-                    <CloseIcon />
+                    <DeleteFolderButton
+                      folderName={folder.name}
+                      folderColor={folder.color}
+                    />
                   </Folder.Actions>
                 </Folder.Item>
               ))}
