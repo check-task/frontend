@@ -4,6 +4,7 @@ import { HomeButtonBar } from '@/components/HomeButtonBar';
 import { parseUICookie } from '@/lib/parse-ui-cookie';
 import { css } from '../../../styled-system/css';
 import { Modal } from '@/components/Modal';
+import { MainContentWrapper } from './MainContentWrapper';
 
 // 레이아웃 스타일
 const layoutContainerStyle = css({
@@ -36,8 +37,10 @@ export default async function MainLayout({
         initialTheme={initialUIState.theme}
       />
       <main className={mainContentStyle}>
-        <HomeButtonBar />
-        {children}
+        <MainContentWrapper>
+          <HomeButtonBar />
+          {children}
+        </MainContentWrapper>
       </main>
       <Modal />
     </div>
