@@ -1,4 +1,5 @@
 import { Button } from '@/components/Button';
+import { Divider } from '@/components/Divider';
 import { PlusButton } from '@/components/PlusButton';
 import { Input } from '@/components/TextField';
 import { FolderColorSelect } from '@/features/addassignment/components/FolderColorSelect';
@@ -17,7 +18,7 @@ const page = () => {
         <CheckboxHeader />
       </div>
 
-      <div className={dividerStyle} />
+      <Divider mt='1.75rem' mb='1.75rem' />
 
       {/* 과제명, 폴더색, 마감일 */}
       <div className={contentWrapperStyle}>
@@ -37,7 +38,7 @@ const page = () => {
         </div>
       </div>
 
-      <div className={dividerStyle} />
+      <Divider mt='1.75rem' mb='1.75rem' />
 
       {/* TASK, 자료 */}
       <div className={taskDataWrapperStyle}>
@@ -83,14 +84,6 @@ const HeaderStyle = css({
   flexDirection: 'column',
   w: 'full',
   gap: '1.25rem',
-});
-
-const dividerStyle = css({
-  border: '0.0625rem solid',
-  borderColor: 'gray.200',
-  width: 'full',
-  mt: '1.75rem',
-  mb: '1.75rem',
 });
 
 const contentWrapperStyle = css({
