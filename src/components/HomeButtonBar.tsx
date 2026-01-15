@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import Link from 'next/link';
 import { css } from 'styled-system/css';
 import { useUIStore } from '@/stores/ui-store';
 import { NotificationButton } from './NotificationButton';
@@ -10,11 +11,14 @@ export const HomeButtonBar = () => {
 
   return (
     <div className={containerStyle}>
-      <button
+      <Link
+        href='/'
         className={css({
           background: 'transparent',
           border: 'none',
           cursor: 'pointer',
+          textDecoration: 'none',
+          display: 'inline-block',
           // 사이드바가 접혀있을 때는 전체 화면 기준으로 중앙 정렬하기 위해 사이드바 너비만큼 왼쪽으로 이동
           // 사이드바가 펼쳐져있을 때는 main 영역 기준으로 중앙 정렬
           marginLeft: isSidebarCollapsed ? '0' : '14.75rem',
@@ -22,7 +26,7 @@ export const HomeButtonBar = () => {
         })}
       >
         <Image src='/HomeLogo.svg' alt='HomeLogo' width={240} height={44} />
-      </button>
+      </Link>
 
       <div className={notificationButtonWrapperStyle}>
         <NotificationButton />
