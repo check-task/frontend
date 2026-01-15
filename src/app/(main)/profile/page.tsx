@@ -1,6 +1,5 @@
 import { styled } from '../../../../styled-system/jsx';
 import { hstack, stack } from '../../../../styled-system/patterns';
-import { Button } from '@/components/Button';
 import { CloseIcon } from '@/components/icons/CloseIcon';
 import { PlusIcon } from '@/components/icons/PlusIcon';
 import { ChevronDownIcon } from '@/components/icons/ChevronDownIcon';
@@ -9,6 +8,7 @@ import { CameraIcon } from '@/components/icons/CameraIcon';
 import { Card } from '@/features/profile/components/Card';
 import { NotificationSetting } from '@/features/profile/components/NotificationSetting';
 import { FolderSetting } from '@/features/profile/components/FolderSetting';
+import { EditProfileButton } from '@/features/profile/components/EditProfileButton';
 
 // 프로필 설정 페이지
 export default function ProfilePage() {
@@ -37,9 +37,7 @@ export default function ProfilePage() {
             <Profile.BasicInfo>
               <Profile.InfoHeader>
                 <Text.SectionTitle>기본정보</Text.SectionTitle>
-                <Button variant='strokeBlue' size='tiny'>
-                  수정
-                </Button>
+                <EditProfileButton />
               </Profile.InfoHeader>
               <Profile.InfoContent>
                 {[
