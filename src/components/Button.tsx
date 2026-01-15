@@ -62,7 +62,7 @@ const button = cva({
 // Figma 디자인 위계에 있는 것만 허용
 type FillButtonProps = {
   variant?: 'fillBlue' | 'fillGray';
-  size?: 'xlarge' | 'large' | 'medium' | 'small';
+  size?: 'xlarge' | 'large' | 'medium' | 'small' | 'tiny';
 };
 
 type StrokeButtonProps = {

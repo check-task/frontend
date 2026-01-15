@@ -3,6 +3,7 @@ import { Sidebar } from '@/components/Sidebar';
 import { HomeButtonBar } from '@/components/HomeButtonBar';
 import { parseUICookie } from '@/lib/parse-ui-cookie';
 import { css } from '../../../styled-system/css';
+import { Modal } from '@/components/Modal';
 
 // 레이아웃 스타일
 const layoutContainerStyle = css({
@@ -38,6 +39,7 @@ export default async function MainLayout({
         <HomeButtonBar />
         {children}
       </main>
+      <Modal />
     </div>
   );
 }

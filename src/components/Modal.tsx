@@ -1,10 +1,12 @@
 'use client';
 
-import { useEffect, ReactNode } from 'react';
+import { useEffect, useState } from 'react';
 import { css, cva } from '../../styled-system/css';
 import { center, stack } from '../../styled-system/patterns';
 import { CloseIcon } from './icons/CloseIcon';
 import { ModalCheckIcon } from './icons/ModalCheckIcon';
+import { useModalStore } from '@/stores/modal-store';
+import { createPortal } from 'react-dom';
 
 // ===== 스타일 정의 =====
 //
@@ -51,7 +53,7 @@ const headerRecipe = cva({
     },
   },
 
-  // 기본은 체크 아이콘
+  // 기본은 닫기 아이콘
   defaultVariants: {
     type: 'withClose',
   },
@@ -64,36 +66,15 @@ const dividerStyle = css({
   width: 'full',
 });
 
-// ===== 타입 정의 =====
-
-interface ModalProps {
-  title: string;
-  onClose: () => void;
-  isOpen: boolean;
-  children?: ReactNode;
-  // 헤더 타입 (3가지)
-  headerType?: 'none' | 'withClose' | 'withCheck';
-  // 아이콘 클릭 시 실행할 추가 함수
-  onRightClick?: () => void;
-}
-
 // ===== 컴포넌트 =====
-export const Modal = ({
-  title,
-  onClose,
-  isOpen,
-  children,
-  headerType = 'withClose',
-  onRightClick,
-}: ModalProps) => {
-  if (!isOpen) return null;
+export const Modal = () => {
+  // 전역 상태 구독
+  const { isOpen, options, closeModal } = useModalStore();
 
   // 아이콘 클릭 핸들러
   const handleRightClick = () => {
-    if (onRightClick) {
-      onRightClick(); // 아이콘을 눌렀을 때 추가로 할 기능
-    }
-    onClose(); // 기본은 닫기
+    onRightClick?.();
+    closeModal();
   };
 
   //esc눌렀을 때
@@ -101,12 +82,12 @@ export const Modal = ({
     if (!isOpen) return;
     const handleEsc = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
-        onClose();
+        closeModal();
       }
     };
     window.addEventListener('keydown', handleEsc);
     return () => window.removeEventListener('keydown', handleEsc);
-  }, [isOpen, onClose]);
+  }, [isOpen, closeModal]);
 
   // 헤더 타입에 따른 아이콘 결정
   const renderIcon = () => {
@@ -116,22 +97,29 @@ export const Modal = ({
       <button
         type='button'
         onClick={handleRightClick}
-        className={css({ cursor: 'pointer', display: 'flex' })}
+        className={css({
+          cursor: 'pointer',
+          display: 'flex',
+        })}
       >
         {headerType === 'withClose' ? <CloseIcon /> : <ModalCheckIcon />}
       </button>
     );
   };
 
-  return (
+  // 모달이 열려있지 않거나 서버에서 실행되는 경우를 차단
+  if (!isOpen || !options || typeof window === 'undefined') return null;
+  const { title, content, headerType = 'withClose', onRightClick } = options;
+
+  return createPortal(
     // 오버레이 부분
-    <div className={overlayStyle} onClick={onClose}>
+    <div className={overlayStyle} onClick={closeModal}>
       {/* 모달 본체 */}
       <div onClick={(e) => e.stopPropagation()} className={modalContainerStyle}>
         <div className={stack({ gap: '1rem', width: 'full' })}>
           {/* 모달 해더 */}
           <header className={headerRecipe({ type: headerType })}>
-            <div className={css({ textStyle: 'body1.m', color: 'fg.default' })}>
+            <div className={css({ textStyle: 'body1.m', color: 'gray.900' })}>
               {title}
             </div>
             {renderIcon()}
@@ -140,8 +128,9 @@ export const Modal = ({
           <div className={dividerStyle} />
         </div>
         {/* 컨텐츠 영역 */}
-        <div className={css({ width: 'full' })}>{children}</div>
+        <div className={css({ width: 'full' })}>{content}</div>
       </div>
-    </div>
+    </div>,
+    document.body, // 이 위치로 렌더링됨
   );
 };
