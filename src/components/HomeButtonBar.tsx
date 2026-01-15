@@ -1,3 +1,5 @@
+'use client';
+
 import Image from 'next/image';
 import { css } from 'styled-system/css';
 import { NotificationButton } from './NotificationButton';
@@ -19,7 +21,8 @@ export const HomeButtonBar = () => {
 // 홈 버튼 바 컨테이너
 const containerStyle = css({
   position: 'relative',
-  pt: '2rem',
+  pt: '1.25rem',
+  pb: '1.25rem',
   width: '100%',
   display: 'flex',
   justifyContent: 'center',
