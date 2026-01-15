@@ -55,6 +55,7 @@ export const AddAssignmentDataModalToggle = ({
 // Container 스타일
 const containerStyle = cva({
   base: {
+    mt: '1.25rem',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
