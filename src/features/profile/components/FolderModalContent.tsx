@@ -2,13 +2,14 @@
 
 import { useState } from 'react';
 import { styled } from 'styled-system/jsx';
-import { stack, hstack } from 'styled-system/patterns';
+import { hstack } from 'styled-system/patterns';
 import { css } from 'styled-system/css';
 import { Button } from '@/components/Button';
 import { Input } from '@/components/TextField';
 import { useModalStore } from '@/stores/modal-store';
 import { FolderCheckMark } from '@/components/icons/FolderCheckMark';
 import { FolderColor, FOLDER_COLORS } from '@/types/folder';
+import { Modal } from '@/features/profile/components/ModalContent';
 
 interface FolderModalContentProps {
   mode: 'add' | 'edit';
@@ -39,10 +40,10 @@ export const FolderModalContent = ({
 
   return (
     <>
-      <Container>
+      <Modal.Container gap='large'>
         {/* 폴더명 */}
-        <FormField gap='name'>
-          <Label>폴더명</Label>
+        <Modal.FormField gap='small'>
+          <Modal.Label>폴더명</Modal.Label>
           <Input
             size='modal'
             type='text'
@@ -50,11 +51,11 @@ export const FolderModalContent = ({
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
-        </FormField>
+        </Modal.FormField>
 
         {/* 폴더색 */}
-        <FormField gap='color'>
-          <Label>폴더색</Label>
+        <Modal.FormField gap='medium'>
+          <Modal.Label>폴더색</Modal.Label>
           <ColorSection>
             {FOLDER_COLORS.map((color) => (
               <ColorButton
@@ -67,8 +68,8 @@ export const FolderModalContent = ({
               </ColorButton>
             ))}
           </ColorSection>
-        </FormField>
-      </Container>
+        </Modal.FormField>
+      </Modal.Container>
 
       {/* 저장 버튼 */}
       <Button
@@ -82,30 +83,6 @@ export const FolderModalContent = ({
     </>
   );
 };
-
-const Container = styled('div', {
-  base: stack.raw({
-    gap: '1.25rem',
-    paddingTop: '1.75rem',
-  }),
-});
-
-const FormField = styled('div', {
-  base: stack.raw({}),
-  variants: {
-    gap: {
-      name: { gap: '0.5rem' },
-      color: { gap: '0.75rem' },
-    },
-  },
-});
-
-const Label = styled('label', {
-  base: {
-    textStyle: 'body3.m',
-    color: 'gray.800',
-  },
-});
 
 const ColorSection = styled('div', {
   base: hstack.raw({

@@ -1,11 +1,11 @@
 'use client';
 
 import { styled } from 'styled-system/jsx';
-import { stack } from 'styled-system/patterns';
 import { css } from 'styled-system/css';
 import { Button } from '@/components/Button';
 import { Input } from '@/components/TextField';
 import { CameraIcon } from '@/components/icons/CameraIcon';
+import { Modal } from '@/features/profile/components/ModalContent';
 
 interface EditProfileModalContentProps {
   onSave?: () => void;
@@ -16,7 +16,7 @@ export const EditProfileModalContent = ({
 }: EditProfileModalContentProps) => {
   return (
     <>
-      <Container>
+      <Modal.Container gap='large'>
         {/* 프로필 이미지 */}
         <ImageSection>
           <ImageWrapper>
@@ -28,21 +28,21 @@ export const EditProfileModalContent = ({
         </ImageSection>
 
         {/* 입력 필드들 */}
-        <FormField>
-          <Label>닉네임</Label>
+        <Modal.FormField gap='small'>
+          <Modal.Label>닉네임</Modal.Label>
           <Input size='modal' type='text' placeholder='송월' />
-        </FormField>
+        </Modal.FormField>
 
-        <FormField>
-          <Label>연락처</Label>
+        <Modal.FormField gap='small'>
+          <Modal.Label>연락처</Modal.Label>
           <Input size='modal' type='tel' placeholder='010-1234-5678' />
-        </FormField>
+        </Modal.FormField>
 
-        <FormField>
-          <Label>이메일</Label>
+        <Modal.FormField gap='small'>
+          <Modal.Label>이메일</Modal.Label>
           <Input size='modal' type='email' placeholder='checktask@ct.kr' />
-        </FormField>
-      </Container>
+        </Modal.FormField>
+      </Modal.Container>
 
       {/* 저장 버튼 */}
       <Button
@@ -56,13 +56,6 @@ export const EditProfileModalContent = ({
     </>
   );
 };
-
-const Container = styled('div', {
-  base: stack.raw({
-    gap: '1.25rem',
-    paddingTop: '1.75rem',
-  }),
-});
 
 const ImageSection = styled('div', {
   base: {
@@ -106,18 +99,5 @@ const ImageOverlay = styled('div', {
     _hover: {
       opacity: 1,
     },
-  },
-});
-
-const FormField = styled('div', {
-  base: stack.raw({
-    gap: '0.5rem',
-  }),
-});
-
-const Label = styled('label', {
-  base: {
-    textStyle: 'body3.m',
-    color: 'gray.800',
   },
 });

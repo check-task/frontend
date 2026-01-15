@@ -1,10 +1,11 @@
 'use client';
 
 import { styled } from 'styled-system/jsx';
-import { stack, hstack } from 'styled-system/patterns';
+import { hstack } from 'styled-system/patterns';
 import { Button } from '@/components/Button';
 import { useModalStore } from '@/stores/modal-store';
 import { FolderColor } from '@/types/folder';
+import { Modal } from '@/features/profile/components/ModalContent';
 
 interface DeleteFolderModalContentProps {
   folderName: string;
@@ -26,57 +27,35 @@ export const DeleteFolderModalContent = ({
 
   return (
     <>
-      <Container>
+      <Modal.Container gap='small'>
         {/* 확인 메시지 */}
-        <MessageSection>
-          <Title>
+        <Modal.MessageSection>
+          <Modal.TitleInline>
             폴더명
             <FolderBadge>
               <FolderDot color={folderColor} />
               <FolderName color={folderColor}>{folderName}</FolderName>
             </FolderBadge>
             을(를) 삭제하시겠습니까?
-          </Title>
-          <Description>
+          </Modal.TitleInline>
+          <Modal.Description>
             삭제된 폴더와 폴더의 과제는 영구 삭제되며 되돌릴 수 없습니다.
-          </Description>
-        </MessageSection>
-      </Container>
+          </Modal.Description>
+        </Modal.MessageSection>
+      </Modal.Container>
 
       {/* 버튼 */}
-      <ButtonSection>
+      <Modal.ButtonSection marginTop='medium'>
         <Button variant='fillGray' size='xlarge' onClick={closeModal}>
           취소
         </Button>
         <Button variant='fillBlue' size='xlarge' onClick={handleDelete}>
           삭제
         </Button>
-      </ButtonSection>
+      </Modal.ButtonSection>
     </>
   );
 };
-
-const Container = styled('div', {
-  base: stack.raw({
-    gap: '0.5rem',
-    paddingTop: '1.75rem',
-  }),
-});
-
-const MessageSection = styled('div', {
-  base: stack.raw({
-    gap: '0.5rem',
-  }),
-});
-
-const Title = styled('p', {
-  base: hstack.raw({
-    gap: '0.5rem',
-    flexWrap: 'wrap',
-    textStyle: 'body2.m',
-    color: 'gray.800',
-  }),
-});
 
 const FolderBadge = styled('span', {
   base: hstack.raw({
@@ -117,18 +96,4 @@ const FolderDot = styled('span', {
       black: { bg: 'sub.05.100' },
     },
   },
-});
-
-const Description = styled('p', {
-  base: {
-    textStyle: 'body3.m',
-    color: 'gray.600',
-  },
-});
-
-const ButtonSection = styled('div', {
-  base: stack.raw({
-    marginTop: '1.125rem',
-    gap: '1rem',
-  }),
 });
