@@ -23,6 +23,7 @@ export const NotificationSetting = ({ children }: NotificationSettingProps) => {
 const notificationSettingStyle = cva({
   base: stack.raw({
     gap: '1.5rem',
+    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
   }),
   variants: {
     collapsed: {

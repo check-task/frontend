@@ -21,6 +21,7 @@ export const FolderSetting = ({ children }: FolderSettingProps) => {
 const folderSettingStyle = cva({
   base: stack.raw({
     gap: '1.5rem',
+    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
   }),
   variants: {
     collapsed: {
