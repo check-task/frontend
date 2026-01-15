@@ -1,9 +1,8 @@
 import { Button } from '@/components/Button';
 import { Divider } from '@/components/Divider';
 import { PlusButton } from '@/components/PlusButton';
-import { Input } from '@/components/TextField';
-import { FolderColorSelect } from '@/features/addassignment/components/FolderColorSelect';
 import { CheckboxHeader } from '@/features/addassignment/components/CheckboxHeader';
+import { AddAssignmentContent } from '@/features/addassignment/components/AddAssignmentContent';
 import React from 'react';
 import { css } from 'styled-system/css';
 
@@ -21,22 +20,7 @@ const page = () => {
       <Divider mt='1.75rem' mb='1.75rem' />
 
       {/* 과제명, 폴더색, 마감일 */}
-      <div className={contentWrapperStyle}>
-        <div className={contentItemStyle}>
-          <p className={labelTextStyle}>과제명</p>
-          <Input size='basic' placeholder='과제명을 입력하세요.' />
-        </div>
-
-        <div className={contentItemStyle}>
-          <p className={labelTextStyle}>폴더색</p>
-          <FolderColorSelect />
-        </div>
-
-        <div className={contentItemStyle}>
-          <p className={labelTextStyle}>마감일</p>
-          {/* DatePicker 추가 */}
-        </div>
-      </div>
+      <AddAssignmentContent />
 
       <Divider mt='1.75rem' mb='1.75rem' />
 
@@ -84,18 +68,6 @@ const HeaderStyle = css({
   flexDirection: 'column',
   w: 'full',
   gap: '1.25rem',
-});
-
-const contentWrapperStyle = css({
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '1.5rem',
-});
-
-const contentItemStyle = css({
-  display: 'flex',
-  gap: '1.75rem',
-  alignItems: 'center',
 });
 
 const taskDataWrapperStyle = css({
