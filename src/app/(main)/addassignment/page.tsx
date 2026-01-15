@@ -50,6 +50,7 @@ const containerStyle = css({
   w: '49.625rem',
   mt: '2.5rem',
   minHeight: 'calc(100vh - 5.25rem - 2.5rem)',
+  pb: '14.5rem',
 });
 
 const HeaderStyle = css({
@@ -68,8 +69,12 @@ const taskDataWrapperStyle = css({
 const buttonWrapperStyle = css({
   display: 'flex',
   justifyContent: 'space-between',
-  marginTop: 'auto',
-  marginBottom: '5rem',
+  position: 'fixed',
+  bottom: '5rem',
+  left: '50%',
+  transform: 'translateX(-50%)',
+  w: '49.625rem',
+  zIndex: 1000,
 });
 
 export default page;
