@@ -7,7 +7,7 @@ import { css } from 'styled-system/css';
 import { Button } from '@/components/Button';
 import { Input } from '@/components/TextField';
 import { useModalStore } from '@/stores/modal-store';
-import { CheckMark } from '@/components/icons/CheckMark';
+import { FolderCheckMark } from '@/components/icons/FolderCheckMark';
 import { FolderColor, FOLDER_COLORS } from '@/types/folder';
 
 interface FolderModalContentProps {
@@ -63,7 +63,7 @@ export const FolderModalContent = ({
                 color={color}
                 onClick={() => setSelectedColor(color)}
               >
-                {selectedColor === color && <CheckMark />}
+                {selectedColor === color && <FolderCheckMark />}
               </ColorButton>
             ))}
           </ColorSection>
