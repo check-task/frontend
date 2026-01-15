@@ -7,8 +7,7 @@ import { Button } from '@/components/Button';
 import { Input } from '@/components/TextField';
 import { useModalStore } from '@/stores/modal-store';
 import { CheckMark } from '@/components/icons/CheckMark';
-
-type FolderColor = 'red' | 'yellow' | 'green' | 'purple' | 'black';
+import { FolderColor, FOLDER_COLORS } from '@/types/folder';
 
 interface FolderModalContentProps {
   mode: 'add' | 'edit';
@@ -16,14 +15,6 @@ interface FolderModalContentProps {
   initialColor?: FolderColor;
   onSave?: (name: string, color: FolderColor) => void;
 }
-
-const FOLDER_COLORS: FolderColor[] = [
-  'red',
-  'yellow',
-  'green',
-  'purple',
-  'black',
-];
 
 export const FolderModalContent = ({
   mode,

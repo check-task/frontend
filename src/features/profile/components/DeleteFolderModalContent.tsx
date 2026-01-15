@@ -4,8 +4,7 @@ import { styled } from 'styled-system/jsx';
 import { stack, hstack } from 'styled-system/patterns';
 import { Button } from '@/components/Button';
 import { useModalStore } from '@/stores/modal-store';
-
-type FolderColor = 'red' | 'yellow' | 'green' | 'purple' | 'black';
+import { FolderColor } from '@/types/folder';
 
 interface DeleteFolderModalContentProps {
   folderName: string;

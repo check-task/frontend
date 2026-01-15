@@ -3,8 +3,7 @@
 import { useModalStore } from '@/stores/modal-store';
 import { FolderModalContent } from './FolderModalContent';
 import { PencilIcon } from '@/components/icons/PencilIcon';
-
-type FolderColor = 'red' | 'yellow' | 'green' | 'purple' | 'black';
+import { FolderColor } from '@/types/folder';
 
 interface EditFolderButtonProps {
   folderName: string;

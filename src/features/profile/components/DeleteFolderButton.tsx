@@ -3,8 +3,7 @@
 import { useModalStore } from '@/stores/modal-store';
 import { DeleteFolderModalContent } from './DeleteFolderModalContent';
 import { CloseIcon } from '@/components/icons/CloseIcon';
-
-type FolderColor = 'red' | 'yellow' | 'green' | 'purple' | 'black';
+import { FolderColor } from '@/types/folder';
 
 interface DeleteFolderButtonProps {
   folderName: string;
