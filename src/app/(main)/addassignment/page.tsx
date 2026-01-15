@@ -1,8 +1,9 @@
 import { Button } from '@/components/Button';
 import { Divider } from '@/components/Divider';
-import { PlusButton } from '@/components/PlusButton';
 import { CheckboxHeader } from '@/features/addassignment/components/CheckboxHeader';
 import { AddAssignmentContent } from '@/features/addassignment/components/AddAssignmentContent';
+import { AddAssignmentTask } from '@/features/addassignment/components/AddAssignmentTask';
+import { AddAssignmentData } from '@/features/addassignment/components/AddAssignmentData';
 import React from 'react';
 import { css } from 'styled-system/css';
 
@@ -26,15 +27,8 @@ const page = () => {
 
       {/* TASK, 자료 */}
       <div className={taskDataWrapperStyle}>
-        <div className={taskDataItemStyle}>
-          <p className={labelTextStyle}>TASK</p>
-          <PlusButton>TASK 추가하기</PlusButton>
-        </div>
-
-        <div className={taskDataItemStyle}>
-          <p className={labelTextStyle}>자료</p>
-          <PlusButton className={css({ ml: '1rem' })}>자료 추가하기</PlusButton>
-        </div>
+        <AddAssignmentTask />
+        <AddAssignmentData />
       </div>
 
       {/* 취소, 저장 */}
@@ -58,11 +52,6 @@ const containerStyle = css({
   minHeight: 'calc(100vh - 5.25rem - 2.5rem)',
 });
 
-const labelTextStyle = css({
-  textStyle: 'body1.m',
-  color: 'gray.900',
-});
-
 const HeaderStyle = css({
   display: 'flex',
   flexDirection: 'column',
@@ -74,12 +63,6 @@ const taskDataWrapperStyle = css({
   display: 'flex',
   flexDirection: 'column',
   gap: '1.75rem',
-});
-
-const taskDataItemStyle = css({
-  display: 'flex',
-  gap: '2rem',
-  alignItems: 'center',
 });
 
 const buttonWrapperStyle = css({
