@@ -21,7 +21,7 @@ export const AddAssignmentTask = () => {
         className={css({
           display: 'flex',
           flexDirection: 'column',
-          gap: 0,
+          gap: '1rem',
           flex: showTaskInput ? 1 : 'none',
         })}
       >
@@ -30,7 +30,7 @@ export const AddAssignmentTask = () => {
             key={id}
             size='basic'
             placeholder='TASK명을 입력하세요.'
-            className={css({ flex: 1, mb: '1.25rem' })}
+            className={css({ flex: 1 })}
           />
         ))}
         {/* TODO: DatePicker 추가 */}
