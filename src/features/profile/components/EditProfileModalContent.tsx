@@ -2,6 +2,7 @@
 
 import { styled } from 'styled-system/jsx';
 import { stack } from 'styled-system/patterns';
+import { css } from 'styled-system/css';
 import { Button } from '@/components/Button';
 import { Input } from '@/components/TextField';
 import { CameraIcon } from '@/components/icons/CameraIcon';
@@ -48,9 +49,7 @@ export const EditProfileModalContent = ({
         variant='fillBlue'
         size='xlarge'
         onClick={onSave}
-        style={{
-          marginTop: '2.125rem',
-        }}
+        className={css({ marginTop: '2.125rem' })}
       >
         변경사항 저장
       </Button>

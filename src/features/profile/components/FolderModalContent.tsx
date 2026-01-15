@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { styled } from 'styled-system/jsx';
 import { stack, hstack } from 'styled-system/patterns';
+import { css } from 'styled-system/css';
 import { Button } from '@/components/Button';
 import { Input } from '@/components/TextField';
 import { useModalStore } from '@/stores/modal-store';
@@ -74,7 +75,7 @@ export const FolderModalContent = ({
         variant='fillBlue'
         size='xlarge'
         onClick={handleSave}
-        style={{ marginTop: '2.5rem' }}
+        className={css({ marginTop: '2.5rem' })}
       >
         {mode === 'edit' ? '변경사항 저장' : '저장'}
       </Button>
