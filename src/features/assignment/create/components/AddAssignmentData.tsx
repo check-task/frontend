@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Input } from '@/components/TextField';
 import { PlusButton } from '@/components/PlusButton';
 import { useModalStore } from '@/stores/modal-store';
-import { AddAssignmentDataModal } from './AddAssignmentDataModal';
+import { AddAssignmentDataModal } from '../../components/AddAssignmentDataModal';
 import { css } from 'styled-system/css';
 
 interface DataItem {
