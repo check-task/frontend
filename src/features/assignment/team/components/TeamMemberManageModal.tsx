@@ -1,11 +1,10 @@
 import { css } from 'styled-system/css';
-import { TeamInviteButton } from './TeamInviteButton';
 import { TeamMemberManageModalItem } from './TeamMemberManageModalItem';
 
 export const TeamMemberManageModal = () => {
   return (
     <div className={modalContentStyle}>
-      <TeamInviteButton />
+      {/* TODO: 팀원 초대 버튼 모달 타이틀에 추가 */}
       <TeamMemberManageModalItem
         nickname='멤버 닉네임'
         role='Owner'
