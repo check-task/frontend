@@ -11,6 +11,8 @@ interface TaskToggleProps {
   teamCount?: number;
   // 토글 버튼 클릭시 실행되는 콜백 함수(현재 선택된 타입을 전달)
   onToggle?: (type: 'personal' | 'team') => void;
+  // url에 따라 상태가 바뀌도록 (추가)
+  selectedType: 'personal' | 'team';
 }
 
 export function TaskToggle({
@@ -18,34 +20,32 @@ export function TaskToggle({
   personalCount = 0,
   teamCount = 0,
   onToggle,
-}: Omit<TaskToggleProps, 'collapsed'>) {
+  selectedType,
+}: TaskToggleProps) {
   // 상태 관리
   const isSidebarCollapsed = useUIStore((state) => state.isSidebarCollapsed);
-  // 개인,팀 과제
-  const [active, setActive] = useState<'personal' | 'team'>('personal');
 
   const handlePress = (type: 'personal' | 'team') => {
-    setActive(type); // 상태에 따른 ui 설정
     onToggle?.(type); // 클릭되었음을 부모에게 알리기
   };
 
   return (
     <div className={containerStyle({ collapsed: isSidebarCollapsed })}>
       <div
-        className={buttonStyle({ active: active === 'personal' })}
+        className={buttonStyle({ active: selectedType === 'personal' })}
         onClick={() => handlePress('personal')}
       >
         <span>개인과제</span>
-        <span className={countStyle({ active: active === 'personal' })}>
+        <span className={countStyle({ active: selectedType === 'personal' })}>
           {personalCount}
         </span>
       </div>
       <div
-        className={buttonStyle({ active: active === 'team' })}
+        className={buttonStyle({ active: selectedType === 'team' })}
         onClick={() => handlePress('team')}
       >
         <span>팀과제</span>
-        <span className={countStyle({ active: active === 'team' })}>
+        <span className={countStyle({ active: selectedType === 'team' })}>
           {teamCount}
         </span>
       </div>
