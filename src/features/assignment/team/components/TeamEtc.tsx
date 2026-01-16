@@ -1,20 +1,59 @@
+'use client';
+
+import { useState } from 'react';
 import { PlusButton } from '@/components/PlusButton';
 import { css } from 'styled-system/css';
+import { useModalStore } from '@/stores/modal-store';
+import { TeamCommunicationModal } from './TeamCommunicationModal';
+
+interface CommunicationItem {
+  id: number;
+  name: string;
+  url: string;
+}
 
 export const TeamEtc = () => {
+  const { openModal, closeModal } = useModalStore();
+  const [communications, setCommunications] = useState<CommunicationItem[]>([]);
+
+  const handleOpenCommunicationModal = () => {
+    openModal({
+      title: '커뮤니케이션 추가',
+      content: (
+        <TeamCommunicationModal
+          onSave={(items) => {
+            setCommunications((prev) => [...prev, ...items]);
+            closeModal();
+          }}
+        />
+      ),
+    });
+  };
+
   return (
     <div className={etcContainerStyle}>
       <div className={etcTypeContainerStyle}>
         <div className={etcTypeTitleStyle}>
           <p className={etcTitleStyle}>커뮤니케이션</p>
-          <PlusButton>커뮤니케이션 추가</PlusButton>
+          <PlusButton onClick={handleOpenCommunicationModal}>
+            커뮤니케이션 추가
+          </PlusButton>
         </div>
 
         <div className={etcCardContainerStyle}>
-          <div className={etcCardStyle}>
-            <p className={cardTitleStyle}>웬투밋 추가</p>
-            <p className={cardContentStyle}>내용내용내용</p>
-          </div>
+          {communications.length > 0 ? (
+            communications.map((item) => (
+              <div key={item.id} className={etcCardStyle}>
+                <p className={cardTitleStyle}>{item.name}</p>
+                <p className={cardContentStyle}>{item.url}</p>
+              </div>
+            ))
+          ) : (
+            <div className={etcCardStyle}>
+              <p className={cardTitleStyle}>웬투밋 추가</p>
+              <p className={cardContentStyle}>내용내용내용</p>
+            </div>
+          )}
         </div>
       </div>
 
