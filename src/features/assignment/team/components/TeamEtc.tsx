@@ -5,6 +5,7 @@ import { PlusButton } from '@/components/PlusButton';
 import { css } from 'styled-system/css';
 import { useModalStore } from '@/stores/modal-store';
 import { TeamCommunicationModal } from './TeamCommunicationModal';
+import { AddAssignmentDataModal } from '@/features/assignment/components/AddAssignmentDataModal';
 
 interface CommunicationItem {
   id: number;
@@ -12,9 +13,17 @@ interface CommunicationItem {
   url: string;
 }
 
+interface DataItem {
+  id: number;
+  type: 0 | 1;
+  name: string;
+  path: string;
+}
+
 export const TeamEtc = () => {
   const { openModal, closeModal } = useModalStore();
   const [communications, setCommunications] = useState<CommunicationItem[]>([]);
+  const [dataItems, setDataItems] = useState<DataItem[]>([]);
 
   const handleOpenCommunicationModal = () => {
     openModal({
@@ -23,6 +32,20 @@ export const TeamEtc = () => {
         <TeamCommunicationModal
           onSave={(items) => {
             setCommunications((prev) => [...prev, ...items]);
+            closeModal();
+          }}
+        />
+      ),
+    });
+  };
+
+  const handleOpenDataModal = () => {
+    openModal({
+      title: '자료 추가',
+      content: (
+        <AddAssignmentDataModal
+          onSave={(items) => {
+            setDataItems((prev) => [...prev, ...items]);
             closeModal();
           }}
         />
@@ -74,14 +97,23 @@ export const TeamEtc = () => {
       <div className={etcTypeContainerStyle}>
         <div className={etcTypeTitleStyle}>
           <p className={etcTitleStyle}>자료 모음집</p>
-          <PlusButton>자료 추가</PlusButton>
+          <PlusButton onClick={handleOpenDataModal}>자료 추가</PlusButton>
         </div>
 
         <div className={etcCardContainerStyle}>
-          <div className={etcCardStyle}>
-            <p className={cardTitleStyle}>웬투밋 추가</p>
-            <p className={cardContentStyle}>내용내용내용</p>
-          </div>
+          {dataItems.length > 0 ? (
+            dataItems.map((item) => (
+              <div key={item.id} className={etcCardStyle}>
+                <p className={cardTitleStyle}>{item.name}</p>
+                <p className={cardContentStyle}>{item.path}</p>
+              </div>
+            ))
+          ) : (
+            <div className={etcCardStyle}>
+              <p className={cardTitleStyle}>웬투밋 추가</p>
+              <p className={cardContentStyle}>내용내용내용</p>
+            </div>
+          )}
         </div>
       </div>
     </div>
