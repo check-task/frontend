@@ -5,6 +5,7 @@ import { ChevronDownIcon } from '@/components/icons/ChevronDownIcon';
 import { AssignmentCard } from '@/features/home/components/AssignmentCard';
 import { FilterChipGroup } from '@/features/home/components/FilterChipGroup';
 import { SortTabs } from '@/features/home/components/SortTabs';
+import Link from 'next/link';
 
 // 샘플 폴더 데이터
 const folders = [
@@ -24,9 +25,12 @@ export default function Home() {
           <Text.DateTitle>2025년 11월</Text.DateTitle>
           <ChevronDownIcon />
         </Container.DateSelector>
-        <Button variant='fillBlue' size='small'>
-          과제등록
-        </Button>
+
+        <Link href='/assignment/create'>
+          <Button variant='fillBlue' size='small'>
+            과제등록
+          </Button>
+        </Link>
       </Container.Header>
 
       {/* 폴더 필터 바 */}
