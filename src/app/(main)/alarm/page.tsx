@@ -1,6 +1,4 @@
-import { css } from 'styled-system/css';
-import { flex } from 'styled-system/patterns';
-import { AlarmListContainer } from './components/AlarmListContainer';
+import { AlarmListContainer } from '@/features/alarm/components/AlarmListContainer';
 
 export default function AlarmPage() {
   return (
