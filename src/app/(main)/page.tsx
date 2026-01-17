@@ -126,7 +126,6 @@ const Container = {
   Page: styled('div', {
     base: stack.raw({
       gap: '1.5rem',
-      width: '75rem',
       marginY: '2rem',
     }),
   }),
@@ -168,7 +167,6 @@ const Container = {
   AssignmentList: styled('div', {
     base: stack.raw({
       gap: '1.25rem',
-      width: '27.375rem',
     }),
   }),
   AssignmentListHeader: styled('div', {

@@ -1,6 +1,9 @@
+'use client';
+
 import { styled } from 'styled-system/jsx';
 import { hstack, stack } from 'styled-system/patterns';
 import { FolderColor } from '@/types/folder';
+import { useUIStore } from '@/stores/ui-store';
 
 export type ColorBrightness = 'high' | 'medium' | 'low';
 
@@ -32,12 +35,15 @@ export const AssignmentCard = ({
   progressColor,
   index = 0,
 }: AssignmentCardProps) => {
+  const isSidebarCollapsed = useUIStore((state) => state.isSidebarCollapsed);
   const brightness = getBrightness(index);
 
   return (
-    <Card.Wrapper>
+    <Card.Wrapper
+      css={{ width: isSidebarCollapsed ? '27.375rem' : '22.75rem' }}
+    >
       <Card.AccentBar color={folderColor} brightness={brightness} />
-      <Card.Content>
+      <Card.Content css={{ gap: isSidebarCollapsed ? '3.875rem' : '0.625rem' }}>
         <Card.Left>
           <Card.FolderName color={folderColor} brightness={brightness}>
             {folderName}
@@ -74,8 +80,7 @@ const Card = {
   Wrapper: styled('div', {
     base: hstack.raw({
       gap: 0,
-      width: '27.375rem',
-      bg: 'white',
+      bg: 'gray.0',
       borderRadius: '0.75rem',
       boxShadow: '0 1px 4px 0 rgba(0, 0, 0, 0.16)',
       cursor: 'pointer',
@@ -124,7 +129,6 @@ const Card = {
   }),
   Content: styled('div', {
     base: hstack.raw({
-      gap: '3.875rem',
       paddingY: '1.5rem',
       paddingLeft: '1.5rem',
       flex: 1,
