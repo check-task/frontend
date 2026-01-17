@@ -2,8 +2,8 @@
 
 import { css, cva } from 'styled-system/css';
 import { flex } from 'styled-system/patterns';
-import { AlarmIcon } from './icons/AlarmIcon';
-import { AlarmCloseIcon } from './icons/AlarmCloseIcon';
+import { AlarmIcon } from '@/components/icons/AlarmIcon';
+import { AlarmCloseIcon } from '@/components/icons/AlarmCloseIcon';
 
 export interface AlarmCardProps {
   taskTitle: string; // 과제 제목
