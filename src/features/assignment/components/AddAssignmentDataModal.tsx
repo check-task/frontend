@@ -8,7 +8,7 @@ import { FileUploadIcon } from '@/components/icons/FileUploadIcon';
 import { URLUploadIcon } from '@/components/icons/URLUploadIcon';
 import { AddAssignmentDataModalToggle } from './AddAssignmentDataModalToggle';
 import { css } from 'styled-system/css';
-import { AddURLDataButton } from './AddURLDataButton';
+import { AddURLDataButton } from '../create/components/AddURLDataButton';
 
 interface DataItem {
   id: number;
