@@ -136,7 +136,7 @@ const Container = {
   }),
   Calendar: styled('div', {
     base: {
-      width: '46.125rem',
+      width: '45.9375rem',
       height: '44rem',
       border: '0.0625rem solid',
       borderColor: 'gray.200',
