@@ -5,6 +5,7 @@ import { ChevronDownIcon } from '@/components/icons/ChevronDownIcon';
 import { AssignmentCard } from '@/features/home/components/AssignmentCard';
 import { FilterChipGroup } from '@/features/home/components/FilterChipGroup';
 import { SortTabs } from '@/features/home/components/SortTabs';
+import { Calendar } from '@/features/home/components/Calendar';
 import Link from 'next/link';
 
 // 샘플 폴더 데이터
@@ -22,7 +23,7 @@ export default function Home() {
       {/* 년/월 선택 + 과제등록 버튼 */}
       <Container.Header>
         <Container.DateSelector>
-          <Text.DateTitle>2025년 11월</Text.DateTitle>
+          <Text.DateTitle>2026년 1월</Text.DateTitle>
           <ChevronDownIcon />
         </Container.DateSelector>
 
@@ -40,7 +41,7 @@ export default function Home() {
       <Container.Main>
         {/* 캘린더 */}
         <Container.Calendar>
-          <CalendarPlaceholder />
+          <Calendar />
         </Container.Calendar>
 
         {/* 과제목록 */}
@@ -109,23 +110,6 @@ export default function Home() {
   );
 }
 
-// 캘린더 Placeholder 컴포넌트
-const CalendarPlaceholder = () => (
-  <div
-    className={stack({
-      width: '100%',
-      height: '100%',
-      bg: 'white',
-      boxShadow: '-1px 1px 4px 0 rgba(0, 0, 0, 0.08)',
-      borderRadius: '0.75rem',
-      alignItems: 'center',
-      justifyContent: 'center',
-    })}
-  >
-    <Text.CalendarPlaceholder>캘린더 영역</Text.CalendarPlaceholder>
-  </div>
-);
-
 const Container = {
   Page: styled('div', {
     base: stack.raw({
@@ -166,6 +150,10 @@ const Container = {
     base: {
       width: '46.125rem',
       height: '44rem',
+      border: '0.0625rem solid',
+      borderColor: 'gray.200',
+      borderRadius: '0.75rem',
+      boxShadow: '-1px 1px 4px 0 rgba(0, 0, 0, 0.08)',
     },
   }),
   AssignmentList: styled('div', {
@@ -197,12 +185,6 @@ const Text = {
     base: {
       textStyle: 'h4',
       color: 'gray.900',
-    },
-  }),
-  CalendarPlaceholder: styled('span', {
-    base: {
-      textStyle: 'body2.m',
-      color: 'gray.400',
     },
   }),
 };
