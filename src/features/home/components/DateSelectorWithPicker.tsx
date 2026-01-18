@@ -5,23 +5,32 @@ import { styled } from 'styled-system/jsx';
 import { hstack } from 'styled-system/patterns';
 import { MonthPickerIcon } from '@/components/icons/MonthPickerIcon';
 import MonthPicker from '@/components/MonthPicker';
+import { useCalendarStore } from '@/stores/calendar-store';
 
 export const DateSelectorWithPicker = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const currentYear = useCalendarStore((state) => state.currentYear);
+  const currentMonth = useCalendarStore((state) => state.currentMonth);
 
   const togglePicker = () => {
     setIsOpen(!isOpen);
   };
 
+  const closePicker = () => {
+    setIsOpen(false);
+  };
+
   return (
     <Container>
       <DateSelector onClick={togglePicker}>
-        <DateTitle>2026년 1월</DateTitle>
+        <DateTitle>
+          {currentYear}년 {currentMonth}월
+        </DateTitle>
         <MonthPickerIcon />
       </DateSelector>
       {isOpen && (
         <PickerWrapper>
-          <MonthPicker />
+          <MonthPicker onClose={closePicker} />
         </PickerWrapper>
       )}
     </Container>

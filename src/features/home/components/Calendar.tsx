@@ -1,11 +1,13 @@
 'use client';
 
+import { useRef, useEffect } from 'react';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import '@/styles/fullcalendar.css';
 import { token } from 'styled-system/tokens';
 import type { FolderColor } from '@/types/folder';
+import { useCalendarStore } from '@/stores/calendar-store';
 
 // FolderColor → Panda CSS 토큰 매핑
 const FOLDER_COLOR_MAP: Record<FolderColor, string> = {
@@ -39,8 +41,22 @@ const sampleEvents = [
 ];
 
 export const Calendar = () => {
+  const calendarRef = useRef<FullCalendar>(null);
+  const currentYear = useCalendarStore((state) => state.currentYear);
+  const currentMonth = useCalendarStore((state) => state.currentMonth);
+
+  // 스토어 날짜가 변경되면 캘린더 이동
+  useEffect(() => {
+    const calendarApi = calendarRef.current?.getApi();
+    if (calendarApi) {
+      // new Date()는 월이 0부터 시작하므로 -1
+      calendarApi.gotoDate(new Date(currentYear, currentMonth - 1, 1));
+    }
+  }, [currentYear, currentMonth]);
+
   return (
     <FullCalendar
+      ref={calendarRef}
       plugins={[dayGridPlugin, interactionPlugin]}
       initialView='dayGridMonth'
       events={sampleEvents}
