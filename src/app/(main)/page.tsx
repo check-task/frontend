@@ -1,7 +1,7 @@
 import { styled } from 'styled-system/jsx';
 import { hstack, stack } from 'styled-system/patterns';
 import { Button } from '@/components/Button';
-import { ChevronDownIcon } from '@/components/icons/ChevronDownIcon';
+import { MonthPickerIcon } from '@/components/icons/MonthPickerIcon';
 import { AssignmentCard } from '@/features/home/components/AssignmentCard';
 import { FilterChipGroup } from '@/features/home/components/FilterChipGroup';
 import { SortTabs } from '@/features/home/components/SortTabs';
@@ -24,7 +24,7 @@ export default function Home() {
       <Container.Header>
         <Container.DateSelector>
           <Text.DateTitle>2026년 1월</Text.DateTitle>
-          <ChevronDownIcon />
+          <MonthPickerIcon />
         </Container.DateSelector>
 
         <Link href='/assignment/create'>
