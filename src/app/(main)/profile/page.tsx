@@ -1,6 +1,5 @@
 import { styled } from '../../../../styled-system/jsx';
 import { hstack, stack } from '../../../../styled-system/patterns';
-import { ChevronDownIcon } from '@/components/icons/ChevronDownIcon';
 import { CameraIcon } from '@/components/icons/CameraIcon';
 import { Card } from '@/features/profile/components/Card';
 import { NotificationSetting } from '@/features/profile/components/NotificationSetting';
