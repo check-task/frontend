@@ -29,7 +29,9 @@ export const HomeButtonBar = () => {
       </Link>
 
       <div className={notificationButtonWrapperStyle}>
-        <NotificationButton />
+        <Link href='/alarm'>
+          <NotificationButton />
+        </Link>
       </div>
     </div>
   );
