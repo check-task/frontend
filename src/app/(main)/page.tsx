@@ -17,6 +17,60 @@ const folders = [
   { id: '5', name: '캡스톤', color: 'black' as const },
 ];
 
+// 샘플 과제 데이터
+const sampleAssignments = [
+  {
+    id: '1',
+    folderName: '그만세',
+    folderColor: 'red' as const,
+    dDay: 'D-43',
+    assignmentName: '프로그래밍 1차 과제',
+    assignmentType: '개인/팀',
+    progress: 81,
+    progressColor: 'red' as const,
+  },
+  {
+    id: '2',
+    folderName: '폴더명',
+    folderColor: 'yellow' as const,
+    dDay: 'D-40',
+    assignmentName: '과제 2',
+    assignmentType: '개인/팀',
+    progress: 82,
+    progressColor: 'yellow' as const,
+  },
+  {
+    id: '3',
+    folderName: '폴더명',
+    folderColor: 'green' as const,
+    dDay: 'D-37',
+    assignmentName: '과제 3',
+    assignmentType: '개인/팀',
+    progress: 62,
+    progressColor: 'green' as const,
+  },
+  {
+    id: '4',
+    folderName: '폴더명',
+    folderColor: 'purple' as const,
+    dDay: 'D-23',
+    assignmentName: '과제 4',
+    assignmentType: '개인/팀',
+    progress: 61,
+    progressColor: 'purple' as const,
+  },
+  {
+    id: '5',
+    folderName: '폴더명',
+    folderColor: 'green' as const,
+    dDay: 'D-13',
+    assignmentName: '과제 5',
+    assignmentType: '개인/팀',
+    progress: 50,
+    progressColor: 'green' as const,
+  },
+];
+
 export default function Home() {
   return (
     <Container.Page>
@@ -50,56 +104,19 @@ export default function Home() {
 
           {/* 과제 카드 리스트 */}
           <Container.AssignmentCards>
-            <AssignmentCard
-              index={0}
-              folderName='그만세'
-              folderColor='red'
-              dDay='D-43'
-              assignmentName='프로그래밍 1차 과제'
-              assignmentType='개인/팀'
-              progress={82}
-              progressColor='red'
-            />
-            <AssignmentCard
-              index={1}
-              folderName='폴더명'
-              folderColor='yellow'
-              dDay='D-43'
-              assignmentName='과제 1'
-              assignmentType='개인/팀'
-              progress={82}
-              progressColor='yellow'
-            />
-            <AssignmentCard
-              index={2}
-              folderName='폴더명'
-              folderColor='green'
-              dDay='D-43'
-              assignmentName='과제 1'
-              assignmentType='개인/팀'
-              progress={82}
-              progressColor='green'
-            />
-            <AssignmentCard
-              index={3}
-              folderName='폴더명'
-              folderColor='purple'
-              dDay='D-43'
-              assignmentName='과제 1'
-              assignmentType='개인/팀'
-              progress={82}
-              progressColor='purple'
-            />
-            <AssignmentCard
-              index={4}
-              folderName='폴더명'
-              folderColor='green'
-              dDay='D-43'
-              assignmentName='과제 1'
-              assignmentType='개인/팀'
-              progress={82}
-              progressColor='green'
-            />
+            {sampleAssignments.map((assignment, index) => (
+              <AssignmentCard
+                key={assignment.id}
+                index={index}
+                folderName={assignment.folderName}
+                folderColor={assignment.folderColor}
+                dDay={assignment.dDay}
+                assignmentName={assignment.assignmentName}
+                assignmentType={assignment.assignmentType}
+                progress={assignment.progress}
+                progressColor={assignment.progressColor}
+              />
+            ))}
           </Container.AssignmentCards>
         </Container.AssignmentList>
       </Container.Main>
