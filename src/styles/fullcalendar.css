@@ -64,9 +64,10 @@
 /* 날짜 셀 */
 .fc .fc-daygrid-day {
   border: 0.0625rem solid var(--colors-gray-200);
-  height: 6.875rem;
+  height: 6.875rem !important;
   background: var(--colors-gray-0);
   padding: 0.5rem;
+  padding-right: 0;
   width: 6.5625rem;
 }
 
@@ -111,6 +112,8 @@
   height: 1.25rem;
   margin: 0 !important;
   margin-bottom: 0.125rem !important;
+  display: inline-block;
+  max-width: 100%;
 }
 
 /* 이벤트 텍스트 기본 색상 */

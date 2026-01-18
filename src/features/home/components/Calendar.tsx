@@ -34,7 +34,7 @@ const sampleEvents = [
   },
   {
     id: '3',
-    title: '세부 TASK명',
+    title: 'TASK',
     start: '2026-01-24',
     backgroundColor: FOLDER_COLOR_MAP['green'],
   },
