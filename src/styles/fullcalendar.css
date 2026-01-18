@@ -12,13 +12,13 @@
 
 /* 캘린더 내부 컨테이너 크기 고정 */
 .fc .fc-scroller-harness {
-  width: 735px;
-  height: 44px;
+  width: 45.9375rem;
+  height: 2.75rem;
 }
 
 .fc .fc-scroller-harness-liquid {
-  width: 735px;
-  height: 660px;
+  width: 45.9375rem;
+  height: 41.25rem;
 }
 
 /* 테이블 외곽 border 제거 */
