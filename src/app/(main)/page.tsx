@@ -114,7 +114,6 @@ export default function Home() {
                 assignmentName={assignment.assignmentName}
                 assignmentType={assignment.assignmentType}
                 progress={assignment.progress}
-                progressColor={assignment.progressColor}
               />
             ))}
           </Container.AssignmentCards>

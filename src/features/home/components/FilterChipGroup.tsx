@@ -63,7 +63,7 @@ const FilterChip = ({
   onClick,
 }: FilterChipProps) => (
   <Chip.Wrapper active={active} color={color} onClick={onClick}>
-    <Chip.Dot color={color} active={active} />
+    <Chip.Dot active={active} />
     <Chip.Text active={active}>{children}</Chip.Text>
   </Chip.Wrapper>
 );
@@ -85,30 +85,33 @@ const Chip = {
       cursor: 'pointer',
     }),
     variants: {
-      active: {
-        true: {},
-        false: {},
-      },
       color: {
-        red: {},
-        yellow: {},
-        green: {},
-        purple: {},
-        black: {},
+        red: {
+          '--chip-color-100': 'token(colors.sub.01.100)',
+          '--chip-color-40': 'token(colors.sub.01.40)',
+        },
+        yellow: {
+          '--chip-color-100': 'token(colors.sub.02.100)',
+          '--chip-color-40': 'token(colors.sub.02.40)',
+        },
+        green: {
+          '--chip-color-100': 'token(colors.sub.03.100)',
+          '--chip-color-40': 'token(colors.sub.03.40)',
+        },
+        purple: {
+          '--chip-color-100': 'token(colors.sub.04.100)',
+          '--chip-color-40': 'token(colors.sub.04.40)',
+        },
+        black: {
+          '--chip-color-100': 'token(colors.sub.05.100)',
+          '--chip-color-40': 'token(colors.sub.05.40)',
+        },
+      },
+      active: {
+        true: { borderColor: 'var(--chip-color-100)' },
+        false: { borderColor: 'var(--chip-color-40)' },
       },
     },
-    compoundVariants: [
-      { active: true, color: 'red', css: { borderColor: 'sub.01.100' } },
-      { active: true, color: 'yellow', css: { borderColor: 'sub.02.100' } },
-      { active: true, color: 'green', css: { borderColor: 'sub.03.100' } },
-      { active: true, color: 'purple', css: { borderColor: 'sub.04.100' } },
-      { active: true, color: 'black', css: { borderColor: 'sub.05.100' } },
-      { active: false, color: 'red', css: { borderColor: 'sub.01.40' } },
-      { active: false, color: 'yellow', css: { borderColor: 'sub.02.40' } },
-      { active: false, color: 'green', css: { borderColor: 'sub.03.40' } },
-      { active: false, color: 'purple', css: { borderColor: 'sub.04.40' } },
-      { active: false, color: 'black', css: { borderColor: 'sub.05.40' } },
-    ],
     defaultVariants: {
       active: false,
     },
@@ -121,29 +124,10 @@ const Chip = {
     },
     variants: {
       active: {
-        true: {},
-        false: {},
-      },
-      color: {
-        red: {},
-        yellow: {},
-        green: {},
-        purple: {},
-        black: {},
+        true: { bg: 'var(--chip-color-100)' },
+        false: { bg: 'var(--chip-color-40)' },
       },
     },
-    compoundVariants: [
-      { active: true, color: 'red', css: { bg: 'sub.01.100' } },
-      { active: true, color: 'yellow', css: { bg: 'sub.02.100' } },
-      { active: true, color: 'green', css: { bg: 'sub.03.100' } },
-      { active: true, color: 'purple', css: { bg: 'sub.04.100' } },
-      { active: true, color: 'black', css: { bg: 'sub.05.100' } },
-      { active: false, color: 'red', css: { bg: 'sub.01.40' } },
-      { active: false, color: 'yellow', css: { bg: 'sub.02.40' } },
-      { active: false, color: 'green', css: { bg: 'sub.03.40' } },
-      { active: false, color: 'purple', css: { bg: 'sub.04.40' } },
-      { active: false, color: 'black', css: { bg: 'sub.05.40' } },
-    ],
     defaultVariants: {
       active: false,
     },

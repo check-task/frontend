@@ -14,7 +14,6 @@ interface AssignmentCardProps {
   assignmentName: string;
   assignmentType: string;
   progress: number;
-  progressColor: FolderColor;
   index?: number;
 }
 
@@ -32,7 +31,6 @@ export const AssignmentCard = ({
   assignmentName,
   assignmentType,
   progress,
-  progressColor,
   index = 0,
 }: AssignmentCardProps) => {
   const isSidebarCollapsed = useUIStore((state) => state.isSidebarCollapsed);
@@ -40,22 +38,20 @@ export const AssignmentCard = ({
 
   return (
     <Card.Wrapper
+      color={folderColor}
+      brightness={brightness}
       css={{ width: isSidebarCollapsed ? '27.375rem' : '22.75rem' }}
     >
-      <Card.AccentBar color={folderColor} brightness={brightness} />
+      <Card.AccentBar />
       <Card.Content css={{ gap: isSidebarCollapsed ? '3.875rem' : '0.625rem' }}>
         <Card.Left>
-          <Card.FolderName color={folderColor} brightness={brightness}>
-            {folderName}
-          </Card.FolderName>
-          <Card.DDay color={folderColor} brightness={brightness}>
-            {dDay}
-          </Card.DDay>
+          <Card.FolderName>{folderName}</Card.FolderName>
+          <Card.DDay>{dDay}</Card.DDay>
         </Card.Left>
         <Card.Right>
           <Card.AssignmentInfo>
             <Card.AssignmentHeader>
-              <Card.AssignmentDot color={folderColor} brightness={brightness} />
+              <Card.AssignmentDot />
               <Card.AssignmentName>{assignmentName}</Card.AssignmentName>
             </Card.AssignmentHeader>
             <Card.AssignmentType>{assignmentType}</Card.AssignmentType>
@@ -63,11 +59,7 @@ export const AssignmentCard = ({
           <Card.ProgressSection>
             <Card.ProgressText>{progress}%</Card.ProgressText>
             <Card.ProgressBar>
-              <Card.ProgressFill
-                color={progressColor}
-                brightness={brightness}
-                style={{ width: `${progress}%` }}
-              />
+              <Card.ProgressFill style={{ width: `${progress}%` }} />
             </Card.ProgressBar>
           </Card.ProgressSection>
         </Card.Right>
@@ -86,46 +78,50 @@ const Card = {
       cursor: 'pointer',
       transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
     }),
+    variants: {
+      color: {
+        red: {
+          '--card-color-100': 'token(colors.sub.01.100)',
+          '--card-color-60': 'token(colors.sub.01.60)',
+          '--card-color-40': 'token(colors.sub.01.40)',
+        },
+        yellow: {
+          '--card-color-100': 'token(colors.sub.02.100)',
+          '--card-color-60': 'token(colors.sub.02.60)',
+          '--card-color-40': 'token(colors.sub.02.40)',
+        },
+        green: {
+          '--card-color-100': 'token(colors.sub.03.100)',
+          '--card-color-60': 'token(colors.sub.03.60)',
+          '--card-color-40': 'token(colors.sub.03.40)',
+        },
+        purple: {
+          '--card-color-100': 'token(colors.sub.04.100)',
+          '--card-color-60': 'token(colors.sub.04.60)',
+          '--card-color-40': 'token(colors.sub.04.40)',
+        },
+        black: {
+          '--card-color-100': 'token(colors.sub.05.100)',
+          '--card-color-60': 'token(colors.sub.05.60)',
+          '--card-color-40': 'token(colors.sub.05.40)',
+        },
+      },
+      brightness: {
+        high: { '--card-color': 'var(--card-color-100)' },
+        medium: { '--card-color': 'var(--card-color-60)' },
+        low: { '--card-color': 'var(--card-color-40)' },
+      },
+    },
+    defaultVariants: {
+      brightness: 'high',
+    },
   }),
   AccentBar: styled('div', {
     base: {
       width: '0.25rem',
       height: '7.125rem',
       marginLeft: '-0.125rem',
-    },
-    variants: {
-      color: {
-        red: {},
-        yellow: {},
-        green: {},
-        purple: {},
-        black: {},
-      },
-      brightness: {
-        high: {},
-        medium: {},
-        low: {},
-      },
-    },
-    compoundVariants: [
-      { color: 'red', brightness: 'high', css: { bg: 'sub.01.100' } },
-      { color: 'red', brightness: 'medium', css: { bg: 'sub.01.60' } },
-      { color: 'red', brightness: 'low', css: { bg: 'sub.01.40' } },
-      { color: 'yellow', brightness: 'high', css: { bg: 'sub.02.100' } },
-      { color: 'yellow', brightness: 'medium', css: { bg: 'sub.02.60' } },
-      { color: 'yellow', brightness: 'low', css: { bg: 'sub.02.40' } },
-      { color: 'green', brightness: 'high', css: { bg: 'sub.03.100' } },
-      { color: 'green', brightness: 'medium', css: { bg: 'sub.03.60' } },
-      { color: 'green', brightness: 'low', css: { bg: 'sub.03.40' } },
-      { color: 'purple', brightness: 'high', css: { bg: 'sub.04.100' } },
-      { color: 'purple', brightness: 'medium', css: { bg: 'sub.04.60' } },
-      { color: 'purple', brightness: 'low', css: { bg: 'sub.04.40' } },
-      { color: 'black', brightness: 'high', css: { bg: 'sub.05.100' } },
-      { color: 'black', brightness: 'medium', css: { bg: 'sub.05.60' } },
-      { color: 'black', brightness: 'low', css: { bg: 'sub.05.40' } },
-    ],
-    defaultVariants: {
-      brightness: 'high',
+      bg: 'var(--card-color)',
     },
   }),
   Content: styled('div', {
@@ -151,40 +147,7 @@ const Card = {
   FolderName: styled('span', {
     base: {
       textStyle: 'body3.m',
-    },
-    variants: {
-      color: {
-        red: {},
-        yellow: {},
-        green: {},
-        purple: {},
-        black: {},
-      },
-      brightness: {
-        high: {},
-        medium: {},
-        low: {},
-      },
-    },
-    compoundVariants: [
-      { color: 'red', brightness: 'high', css: { color: 'sub.01.100' } },
-      { color: 'red', brightness: 'medium', css: { color: 'sub.01.60' } },
-      { color: 'red', brightness: 'low', css: { color: 'sub.01.40' } },
-      { color: 'yellow', brightness: 'high', css: { color: 'sub.02.100' } },
-      { color: 'yellow', brightness: 'medium', css: { color: 'sub.02.60' } },
-      { color: 'yellow', brightness: 'low', css: { color: 'sub.02.40' } },
-      { color: 'green', brightness: 'high', css: { color: 'sub.03.100' } },
-      { color: 'green', brightness: 'medium', css: { color: 'sub.03.60' } },
-      { color: 'green', brightness: 'low', css: { color: 'sub.03.40' } },
-      { color: 'purple', brightness: 'high', css: { color: 'sub.04.100' } },
-      { color: 'purple', brightness: 'medium', css: { color: 'sub.04.60' } },
-      { color: 'purple', brightness: 'low', css: { color: 'sub.04.40' } },
-      { color: 'black', brightness: 'high', css: { color: 'sub.05.100' } },
-      { color: 'black', brightness: 'medium', css: { color: 'sub.05.60' } },
-      { color: 'black', brightness: 'low', css: { color: 'sub.05.40' } },
-    ],
-    defaultVariants: {
-      brightness: 'high',
+      color: 'var(--card-color)',
     },
   }),
   DDay: styled('div', {
@@ -193,40 +156,7 @@ const Card = {
       borderRadius: '0.25rem',
       textStyle: 'btn',
       color: 'primary-button-text',
-    },
-    variants: {
-      color: {
-        red: {},
-        yellow: {},
-        green: {},
-        purple: {},
-        black: {},
-      },
-      brightness: {
-        high: {},
-        medium: {},
-        low: {},
-      },
-    },
-    compoundVariants: [
-      { color: 'red', brightness: 'high', css: { bg: 'sub.01.100' } },
-      { color: 'red', brightness: 'medium', css: { bg: 'sub.01.60' } },
-      { color: 'red', brightness: 'low', css: { bg: 'sub.01.40' } },
-      { color: 'yellow', brightness: 'high', css: { bg: 'sub.02.100' } },
-      { color: 'yellow', brightness: 'medium', css: { bg: 'sub.02.60' } },
-      { color: 'yellow', brightness: 'low', css: { bg: 'sub.02.40' } },
-      { color: 'green', brightness: 'high', css: { bg: 'sub.03.100' } },
-      { color: 'green', brightness: 'medium', css: { bg: 'sub.03.60' } },
-      { color: 'green', brightness: 'low', css: { bg: 'sub.03.40' } },
-      { color: 'purple', brightness: 'high', css: { bg: 'sub.04.100' } },
-      { color: 'purple', brightness: 'medium', css: { bg: 'sub.04.60' } },
-      { color: 'purple', brightness: 'low', css: { bg: 'sub.04.40' } },
-      { color: 'black', brightness: 'high', css: { bg: 'sub.05.100' } },
-      { color: 'black', brightness: 'medium', css: { bg: 'sub.05.60' } },
-      { color: 'black', brightness: 'low', css: { bg: 'sub.05.40' } },
-    ],
-    defaultVariants: {
-      brightness: 'high',
+      bg: 'var(--card-color)',
     },
   }),
   AssignmentInfo: styled('div', {
@@ -245,40 +175,7 @@ const Card = {
       width: '1.5rem',
       height: '1.5rem',
       borderRadius: '50%',
-    },
-    variants: {
-      color: {
-        red: {},
-        yellow: {},
-        green: {},
-        purple: {},
-        black: {},
-      },
-      brightness: {
-        high: {},
-        medium: {},
-        low: {},
-      },
-    },
-    compoundVariants: [
-      { color: 'red', brightness: 'high', css: { bg: 'sub.01.100' } },
-      { color: 'red', brightness: 'medium', css: { bg: 'sub.01.60' } },
-      { color: 'red', brightness: 'low', css: { bg: 'sub.01.40' } },
-      { color: 'yellow', brightness: 'high', css: { bg: 'sub.02.100' } },
-      { color: 'yellow', brightness: 'medium', css: { bg: 'sub.02.60' } },
-      { color: 'yellow', brightness: 'low', css: { bg: 'sub.02.40' } },
-      { color: 'green', brightness: 'high', css: { bg: 'sub.03.100' } },
-      { color: 'green', brightness: 'medium', css: { bg: 'sub.03.60' } },
-      { color: 'green', brightness: 'low', css: { bg: 'sub.03.40' } },
-      { color: 'purple', brightness: 'high', css: { bg: 'sub.04.100' } },
-      { color: 'purple', brightness: 'medium', css: { bg: 'sub.04.60' } },
-      { color: 'purple', brightness: 'low', css: { bg: 'sub.04.40' } },
-      { color: 'black', brightness: 'high', css: { bg: 'sub.05.100' } },
-      { color: 'black', brightness: 'medium', css: { bg: 'sub.05.60' } },
-      { color: 'black', brightness: 'low', css: { bg: 'sub.05.40' } },
-    ],
-    defaultVariants: {
-      brightness: 'high',
+      bg: 'var(--card-color)',
     },
   }),
   AssignmentName: styled('span', {
@@ -320,40 +217,7 @@ const Card = {
     base: {
       height: '100%',
       borderRadius: '0.625rem',
-    },
-    variants: {
-      color: {
-        red: {},
-        yellow: {},
-        green: {},
-        purple: {},
-        black: {},
-      },
-      brightness: {
-        high: {},
-        medium: {},
-        low: {},
-      },
-    },
-    compoundVariants: [
-      { color: 'red', brightness: 'high', css: { bg: 'sub.01.100' } },
-      { color: 'red', brightness: 'medium', css: { bg: 'sub.01.60' } },
-      { color: 'red', brightness: 'low', css: { bg: 'sub.01.40' } },
-      { color: 'yellow', brightness: 'high', css: { bg: 'sub.02.100' } },
-      { color: 'yellow', brightness: 'medium', css: { bg: 'sub.02.60' } },
-      { color: 'yellow', brightness: 'low', css: { bg: 'sub.02.40' } },
-      { color: 'green', brightness: 'high', css: { bg: 'sub.03.100' } },
-      { color: 'green', brightness: 'medium', css: { bg: 'sub.03.60' } },
-      { color: 'green', brightness: 'low', css: { bg: 'sub.03.40' } },
-      { color: 'purple', brightness: 'high', css: { bg: 'sub.04.100' } },
-      { color: 'purple', brightness: 'medium', css: { bg: 'sub.04.60' } },
-      { color: 'purple', brightness: 'low', css: { bg: 'sub.04.40' } },
-      { color: 'black', brightness: 'high', css: { bg: 'sub.05.100' } },
-      { color: 'black', brightness: 'medium', css: { bg: 'sub.05.60' } },
-      { color: 'black', brightness: 'low', css: { bg: 'sub.05.40' } },
-    ],
-    defaultVariants: {
-      brightness: 'high',
+      bg: 'var(--card-color)',
     },
   }),
 };
