@@ -1,6 +1,5 @@
 import { styled } from '../../../../styled-system/jsx';
 import { hstack, stack } from '../../../../styled-system/patterns';
-import { ChevronDownIcon } from '@/components/icons/ChevronDownIcon';
 import { CameraIcon } from '@/components/icons/CameraIcon';
 import { Card } from '@/features/profile/components/Card';
 import { NotificationSetting } from '@/features/profile/components/NotificationSetting';
@@ -10,6 +9,7 @@ import { WithdrawalButton } from '@/features/profile/components/WithdrawalButton
 import { AddFolderButton } from '@/features/profile/components/AddFolderButton';
 import { EditFolderButton } from '@/features/profile/components/EditFolderButton';
 import { DeleteFolderButton } from '@/features/profile/components/DeleteFolderButton';
+import { AlarmTimeSelect } from '@/features/profile/components/AlarmTimeSelect';
 
 // 프로필 설정 페이지
 export default function ProfilePage() {
@@ -71,15 +71,11 @@ export default function ProfilePage() {
             <Setting.Content>
               <Setting.Row>
                 <Text.SettingLabel>최종 마감 알림</Text.SettingLabel>
-                <StyledButton.Select>
-                  24시간 전 <ChevronDownIcon />
-                </StyledButton.Select>
+                <AlarmTimeSelect />
               </Setting.Row>
               <Setting.Row>
                 <Text.SettingLabel>TASK별 알림</Text.SettingLabel>
-                <StyledButton.Select>
-                  24시간 전 <ChevronDownIcon />
-                </StyledButton.Select>
+                <AlarmTimeSelect />
               </Setting.Row>
             </Setting.Content>
           </NotificationSetting>
@@ -236,18 +232,6 @@ const StyledButton = {
       color: 'gray.500',
       cursor: 'pointer',
       alignSelf: 'flex-start',
-    },
-  }),
-  Select: styled('button', {
-    base: {
-      display: 'flex',
-      alignItems: 'center',
-      gap: '0.75rem',
-      textStyle: 'body1.m',
-      color: 'gray.700',
-      bg: 'transparent',
-      border: 'none',
-      cursor: 'pointer',
     },
   }),
   Add: styled('button', {
