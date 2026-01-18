@@ -1,12 +1,13 @@
 import { css } from 'styled-system/css';
 
-type FolderColor = '01' | '02' | '03' | '04' | '05';
+// 여기에 정의된 폴더 색상을 헤더에서 사용하기 위해 export 추가해주었습니다.
+export type FolderColor = '01' | '02' | '03' | '04' | '05';
 
-interface FolderClassificationProps {
+export interface FolderClassificationProps {
   color: FolderColor;
 }
 
-const colorMap: Record<FolderColor, string> = {
+export const colorMap: Record<FolderColor, string> = {
   '01': 'sub.01.100',
   '02': 'sub.02.100',
   '03': 'sub.03.100',
