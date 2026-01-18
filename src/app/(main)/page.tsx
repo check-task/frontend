@@ -1,11 +1,11 @@
 import { styled } from 'styled-system/jsx';
 import { hstack, stack } from 'styled-system/patterns';
 import { Button } from '@/components/Button';
-import { MonthPickerIcon } from '@/components/icons/MonthPickerIcon';
 import { AssignmentCard } from '@/features/home/components/AssignmentCard';
 import { FilterChipGroup } from '@/features/home/components/FilterChipGroup';
 import { SortTabs } from '@/features/home/components/SortTabs';
 import { Calendar } from '@/features/home/components/Calendar';
+import { DateSelectorWithPicker } from '@/features/home/components/DateSelectorWithPicker';
 import Link from 'next/link';
 
 // 샘플 폴더 데이터
@@ -22,10 +22,7 @@ export default function Home() {
     <Container.Page>
       {/* 년/월 선택 + 과제등록 버튼 */}
       <Container.Header>
-        <Container.DateSelector>
-          <Text.DateTitle>2026년 1월</Text.DateTitle>
-          <MonthPickerIcon />
-        </Container.DateSelector>
+        <DateSelectorWithPicker />
 
         <Link href='/assignment/create'>
           <Button variant='fillBlue' size='small'>
@@ -124,15 +121,6 @@ const Container = {
       width: '100%',
     }),
   }),
-  DateSelector: styled('button', {
-    base: hstack.raw({
-      gap: '0.25rem',
-      alignItems: 'center',
-      cursor: 'pointer',
-      background: 'transparent',
-      border: 'none',
-    }),
-  }),
   FilterBar: styled('div', {
     base: hstack.raw({
       gap: '0.25rem',
@@ -175,12 +163,6 @@ const Container = {
 };
 
 const Text = {
-  DateTitle: styled('h1', {
-    base: {
-      textStyle: 'h1',
-      color: 'gray.900',
-    },
-  }),
   AssignmentListTitle: styled('h4', {
     base: {
       textStyle: 'h4',
