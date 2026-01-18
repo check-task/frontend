@@ -135,3 +135,8 @@
 .fc table {
   border-collapse: collapse;
 }
+
+/* 드래그 선택 하이라이트 제거 */
+.fc .fc-highlight {
+  background: transparent;
+}
