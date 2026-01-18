@@ -27,7 +27,6 @@ const sampleAssignments = [
     assignmentName: '프로그래밍 1차 과제',
     assignmentType: '개인/팀',
     progress: 81,
-    progressColor: 'red' as const,
   },
   {
     id: '2',
@@ -37,7 +36,6 @@ const sampleAssignments = [
     assignmentName: '과제 2',
     assignmentType: '개인/팀',
     progress: 82,
-    progressColor: 'yellow' as const,
   },
   {
     id: '3',
@@ -47,7 +45,6 @@ const sampleAssignments = [
     assignmentName: '과제 3',
     assignmentType: '개인/팀',
     progress: 62,
-    progressColor: 'green' as const,
   },
   {
     id: '4',
@@ -57,7 +54,6 @@ const sampleAssignments = [
     assignmentName: '과제 4',
     assignmentType: '개인/팀',
     progress: 61,
-    progressColor: 'purple' as const,
   },
   {
     id: '5',
@@ -67,7 +63,6 @@ const sampleAssignments = [
     assignmentName: '과제 5',
     assignmentType: '개인/팀',
     progress: 50,
-    progressColor: 'green' as const,
   },
 ];
 
@@ -135,12 +130,6 @@ const Container = {
       justifyContent: 'space-between',
       alignItems: 'center',
       width: '100%',
-    }),
-  }),
-  FilterBar: styled('div', {
-    base: hstack.raw({
-      gap: '0.25rem',
-      flexWrap: 'wrap',
     }),
   }),
   Main: styled('div', {
