@@ -6,6 +6,12 @@ import { hstack } from 'styled-system/patterns';
 
 export type SortType = 'priority' | 'deadline' | 'progress';
 
+const TABS: { id: SortType; label: string }[] = [
+  { id: 'priority', label: '우선순위' },
+  { id: 'deadline', label: '마감일순' },
+  { id: 'progress', label: '진척도순' },
+];
+
 interface SortTabsProps {
   defaultTab?: SortType;
   onTabChange?: (tab: SortType) => void;
@@ -24,24 +30,15 @@ export const SortTabs = ({
 
   return (
     <Tabs.Container>
-      <Tabs.Tab
-        active={activeTab === 'priority'}
-        onClick={() => handleTabClick('priority')}
-      >
-        우선순위
-      </Tabs.Tab>
-      <Tabs.Tab
-        active={activeTab === 'deadline'}
-        onClick={() => handleTabClick('deadline')}
-      >
-        마감일순
-      </Tabs.Tab>
-      <Tabs.Tab
-        active={activeTab === 'progress'}
-        onClick={() => handleTabClick('progress')}
-      >
-        진척도순
-      </Tabs.Tab>
+      {TABS.map((tab) => (
+        <Tabs.Tab
+          key={tab.id}
+          active={activeTab === tab.id}
+          onClick={() => handleTabClick(tab.id)}
+        >
+          {tab.label}
+        </Tabs.Tab>
+      ))}
     </Tabs.Container>
   );
 };
