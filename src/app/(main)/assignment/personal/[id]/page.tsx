@@ -1,10 +1,30 @@
-'use client';
+import { css } from 'styled-system/css';
+import { PersonalLeftContainer } from '@/features/assignment/personal/components/PersonalLeftContainer';
+import { PersonalRightContainer } from '@/features/assignment/personal/components/PersonalRightContainer';
 
-import { useParams } from 'next/navigation';
-
-export default function IndividualAssignmentDetail() {
-  const params = useParams();
-  const id = params.id; // URL에서 [id] 값을 가져옴
-
-  return <h1>개인 과제 상세 페이지 (ID: {id})</h1>;
+export default function PersonalPage() {
+  return (
+    <div className={containerStyle}>
+      <div className={contentGridStyle}>
+        <PersonalLeftContainer />
+        <PersonalRightContainer />
+      </div>
+    </div>
+  );
 }
+
+// ======== 스타일 정의 ========
+const containerStyle = css({
+  display: 'flex',
+  justifyContent: 'center',
+  width: '100%',
+  py: '3.38rem',
+});
+
+// 왼쪽과 오른쪽을 가로로 배치
+const contentGridStyle = css({
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'flex-start',
+  width: 'fit-content', // 각 컨테이너에서 길이 처리할 예정
+});
