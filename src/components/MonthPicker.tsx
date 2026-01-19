@@ -38,7 +38,7 @@ const navigationBtnStyle = {
 
 const modalWrapper = css({
   zIndex: 'modal',
-  bg: 'BG',
+  bg: 'bg',
   width: '20rem',
   padding: '1.25rem !important',
   borderRadius: '0.75rem',

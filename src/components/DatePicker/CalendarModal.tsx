@@ -96,7 +96,7 @@ const modalWrapper = css({
   top: '2.5rem',
   left: 0,
   zIndex: 'modal',
-  bg: 'BG',
+  bg: 'bg',
   p: '1.5rem 1.25rem',
   borderRadius: '0.75rem',
   width: '21.25rem',

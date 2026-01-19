@@ -8,7 +8,7 @@ const checkboxControl = cva({
     h: '1.375rem',
     borderRadius: '0.125rem',
     borderWidth: '0.0725rem',
-    bg: 'white',
+    bg: 'transparent',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
