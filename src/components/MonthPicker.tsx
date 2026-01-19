@@ -6,8 +6,22 @@ import { css } from 'styled-system/css';
 import { token } from 'styled-system/tokens';
 import { DatepickerNextIcon } from '@/components/icons/DatepickerNextIcon';
 import { DatepickerPrevIcon } from '@/components/icons/DatepickerPrevIcon';
+import { useCalendarStore } from '@/stores/calendar-store';
 
-export default function MonthPicker({}) {
+interface MonthPickerProps {
+  onClose?: () => void;
+}
+
+export default function MonthPicker({ onClose }: MonthPickerProps) {
+  const setDate = useCalendarStore((state) => state.setDate);
+
+  const handleClickMonth = (value: Date) => {
+    const year = value.getFullYear();
+    const month = value.getMonth() + 1; // getMonth()는 0부터 시작하므로 +1
+    setDate(year, month);
+    onClose?.();
+  };
+
   return (
     <div className={modalWrapper}>
       <Calendar
@@ -20,6 +34,7 @@ export default function MonthPicker({}) {
         next2Label={null}
         prev2Label={null}
         formatMonthYear={(locale, date) => `${date.getFullYear()}년`}
+        onClickMonth={handleClickMonth}
       />
     </div>
   );
