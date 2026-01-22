@@ -126,9 +126,7 @@ const Card = {
   }),
   Content: styled('div', {
     base: hstack.raw({
-      paddingY: '1.5rem',
-      paddingLeft: '1.5rem',
-      paddingRight: '1.75rem',
+      padding: '1.5rem',
       flex: 1,
       alignItems: 'flex-start',
       transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
