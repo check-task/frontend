@@ -76,7 +76,7 @@ const Card = {
       borderRadius: '0.75rem',
       boxShadow: '0 1px 4px 0 rgba(0, 0, 0, 0.16)',
       cursor: 'pointer',
-      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+      transition: 'width 0.3s ease',
     }),
     variants: {
       color: {
@@ -129,7 +129,7 @@ const Card = {
       padding: '1.5rem',
       flex: 1,
       alignItems: 'flex-start',
-      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+      transition: 'gap 0.3s ease',
     }),
   }),
   Left: styled('div', {
