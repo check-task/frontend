@@ -1,0 +1,137 @@
+'use client';
+
+import { useState } from 'react';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { styled } from 'styled-system/jsx';
+import { stack } from 'styled-system/patterns';
+import { AssignmentCard } from './AssignmentCard';
+import type { FolderColor } from '@/types/folder';
+
+export interface Assignment {
+  id: string;
+  folderName: string;
+  folderColor: FolderColor;
+  dDay: string;
+  assignmentName: string;
+  assignmentType: string;
+  progress: number;
+}
+
+interface AssignmentCardListProps {
+  initialAssignments: Assignment[];
+}
+
+// 드래그 가능한 과제 카드 래퍼 컴포넌트
+const SortableAssignmentCard = ({
+  assignment,
+  index,
+}: {
+  assignment: Assignment;
+  index: number;
+}) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: assignment.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+    cursor: isDragging ? 'grabbing' : 'grab',
+  };
+
+  return (
+    <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
+      <AssignmentCard
+        index={index}
+        folderName={assignment.folderName}
+        folderColor={assignment.folderColor}
+        dDay={assignment.dDay}
+        assignmentName={assignment.assignmentName}
+        assignmentType={assignment.assignmentType}
+        progress={assignment.progress}
+      />
+    </div>
+  );
+};
+
+export const AssignmentCardList = ({
+  initialAssignments,
+}: AssignmentCardListProps) => {
+  const [assignments, setAssignments] = useState(initialAssignments);
+
+  const sensors = useSensors(
+    // 마우스/터치 감지
+    useSensor(PointerSensor),
+    // 접근성을 위한 키보드 감지
+    // Tab으로 카드 선택 후 Space/Enter로 드래그 시작
+    // 방향키로 위치로 이동 후 Space/Enter로 드롭
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    }),
+  );
+
+  // 드래그 완료 시 카드 순서 재정렬
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      setAssignments((items) => {
+        const oldIndex = items.findIndex((item) => item.id === active.id);
+        const newIndex = items.findIndex((item) => item.id === over.id);
+
+        return arrayMove(items, oldIndex, newIndex);
+      });
+    }
+  };
+
+  return (
+    <DndContext
+      sensors={sensors}
+      collisionDetection={closestCenter}
+      onDragEnd={handleDragEnd}
+    >
+      <SortableContext
+        items={assignments.map((a) => a.id)}
+        strategy={verticalListSortingStrategy}
+      >
+        <Container>
+          {assignments.map((assignment, index) => (
+            <SortableAssignmentCard
+              key={assignment.id}
+              assignment={assignment}
+              index={index}
+            />
+          ))}
+        </Container>
+      </SortableContext>
+    </DndContext>
+  );
+};
+
+const Container = styled('div', {
+  base: stack.raw({
+    gap: '0.75rem',
+  }),
+});

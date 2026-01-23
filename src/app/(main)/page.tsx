@@ -1,11 +1,11 @@
 import { styled } from 'styled-system/jsx';
 import { hstack, stack } from 'styled-system/patterns';
 import { Button } from '@/components/Button';
-import { AssignmentCard } from '@/features/home/components/AssignmentCard';
 import { FilterChipGroup } from '@/features/home/components/FilterChipGroup';
 import { SortTabs } from '@/features/home/components/SortTabs';
 import { Calendar } from '@/features/home/components/Calendar';
 import { DateSelectorWithPicker } from '@/features/home/components/DateSelectorWithPicker';
+import { AssignmentCardList } from '@/features/home/components/AssignmentCardList';
 import Link from 'next/link';
 
 // 샘플 폴더 데이터
@@ -97,21 +97,8 @@ export default function Home() {
             <SortTabs defaultTab='priority' />
           </Container.AssignmentListHeader>
 
-          {/* 과제 카드 리스트 */}
-          <Container.AssignmentCards>
-            {sampleAssignments.map((assignment, index) => (
-              <AssignmentCard
-                key={assignment.id}
-                index={index}
-                folderName={assignment.folderName}
-                folderColor={assignment.folderColor}
-                dDay={assignment.dDay}
-                assignmentName={assignment.assignmentName}
-                assignmentType={assignment.assignmentType}
-                progress={assignment.progress}
-              />
-            ))}
-          </Container.AssignmentCards>
+          {/* 과제 카드 리스트 (드래그 앤 드롭) */}
+          <AssignmentCardList initialAssignments={sampleAssignments} />
         </Container.AssignmentList>
       </Container.Main>
     </Container.Page>
@@ -158,11 +145,6 @@ const Container = {
     base: hstack.raw({
       justifyContent: 'space-between',
       alignItems: 'center',
-    }),
-  }),
-  AssignmentCards: styled('div', {
-    base: stack.raw({
-      gap: '0.75rem',
     }),
   }),
 };
