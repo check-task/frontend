@@ -2,8 +2,10 @@
 
 import { useState } from 'react';
 import { styled } from 'styled-system/jsx';
+import { css } from 'styled-system/css';
 import { ChevronDownIcon } from '@/components/icons/ChevronDownIcon';
 import { AlarmTimeSelectMenu } from './AlarmTimeSelectMenu';
+import { useClickOutside } from '@/hooks/useClickOutside';
 
 interface AlarmTimeSelectProps {
   defaultValue?: number;
@@ -27,17 +29,23 @@ export const AlarmTimeSelect = ({
     setIsOpen((prev) => !prev);
   };
 
+  // 커스텀 훅 사용해서 외부 클릭시 닫기 처리
+  const menuRef = useClickOutside<HTMLDivElement>(() => setIsOpen(false));
+
   return (
-    <div style={{ position: 'relative' }}>
+    <div ref={menuRef} style={{ position: 'relative' }}>
       <StyledButton.Select onMouseDown={handleToggle}>
-        {selectedHour}시간 전 <ChevronDownIcon />
+        {selectedHour}시간 전
+        <div className={iconWrapperStyle(isOpen)}>
+          <ChevronDownIcon />
+        </div>
       </StyledButton.Select>
 
       {/* 드롭다운 메뉴가 열린 경우 */}
       {isOpen && (
         <AlarmTimeSelectMenu
           onSelect={handleSelect}
-          onClose={() => setIsOpen(false)}
+          // onClose={() => setIsOpen(false)}
         />
       )}
     </div>
@@ -60,3 +68,13 @@ const StyledButton = {
     },
   }),
 };
+
+// 작성해주신 토글 위아래 전환 코드 부분만 뜯어옴
+const iconWrapperStyle = (isOpen: boolean) =>
+  css({
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+    transition: 'transform 0.3s ease',
+  });
