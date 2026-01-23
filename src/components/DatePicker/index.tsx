@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState } from 'react';
 import { CalenderIcon } from '../icons/CalendarIcon';
 import { css } from 'styled-system/css';
 import CalendarModal from './CalendarModal';
@@ -13,18 +13,7 @@ export default function DatePicker() {
   const [confirmedDate, setConfirmedDate] = useState<Date>(new Date());
 
   // datepicker 외 화면 클릭하면 닫히도록 처리.
-  const pickerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (pickerRef.current && !pickerRef.current.contains(e.target as Node)) {
-        setIsOpen(false);
-      }
-    };
-
-    document.addEventListener('click', handleClickOutside);
-    return () => document.removeEventListener('click', handleClickOutside);
-  }, []);
+  const pickerRef = useClickOutside<HTMLDivElement>(() => setIsOpen(false));
 
   // 선택한 날짜 저장
   const handleSave = (date: Date) => {

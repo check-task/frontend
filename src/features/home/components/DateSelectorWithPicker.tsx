@@ -1,11 +1,12 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState } from 'react';
 import { styled } from 'styled-system/jsx';
 import { hstack } from 'styled-system/patterns';
 import { MonthPickerIcon } from '@/components/icons/MonthPickerIcon';
 import MonthPicker from '@/components/MonthPicker';
 import { useCalendarStore } from '@/stores/calendar-store';
+import { useClickOutside } from '@/hooks/useClickOutside';
 
 export const DateSelectorWithPicker = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -21,18 +22,7 @@ export const DateSelectorWithPicker = () => {
   };
 
   // monthpicker 외 화면 클릭하면 닫히도록 처리.
-  const pickerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (pickerRef.current && !pickerRef.current.contains(e.target as Node)) {
-        setIsOpen(false);
-      }
-    };
-
-    document.addEventListener('click', handleClickOutside);
-    return () => document.removeEventListener('click', handleClickOutside);
-  }, []);
+  const pickerRef = useClickOutside<HTMLDivElement>(() => setIsOpen(false));
 
   return (
     <Container ref={pickerRef}>
