@@ -1,11 +1,10 @@
 import { styled } from 'styled-system/jsx';
 import { hstack, stack } from 'styled-system/patterns';
-import { Button } from '@/components/Button';
 import { FilterChipGroup } from '@/features/home/components/FilterChipGroup';
 import { Calendar } from '@/features/home/components/Calendar';
 import { DateSelectorWithPicker } from '@/features/home/components/DateSelectorWithPicker';
 import { AssignmentSection } from '@/features/home/components/AssignmentSection';
-import Link from 'next/link';
+import { ButtonGroup } from '@/features/home/components/ButtonGroup';
 
 // 샘플 폴더 데이터
 const folders = [
@@ -68,15 +67,10 @@ const sampleAssignments = [
 export default function Home() {
   return (
     <Container.Page>
-      {/* 년/월 선택 + 과제등록 버튼 */}
+      {/* 년/월 선택 + 버튼 */}
       <Container.Header>
         <DateSelectorWithPicker />
-
-        <Link href='/assignment/create'>
-          <Button variant='fillBlue' size='small'>
-            과제등록
-          </Button>
-        </Link>
+        <ButtonGroup />
       </Container.Header>
 
       {/* 폴더 필터 바 */}
