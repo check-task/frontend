@@ -94,7 +94,8 @@ const Container = {
   Page: styled('div', {
     base: stack.raw({
       gap: '1.5rem',
-      marginY: '2rem',
+      marginTop: '2rem',
+      marginBottom: '3.75rem',
     }),
   }),
   Header: styled('div', {
