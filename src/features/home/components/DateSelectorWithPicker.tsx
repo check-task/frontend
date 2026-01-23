@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { styled } from 'styled-system/jsx';
 import { hstack } from 'styled-system/patterns';
 import { MonthPickerIcon } from '@/components/icons/MonthPickerIcon';
@@ -20,8 +20,22 @@ export const DateSelectorWithPicker = () => {
     setIsOpen(false);
   };
 
+  // monthpicker 외 화면 클릭하면 닫히도록 처리.
+  const pickerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (pickerRef.current && !pickerRef.current.contains(e.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, []);
+
   return (
-    <Container>
+    <Container ref={pickerRef}>
       <DateSelector onClick={togglePicker}>
         <DateTitle>
           {currentYear}년 {currentMonth}월
