@@ -2,10 +2,9 @@ import { styled } from 'styled-system/jsx';
 import { hstack, stack } from 'styled-system/patterns';
 import { Button } from '@/components/Button';
 import { FilterChipGroup } from '@/features/home/components/FilterChipGroup';
-import { SortTabs } from '@/features/home/components/SortTabs';
 import { Calendar } from '@/features/home/components/Calendar';
 import { DateSelectorWithPicker } from '@/features/home/components/DateSelectorWithPicker';
-import { AssignmentCardList } from '@/features/home/components/AssignmentCardList';
+import { AssignmentSection } from '@/features/home/components/AssignmentSection';
 import Link from 'next/link';
 
 // 샘플 폴더 데이터
@@ -91,15 +90,7 @@ export default function Home() {
         </Container.Calendar>
 
         {/* 과제목록 */}
-        <Container.AssignmentList>
-          <Container.AssignmentListHeader>
-            <Text.AssignmentListTitle>과제목록</Text.AssignmentListTitle>
-            <SortTabs defaultTab='priority' />
-          </Container.AssignmentListHeader>
-
-          {/* 과제 카드 리스트 (드래그 앤 드롭) */}
-          <AssignmentCardList initialAssignments={sampleAssignments} />
-        </Container.AssignmentList>
+        <AssignmentSection initialAssignments={sampleAssignments} />
       </Container.Main>
     </Container.Page>
   );
@@ -134,26 +125,6 @@ const Container = {
       borderColor: 'gray.200',
       borderRadius: '0.75rem',
       boxShadow: '-1px 1px 4px 0 rgba(0, 0, 0, 0.08)',
-    },
-  }),
-  AssignmentList: styled('div', {
-    base: stack.raw({
-      gap: '1.25rem',
-    }),
-  }),
-  AssignmentListHeader: styled('div', {
-    base: hstack.raw({
-      justifyContent: 'space-between',
-      alignItems: 'center',
-    }),
-  }),
-};
-
-const Text = {
-  AssignmentListTitle: styled('h4', {
-    base: {
-      textStyle: 'h4',
-      color: 'gray.900',
     },
   }),
 };

@@ -35,15 +35,18 @@ export interface Assignment {
 
 interface AssignmentCardListProps {
   initialAssignments: Assignment[];
+  isDragDisabled?: boolean;
 }
 
 // 드래그 가능한 과제 카드 래퍼 컴포넌트
 const SortableAssignmentCard = ({
   assignment,
   index,
+  disabled,
 }: {
   assignment: Assignment;
   index: number;
+  disabled?: boolean;
 }) => {
   const {
     attributes,
@@ -52,13 +55,13 @@ const SortableAssignmentCard = ({
     transform,
     transition,
     isDragging,
-  } = useSortable({ id: assignment.id });
+  } = useSortable({ id: assignment.id, disabled });
 
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
     opacity: isDragging ? 0.5 : 1,
-    cursor: isDragging ? 'grabbing' : 'grab',
+    cursor: disabled ? 'default' : isDragging ? 'grabbing' : 'grab',
   };
 
   return (
@@ -78,6 +81,7 @@ const SortableAssignmentCard = ({
 
 export const AssignmentCardList = ({
   initialAssignments,
+  isDragDisabled = false,
 }: AssignmentCardListProps) => {
   const [assignments, setAssignments] = useState(initialAssignments);
 
@@ -122,6 +126,7 @@ export const AssignmentCardList = ({
               key={assignment.id}
               assignment={assignment}
               index={index}
+              disabled={isDragDisabled}
             />
           ))}
         </Container>
