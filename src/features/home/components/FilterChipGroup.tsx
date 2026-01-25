@@ -1,50 +1,53 @@
 'use client';
 
-import { useState } from 'react';
 import { styled } from 'styled-system/jsx';
 import { hstack } from 'styled-system/patterns';
 import { FolderColor } from '@/types/folder';
 
-export interface FolderItem {
-  id: string;
-  name: string;
-  color: FolderColor;
+interface Assignment {
+  folderId: string;
+  folderName: string;
+  folderColor: FolderColor;
 }
 
 interface FilterChipGroupProps {
-  folders: FolderItem[];
-  defaultSelected?: string[];
+  assignments: Assignment[];
+  selectedIds: string[];
   onSelectionChange?: (selectedIds: string[]) => void;
 }
 
 export const FilterChipGroup = ({
-  folders,
-  defaultSelected = [],
+  assignments,
+  selectedIds,
   onSelectionChange,
 }: FilterChipGroupProps) => {
-  const [selectedIds, setSelectedIds] = useState<string[]>(defaultSelected);
+  // 중복 폴더 칩 방지
+  const renderedFolderIds = new Set<string>();
 
   // 폴더 선택/해제 토글
   const toggleFolder = (folderId: string) => {
     const next = selectedIds.includes(folderId)
       ? selectedIds.filter((id) => id !== folderId)
       : [...selectedIds, folderId];
-    setSelectedIds(next);
     onSelectionChange?.(next);
   };
 
   return (
     <Container>
-      {folders.map((folder) => (
-        <FilterChip
-          key={folder.id}
-          color={folder.color}
-          active={selectedIds.includes(folder.id)}
-          onClick={() => toggleFolder(folder.id)}
-        >
-          {folder.name}
-        </FilterChip>
-      ))}
+      {assignments.map((assignment) => {
+        if (renderedFolderIds.has(assignment.folderId)) return null;
+        renderedFolderIds.add(assignment.folderId);
+        return (
+          <FilterChip
+            key={assignment.folderId}
+            color={assignment.folderColor}
+            active={selectedIds.includes(assignment.folderId)}
+            onClick={() => toggleFolder(assignment.folderId)}
+          >
+            {assignment.folderName}
+          </FilterChip>
+        );
+      })}
     </Container>
   );
 };

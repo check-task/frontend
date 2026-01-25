@@ -18,32 +18,38 @@ const FOLDER_COLOR_MAP: Record<FolderColor, string> = {
   black: token('colors.sub.05.100'),
 };
 
-// 샘플 이벤트
-const sampleEvents = [
-  {
-    id: '1',
-    title: '프로그래밍 1차 과제',
-    start: '2026-01-24',
-    backgroundColor: FOLDER_COLOR_MAP['red'],
-  },
-  {
-    id: '2',
-    title: '세부 TASK 긴 버전입니다',
-    start: '2026-01-24',
-    backgroundColor: FOLDER_COLOR_MAP['yellow'],
-  },
-  {
-    id: '3',
-    title: 'TASK',
-    start: '2026-01-24',
-    backgroundColor: FOLDER_COLOR_MAP['green'],
-  },
-];
+// 과제 타입
+interface Assignment {
+  id: string;
+  folderId: string;
+  folderName: string;
+  folderColor: FolderColor;
+  dDay: string;
+  dueDate: string;
+  assignmentName: string;
+  assignmentType: string;
+  progress: number;
+}
 
-export const Calendar = () => {
+interface CalendarProps {
+  assignments: Assignment[];
+  selectedFolderIds: string[];
+}
+
+export const Calendar = ({ assignments, selectedFolderIds }: CalendarProps) => {
   const calendarRef = useRef<FullCalendar>(null);
   const currentYear = useCalendarStore((state) => state.currentYear);
   const currentMonth = useCalendarStore((state) => state.currentMonth);
+
+  // 선택된 폴더의 과제만 필터링하여 캘린더 이벤트로 변환
+  const filteredEvents = assignments
+    .filter((assignment) => selectedFolderIds.includes(assignment.folderId))
+    .map((assignment) => ({
+      id: assignment.id,
+      title: assignment.assignmentName,
+      start: assignment.dueDate,
+      backgroundColor: FOLDER_COLOR_MAP[assignment.folderColor],
+    }));
 
   // 스토어 날짜가 변경되면 캘린더 이동
   useEffect(() => {
@@ -59,7 +65,7 @@ export const Calendar = () => {
       ref={calendarRef}
       plugins={[dayGridPlugin, interactionPlugin]}
       initialView='dayGridMonth'
-      events={sampleEvents}
+      events={filteredEvents}
       editable={true}
       droppable={true}
       headerToolbar={false}
