@@ -9,6 +9,7 @@ import { AddFolderButton } from '@/features/profile/components/AddFolderButton';
 import { EditFolderButton } from '@/features/profile/components/EditFolderButton';
 import { DeleteFolderButton } from '@/features/profile/components/DeleteFolderButton';
 import { AlarmTimeSelect } from '@/features/profile/components/AlarmTimeSelect';
+import { sampleFolders } from '@/data/sampleFolders';
 
 // 프로필 설정 페이지
 export default function ProfilePage() {
@@ -84,12 +85,7 @@ export default function ProfilePage() {
               <AddFolderButton />
             </Folder.Header>
             <Folder.List>
-              {[
-                { color: 'black' as const, name: '프로그래밍' },
-                { color: 'red' as const, name: '그만세' },
-                { color: 'yellow' as const, name: '웹서프' },
-                { color: 'purple' as const, name: '팀과제' },
-              ].map((folder) => (
+              {sampleFolders.map((folder) => (
                 <Folder.Item key={folder.name}>
                   <Folder.Info>
                     <Folder.Color color={folder.color} />
