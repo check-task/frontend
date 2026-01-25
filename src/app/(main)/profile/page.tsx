@@ -1,6 +1,5 @@
 import { styled } from '../../../../styled-system/jsx';
 import { hstack, stack } from '../../../../styled-system/patterns';
-import { CameraIcon } from '@/components/icons/CameraIcon';
 import { Card } from '@/features/profile/components/Card';
 import { NotificationSetting } from '@/features/profile/components/NotificationSetting';
 import { FolderSetting } from '@/features/profile/components/FolderSetting';
@@ -21,12 +20,7 @@ export default function ProfilePage() {
         {/* 프로필 카드 */}
         <Card type='profile'>
           <Profile.ImageSection>
-            <Profile.ImageWrapper>
-              <Profile.Image />
-              <Profile.ImageOverlay>
-                <CameraIcon />
-              </Profile.ImageOverlay>
-            </Profile.ImageWrapper>
+            <Profile.Image />
             <Profile.Name>송월</Profile.Name>
           </Profile.ImageSection>
 
@@ -261,44 +255,12 @@ const Profile = {
   ImageSection: styled('div', {
     base: stack.raw({ gap: '1.5rem', alignItems: 'center' }),
   }),
-  ImageWrapper: styled('div', {
-    base: {
-      position: 'relative',
-      cursor: 'pointer',
-    },
-  }),
   Image: styled('div', {
     base: {
       width: '10rem',
       height: '10rem',
       borderRadius: '50%',
       bg: 'blue.100',
-    },
-  }),
-  ImageOverlay: styled('div', {
-    base: {
-      position: 'absolute',
-      top: 0,
-      left: 0,
-      width: '10rem',
-      height: '10rem',
-      borderRadius: '50%',
-      background:
-        'linear-gradient(0deg, rgba(0, 0, 0, 0.60) 0%, rgba(0, 0, 0, 0.60) 100%), var(--colors-blue-100)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      opacity: 0,
-      transition: 'opacity 0.2s ease',
-      _hover: {
-        opacity: 1,
-      },
-    },
-  }),
-  CameraIcon: styled('span', {
-    base: {
-      fontSize: '1.5rem',
-      color: 'white',
     },
   }),
   Name: styled('p', {
