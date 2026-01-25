@@ -77,6 +77,7 @@ export const FolderModalContent = ({
         size='xlarge'
         onClick={handleSave}
         className={css({ marginTop: '2.5rem' })}
+        disabled={!name.trim() || !selectedColor}
       >
         {mode === 'edit' ? '변경사항 저장' : '저장'}
       </Button>
