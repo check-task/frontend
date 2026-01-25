@@ -138,7 +138,8 @@ const Layout = {
       gap: '1.75rem',
       width: '62.25rem',
       marginX: 'auto',
-      marginY: '2rem',
+      marginTop: '3.25rem',
+      marginBottom: '3.75rem',
     }),
   }),
   Section: styled('section', {
