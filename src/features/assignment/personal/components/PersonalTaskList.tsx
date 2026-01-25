@@ -1,7 +1,9 @@
+import { useEffect, useRef, useState } from 'react';
 import { Checkbox } from '@/components/Checkbox';
 import { css, cva } from 'styled-system/css';
 import { ClockToggle } from '../../components/ClockToggle';
 import DatePicker from '@/components/DatePicker';
+import { dummyPersonalTasks } from '@/constants/PersonalTaskMock';
 
 // Task 목록
 export const PersonalTaskList = () => {
@@ -9,7 +11,7 @@ export const PersonalTaskList = () => {
     <div className={PersonalTaskListContainerStyle}>
       <div className={PersonalTaskListStyle}>
         {dummyPersonalTasks.map((task) => {
-          const isLongTitle = task.title.length >= 28;
+          const isLongTitle = task.title.length >= 23;
 
           return (
             <div key={task.id} className={PersonalTaskItemContainerStyle}>
@@ -81,6 +83,7 @@ const PersonalTaskItemLeftStyle = cva({
     display: 'flex',
     gap: '0.75rem', // 체크박스랑 task 제목 간격
     flex: 1, // 오른쪽 영역에 마진을 줄거라서 남은 부분 차지
+    maxWidth: '27rem', // 줄 바꿈이 되기 직전 너비를 주면 됩니다
   },
 
   variants: {
@@ -102,7 +105,6 @@ const PersonalTaskItemLeftStyle = cva({
 const taskTextStyle = css({
   textStyle: 'body1.m',
   color: 'gray.900',
-  // whiteSpace: 'pre-wrap', // 공백과 줄바꿈 유지
   wordBreak: 'break-word', // 상자 크기 넘어가면 자동으로 줄 바꿈
 });
 
@@ -159,25 +161,3 @@ const rightContentWrapperStyle = css({
   gap: '2.25rem',
   width: '12rem', // 직접 계산
 });
-
-// ======== 더미 데이터 ========
-const dummyPersonalTasks = [
-  { id: 1, title: '프로젝트 세팅' },
-  { id: 2, title: '주제 정하기' },
-  {
-    id: 3,
-    title: '프론트엔드개발프론트엔드개발프론트엔드개발개발개발발',
-  },
-  {
-    id: 4,
-    title: '프론트엔드개발프론트엔드개발프론트엔드개발개발개발발개',
-  },
-  {
-    id: 5,
-    title: '프론트엔드개발프론트엔드개발프론트엔드개발개발개발발개개',
-  },
-  {
-    id: 6,
-    title: '프론트엔드개발프론트엔드개발프론트엔드개발개발개발발개개개개개개',
-  },
-];
