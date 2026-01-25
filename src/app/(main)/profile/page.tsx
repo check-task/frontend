@@ -31,10 +31,7 @@ export default function ProfilePage() {
           {/* 기본 정보 섹션 */}
           <Profile.InfoSection>
             <Profile.BasicInfo>
-              <Profile.InfoHeader>
-                <Text.SectionTitle>기본정보</Text.SectionTitle>
-                <EditProfileButton />
-              </Profile.InfoHeader>
+              <Text.SectionTitle>기본정보</Text.SectionTitle>
               <Profile.InfoContent>
                 {[
                   { label: '연락처', value: '010-8831-4721' },
@@ -47,10 +44,7 @@ export default function ProfilePage() {
                 ))}
               </Profile.InfoContent>
             </Profile.BasicInfo>
-            <StyledButton.UnderlineLink>
-              <Text.PasswordLink>비밀번호 변경</Text.PasswordLink>
-              <Underline color='password' />
-            </StyledButton.UnderlineLink>
+            <EditProfileButton />
           </Profile.InfoSection>
         </Card>
       </Layout.Section>
@@ -164,19 +158,8 @@ const Text = {
   Value: styled('span', {
     base: { textStyle: 'body1.m', color: 'gray.700' },
   }),
-  PasswordLink: styled('span', {
-    base: {
-      textStyle: 'body4.m',
-      color: 'gray.500',
-      width: '5rem',
-      height: '1.25rem',
-    },
-  }),
   SettingLabel: styled('span', {
     base: { textStyle: 'body1.r', color: 'gray.400' },
-  }),
-  Footer: styled('p', {
-    base: { textStyle: 'body4.r', color: 'gray.400' },
   }),
   FooterLinks: styled('div', {
     base: hstack.raw({ gap: '0.25rem', alignItems: 'center' }),
@@ -191,58 +174,6 @@ const Text = {
     base: {
       textStyle: 'body4.r',
       color: 'gray.300',
-    },
-  }),
-  WithdrawalLink: styled('span', {
-    base: { textStyle: 'body4.m', color: 'gray.400' },
-  }),
-};
-
-// 버튼 스타일
-const StyledButton = {
-  Edit: styled('button', {
-    base: {
-      textStyle: 'btn',
-      color: 'blue.500',
-      paddingX: '1rem',
-      paddingY: '0.5rem',
-      borderRadius: '0.5rem',
-      border: '1px solid',
-      borderColor: 'blue.500',
-      bg: 'transparent',
-      cursor: 'pointer',
-      _hover: { bg: 'blue.50' },
-    },
-  }),
-  UnderlineLink: styled('button', {
-    base: {
-      display: 'flex',
-      flexDirection: 'column',
-      gap: '0.25rem',
-      textStyle: 'body4.m',
-      color: 'gray.500',
-      cursor: 'pointer',
-      alignSelf: 'flex-start',
-    },
-  }),
-  Add: styled('button', {
-    base: {
-      textStyle: 'h4',
-      color: 'gray.400',
-      bg: 'transparent',
-      border: 'none',
-      cursor: 'pointer',
-      _hover: { color: 'gray.600' },
-    },
-  }),
-  Action: styled('button', {
-    base: {
-      textStyle: 'body1.r',
-      color: 'gray.400',
-      bg: 'transparent',
-      border: 'none',
-      cursor: 'pointer',
-      _hover: { color: 'gray.600' },
     },
   }),
 };
@@ -265,9 +196,6 @@ const Profile = {
   }),
   InfoSection: styled('div', {
     base: stack.raw({ gap: '2.5rem', flex: 1 }),
-  }),
-  InfoHeader: styled('div', {
-    base: hstack.raw({ justifyContent: 'space-between', alignItems: 'center' }),
   }),
   BasicInfo: styled('div', {
     base: stack.raw({ gap: '1.75rem' }),
@@ -348,20 +276,6 @@ const Divider = styled('div', {
       profile: { height: '13.625rem', bg: 'gray.200' },
       management: { height: '17.25rem', bg: 'gray.200' },
       footer: { height: '1rem', bg: 'gray.300' },
-    },
-  },
-});
-
-// 언더라인
-const Underline = styled('span', {
-  base: {
-    width: '100%',
-    height: '0.0625rem',
-  },
-  variants: {
-    color: {
-      password: { bg: 'gray.500' },
-      withdrawal: { bg: 'gray.400' },
     },
   },
 });
