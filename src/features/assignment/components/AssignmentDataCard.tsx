@@ -1,3 +1,5 @@
+'use client';
+
 import { CloseIcon } from '@/components/icons/CloseIcon';
 import { PencilIcon } from '@/components/icons/PencilIcon';
 import { css } from 'styled-system/css';
