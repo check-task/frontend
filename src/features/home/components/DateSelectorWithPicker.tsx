@@ -2,10 +2,12 @@
 
 import { useState } from 'react';
 import { styled } from 'styled-system/jsx';
+import { css } from 'styled-system/css';
 import { hstack } from 'styled-system/patterns';
 import { MonthPickerIcon } from '@/components/icons/MonthPickerIcon';
 import MonthPicker from '@/components/MonthPicker';
 import { useCalendarStore } from '@/stores/calendar-store';
+import { useClickOutside } from '@/hooks/useClickOutside';
 
 export const DateSelectorWithPicker = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -20,13 +22,19 @@ export const DateSelectorWithPicker = () => {
     setIsOpen(false);
   };
 
+  // monthpicker 외 화면 클릭하면 닫히도록 처리.
+  const pickerRef = useClickOutside<HTMLDivElement>(() => setIsOpen(false));
+
   return (
-    <Container>
+    <Container ref={pickerRef}>
       <DateSelector onClick={togglePicker}>
         <DateTitle>
           {currentYear}년 {currentMonth}월
         </DateTitle>
-        <MonthPickerIcon />
+        <div className={iconWrapperStyle(isOpen)}>
+          <MonthPickerIcon />
+        </div>
+        {/* <MonthPickerIcon /> */}
       </DateSelector>
       {isOpen && (
         <PickerWrapper>
@@ -68,3 +76,13 @@ const PickerWrapper = styled('div', {
     zIndex: 'dropdown',
   },
 });
+
+// 작성해주신 토글 위아래 전환 코드 부분만 뜯어옴
+const iconWrapperStyle = (isOpen: boolean) =>
+  css({
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+    transition: 'transform 0.3s ease',
+  });

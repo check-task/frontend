@@ -63,18 +63,23 @@ export const containerStyle = cva({
     borderRadius: '0.5rem',
     padding: '0.75rem 0.5rem',
     height: '3.375rem',
-    gap: '0.125rem',
-    transition: 'all 0.3s ease',
+    _hover: {
+      '& div, & span': {
+        transition: 'background-color 0.3s ease, color 0.3s ease',
+      },
+    },
   },
   variants: {
     collapsed: {
       // 사이드바 닫혀 있음
       true: {
         w: '49.625rem',
+        gap: '0.125rem',
       },
       // 사이드바 열여 있음
       false: {
         w: '43.25rem',
+        gap: '0.5rem',
       },
     },
   },
@@ -89,11 +94,10 @@ export const buttonStyle = cva({
     justifyContent: 'center',
     h: '2.375rem',
     borderRadius: '0.25rem',
-    textStyle: 'body2.r',
     color: 'gray.900',
     cursor: 'pointer',
     gap: '0.5rem',
-    transition: 'background-color 0.3s ease, color 0.3s ease',
+    transition: 'none',
   },
   variants: {
     // 토글 내 활성화 비활성화
@@ -101,10 +105,12 @@ export const buttonStyle = cva({
       true: {
         color: 'gray.900',
         bg: 'gray.0',
+        textStyle: 'body2.m',
       },
       false: {
         color: 'gray.500',
         backgroundColor: 'gray.100',
+        textStyle: 'body2.r',
       },
     },
   },
@@ -121,8 +127,8 @@ export const countStyle = cva({
     minW: '1.375rem',
     h: '1.375rem',
     borderRadius: '0.25rem',
-    textStyle: 'body4.r',
-    transition: 'all 0.3s ease',
+    textStyle: 'body4.m',
+    transition: 'none',
   },
   variants: {
     active: {

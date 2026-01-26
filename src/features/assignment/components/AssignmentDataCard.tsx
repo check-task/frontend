@@ -31,7 +31,6 @@ const cardStyle = css({
 const cardTitleStyle = css({
   textStyle: 'body2.r',
   color: 'gray.900',
-  fontWeight: 'bold',
 });
 
 // 파일 URL

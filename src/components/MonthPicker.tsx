@@ -57,10 +57,16 @@ const modalWrapper = css({
   width: '20rem',
   padding: '1.25rem !important',
   borderRadius: '0.75rem',
-  boxShadow: '0 1px 4px 0 rgba(0, 0, 0, 0.16)', // 크기가 안보여서 임시로 넣어둠
+  // 그림자 다크모드시 밝게 나타나도록 추가
+  boxShadow: '0 0 4px 0 rgba(0, 0, 0, 0.08), 0 1px 4px 0 rgba(0, 0, 0, 0.08)',
+  _dark: {
+    boxShadow:
+      '0 0 4px 0 rgba(238, 239, 241, 0.08), 0 1px 4px 0 rgba(238, 239, 241, 0.08)',
+  },
 
   // 캘린더 전체 컨테이너
   '& .react-calendar': {
+    fontFamily: 'inherit !important', // 폰트 적용 확실하게
     border: 'none !important', // 기본 테두리 없애기
     bg: 'transparent !important', // 기본 배경 없애기
     width: '100% !important',
