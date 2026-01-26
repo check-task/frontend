@@ -1,15 +1,30 @@
+import { CloseIcon } from '@/components/icons/CloseIcon';
+import { PencilIcon } from '@/components/icons/PencilIcon';
 import { css } from 'styled-system/css';
+import { AssignmentData } from '../personal/components/PersonalEtc';
 
-interface AssignmentDataCardProps {
-  name: string;
-  path: string;
+interface AssignmentDataCardProps extends AssignmentData {
+  onEdit: () => void;
 }
 
 // 자료 모음집 카드 컴포넌트
-export const AssignmentDataCard = ({ name, path }: AssignmentDataCardProps) => {
+export const AssignmentDataCard = ({
+  name,
+  path,
+  onEdit,
+}: AssignmentDataCardProps) => {
   return (
-    <div className={cardStyle}>
-      <p className={cardTitleStyle}>{name}</p>
+    <div className={`group ${cardStyle}`}>
+      <div className={headerStyle}>
+        <p className={cardTitleStyle}>{name}</p>
+
+        <div className={iconGroupStyle}>
+          <button onClick={onEdit}>
+            <PencilIcon />
+          </button>
+          <CloseIcon color='gray.700' />
+        </div>
+      </div>
       <p className={cardContentStyle}>{path}</p>
     </div>
   );
@@ -27,6 +42,32 @@ const cardStyle = css({
   shadow: '0 1px 4px 0 rgba(0, 0, 0, 0.16)',
 });
 
+// 파일명 + 아이콘
+const headerStyle = css({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+});
+
+// 아이콘 묶음
+const iconGroupStyle = css({
+  display: 'flex',
+  alignItems: 'center',
+  gap: '0.5rem',
+  flexShrink: 0,
+  opacity: 0,
+  transition: 'opacity 0.2s ease',
+
+  // 카드 호버시 아이콘 나타나도록
+  _groupHover: {
+    opacity: 1,
+  },
+
+  '& svg': {
+    cursor: 'pointer',
+  },
+});
+
 // 파일명
 const cardTitleStyle = css({
   textStyle: 'body2.r',
@@ -39,5 +80,5 @@ const cardContentStyle = css({
   textStyle: 'body3.r',
   color: 'gray.600',
   textDecoration: 'underline',
-  wordBreak: 'break-all', // 긴 링크나 파일명 방어
+  wordBreak: 'break-all', // 줄바꿈
 });
