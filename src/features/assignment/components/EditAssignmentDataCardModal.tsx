@@ -4,6 +4,7 @@ import { Button } from '@/components/Button';
 import { useState } from 'react';
 import { css } from 'styled-system/css';
 import { AssignmentData } from '../personal/components/PersonalEtc';
+import { Input } from '@/components/TextField';
 
 interface EditAssignmentDataModalProps {
   type: 0 | 1; // 0은 url, 1은 파일로 지정
@@ -42,17 +43,17 @@ export const EditAssignmentDataCardModal = ({
       <div className={contentWrapperStyle}>
         <div className={fieldStyle}>
           <label className={labelStyle}>{text.nameLabel}</label>
-          <input
-            className={inputStyle}
-            value={name} // 기본값으로 나타나도록
+          <Input
+            size='modal'
+            value={name}
             placeholder={text.namePlaceholder}
             onChange={(e) => setName(e.target.value)}
           />
         </div>
         <div className={fieldStyle}>
           <label className={labelStyle}>{text.pathLabel}</label>
-          <input
-            className={inputStyle}
+          <Input
+            size='modal'
             value={path}
             placeholder={text.pathPlaceholder}
             onChange={(e) => setPath(e.target.value)}
