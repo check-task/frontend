@@ -9,7 +9,7 @@ import { AddFolderButton } from '@/features/profile/components/AddFolderButton';
 import { EditFolderButton } from '@/features/profile/components/EditFolderButton';
 import { DeleteFolderButton } from '@/features/profile/components/DeleteFolderButton';
 import { AlarmTimeSelect } from '@/features/profile/components/AlarmTimeSelect';
-import { sampleFolders } from '@/data/sampleFolders';
+import { sampleFolders } from '@/constants/sampleFolders';
 
 // 프로필 설정 페이지
 export default function ProfilePage() {
