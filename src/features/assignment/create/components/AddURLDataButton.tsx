@@ -23,12 +23,13 @@ export const AddURLDataButton = ({
 const buttonStyle = css({
   display: 'inline-flex',
   alignItems: 'center',
-  gap: '0.5rem',
+  gap: '0.25rem', // 갭 수정
   background: 'transparent',
   border: 'none',
   cursor: 'pointer',
   textStyle: 'body3.r',
   color: 'gray.400',
   paddingX: '0.75rem',
+  paddingY: '0.5rem',
   width: 'fit-content',
 });
