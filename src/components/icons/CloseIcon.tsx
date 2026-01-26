@@ -1,17 +1,27 @@
 import { css } from 'styled-system/css';
 
-export const CloseIcon = () => {
+interface CloseIconProps {
+  size?: number | string; // 크기
+  color?: string; // 색상
+  strokeWidth?: number; // 선 두께
+}
+
+export const CloseIcon = ({
+  size = '1.75rem',
+  color = 'gray.900',
+  strokeWidth = 1.16667,
+}: CloseIconProps) => {
   const pathStyle = css({
-    stroke: 'gray.900',
-    strokeWidth: '1.16667',
+    stroke: color,
+    strokeWidth,
     strokeLinecap: 'round',
   });
 
   return (
     <svg
       xmlns='http://www.w3.org/2000/svg'
-      width='28'
-      height='28'
+      width={size}
+      height={size}
       viewBox='0 0 28 28'
       fill='none'
     >
