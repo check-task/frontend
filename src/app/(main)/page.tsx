@@ -3,7 +3,7 @@ import { hstack, stack } from 'styled-system/patterns';
 import { DateSelectorWithPicker } from '@/features/home/components/DateSelectorWithPicker';
 import { ButtonGroup } from '@/features/home/components/ButtonGroup';
 import { HomeContent } from '@/features/home/components/HomeContent';
-import { sampleAssignments } from '@/data/sampleAssignments';
+import { sampleAssignments } from '@/constants/sampleAssignments';
 
 export default function Home() {
   return (
