@@ -6,11 +6,11 @@ const baseStyles = {
   display: 'block',
   p: '0.75rem',
   borderRadius: '0.25rem',
-  borderWidth: '0.125rem',
   borderColor: 'gray.400',
   color: 'gray.600',
   bg: 'bg',
   outline: 'none',
+  border: '1px solid', // 두께 수정
 
   _placeholder: {
     color: 'gray.400',
