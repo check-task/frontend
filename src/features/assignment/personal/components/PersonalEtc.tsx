@@ -8,6 +8,7 @@ import { AddAssignmentDataModal } from '@/features/assignment/components/AddAssi
 import { AssignmentDataCard } from '@/features/assignment/components/AssignmentDataCard'; // 공용 컴포넌트 임포트
 import { EditAssignmentDataCardModal } from '../../components/EditAssignmentDataCardModal';
 import { DUMMY_DATA } from '@/constants/AssignmentDataCardMock';
+import { ConfirmDeleteAssignmentDataModal } from '../../components/ConfirmDeleteAssginmentDataModal';
 
 export interface AssignmentData {
   name: string;
@@ -62,6 +63,24 @@ export const PersonalEtc = () => {
     });
   };
 
+  // 자료 삭제 핸들러
+  const handleDelete = (item: DataItem) => {
+    openModal({
+      title: '자료 삭제',
+      headerType: 'none',
+      content: (
+        <ConfirmDeleteAssignmentDataModal
+          highlightText='자료명(파일명.확장자 or URL 경로)'
+          onConfirm={() => {
+            setDataItems((prev) => prev.filter((data) => data.id !== item.id));
+            closeModal();
+          }}
+          onCancel={closeModal}
+        />
+      ),
+    });
+  };
+
   return (
     <div className={etcTypeContainerStyle}>
       <div className={etcTypeTitleStyle}>
@@ -76,6 +95,7 @@ export const PersonalEtc = () => {
             name={item.name}
             path={item.path}
             onEdit={() => handleEdit(item)}
+            onDelete={() => handleDelete(item)}
           />
         ))}
       </div>

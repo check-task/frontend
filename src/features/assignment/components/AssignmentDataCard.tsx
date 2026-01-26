@@ -5,6 +5,7 @@ import { AssignmentData } from '../personal/components/PersonalEtc';
 
 interface AssignmentDataCardProps extends AssignmentData {
   onEdit: () => void;
+  onDelete: () => void;
 }
 
 // 자료 모음집 카드 컴포넌트
@@ -12,6 +13,7 @@ export const AssignmentDataCard = ({
   name,
   path,
   onEdit,
+  onDelete,
 }: AssignmentDataCardProps) => {
   return (
     <div className={`group ${cardStyle}`}>
@@ -22,7 +24,9 @@ export const AssignmentDataCard = ({
           <button onClick={onEdit}>
             <PencilIcon />
           </button>
-          <CloseIcon color='gray.700' />
+          <button onClick={onDelete}>
+            <CloseIcon color='gray.700' />
+          </button>
         </div>
       </div>
       <p className={cardContentStyle}>{path}</p>
