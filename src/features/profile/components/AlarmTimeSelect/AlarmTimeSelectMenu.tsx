@@ -9,29 +9,12 @@ const HOURS = Array.from({ length: 24 }, (_, i) => 24 - i);
 
 interface AlarmTimeSelectMenuProps {
   onSelect: (value: number) => void;
-  onClose: () => void;
 }
 
-export const AlarmTimeSelectMenu = ({
-  onSelect,
-  onClose,
-}: AlarmTimeSelectMenuProps) => {
-  const menuRef = useRef<HTMLDivElement>(null);
-
-  // 외부 클릭 감지 로직 추가
-  useEffect(() => {
-    const handleOutsideClick = (e: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
-        onClose();
-      }
-    };
-    document.addEventListener('mousedown', handleOutsideClick);
-    return () => document.removeEventListener('mousedown', handleOutsideClick);
-  }, [onClose]);
-
+export const AlarmTimeSelectMenu = ({ onSelect }: AlarmTimeSelectMenuProps) => {
+  // 드롭박스에서 진행하던 외부 클릭시 닫기를 부모로 뺌
   return (
-    <DropdownContainer ref={menuRef}>
-      {/* 스크롤이 필요할 수 있으므로 maxHeight를 추가하는 것이 좋습니다 */}
+    <DropdownContainer>
       <ScrollWrapper>
         {HOURS.map((hour) => (
           <OptionItem key={hour} onClick={() => onSelect(hour)}>
@@ -56,15 +39,21 @@ const DropdownContainer = styled('div', {
     padding: '0.25rem',
     bg: 'gray.0',
     borderRadius: '0.5rem',
-    boxShadow: '0px 1px 4px 0px rgba(0, 0, 0, 0.16)',
     overflow: 'hidden',
+    // 그림자 추가
+    boxShadow: '0 1px 4px 0 rgba(0, 0, 0, 0.16)',
+    _dark: {
+      boxShadow:
+        '0 0 4px 0 rgba(238, 239, 241, 0.08), 0 1px 4px 0 rgba(238, 239, 241, 0.08), 0 1px 4px 0 rgba(0, 0, 0, 0.16)',
+    },
   },
 });
 
 // 프로토타입에 스크롤이 없어서 일단은 안보이게
 const ScrollWrapper = styled('div', {
   base: {
-    height: '12.75rem',
+    // 선택 시간 5개만 보이도록 높이 지정
+    height: '12.5rem',
     overflowY: 'auto',
     '&::-webkit-scrollbar': { display: 'none' },
   },
@@ -74,7 +63,8 @@ const OptionItem = styled('button', {
   base: {
     display: 'flex',
     alignItems: 'center',
-    justifyContent: 'flex-start',
+    // 시간이랑 체크 표시가 딱 맞춰지도록
+    justifyContent: 'space-between',
     width: '7.75rem',
     height: '2.5rem',
     padding: '0.5rem 0.25rem 0.5rem 0.5rem',
@@ -85,7 +75,6 @@ const OptionItem = styled('button', {
 
     '& svg': {
       visibility: 'hidden',
-      marginLeft: '0.5rem',
     },
 
     _hover: {

@@ -61,8 +61,8 @@ const headerRecipe = cva({
 
 // 구분선
 const dividerStyle = css({
-  borderBottom: '1px solid',
-  borderColor: 'gray.200',
+  border: '0.5px solid',
+  color: 'gray.200',
   width: 'full',
 });
 
@@ -125,7 +125,7 @@ export const Modal = () => {
             {renderIcon()}
           </header>
           {/* 선 역할 */}
-          <div className={dividerStyle} />
+          <span className={dividerStyle} />
         </div>
         {/* 컨텐츠 영역 */}
         <div className={css({ width: 'full' })}>{content}</div>

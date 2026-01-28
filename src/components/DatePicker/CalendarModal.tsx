@@ -47,8 +47,9 @@ export default function CalendarModal({
         formatShortWeekday={(locale, date) =>
           date.toLocaleString('en', { weekday: 'narrow' })
         }
+        showNeighboringMonth={true} // 기본이 true인데 한번 더 명시
+        showFixedNumberOfWeeks={true} // 6주를 보여주는 프롭이 있음
       />
-
       <div className={footer}>
         <Button
           variant='fillGray'
@@ -100,9 +101,16 @@ const modalWrapper = css({
   p: '1.5rem 1.25rem',
   borderRadius: '0.75rem',
   width: '21.25rem',
+  // 그림자 다크모드시 밝게 나타나도록 추가
+  boxShadow: '0 0 4px 0 rgba(0, 0, 0, 0.08), 0 1px 4px 0 rgba(0, 0, 0, 0.08)',
+  _dark: {
+    boxShadow:
+      '0 0 4px 0 rgba(238, 239, 241, 0.08), 0 1px 4px 0 rgba(238, 239, 241, 0.08)',
+  },
 
   // 캘린더 전체 컨테이너
   '& .react-calendar': {
+    fontFamily: 'inherit !important', // 폰트 적용 확실하게
     border: 'none !important', // 기본 테두리 없애기
     bg: 'transparent !important', // 기본 배경 없애기
     width: '100% !important',
@@ -218,6 +226,7 @@ const modalWrapper = css({
   // 이웃한 달 날짜들
   '& .react-calendar__month-view__days__day--neighboringMonth': {
     color: 'gray.400 !important',
+    opacity: 0.38,
 
     // 이웃한 달이면 주말도 연하게 (중첩)
     '&.react-calendar__month-view__days__day--weekend': {
