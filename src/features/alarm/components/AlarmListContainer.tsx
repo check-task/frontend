@@ -3,13 +3,9 @@
 import { useState } from 'react';
 import { css, cva } from 'styled-system/css';
 import { flex } from 'styled-system/patterns';
-import { AlarmCard, AlarmCardProps } from './AlarmCard';
+import { AlarmCard, AlarmData } from './AlarmCard';
 import { useUIStore } from '@/stores/ui-store';
-
-// id 속성 추가
-interface AlarmData extends AlarmCardProps {
-  id: number;
-}
+import { AlarmAllClearButton } from './AlarmAllClearButton';
 
 interface AlarmListContainerProps {
   // 알림이 없는 경우도 고려해서 옵셔널
@@ -29,9 +25,8 @@ export const AlarmListContainer = ({
   };
 
   // 모든 알림 삭제 함수
-  // confirm은 임시로 넣어두었습니다
   const handleClearAll = () => {
-    if (alarms.length > 0 && confirm('모든 알림을 삭제하시겠습니까?')) {
+    if (alarms.length > 0) {
       setAlarms([]);
     }
   };
@@ -50,9 +45,7 @@ export const AlarmListContainer = ({
         })}
       >
         <div className={titleStyle}>알림</div>
-        <button onClick={handleClearAll} className={deleteAllButtonStyle}>
-          모두 지우기
-        </button>
+        <AlarmAllClearButton onClearAll={handleClearAll} />
       </header>
 
       {/* 알림 카드 리스트 */}
@@ -60,11 +53,8 @@ export const AlarmListContainer = ({
         {alarms.map((alarm) => (
           <AlarmCard
             key={alarm.id}
-            taskTitle={alarm.taskTitle}
-            remainingTime={alarm.remainingTime}
-            progressRate={alarm.progressRate}
-            isDone={alarm.isDone}
-            onDelete={() => handleDelete(alarm.id)} // 개별 삭제
+            {...alarm}
+            onDelete={() => handleDelete(alarm.id)}
           />
         ))}
       </div>
@@ -102,14 +92,4 @@ const containerStyle = cva({
 const titleStyle = css({
   textStyle: 'h3',
   color: 'gray.900',
-});
-
-const deleteAllButtonStyle = css({
-  textStyle: 'body2.m',
-  color: 'gray.400',
-  textDecoration: 'underline',
-  // 지정값으로 주면 너무 붙어보여서 좀 늘렸습니다
-  textUnderlineOffset: '0.5rem',
-  cursor: 'pointer',
-  transition: 'color 0.3s',
 });

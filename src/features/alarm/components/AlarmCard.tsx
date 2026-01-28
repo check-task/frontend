@@ -5,15 +5,20 @@ import { flex } from 'styled-system/patterns';
 import { AlarmIcon } from '@/components/icons/AlarmIcon';
 import { AlarmCloseIcon } from '@/components/icons/AlarmCloseIcon';
 
-export interface AlarmCardProps {
-  taskTitle: string; // 과제 제목
-  remainingTime: number; // 남은 시간 (숫자만 받음)
-  progressRate: number; // 진행률 (숫자만 받음)
-  isDone?: boolean; // 끝났는지 아닌지
+export interface AlarmData {
+  id: number;
+  taskTitle: string;
+  remainingTime: number;
+  progressRate: number;
+  isDone?: boolean;
+}
+
+interface AlarmCardProps extends AlarmData {
   onDelete?: () => void;
 }
 
 export const AlarmCard = ({
+  id,
   taskTitle,
   remainingTime,
   progressRate,
@@ -63,7 +68,6 @@ const cardContainer = cva({
     gap: '1rem',
     boxShadow: '0 1px 4px rgba(0, 0, 0, 0.16)',
     position: 'relative',
-    transition: 'all 0.3s ease',
   },
   variants: {
     // 알림 완료 상태
