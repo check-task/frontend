@@ -1,5 +1,5 @@
 import { AlarmListContainer } from '@/features/alarm/components/AlarmListContainer';
-import { DUMMY_ALARMS } from '@/features/alarm/mocks/AlarmMock';
+import { DUMMY_ALARMS } from '@/constants/AlarmMock';
 
 export default function AlarmPage() {
   return (

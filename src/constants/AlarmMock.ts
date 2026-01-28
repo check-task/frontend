@@ -1,4 +1,4 @@
-import { AlarmData } from '../components/AlarmCard';
+import { AlarmData } from '../features/alarm/components/AlarmCard';
 
 // 알람 더미 데이터
 export const DUMMY_ALARMS: AlarmData[] = [
