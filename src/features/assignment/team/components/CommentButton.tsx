@@ -1,23 +1,28 @@
 'use client';
 
-import { useState } from 'react';
 import { CommentIcon } from '@/components/icons/CommentIcon';
 import { css, cx } from 'styled-system/css';
 
-export const CommentButton = () => {
-  const [isClicked, setIsClicked] = useState(false);
+interface CommentButtonProps {
+  isOpen?: boolean;
+  onClick?: () => void;
+  commentCount?: number;
+}
 
-  const handleClick = () => {
-    setIsClicked(!isClicked);
-  };
-
+export const CommentButton = ({
+  isOpen = false,
+  onClick,
+  commentCount = 0,
+}: CommentButtonProps) => {
   return (
     <button
-      className={cx(commentButtonStyle, isClicked && clickedStyle)}
-      onClick={handleClick}
+      className={cx(commentButtonStyle, isOpen && clickedStyle)}
+      onClick={onClick}
     >
       <CommentIcon />
-      <p className={css({ textStyle: 'body2.r', color: 'blue.500' })}>1</p>
+      <p className={css({ textStyle: 'body2.r', color: 'blue.500' })}>
+        {commentCount}
+      </p>
     </button>
   );
 };

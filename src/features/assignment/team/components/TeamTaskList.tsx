@@ -7,9 +7,14 @@ import { ClockToggle } from '../../components/ClockToggle';
 import { CommentButton } from './CommentButton';
 import { TeamTaskManager } from './TeamTaskManager';
 import DatePicker from '@/components/DatePicker';
+import { Input } from '@/components/TextField';
+import { CommentEditDropdown } from './CommentEditDropdown';
 
 const TeamTaskList = () => {
   const [checkedTasks, setCheckedTasks] = useState<{ [key: number]: boolean }>(
+    {},
+  );
+  const [openComments, setOpenComments] = useState<{ [key: number]: boolean }>(
     {},
   );
 
@@ -20,9 +25,18 @@ const TeamTaskList = () => {
     }));
   };
 
+  const handleCommentToggle = (taskId: number) => {
+    setOpenComments((prev) => ({
+      ...prev,
+      [taskId]: !prev[taskId],
+    }));
+  };
+
   // TODO: 데이터 연동 후 방식 변경
   const task1Checked = checkedTasks[1] || false;
   const task2Checked = checkedTasks[2] || false;
+  const task1CommentOpen = openComments[1] || false;
+  const task2CommentOpen = openComments[2] || false;
 
   return (
     <div className={teamTaskListContainerStyle}>
@@ -41,7 +55,11 @@ const TeamTaskList = () => {
             <div className={taskComponentsStyle({ checked: task1Checked })}>
               <DatePicker />
               <ClockToggle />
-              <CommentButton />
+              <CommentButton
+                isOpen={task1CommentOpen}
+                onClick={() => handleCommentToggle(1)}
+                commentCount={1}
+              />
             </div>
           </div>
 
@@ -52,6 +70,34 @@ const TeamTaskList = () => {
             <TeamTaskManager manager='두현우' />
           </div>
         </div>
+
+        {task1CommentOpen && (
+          <div className={commentSectionStyle}>
+            <div className={inputWrapperStyle}>
+              <Input
+                size='basic'
+                placeholder='댓글 추가'
+                className={commentInputStyle}
+              />
+              <div className={inputProfileIconStyle} />
+            </div>
+            <div className={commentItemContainerStyle}>
+              <div className={commentItemStyle}>
+                <div className={commentItemHeaderStyle}>
+                  <div className={commentItemHeaderProfileStyle} />
+                  <p className={commentItemHeaderCommentStyle}>
+                    수고하셨습니다!
+                  </p>
+                </div>
+
+                <div className={commentItemEtcStyle}>
+                  <p>26.01.29 00:00</p>
+                  <CommentEditDropdown />
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         <div className={taskItemContainerStyle({ checked: task2Checked })}>
           <div className={teamTaskItemTitleStyle}>
@@ -67,7 +113,11 @@ const TeamTaskList = () => {
             <div className={taskComponentsStyle({ checked: task2Checked })}>
               <DatePicker />
               <ClockToggle />
-              <CommentButton />
+              <CommentButton
+                isOpen={task2CommentOpen}
+                onClick={() => handleCommentToggle(2)}
+                commentCount={0}
+              />
             </div>
           </div>
 
@@ -216,6 +266,78 @@ const managerLabelStyle = cva({
   defaultVariants: {
     checked: false,
   },
+});
+
+const commentSectionStyle = css({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '1.25rem',
+  w: '36.375rem',
+  h: 'auto',
+  ml: '2.25rem',
+});
+
+const inputWrapperStyle = css({
+  position: 'relative',
+  display: 'flex',
+  alignItems: 'center',
+  width: '100%',
+});
+
+const commentInputStyle = css({
+  width: '100%',
+  paddingRight: '3rem',
+});
+
+const inputProfileIconStyle = css({
+  position: 'absolute',
+  right: '0.75rem',
+  display: 'flex',
+  w: '1.5rem',
+  h: '1.5rem',
+  borderRadius: '100%',
+  bg: 'blue.100',
+  pointerEvents: 'none',
+});
+
+const commentItemContainerStyle = css({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '1rem',
+  alignItems: 'center',
+});
+
+const commentItemStyle = css({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  width: 'full',
+});
+
+const commentItemHeaderStyle = css({
+  display: 'flex',
+  alignItems: 'center',
+  gap: '0.5rem',
+});
+
+const commentItemHeaderProfileStyle = css({
+  display: 'flex',
+  w: '1.5rem',
+  h: '1.5rem',
+  borderRadius: '100%',
+  bg: 'blue.100',
+});
+
+const commentItemHeaderCommentStyle = css({
+  textStyle: 'body3',
+  color: 'gray.700',
+});
+
+const commentItemEtcStyle = css({
+  display: 'flex',
+  alignItems: 'center',
+  textStyle: 'body4.r',
+  color: 'gray.400',
 });
 
 export default TeamTaskList;
