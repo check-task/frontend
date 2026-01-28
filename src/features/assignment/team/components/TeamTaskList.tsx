@@ -4,6 +4,7 @@ import { css } from 'styled-system/css';
 import { ClockToggle } from '../../components/ClockToggle';
 import { CommentButton } from './CommentButton';
 import { TeamTaskManager } from './TeamTaskManager';
+import DatePicker from '@/components/DatePicker';
 
 const TeamTaskList = () => {
   return (
@@ -18,7 +19,7 @@ const TeamTaskList = () => {
               </p>
             </div>
             <div className={teamTaskItemComponentStyle}>
-              <div>DatePicker</div>
+              <DatePicker />
               <ClockToggle />
               <CommentButton />
             </div>
@@ -41,7 +42,7 @@ const TeamTaskList = () => {
               </p>
             </div>
             <div className={teamTaskItemComponentStyle}>
-              <div>DatePicker</div>
+              <DatePicker />
               <ClockToggle />
               <CommentButton />
             </div>
