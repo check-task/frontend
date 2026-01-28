@@ -69,7 +69,6 @@ const dateStyle = cva({
     paddingX: '0.75rem',
     paddingY: '0.25rem',
     borderRadius: '0.25rem',
-    bg: 'bg',
     textStyle: 'btn',
   },
   variants: {
@@ -85,7 +84,6 @@ const dateStyle = cva({
       date: {
         color: 'gray.400',
         textStyle: 'body3.r',
-        bg: 'transparent',
       },
     },
   },
@@ -104,6 +102,7 @@ const cardContainerStyle = css(
     width: '100%',
     _hover: {
       bg: 'blue.50',
+      transition: 'background-color 0.3s ease-out',
     },
   }),
 );
