@@ -119,7 +119,7 @@ const sidebarStyleVariant = cva({
   variants: {
     collapsed: {
       true: {
-        w: '4.5rem', // 접힌 상태: 아이콘 + padding
+        w: '3.75rem', // 접힌 상태: 아이콘 + padding
       },
       false: {
         w: '15rem', // 펼쳐진 상태: 아이콘 + 텍스트 + padding
