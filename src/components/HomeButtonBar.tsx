@@ -47,6 +47,7 @@ const containerStyle = css({
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
+  zIndex: 'sticky',
 });
 
 // 알림 버튼 Wrapper

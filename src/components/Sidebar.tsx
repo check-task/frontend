@@ -114,7 +114,7 @@ const sidebarStyleVariant = cva({
     position: 'fixed',
     top: '0',
     left: '0',
-    zIndex: 10,
+    zIndex: 'banner',
   },
   variants: {
     collapsed: {
