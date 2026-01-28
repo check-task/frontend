@@ -1,6 +1,3 @@
-'use client';
-
-import { useState } from 'react';
 import { styled } from 'styled-system/jsx';
 import { hstack } from 'styled-system/patterns';
 
@@ -13,28 +10,18 @@ const TABS: { id: SortType; label: string }[] = [
 ];
 
 interface SortTabsProps {
-  defaultTab?: SortType;
-  onTabChange?: (tab: SortType) => void;
+  activeTab: SortType;
+  onTabChange: (tab: SortType) => void;
 }
 
-export const SortTabs = ({
-  defaultTab = 'priority',
-  onTabChange,
-}: SortTabsProps) => {
-  const [activeTab, setActiveTab] = useState<SortType>(defaultTab);
-
-  const handleTabClick = (tab: SortType) => {
-    setActiveTab(tab);
-    onTabChange?.(tab);
-  };
-
+export const SortTabs = ({ activeTab, onTabChange }: SortTabsProps) => {
   return (
     <Tabs.Container>
       {TABS.map((tab) => (
         <Tabs.Tab
           key={tab.id}
           active={activeTab === tab.id}
-          onClick={() => handleTabClick(tab.id)}
+          onClick={() => onTabChange(tab.id)}
         >
           {tab.label}
         </Tabs.Tab>

@@ -14,12 +14,25 @@ interface MonthPickerProps {
 
 export default function MonthPicker({ onClose }: MonthPickerProps) {
   const setDate = useCalendarStore((state) => state.setDate);
+  const viewingYear = useCalendarStore((state) => state.viewingYear);
+  const setViewingYear = useCalendarStore((state) => state.setViewingYear);
 
   const handleClickMonth = (value: Date) => {
     const year = value.getFullYear();
     const month = value.getMonth() + 1; // getMonth()는 0부터 시작하므로 +1
     setDate(year, month);
     onClose?.();
+  };
+
+  // 년도 이동 시 호출
+  const handleActiveStartDateChange = ({
+    activeStartDate,
+  }: {
+    activeStartDate: Date | null;
+  }) => {
+    if (activeStartDate) {
+      setViewingYear(activeStartDate.getFullYear());
+    }
   };
 
   return (
@@ -29,6 +42,8 @@ export default function MonthPicker({ onClose }: MonthPickerProps) {
         calendarType='gregory'
         maxDetail='year'
         minDetail='year'
+        activeStartDate={new Date(viewingYear, 0, 1)}
+        onActiveStartDateChange={handleActiveStartDateChange}
         nextLabel={<DatepickerNextIcon size='lg' />}
         prevLabel={<DatepickerPrevIcon size='lg' />}
         next2Label={null}
