@@ -5,7 +5,16 @@ import { FolderColorSelect } from './FolderColorSelect';
 import DatePicker from '@/components/DatePicker';
 import { css } from 'styled-system/css';
 
-export const AddAssignmentContent = () => {
+interface AddAssignmentContentProps {
+  onNameChange?: (name: string) => void;
+  onColorChange?: (color: string) => void;
+  onDateChange?: (date: Date | null) => void;
+}
+
+export const AddAssignmentContent = ({
+  onNameChange,
+  onColorChange,
+}: AddAssignmentContentProps) => {
   return (
     <div className={contentWrapperStyle}>
       <div className={contentItemStyle}>
@@ -14,12 +23,13 @@ export const AddAssignmentContent = () => {
           size='basic'
           placeholder='과제명을 입력하세요.'
           className={css({ flex: 1 })}
+          onChange={(e) => onNameChange?.(e.target.value)}
         />
       </div>
 
       <div className={contentItemStyle}>
         <p className={labelTextStyle}>폴더색</p>
-        <FolderColorSelect />
+        <FolderColorSelect onChange={onColorChange} />
       </div>
 
       <div className={contentItemStyle}>
