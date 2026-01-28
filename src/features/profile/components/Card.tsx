@@ -26,7 +26,7 @@ const cardStyle = cva({
     borderRadius: '0.75rem',
     bg: 'gray.0',
     shadow: '0px 1px 4px 0px rgba(0, 0, 0, 0.16)',
-    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+    transition: 'width 0.3s ease, padding 0.3s ease, gap 0.3s ease',
   },
   variants: {
     collapsed: {

@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { styled } from 'styled-system/jsx';
 import { css } from 'styled-system/css';
 import { Button } from '@/components/Button';
@@ -14,6 +15,10 @@ interface EditProfileModalContentProps {
 export const EditProfileModalContent = ({
   onSave,
 }: EditProfileModalContentProps) => {
+  const [nickname, setNickname] = useState('');
+  const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
+
   return (
     <>
       <Modal.Container gap='large'>
@@ -30,17 +35,35 @@ export const EditProfileModalContent = ({
         {/* 입력 필드들 */}
         <Modal.FormField gap='small'>
           <Modal.Label>닉네임</Modal.Label>
-          <Input size='modal' type='text' placeholder='송월' />
+          <Input
+            size='modal'
+            type='text'
+            placeholder='송월'
+            value={nickname}
+            onChange={(e) => setNickname(e.target.value)}
+          />
         </Modal.FormField>
 
         <Modal.FormField gap='small'>
           <Modal.Label>연락처</Modal.Label>
-          <Input size='modal' type='tel' placeholder='010-1234-5678' />
+          <Input
+            size='modal'
+            type='tel'
+            placeholder='010-1234-5678'
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+          />
         </Modal.FormField>
 
         <Modal.FormField gap='small'>
           <Modal.Label>이메일</Modal.Label>
-          <Input size='modal' type='email' placeholder='checktask@ct.kr' />
+          <Input
+            size='modal'
+            type='email'
+            placeholder='checktask@ct.kr'
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
         </Modal.FormField>
       </Modal.Container>
 
@@ -49,6 +72,7 @@ export const EditProfileModalContent = ({
         variant='fillBlue'
         size='xlarge'
         onClick={onSave}
+        disabled={!nickname.trim() || !phone.trim() || !email.trim()}
         className={css({ marginTop: '2.125rem' })}
       >
         변경사항 저장

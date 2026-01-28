@@ -1,6 +1,5 @@
 import { styled } from '../../../../styled-system/jsx';
 import { hstack, stack } from '../../../../styled-system/patterns';
-import { CameraIcon } from '@/components/icons/CameraIcon';
 import { Card } from '@/features/profile/components/Card';
 import { NotificationSetting } from '@/features/profile/components/NotificationSetting';
 import { FolderSetting } from '@/features/profile/components/FolderSetting';
@@ -10,6 +9,7 @@ import { AddFolderButton } from '@/features/profile/components/AddFolderButton';
 import { EditFolderButton } from '@/features/profile/components/EditFolderButton';
 import { DeleteFolderButton } from '@/features/profile/components/DeleteFolderButton';
 import { AlarmTimeSelect } from '@/features/profile/components/AlarmTimeSelect';
+import { sampleFolders } from '@/constants/sampleFolders';
 
 // 프로필 설정 페이지
 export default function ProfilePage() {
@@ -21,12 +21,7 @@ export default function ProfilePage() {
         {/* 프로필 카드 */}
         <Card type='profile'>
           <Profile.ImageSection>
-            <Profile.ImageWrapper>
-              <Profile.Image />
-              <Profile.ImageOverlay>
-                <CameraIcon />
-              </Profile.ImageOverlay>
-            </Profile.ImageWrapper>
+            <Profile.Image />
             <Profile.Name>송월</Profile.Name>
           </Profile.ImageSection>
 
@@ -36,10 +31,7 @@ export default function ProfilePage() {
           {/* 기본 정보 섹션 */}
           <Profile.InfoSection>
             <Profile.BasicInfo>
-              <Profile.InfoHeader>
-                <Text.SectionTitle>기본정보</Text.SectionTitle>
-                <EditProfileButton />
-              </Profile.InfoHeader>
+              <Text.SectionTitle>기본정보</Text.SectionTitle>
               <Profile.InfoContent>
                 {[
                   { label: '연락처', value: '010-8831-4721' },
@@ -52,10 +44,7 @@ export default function ProfilePage() {
                 ))}
               </Profile.InfoContent>
             </Profile.BasicInfo>
-            <StyledButton.UnderlineLink>
-              <Text.PasswordLink>비밀번호 변경</Text.PasswordLink>
-              <Underline color='password' />
-            </StyledButton.UnderlineLink>
+            <EditProfileButton />
           </Profile.InfoSection>
         </Card>
       </Layout.Section>
@@ -90,12 +79,7 @@ export default function ProfilePage() {
               <AddFolderButton />
             </Folder.Header>
             <Folder.List>
-              {[
-                { color: 'black' as const, name: '프로그래밍' },
-                { color: 'red' as const, name: '그만세' },
-                { color: 'yellow' as const, name: '웹서프' },
-                { color: 'purple' as const, name: '팀과제' },
-              ].map((folder) => (
+              {sampleFolders.map((folder) => (
                 <Folder.Item key={folder.name}>
                   <Folder.Info>
                     <Folder.Color color={folder.color} />
@@ -144,7 +128,8 @@ const Layout = {
       gap: '1.75rem',
       width: '62.25rem',
       marginX: 'auto',
-      marginY: '2rem',
+      marginTop: '3.25rem',
+      marginBottom: '3.75rem',
     }),
   }),
   Section: styled('section', {
@@ -173,19 +158,8 @@ const Text = {
   Value: styled('span', {
     base: { textStyle: 'body1.m', color: 'gray.700' },
   }),
-  PasswordLink: styled('span', {
-    base: {
-      textStyle: 'body4.m',
-      color: 'gray.500',
-      width: '5rem',
-      height: '1.25rem',
-    },
-  }),
   SettingLabel: styled('span', {
     base: { textStyle: 'body1.r', color: 'gray.400' },
-  }),
-  Footer: styled('p', {
-    base: { textStyle: 'body4.r', color: 'gray.400' },
   }),
   FooterLinks: styled('div', {
     base: hstack.raw({ gap: '0.25rem', alignItems: 'center' }),
@@ -202,70 +176,12 @@ const Text = {
       color: 'gray.300',
     },
   }),
-  WithdrawalLink: styled('span', {
-    base: { textStyle: 'body4.m', color: 'gray.400' },
-  }),
-};
-
-// 버튼 스타일
-const StyledButton = {
-  Edit: styled('button', {
-    base: {
-      textStyle: 'btn',
-      color: 'blue.500',
-      paddingX: '1rem',
-      paddingY: '0.5rem',
-      borderRadius: '0.5rem',
-      border: '1px solid',
-      borderColor: 'blue.500',
-      bg: 'transparent',
-      cursor: 'pointer',
-      _hover: { bg: 'blue.50' },
-    },
-  }),
-  UnderlineLink: styled('button', {
-    base: {
-      display: 'flex',
-      flexDirection: 'column',
-      gap: '0.25rem',
-      textStyle: 'body4.m',
-      color: 'gray.500',
-      cursor: 'pointer',
-      alignSelf: 'flex-start',
-    },
-  }),
-  Add: styled('button', {
-    base: {
-      textStyle: 'h4',
-      color: 'gray.400',
-      bg: 'transparent',
-      border: 'none',
-      cursor: 'pointer',
-      _hover: { color: 'gray.600' },
-    },
-  }),
-  Action: styled('button', {
-    base: {
-      textStyle: 'body1.r',
-      color: 'gray.400',
-      bg: 'transparent',
-      border: 'none',
-      cursor: 'pointer',
-      _hover: { color: 'gray.600' },
-    },
-  }),
 };
 
 // 프로필 섹션 스타일
 const Profile = {
   ImageSection: styled('div', {
     base: stack.raw({ gap: '1.5rem', alignItems: 'center' }),
-  }),
-  ImageWrapper: styled('div', {
-    base: {
-      position: 'relative',
-      cursor: 'pointer',
-    },
   }),
   Image: styled('div', {
     base: {
@@ -275,40 +191,11 @@ const Profile = {
       bg: 'blue.100',
     },
   }),
-  ImageOverlay: styled('div', {
-    base: {
-      position: 'absolute',
-      top: 0,
-      left: 0,
-      width: '10rem',
-      height: '10rem',
-      borderRadius: '50%',
-      background:
-        'linear-gradient(0deg, rgba(0, 0, 0, 0.60) 0%, rgba(0, 0, 0, 0.60) 100%), var(--colors-blue-100)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      opacity: 0,
-      transition: 'opacity 0.2s ease',
-      _hover: {
-        opacity: 1,
-      },
-    },
-  }),
-  CameraIcon: styled('span', {
-    base: {
-      fontSize: '1.5rem',
-      color: 'white',
-    },
-  }),
   Name: styled('p', {
     base: { textStyle: 'body1.m', color: 'gray.900' },
   }),
   InfoSection: styled('div', {
     base: stack.raw({ gap: '2.5rem', flex: 1 }),
-  }),
-  InfoHeader: styled('div', {
-    base: hstack.raw({ justifyContent: 'space-between', alignItems: 'center' }),
   }),
   BasicInfo: styled('div', {
     base: stack.raw({ gap: '1.75rem' }),
@@ -389,20 +276,6 @@ const Divider = styled('div', {
       profile: { height: '13.625rem', bg: 'gray.200' },
       management: { height: '17.25rem', bg: 'gray.200' },
       footer: { height: '1rem', bg: 'gray.300' },
-    },
-  },
-});
-
-// 언더라인
-const Underline = styled('span', {
-  base: {
-    width: '100%',
-    height: '0.0625rem',
-  },
-  variants: {
-    color: {
-      password: { bg: 'gray.500' },
-      withdrawal: { bg: 'gray.400' },
     },
   },
 });

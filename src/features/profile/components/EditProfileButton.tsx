@@ -1,8 +1,8 @@
 'use client';
 
-import { Button } from '@/components/Button';
 import { useModalStore } from '@/stores/modal-store';
 import { EditProfileModalContent } from './EditProfileModalContent';
+import { styled } from 'styled-system/jsx';
 
 export const EditProfileButton = () => {
   const openModal = useModalStore((state) => state.openModal);
@@ -16,8 +16,34 @@ export const EditProfileButton = () => {
   };
 
   return (
-    <Button variant='strokeBlue' size='tiny' onClick={handleOpen}>
-      수정
-    </Button>
+    <UnderlineLink onClick={handleOpen}>
+      <ProfileLink>프로필 변경</ProfileLink>
+      <Underline />
+    </UnderlineLink>
   );
 };
+
+const UnderlineLink = styled('button', {
+  base: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '0.25rem',
+    cursor: 'pointer',
+    alignSelf: 'flex-start',
+  },
+});
+
+const ProfileLink = styled('span', {
+  base: {
+    textStyle: 'body4.m',
+    color: 'blue.500',
+  },
+});
+
+const Underline = styled('span', {
+  base: {
+    width: '100%',
+    height: '0.0625rem',
+    bg: 'blue.500',
+  },
+});
