@@ -6,12 +6,18 @@ import { css } from 'styled-system/css';
 import { useModalStore } from '@/stores/modal-store';
 import { AddAssignmentDataModal } from '@/features/assignment/components/AddAssignmentDataModal';
 import { AssignmentDataCard } from '@/features/assignment/components/AssignmentDataCard'; // 공용 컴포넌트 임포트
+import { EditAssignmentDataCardModal } from '../../components/EditAssignmentDataCardModal';
+import { DUMMY_DATA } from '@/constants/AssignmentDataCardMock';
+import { ConfirmDeleteAssignmentDataModal } from '../../components/ConfirmDeleteAssginmentDataModal';
 
-interface DataItem {
-  id: number;
-  type: 0 | 1;
+export interface AssignmentData {
   name: string;
   path: string;
+}
+
+export interface DataItem extends AssignmentData {
+  id: number;
+  type: 0 | 1; // 0은 url, 1은 파일로 지정
 }
 
 export const PersonalEtc = () => {
@@ -35,6 +41,46 @@ export const PersonalEtc = () => {
     });
   };
 
+  // 자료 수정 핸들러
+  const handleEdit = (item: DataItem) => {
+    openModal({
+      title: '자료 수정',
+      content: (
+        <EditAssignmentDataCardModal
+          type={item.type} // 타입 전달 0,1 형태에 따라 문구 다르게
+          defaultValue={{ name: item.name, path: item.path }} // 이미 작성되어 있던 기본값
+          onSave={(updated) => {
+            setDataItems((prev) =>
+              prev.map((data) =>
+                // 수정된 id이면 기존값은 그대로에 업데이트 된 내용만 덮어씀
+                data.id === item.id ? { ...data, ...updated } : data,
+              ),
+            );
+            closeModal();
+          }}
+        />
+      ),
+    });
+  };
+
+  // 자료 삭제 핸들러
+  const handleDelete = (item: DataItem) => {
+    openModal({
+      title: '자료 삭제',
+      headerType: 'none',
+      content: (
+        <ConfirmDeleteAssignmentDataModal
+          highlightText='자료명(파일명.확장자 or URL 경로)'
+          onConfirm={() => {
+            setDataItems((prev) => prev.filter((data) => data.id !== item.id));
+            closeModal();
+          }}
+          onCancel={closeModal}
+        />
+      ),
+    });
+  };
+
   return (
     <div className={etcTypeContainerStyle}>
       <div className={etcTypeTitleStyle}>
@@ -44,7 +90,13 @@ export const PersonalEtc = () => {
 
       <div className={etcCardContainerStyle}>
         {dataItems.map((item) => (
-          <AssignmentDataCard key={item.id} name={item.name} path={item.path} />
+          <AssignmentDataCard
+            key={item.id}
+            name={item.name}
+            path={item.path}
+            onEdit={() => handleEdit(item)}
+            onDelete={() => handleDelete(item)}
+          />
         ))}
       </div>
     </div>
@@ -78,10 +130,3 @@ const etcCardContainerStyle = css({
   gap: '1rem',
   width: '100%',
 });
-
-// ======== 더미 데이터 ========
-const DUMMY_DATA: DataItem[] = [
-  { id: 1, type: 0, name: '이클래스', path: 'https://class.tukorea.ac.kr/' },
-  { id: 2, type: 1, name: '과제 공지 자료', path: '프로그래밍 제1차 과제.pdf' },
-  { id: 3, type: 1, name: '선행연구', path: 'FIFO알고리즘의효과에대하여.pdf' },
-];
