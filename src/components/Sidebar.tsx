@@ -10,6 +10,7 @@ import { css, cva } from 'styled-system/css';
 import { SidebarCloseButton } from './SidebarCloseButton';
 import { useEffect, useState, useRef } from 'react';
 import { useUIStore } from '@/stores/ui-store';
+import { SidebarHooks } from './SidebarHooks';
 
 interface SidebarProps {
   initialCollapsed: boolean;
@@ -95,7 +96,10 @@ export const Sidebar = ({ initialCollapsed, initialTheme }: SidebarProps) => {
       </div>
 
       <div className={contentStyle}>
-        <AssignmentButton collapsed={isSidebarCollapsed} />
+        <div>
+          <AssignmentButton collapsed={isSidebarCollapsed} />
+          <SidebarHooks collapsed={isSidebarCollapsed} />
+        </div>
         <CompletedAssignmentButton collapsed={isSidebarCollapsed} />
         <MyInfoButton collapsed={isSidebarCollapsed} />
         <ModeSwitchToggle collapsed={isSidebarCollapsed} />
