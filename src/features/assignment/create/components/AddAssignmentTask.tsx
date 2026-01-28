@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { PlusButton } from '@/components/PlusButton';
 import { Input } from '@/components/TextField';
+import DatePicker from '@/components/DatePicker';
 import { css } from 'styled-system/css';
 
 export const AddAssignmentTask = () => {
@@ -26,14 +27,22 @@ export const AddAssignmentTask = () => {
         })}
       >
         {taskInputs.map((id) => (
-          <Input
+          <div
             key={id}
-            size='basic'
-            placeholder='TASK명을 입력하세요.'
-            className={css({ flex: 1 })}
-          />
+            className={css({
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+            })}
+          >
+            <Input
+              size='basic'
+              placeholder='TASK명을 입력하세요.'
+              className={css({ flex: 1 })}
+            />
+            <DatePicker />
+          </div>
         ))}
-        {/* TODO: DatePicker 추가 */}
 
         <PlusButton
           onClick={handleAddTask}
