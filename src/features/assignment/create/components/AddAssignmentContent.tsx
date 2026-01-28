@@ -1,5 +1,8 @@
+'use client';
+
 import { Input } from '@/components/TextField';
 import { FolderColorSelect } from './FolderColorSelect';
+import DatePicker from '@/components/DatePicker';
 import { css } from 'styled-system/css';
 
 export const AddAssignmentContent = () => {
@@ -21,7 +24,7 @@ export const AddAssignmentContent = () => {
 
       <div className={contentItemStyle}>
         <p className={labelTextStyle}>마감일</p>
-        {/* DatePicker 추가 */}
+        <DatePicker />
       </div>
     </div>
   );
