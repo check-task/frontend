@@ -7,7 +7,11 @@ export const AddAssignmentContent = () => {
     <div className={contentWrapperStyle}>
       <div className={contentItemStyle}>
         <p className={labelTextStyle}>과제명</p>
-        <Input size='basic' placeholder='과제명을 입력하세요.' />
+        <Input
+          size='basic'
+          placeholder='과제명을 입력하세요.'
+          className={css({ flex: 1 })}
+        />
       </div>
 
       <div className={contentItemStyle}>
