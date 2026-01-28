@@ -104,8 +104,9 @@ const containerStyle = css({
 const inputContainerStyle = css({
   display: 'flex',
   flexDirection: 'column',
-  gap: '1.25rem',
+  gap: '1rem',
   width: '100%',
+  pb: '1rem',
 });
 
 const inputGroupStyle = css({
