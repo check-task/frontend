@@ -69,12 +69,8 @@ const taskDataWrapperStyle = css({
 const buttonWrapperStyle = css({
   display: 'flex',
   justifyContent: 'space-between',
-  position: 'fixed',
-  bottom: '5rem',
-  left: '50%',
-  transform: 'translateX(-50%)',
+  mt: '6.125rem',
   w: '49.625rem',
-  zIndex: 1000,
 });
 
 export default page;
