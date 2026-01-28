@@ -13,7 +13,6 @@ const buttonStyle = cva({
     color: 'blue.600',
     gap: '0.75rem',
     cursor: 'pointer',
-    ml: '0.4rem',
   },
 });
 

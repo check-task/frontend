@@ -126,8 +126,8 @@ const containerStyle = cva({
     },
     collapsed: {
       true: {
-        w: '2.5rem',
-        h: '2.5rem',
+        w: '1.75rem',
+        h: '1.75rem',
         px: '0',
         justifyContent: 'center',
       },

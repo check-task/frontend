@@ -17,7 +17,6 @@ const imageWrapperStyle = css({
   flexShrink: 0,
   w: '1.75rem',
   h: '1.75rem',
-  ml: '0.4rem',
 });
 
 interface SidebarOpenButtonProps {
