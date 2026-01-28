@@ -1,8 +1,8 @@
 import Image from 'next/image';
 import { css } from 'styled-system/css';
 
-// 사이드바 오픈 버튼 스타일링
-const sidebarOpenButtonStyle = css({
+// 사이드바 로고 버튼 스타일링
+const sidebarLogoButtonStyle = css({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'flex-start',
@@ -19,13 +19,13 @@ const imageWrapperStyle = css({
   h: '1.75rem',
 });
 
-interface SidebarOpenButtonProps {
+interface SidebarLogoButtonProps {
   onClick?: () => void;
 }
 
-export const SidebarOpenButton = ({ onClick }: SidebarOpenButtonProps) => {
+export const SidebarLogoButton = ({ onClick }: SidebarLogoButtonProps) => {
   return (
-    <button className={sidebarOpenButtonStyle} onClick={onClick}>
+    <button className={sidebarLogoButtonStyle} onClick={onClick}>
       <div className={imageWrapperStyle}>
         <Image
           src='/SidebarLogo.svg'

@@ -1,7 +1,7 @@
 'use client';
 
 import { AssignmentButton } from './AssignmentButton';
-import { SidebarOpenButton } from './SidebarOpenButton';
+import { SidebarLogoButton } from './SidebarLogoButton';
 import { CompletedAssignmentButton } from './CompletedAssignmentButton';
 import { MyInfoButton } from './MyInfoButton';
 import { ModeSwitchToggle } from './ModeSwitchToggle';
@@ -69,10 +69,18 @@ export const Sidebar = ({ initialCollapsed, initialTheme }: SidebarProps) => {
     }
   };
 
+  const handleToggle = () => {
+    if (isSidebarCollapsed) {
+      handleExpand();
+    } else {
+      handleCollapse();
+    }
+  };
+
   return (
     <div className={sidebarStyleVariant({ collapsed: isSidebarCollapsed })}>
       <div className={headerStyle}>
-        <SidebarOpenButton onClick={handleExpand} />
+        <SidebarLogoButton onClick={handleToggle} />
         <div
           style={{
             opacity: isSidebarCollapsed ? 0 : 1,
