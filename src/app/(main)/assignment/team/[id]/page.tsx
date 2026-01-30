@@ -37,6 +37,7 @@ const containerStyle = css({
   maxWidth: '75rem',
   minWidth: '70.125rem',
   pt: '2.5rem',
+  pb: '3.75rem',
 });
 
 const headerContainerStyle = css({

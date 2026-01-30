@@ -8,6 +8,9 @@ import { NotificationButton } from './NotificationButton';
 
 export const HomeButtonBar = () => {
   const isSidebarCollapsed = useUIStore((state) => state.isSidebarCollapsed);
+  const theme = useUIStore((state) => state.theme);
+
+  const logoSrc = theme === 'dark' ? '/HomeLogoDark.svg' : '/HomeLogo.svg';
 
   return (
     <div className={containerStyle}>
@@ -25,7 +28,7 @@ export const HomeButtonBar = () => {
           transition: 'margin-left 0.3s ease',
         })}
       >
-        <Image src='/HomeLogo.svg' alt='HomeLogo' width={240} height={44} />
+        <Image src={logoSrc} alt='HomeLogo' width={240} height={44} />
       </Link>
 
       <div className={notificationButtonWrapperStyle}>
@@ -47,6 +50,7 @@ const containerStyle = css({
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
+  zIndex: 'sticky',
 });
 
 // 알림 버튼 Wrapper

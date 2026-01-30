@@ -71,7 +71,7 @@ export const FolderColorSelect = ({
                 },
               })}
             >
-              <CheckMark variant='gray' />
+              <CheckMark variant='white' />
             </div>
           </label>
         );

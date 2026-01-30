@@ -15,7 +15,6 @@ export const LogoutButton = ({ collapsed = false }: LogoutButtonProps) => {
       textStyle: 'body3.r',
       color: 'gray.500',
       cursor: 'pointer',
-      ml: '0.4rem',
     },
   });
 

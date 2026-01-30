@@ -1,7 +1,7 @@
 'use client';
 
 import { AssignmentButton } from './AssignmentButton';
-import { SidebarOpenButton } from './SidebarOpenButton';
+import { SidebarLogoButton } from './SidebarLogoButton';
 import { CompletedAssignmentButton } from './CompletedAssignmentButton';
 import { MyInfoButton } from './MyInfoButton';
 import { ModeSwitchToggle } from './ModeSwitchToggle';
@@ -10,6 +10,7 @@ import { css, cva } from 'styled-system/css';
 import { SidebarCloseButton } from './SidebarCloseButton';
 import { useEffect, useState, useRef } from 'react';
 import { useUIStore } from '@/stores/ui-store';
+import { SidebarHooks } from './SidebarHooks';
 
 interface SidebarProps {
   initialCollapsed: boolean;
@@ -69,10 +70,18 @@ export const Sidebar = ({ initialCollapsed, initialTheme }: SidebarProps) => {
     }
   };
 
+  const handleToggle = () => {
+    if (isSidebarCollapsed) {
+      handleExpand();
+    } else {
+      handleCollapse();
+    }
+  };
+
   return (
     <div className={sidebarStyleVariant({ collapsed: isSidebarCollapsed })}>
       <div className={headerStyle}>
-        <SidebarOpenButton onClick={handleExpand} />
+        <SidebarLogoButton onClick={handleToggle} />
         <div
           style={{
             opacity: isSidebarCollapsed ? 0 : 1,
@@ -87,7 +96,10 @@ export const Sidebar = ({ initialCollapsed, initialTheme }: SidebarProps) => {
       </div>
 
       <div className={contentStyle}>
-        <AssignmentButton collapsed={isSidebarCollapsed} />
+        <div>
+          <AssignmentButton collapsed={isSidebarCollapsed} />
+          <SidebarHooks collapsed={isSidebarCollapsed} />
+        </div>
         <CompletedAssignmentButton collapsed={isSidebarCollapsed} />
         <MyInfoButton collapsed={isSidebarCollapsed} />
         <ModeSwitchToggle collapsed={isSidebarCollapsed} />
@@ -114,12 +126,12 @@ const sidebarStyleVariant = cva({
     position: 'fixed',
     top: '0',
     left: '0',
-    zIndex: 10,
+    zIndex: 'banner',
   },
   variants: {
     collapsed: {
       true: {
-        w: '4.5rem', // 접힌 상태: 아이콘 + padding
+        w: '3.75rem', // 접힌 상태: 아이콘 + padding
       },
       false: {
         w: '15rem', // 펼쳐진 상태: 아이콘 + 텍스트 + padding

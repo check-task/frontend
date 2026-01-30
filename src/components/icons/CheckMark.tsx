@@ -13,6 +13,9 @@ const pathStyle = cva({
       black: {
         stroke: 'gray.900',
       },
+      white: {
+        stroke: 'white',
+      },
     },
   },
   defaultVariants: {
@@ -21,7 +24,7 @@ const pathStyle = cva({
 });
 
 interface CheckMarkProps {
-  variant?: 'gray' | 'black';
+  variant?: 'gray' | 'black' | 'white';
 }
 
 export const CheckMark = ({ variant = 'gray' }: CheckMarkProps) => {
