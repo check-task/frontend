@@ -1,3 +1,5 @@
+'use client';
+
 import { styled } from 'styled-system/jsx';
 import { hstack } from 'styled-system/patterns';
 import Image from 'next/image';
@@ -23,14 +25,18 @@ const ButtonText = styled('span', {
   },
 });
 
-// HTML 버튼 태그의 속성을 사용하기 위해 (예 : onClick)
-interface KakaoLoginButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  children?: React.ReactNode;
-}
+export const KakaoLoginButton = () => {
+  const handleClick = () => {
+    // 개발환경에서는 state=local, 배포환경에서는 state=prod
+    const isLocal = process.env.NODE_ENV === 'development';
+    const state = isLocal ? 'local' : 'prod';
+    window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/auth/kakao?state=${state}`;
+  };
 
-export const KakaoLoginButton = ({ ...props }: KakaoLoginButtonProps) => (
-  <Button {...props}>
-    <Image src='/kakao-icon.svg' alt='kakaoicon' width={24} height={27} />
-    <ButtonText>카카오 로그인</ButtonText>
-  </Button>
-);
+  return (
+    <Button onClick={handleClick}>
+      <Image src='/kakao-icon.svg' alt='kakaoicon' width={24} height={27} />
+      <ButtonText>카카오 로그인</ButtonText>
+    </Button>
+  );
+};
