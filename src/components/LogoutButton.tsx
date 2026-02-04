@@ -1,5 +1,10 @@
+'use client';
+
+import { useRouter } from 'next/navigation';
 import { cva } from 'styled-system/css';
 import { LogoutIcon } from './icons/LogoutIcon';
+import { useAuthStore } from '@/stores/auth-store';
+import axiosInstance from '@/lib/axiosInstance';
 
 // collapsed: 버튼 축소 여부
 interface LogoutButtonProps {
@@ -7,6 +12,21 @@ interface LogoutButtonProps {
 }
 
 export const LogoutButton = ({ collapsed = false }: LogoutButtonProps) => {
+  const router = useRouter();
+  const logout = useAuthStore((state) => state.logout);
+
+  const handleLogout = async () => {
+    try {
+      await axiosInstance.post('/auth/logout');
+    } catch (error) {
+      console.error('로그아웃 API 실패:', error);
+    } finally {
+      // API 실패해도 클라이언트에서 로그아웃 처리
+      logout();
+      router.push('/login');
+    }
+  };
+
   const logoutButtonStyle = cva({
     base: {
       display: 'flex',
@@ -52,7 +72,7 @@ export const LogoutButton = ({ collapsed = false }: LogoutButtonProps) => {
   });
 
   return (
-    <button className={logoutButtonStyle({ collapsed })}>
+    <button className={logoutButtonStyle()} onClick={handleLogout}>
       <div className={iconWrapperStyle()}>
         <LogoutIcon />
       </div>
