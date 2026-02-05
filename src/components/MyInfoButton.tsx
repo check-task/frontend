@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { cva } from 'styled-system/css';
 import { MyInfoIcon } from './icons/MyInfoIcon';
 
@@ -49,10 +50,10 @@ const textStyle = cva({
 });
 
 export const MyInfoButton = ({ collapsed = false }: MyInfoButtonProps) => (
-  <button className={buttonStyle()}>
+  <Link href='/profile' className={buttonStyle()}>
     <div className={iconWrapperStyle()}>
       <MyInfoIcon />
     </div>
     <span className={textStyle({ collapsed })}>내 정보</span>
-  </button>
+  </Link>
 );
