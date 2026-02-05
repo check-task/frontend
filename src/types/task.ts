@@ -1,4 +1,6 @@
+// ============================
 // 과제 목록 조회 타입 정의
+// ============================
 export type TaskType = 'TEAM' | 'PERSONAL';
 export type TaskSort =
   | 'PROGRESSRATE' // 진적도순
@@ -12,11 +14,12 @@ export interface GetTaskListParams {
   sort?: TaskSort;
 }
 
-// 응답
+// 과제 기본 정보
+// 세부 과제 정보에 상속됨 그래서 folderId, folderTitle optional 처리
 export interface Task {
   taskId: number;
-  folderId: number;
-  folderTitle: string;
+  folderId?: number;
+  folderTitle?: string;
   title: string;
   type: TaskType; // PERSONAL | TEAM
   deadline: string; // YYYY-MM-DD
@@ -32,8 +35,46 @@ export interface GetTaskListResponse {
 }
 
 // ============================
+// 과제 상세 조회 타입 정의
+// ============================
 
+// Task 목록에 보여지는 세부 과제 항목
+export interface TaskDetailSubTask {
+  subTaskId: number;
+  title: string;
+  deadline: string; // YYYY-MM-DD
+  status: string;
+  isAlarm: boolean;
+  commentCount: number;
+  assigneeName: string;
+}
+
+// 자료 모음집 참조 항목
+export interface TaskReference {
+  name: string;
+  url: string;
+}
+
+// 세부 과제 정보
+// communications, meetingLogs는 개인에서는 사용 안해서 일단은 unknown[] 처리
+// 옵셔널 처리 해두어서 추후 확장하시면 될 듯 합니다.
+export interface TaskDetail extends Task {
+  subTasks: TaskDetailSubTask[];
+  communications?: unknown[];
+  meetingLogs?: unknown[];
+  references: TaskReference[];
+}
+
+// 세부 과제 정보 조회 최종 응답 타입
+export interface GetTaskDetailResponse {
+  resultType: 'SUCCESS' | 'FAIL';
+  message: string;
+  data: TaskDetail;
+}
+
+// ============================
 // 완료 과제 목록 조회 타입 정의
+// ============================
 export type CompletedTaskType = '개인' | '팀';
 export type CompletedTaskStatus = '완료' | '미완료';
 
