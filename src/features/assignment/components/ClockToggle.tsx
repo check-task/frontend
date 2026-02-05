@@ -5,7 +5,11 @@ import { ClockOnIcon } from '@/components/icons/ClockOnIcon';
 import { ClockOffIcon } from '@/components/icons/ClockOffIcon';
 import { css } from 'styled-system/css';
 
-export const ClockToggle = () => {
+interface ClockToggleProps {
+  muted?: boolean; // 여기도 공통이니까 불리언으로 처리
+}
+
+export const ClockToggle = ({ muted = false }: ClockToggleProps) => {
   const [isOn, setIsOn] = useState(false);
 
   const handleClick = () => {
@@ -24,7 +28,7 @@ export const ClockToggle = () => {
         padding: 0,
       })}
     >
-      {isOn ? <ClockOnIcon /> : <ClockOffIcon />}
+      {isOn ? <ClockOnIcon muted={muted} /> : <ClockOffIcon muted={muted} />}
     </button>
   );
 };

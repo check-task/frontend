@@ -23,10 +23,15 @@ const checkboxControl = cva({
     },
 
     //  체크되었을 때 스타일
+    // 체크 되엇을 때 색상도 추가하였습니다. -김예원
     _peerChecked: {
+      borderColor: 'gray.400',
       '& svg': {
         opacity: 1,
         transform: 'scale(1)',
+      },
+      '& svg path': {
+        stroke: 'gray.400',
       },
     },
   },
