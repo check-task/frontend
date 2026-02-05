@@ -1,16 +1,22 @@
-import { useEffect, useRef, useState } from 'react';
 import { Checkbox } from '@/components/Checkbox';
 import { css, cva } from 'styled-system/css';
 import { ClockToggle } from '../../components/ClockToggle';
 import DatePicker from '@/components/DatePicker';
-import { dummyPersonalTasks } from '@/constants/PersonalTaskMock';
+
+export interface PersonalTaskItem {
+  id: number;
+  title: string;
+  deadline: string;
+  isAlarm: boolean;
+  status: string;
+}
 
 // Task 목록
-export const PersonalTaskList = () => {
+export const PersonalTaskList = ({ tasks }: { tasks: PersonalTaskItem[] }) => {
   return (
     <div className={PersonalTaskListContainerStyle}>
       <div className={PersonalTaskListStyle}>
-        {dummyPersonalTasks.map((task) => {
+        {tasks.map((task) => {
           const isLongTitle = task.title.length >= 23;
 
           return (

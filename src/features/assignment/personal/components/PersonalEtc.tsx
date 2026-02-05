@@ -1,30 +1,33 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { PlusButton } from '@/components/PlusButton';
 import { css } from 'styled-system/css';
 import { useModalStore } from '@/stores/modal-store';
 import { AddAssignmentDataModal } from '@/features/assignment/components/AddAssignmentDataModal';
 import { AssignmentDataCard } from '@/features/assignment/components/AssignmentDataCard'; // 공용 컴포넌트 임포트
 import { EditAssignmentDataCardModal } from '../../components/EditAssignmentDataCardModal';
-import { DUMMY_DATA } from '@/constants/AssignmentDataCardMock';
 import { ConfirmDeleteAssignmentDataModal } from '../../components/ConfirmDeleteAssginmentDataModal';
+import type { ReferenceItem } from './PersonalRightContainer';
 
-export interface AssignmentData {
+// 자료 모음집에 사용되는 폼 데이터 타입
+export interface ReferenceFormData {
   name: string;
   path: string;
 }
 
-export interface DataItem extends AssignmentData {
-  id: number;
-  type: 0 | 1; // 0은 url, 1은 파일로 지정
+interface PersonalEtcProps {
+  items: ReferenceItem[];
 }
 
-export const PersonalEtc = () => {
+export const PersonalEtc = ({ items }: PersonalEtcProps) => {
   // close 저장 누를 때 닫으려면 필요
   const { openModal, closeModal } = useModalStore();
-  // 더미데이터로 초기 상태 세팅
-  const [dataItems, setDataItems] = useState<DataItem[]>(DUMMY_DATA);
+  const [dataItems, setDataItems] = useState<ReferenceItem[]>(items);
+
+  useEffect(() => {
+    setDataItems(items);
+  }, [items]);
 
   // 자료 모음집 추가 모달 핸들러
   const handleOpenDataModal = () => {
@@ -42,7 +45,7 @@ export const PersonalEtc = () => {
   };
 
   // 자료 수정 핸들러
-  const handleEdit = (item: DataItem) => {
+  const handleEdit = (item: ReferenceItem) => {
     openModal({
       title: '자료 수정',
       content: (
@@ -64,7 +67,7 @@ export const PersonalEtc = () => {
   };
 
   // 자료 삭제 핸들러
-  const handleDelete = (item: DataItem) => {
+  const handleDelete = (item: ReferenceItem) => {
     openModal({
       title: '자료 삭제',
       headerType: 'none',

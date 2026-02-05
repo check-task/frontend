@@ -3,23 +3,39 @@
 import { css, cva } from 'styled-system/css';
 import { useUIStore } from '@/stores/ui-store';
 import { PersonalHeader } from './PersonalHeader';
-import { PersonalTaskList } from './PersonalTaskList';
+import { PersonalTaskList, type PersonalTaskItem } from './PersonalTaskList';
+
+interface PersonalLeftContainerProps {
+  // 헤더 정보
+  title: string;
+  daysLeft: string;
+  completionRate: number;
+  // task 목록
+  tasks: PersonalTaskItem[];
+}
 
 // 페이지 기준 왼쪽 영역 (헤더+ task 목록)
-export const PersonalLeftContainer = () => {
-  // 완료율(임의값)
-  const completionRate = 80; // TODO: 실제 데이터로 교체
+export const PersonalLeftContainer = ({
+  title,
+  daysLeft,
+  completionRate,
+  tasks,
+}: PersonalLeftContainerProps) => {
   const isSidebarCollapsed = useUIStore((state) => state.isSidebarCollapsed);
 
   return (
     <div className={containerStyle({ collapsed: isSidebarCollapsed })}>
       <div className={contentWrapperStyle}>
-        <PersonalHeader completionRate={completionRate} />
+        <PersonalHeader
+          completionRate={completionRate}
+          title={title}
+          daysLeft={daysLeft}
+        />
         <div className={taskContainerStyle}>
           <h2 className={css({ textStyle: 'h4', color: 'gray.900' })}>
             TASK 목록
           </h2>
-          <PersonalTaskList />
+          <PersonalTaskList tasks={tasks} />
         </div>
       </div>
     </div>

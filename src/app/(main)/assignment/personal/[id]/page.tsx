@@ -1,13 +1,36 @@
+'use client';
+
 import { css } from 'styled-system/css';
+import { useParams } from 'next/navigation';
 import { PersonalLeftContainer } from '@/features/assignment/personal/components/PersonalLeftContainer';
 import { PersonalRightContainer } from '@/features/assignment/personal/components/PersonalRightContainer';
+import { usePersonalTaskDetail } from '@/features/assignment/personal/components/hooks/usePersonalTaskDetail';
 
 export default function PersonalPage() {
+  const params = useParams();
+  const taskId = Number(params?.id);
+  // 개인 과제 상세 커스텀 훅 호출
+  const { data, isLoading } = usePersonalTaskDetail(taskId);
+  console.log('개인 과제 상세 데이터:', data);
+
+  if (isLoading || !data) {
+    return (
+      <div className={containerStyle}>
+        <div>로딩 중...</div>
+      </div>
+    );
+  }
+
   return (
     <div className={containerStyle}>
       <div className={contentGridStyle}>
-        <PersonalLeftContainer />
-        <PersonalRightContainer />
+        <PersonalLeftContainer
+          title={data.title}
+          daysLeft={data.dDay}
+          completionRate={data.progressRate}
+          tasks={data.tasks}
+        />
+        <PersonalRightContainer items={data.items} />
       </div>
     </div>
   );
