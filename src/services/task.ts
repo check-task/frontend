@@ -1,9 +1,11 @@
 import {
   CompletedTask,
   GetCompletedTaskListResponse,
+  GetTaskDetailResponse,
   GetTaskListParams,
   GetTaskListResponse,
   Task,
+  TaskDetail,
 } from '@/types/task';
 import axiosInstance from '@/lib/axiosInstance';
 
@@ -24,4 +26,11 @@ export const getCompletedTaskList = async (): Promise<CompletedTask[]> => {
     await axiosInstance.get<GetCompletedTaskListResponse>('/task/completed');
 
   return res.data.data.tasks;
+};
+
+// 과제 상세 조회 api 호출
+export const getTaskDetail = async (taskId: number): Promise<TaskDetail> => {
+  const res = await axiosInstance.get<GetTaskDetailResponse>(`/task/${taskId}`);
+
+  return res.data.data;
 };
