@@ -14,6 +14,18 @@ export interface TaskListItem {
   // dateType은 assignmentList에서 전달
 }
 
+// ==============================
+// 임의로 폴더 색상 매핑을 위함
+// 백엔드에서 폴더 색상 내려주면 수정할 부분
+// ==============================
+const resolveFolderColor = (folderId?: number): FolderColor => {
+  if (typeof folderId !== 'number') {
+    return 'red';
+  }
+
+  return FOLDER_COLORS[folderId - 2] ?? 'red';
+};
+
 // 과제 목록 조회 커스텀 훅
 export const useTaskList = () => {
   return useQuery({
@@ -28,13 +40,13 @@ export const useTaskList = () => {
         .map((task) => ({
           id: task.taskId,
           type: task.type === 'TEAM' ? 'team' : 'personal',
-          folderName: task.folderTitle,
+          folderName: task.folderTitle ?? '',
           assignmentName: task.title,
           dueDate: task.dDay,
           // ==============================
           // 폴더 색상 수정해야함 지금은 관련 없는 값임
           // ==============================
-          folderColor: FOLDER_COLORS[task.folderId - 2],
+          folderColor: resolveFolderColor(task.folderId),
         }));
     },
   });
