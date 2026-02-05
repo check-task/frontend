@@ -2,6 +2,7 @@ import { Checkbox } from '@/components/Checkbox';
 import { css, cva } from 'styled-system/css';
 import { ClockToggle } from '../../components/ClockToggle';
 import DatePicker from '@/components/DatePicker';
+import { useUpdateSubTaskDeadline } from './hooks/useUpdateSubTaskDeadline';
 
 export interface PersonalTaskItem {
   id: number;
@@ -11,8 +12,24 @@ export interface PersonalTaskItem {
   status: string;
 }
 
+interface PersonalTaskListProps {
+  taskId: number;
+  tasks: PersonalTaskItem[];
+}
+
+// Api형태에 맞게 Date형태를 YYYY-MM-DD 문자열로 변환
+const formatDate = (date: Date) => date.toLocaleDateString('en-CA');
+
 // Task 목록
-export const PersonalTaskList = ({ tasks }: { tasks: PersonalTaskItem[] }) => {
+export const PersonalTaskList = ({ taskId, tasks }: PersonalTaskListProps) => {
+  // 세부 task 마감일 변경 훅 호출
+  const { mutate } = useUpdateSubTaskDeadline(taskId);
+
+  // 달력 변경 시 호출 핸들러
+  const handleDeadlineChange = (subTaskId: number) => (date: Date) => {
+    mutate({ subTaskId, endDate: formatDate(date) });
+  };
+
   return (
     <div className={PersonalTaskListContainerStyle}>
       <div className={PersonalTaskListStyle}>
@@ -44,7 +61,10 @@ export const PersonalTaskList = ({ tasks }: { tasks: PersonalTaskItem[] }) => {
                 })}
               >
                 <div className={rightContentWrapperStyle}>
-                  <DatePicker value={task.deadline} />
+                  <DatePicker
+                    value={task.deadline}
+                    onChange={handleDeadlineChange(task.id)}
+                  />
                   {/* 시계 아이콘은 꺼짐으로 시작됨  */}
                   <ClockToggle />
                 </div>
