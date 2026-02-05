@@ -1,10 +1,13 @@
+'use client';
+
 import { css } from 'styled-system/css';
-import {
-  AssignmentList,
-  type AssignmentData,
-} from '@/components/AssignmentList';
+import { AssignmentList } from '@/components/AssignmentList';
+import { useTaskList } from '@/features/assignment/hooks/useTaskList';
 
 export default function AssignmentPage() {
+  // 과제 목록 데이터 가져오기
+  const { data = [], isLoading } = useTaskList();
+
   return (
     // 전체 컨테이너
     <div
@@ -13,7 +16,11 @@ export default function AssignmentPage() {
       })}
     >
       <h3 className={titleStyle}>내 과제</h3>
-      <AssignmentList assignments={DUMMY_ING_ASSIGNMENTS} />
+      {isLoading ? (
+        <div>로딩 중...</div>
+      ) : (
+        <AssignmentList assignments={data} />
+      )}
     </div>
   );
 }
@@ -24,47 +31,3 @@ const titleStyle = css({
   mb: '0.75rem',
   color: 'gray.900',
 });
-
-// ======== 더미데이터 ========
-const DUMMY_ING_ASSIGNMENTS: AssignmentData[] = [
-  {
-    id: '1',
-    type: 'personal',
-    folderName: '폴더명',
-    assignmentName: '과제명',
-    dueDate: 43,
-    folderColor: 'purple',
-  },
-  {
-    id: '2',
-    type: 'personal',
-    folderName: '폴더명',
-    assignmentName: '과제명',
-    dueDate: 12,
-    folderColor: 'green',
-  },
-  {
-    id: '3',
-    type: 'team',
-    folderName: '폴더명',
-    assignmentName: '과제명',
-    dueDate: 5,
-    folderColor: 'black',
-  },
-  {
-    id: '4',
-    type: 'personal',
-    folderName: '폴더명',
-    assignmentName: '과제명',
-    dueDate: 43,
-    folderColor: 'red',
-  },
-  {
-    id: '5',
-    type: 'team',
-    folderName: '폴더명',
-    assignmentName: '과제명',
-    dueDate: 43,
-    folderColor: 'yellow',
-  },
-];
