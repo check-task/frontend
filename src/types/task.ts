@@ -98,3 +98,20 @@ export interface GetCompletedTaskListResponse {
     tasks: CompletedTask[];
   };
 }
+
+// ============================
+// 세부 TASK 마감일 변경 타입 정의
+// ============================
+
+export interface UpdateSubTaskDeadlineRequest {
+  endDate: string; // YYYY-MM-DD
+}
+
+export interface UpdateSubTaskDeadlineResponse {
+  resultType: 'SUCCESS' | 'FAIL';
+  message: string;
+  data: {
+    sub_task_id: number;
+    end_date: string; // YYYY-MM-DD
+  };
+}
