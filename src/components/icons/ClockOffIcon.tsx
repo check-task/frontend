@@ -1,15 +1,20 @@
 import { css } from 'styled-system/css';
 
-export const ClockOffIcon = () => {
+interface ClockOffIconProps {
+  muted?: boolean;
+}
+
+export const ClockOffIcon = ({ muted = false }: ClockOffIconProps) => {
+  const color = muted ? 'gray.400' : 'blue.200';
   const pathStyle = css({
-    stroke: 'blue.200',
+    stroke: color,
     strokeWidth: '1.33333',
     strokeLinecap: 'round',
     fill: 'none',
   });
 
   const lineStyle = css({
-    fill: 'blue.200',
+    fill: color,
   });
   return (
     <svg
