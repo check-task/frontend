@@ -25,6 +25,7 @@ export default function PersonalPage() {
     <div className={containerStyle}>
       <div className={contentGridStyle}>
         <PersonalLeftContainer
+          taskId={data.taskId}
           title={data.title}
           daysLeft={data.dDay}
           completionRate={data.progressRate}

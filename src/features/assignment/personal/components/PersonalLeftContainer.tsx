@@ -10,6 +10,7 @@ interface PersonalLeftContainerProps {
   title: string;
   daysLeft: string;
   completionRate: number;
+  taskId: number;
   // task 목록
   tasks: PersonalTaskItem[];
 }
@@ -19,6 +20,7 @@ export const PersonalLeftContainer = ({
   title,
   daysLeft,
   completionRate,
+  taskId,
   tasks,
 }: PersonalLeftContainerProps) => {
   const isSidebarCollapsed = useUIStore((state) => state.isSidebarCollapsed);
@@ -35,7 +37,10 @@ export const PersonalLeftContainer = ({
           <h2 className={css({ textStyle: 'h4', color: 'gray.900' })}>
             TASK 목록
           </h2>
-          <PersonalTaskList tasks={tasks} />
+          <PersonalTaskList
+            taskId={taskId}
+            tasks={tasks}
+          />
         </div>
       </div>
     </div>
