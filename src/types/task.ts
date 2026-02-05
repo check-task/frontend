@@ -38,12 +38,15 @@ export interface GetTaskListResponse {
 // 과제 상세 조회 타입 정의
 // ============================
 
+// 세부 TASK 상태 (과제 상세 응답)
+export type SubTaskStatus = 'PROGRESS' | 'COMPLETED';
+
 // Task 목록에 보여지는 세부 과제 항목
 export interface TaskDetailSubTask {
   subTaskId: number;
   title: string;
   deadline: string; // YYYY-MM-DD
-  status: string;
+  status: SubTaskStatus;
   isAlarm: boolean;
   commentCount: number;
   assigneeName: string;
@@ -113,5 +116,25 @@ export interface UpdateSubTaskDeadlineResponse {
   data: {
     sub_task_id: number;
     end_date: string; // YYYY-MM-DD
+  };
+}
+
+// ============================
+// 세부 TASK 완료 상태 변경 타입 정의
+// ============================
+// 상태 변경 요청시 사용되는 타입
+// SubTaskStatus 이걸 사용하지 못한 건 상태 값이 달라서 입니다.
+export type UpdateSubTaskStatusRequestStatus = 'PROGRESS' | 'COMPLETE';
+
+export interface UpdateSubTaskStatusRequest {
+  status: UpdateSubTaskStatusRequestStatus;
+}
+
+export interface UpdateSubTaskStatusResponse {
+  resultType: 'SUCCESS' | 'FAIL';
+  message: string;
+  data: {
+    sub_task_id: number;
+    status: CompletedTaskStatus; // '완료' | '미완료'
   };
 }
