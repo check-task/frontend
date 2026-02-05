@@ -4,6 +4,7 @@ import { cookies } from 'next/headers';
 import './globals.css';
 import { CounterStoreProvider } from '@/providers/counter-store-provider';
 import { ThemeProvider } from '@/providers/theme-provider';
+import { QueryProvider } from '@/providers/query-provider';
 import { parseUICookie } from '@/lib/parse-ui-cookie';
 
 const inter = Inter({
@@ -35,7 +36,9 @@ export default async function RootLayout({
       <head />
       <body className={inter.className}>
         <ThemeProvider>
-          <CounterStoreProvider>{children}</CounterStoreProvider>
+          <QueryProvider>
+            <CounterStoreProvider>{children}</CounterStoreProvider>
+          </QueryProvider>
         </ThemeProvider>
       </body>
     </html>

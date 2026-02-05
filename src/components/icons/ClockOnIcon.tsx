@@ -1,8 +1,13 @@
 import { css } from 'styled-system/css';
 
-export const ClockOnIcon = () => {
+interface ClockOnIconProps {
+  muted?: boolean;
+}
+
+export const ClockOnIcon = ({ muted = false }: ClockOnIconProps) => {
+  const color = muted ? 'gray.400' : 'blue.500';
   const iconStyle = css({
-    stroke: 'blue.500',
+    stroke: color,
     strokeWidth: '1.33333',
     strokeLinecap: 'round',
   });

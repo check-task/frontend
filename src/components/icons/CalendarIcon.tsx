@@ -1,16 +1,22 @@
 import { css } from 'styled-system/css';
 
-export const CalenderIcon = () => {
+interface CalendarIconProps {
+  muted?: boolean;
+}
+
+export const CalenderIcon = ({ muted = false }: CalendarIconProps) => {
+  // 체크 상태에 따라 색상 변경 추가
+  const color = muted ? 'gray.400' : 'gray.600';
   const iconStyle = css({
     width: '2rem',
     height: '2rem',
 
     '& path, & rect': {
-      stroke: 'gray.600',
+      stroke: color,
       strokeLinecap: 'round',
     },
     '& circle': {
-      fill: 'gray.600',
+      fill: color,
     },
   });
 

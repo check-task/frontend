@@ -3,13 +3,13 @@
 import { Button } from '@/components/Button';
 import { useState } from 'react';
 import { css } from 'styled-system/css';
-import { AssignmentData } from '../personal/components/PersonalEtc';
+import { ReferenceFormData } from '../personal/components/PersonalEtc';
 import { Input } from '@/components/TextField';
 
 interface EditAssignmentDataModalProps {
   type: 0 | 1; // 0은 url, 1은 파일로 지정
-  defaultValue: AssignmentData;
-  onSave: (value: AssignmentData) => void;
+  defaultValue: ReferenceFormData;
+  onSave: (value: ReferenceFormData) => void;
 }
 
 const MODAL_TEXT = {

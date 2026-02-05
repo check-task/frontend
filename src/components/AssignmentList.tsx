@@ -1,30 +1,17 @@
 'use client';
 
 import { useSearchParams, useRouter } from 'next/navigation';
-import { Suspense } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { stack } from 'styled-system/patterns';
 import { css } from 'styled-system/css';
 import { AssignmentCard } from '@/components/AssignmentCard';
 import { TaskToggle } from '@/components/TaskToggle';
 import { FolderColor } from '@/types/folder';
+import { TaskListItem } from '@/features/assignment/hooks/useTaskList';
 
 // ======== 타입 정의 ========
-// 과제 타입 (토글)
-interface AssignmentType {
-  type: 'personal' | 'team';
-}
-
-// 과제 정보 (카드에 들어가는)
-interface AssignmentInfo {
-  folderName: string;
-  assignmentName: string;
-  dueDate: string | number;
-  folderColor: FolderColor;
-}
-export type AssignmentData = AssignmentType & AssignmentInfo & { id: string };
-
 interface AssignmentListProps {
-  assignments: AssignmentData[];
+  assignments: TaskListItem[];
   isDone?: boolean; // 진행중인 과제인지 완료된 과제인지
 }
 
@@ -36,29 +23,33 @@ function AssignmentListContent({
 }: AssignmentListProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [currentTab, setCurrentTab] = useState<'personal' | 'team'>('personal');
 
-  // url에서 현재 토글 상태 가져오기
-  const currentTab =
-    (searchParams.get('type') as 'personal' | 'team') || 'personal';
+  // url에서 현재 토글 상태 가져오기 (hydration mismatch 방지)
+  useEffect(() => {
+    const nextTab =
+      (searchParams.get('type') as 'personal' | 'team') || 'personal';
+    setCurrentTab(nextTab);
+  }, [searchParams]);
 
   // 토글 변경 시 호출되는 함수
   const handleToggle = (type: 'personal' | 'team') => {
     const params = new URLSearchParams(searchParams.toString());
     params.set('type', type);
+    setCurrentTab(type);
     router.push(`?${params.toString()}`);
   };
 
   // 카드 컴포넌트 클릭 시 상세 페이지 이동 함수
-  const handleCardClick = (id: string, type: 'personal' | 'team') => {
-    // 완료 상태면 상세 페이지로 이동하지 않음
-    if (isDone) return;
+  const handleCardClick = (id: number, type: 'personal' | 'team') => {
     const path = type === 'personal' ? 'personal' : 'team';
     router.push(`/assignment/${path}/${id}`);
   };
 
-  // 더미 데이터에서 토글 상태에 따라 분리
+  // 토글 상태에 따라 분리
   const filtered = assignments.filter((item) => item.type === currentTab);
-  // 더미 데이터에서 토글 상태에 따라 개수 카운트
+
+  // 토글 상태에 따라 개수 카운트
   const personalCount = assignments.filter((d) => d.type === 'personal').length;
   const teamCount = assignments.filter((d) => d.type === 'team').length;
 
@@ -74,18 +65,17 @@ function AssignmentListContent({
       </div>
 
       <div className={stack({ gap: '1rem' })}>
-        {filtered.map((item) => (
-          <AssignmentCard
-            key={item.id}
-            {...item}
-            dateType={isDone ? 'date' : 'dday'}
-            onClick={() => handleCardClick(item.id, item.type)}
-            className={css({
-              // 완료 상태면 커서 모양 변경
-              cursor: isDone ? 'default' : 'pointer',
-            })}
-          />
-        ))}
+        {filtered.map((item) => {
+          const { id, ...cardProps } = item;
+          return (
+            <AssignmentCard
+              key={id}
+              {...cardProps}
+              dateType={isDone ? 'date' : 'dday'}
+              onClick={() => handleCardClick(id, item.type)}
+            />
+          );
+        })}
       </div>
     </>
   );
@@ -94,7 +84,7 @@ function AssignmentListContent({
 // 내보낼 컴포넌트
 export function AssignmentList(props: AssignmentListProps) {
   return (
-    <Suspense fallback={<div>로딩 중...</div>}>
+    <Suspense>
       <AssignmentListContent {...props} />
     </Suspense>
   );

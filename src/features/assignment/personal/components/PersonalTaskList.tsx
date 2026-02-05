@@ -1,17 +1,55 @@
-import { useEffect, useRef, useState } from 'react';
 import { Checkbox } from '@/components/Checkbox';
 import { css, cva } from 'styled-system/css';
 import { ClockToggle } from '../../components/ClockToggle';
 import DatePicker from '@/components/DatePicker';
-import { dummyPersonalTasks } from '@/constants/PersonalTaskMock';
+import { useUpdateSubTaskDeadline } from './hooks/useUpdateSubTaskDeadline';
+import { useUpdateSubTaskStatus } from './hooks/useUpdateSubTaskStatus';
+import { SubTaskStatus } from '@/types/task';
+
+export interface PersonalTaskItem {
+  id: number;
+  title: string;
+  deadline: string;
+  isAlarm: boolean;
+  status: SubTaskStatus; // 'PROGRESS' | 'COMPLETED' 상태 추가
+}
+
+interface PersonalTaskListProps {
+  taskId: number;
+  tasks: PersonalTaskItem[];
+}
+
+// Api형태에 맞게 Date형태를 YYYY-MM-DD 문자열로 변환
+const formatDate = (date: Date) => date.toLocaleDateString('en-CA');
 
 // Task 목록
-export const PersonalTaskList = () => {
+export const PersonalTaskList = ({ taskId, tasks }: PersonalTaskListProps) => {
+  // 세부 task 마감일 변경 훅 호출
+  const { mutate: mutateDeadline } = useUpdateSubTaskDeadline(taskId);
+  // 세부 task 완료 상태 변경 훅 호출
+  const { mutate: mutateStatus } = useUpdateSubTaskStatus(taskId);
+
+  // 달력 날짜 변경 시 호출 핸들러
+  const handleDeadlineChange = (subTaskId: number) => (date: Date) => {
+    mutateDeadline({ subTaskId, endDate: formatDate(date) });
+  };
+
+  // 체크박스 선택 시 호출 핸들러
+  const handleStatusChange = (subTaskId: number, isChecked: boolean) => {
+    mutateStatus({
+      subTaskId,
+      status: isChecked ? 'COMPLETE' : 'PROGRESS', // 스웨거 요청에 맞게
+    });
+  };
+
   return (
     <div className={PersonalTaskListContainerStyle}>
       <div className={PersonalTaskListStyle}>
-        {dummyPersonalTasks.map((task) => {
+        {tasks.map((task) => {
           const isLongTitle = task.title.length >= 23;
+          // 완료 여부를 UI에서 사용하기 위함
+          // 리스트 한줄을 기준으로 처리하려 했는데 아이콘 부분이 처리가 안되어서  개별 요소로 보냄
+          const isCompleted = task.status === 'COMPLETED';
 
           return (
             <div key={task.id} className={PersonalTaskItemContainerStyle}>
@@ -26,9 +64,17 @@ export const PersonalTaskList = () => {
                     align: isLongTitle ? 'top' : 'center',
                   })}
                 >
-                  <Checkbox />
+                  <Checkbox
+                    checked={isCompleted}
+                    variant='black'
+                    onChange={(event) =>
+                      handleStatusChange(task.id, event.target.checked)
+                    }
+                  />
                 </div>
-                <p className={taskTextStyle}>{task.title}</p>
+                <p className={taskTextStyle({ completed: isCompleted })}>
+                  {task.title}
+                </p>
               </div>
 
               {/* 오른쪽: 달력 + 시계토글 */}
@@ -38,9 +84,13 @@ export const PersonalTaskList = () => {
                 })}
               >
                 <div className={rightContentWrapperStyle}>
-                  <DatePicker />
+                  <DatePicker
+                    value={task.deadline}
+                    onChange={handleDeadlineChange(task.id)}
+                    muted={isCompleted}
+                  />
                   {/* 시계 아이콘은 꺼짐으로 시작됨  */}
-                  <ClockToggle />
+                  <ClockToggle muted={isCompleted} />
                 </div>
               </div>
             </div>
@@ -102,10 +152,26 @@ const PersonalTaskItemLeftStyle = cva({
   },
 });
 
-const taskTextStyle = css({
-  textStyle: 'body1.m',
-  color: 'gray.900',
-  wordBreak: 'break-word', // 상자 크기 넘어가면 자동으로 줄 바꿈
+const taskTextStyle = cva({
+  base: {
+    textStyle: 'body1.m',
+    color: 'gray.900',
+    wordBreak: 'break-word', // 상자 크기 넘어가면 자동으로 줄 바꿈
+  },
+  variants: {
+    completed: {
+      true: {
+        textStyle: 'body1.r',
+        color: 'gray.400',
+        textDecoration: 'line-through',
+        textDecorationThickness: '0.09rem', // 임의로 넣음
+      },
+      false: { color: 'gray.900' },
+    },
+  },
+  defaultVariants: {
+    completed: false,
+  },
 });
 
 // 체크 박스

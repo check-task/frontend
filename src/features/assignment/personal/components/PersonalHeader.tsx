@@ -10,16 +10,20 @@ import {
 
 interface HeaderProps {
   completionRate: number;
-  folderColor?: FolderColor; // export해와서 타입 지정으로 변경
-  title?: string;
-  daysLeft?: string;
+  // ============================
+  // 폴더 색상은 백엔드 수정 후에 추후 반영 예정
+  // 현재는 기본값 01로 설정
+  // ============================
+  folderColor?: FolderColor;
+  title: string;
+  daysLeft: string;
 }
 
 export const PersonalHeader = ({
   completionRate,
   folderColor = '01',
-  title = '프로그래밍 1차 과제',
-  daysLeft = 'D-43',
+  title,
+  daysLeft,
 }: HeaderProps) => {
   return (
     <div className={containerStyle}>
