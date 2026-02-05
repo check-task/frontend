@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { cva } from 'styled-system/css';
 import { CompletedAssignmentIcon } from './icons/CompletedAssignmentIcon';
 
@@ -51,10 +52,10 @@ const textStyle = cva({
 export const CompletedAssignmentButton = ({
   collapsed = false,
 }: CompletedAssignmentButtonProps) => (
-  <button className={buttonStyle()}>
+  <Link href='/completed' className={buttonStyle()}>
     <div className={iconWrapperStyle()}>
       <CompletedAssignmentIcon />
     </div>
     <span className={textStyle({ collapsed })}>완료 과제 히스토리</span>
-  </button>
+  </Link>
 );
