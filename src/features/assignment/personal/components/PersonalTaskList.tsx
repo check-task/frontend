@@ -44,7 +44,7 @@ export const PersonalTaskList = ({ tasks }: { tasks: PersonalTaskItem[] }) => {
                 })}
               >
                 <div className={rightContentWrapperStyle}>
-                  <DatePicker />
+                  <DatePicker value={task.deadline} />
                   {/* 시계 아이콘은 꺼짐으로 시작됨  */}
                   <ClockToggle />
                 </div>

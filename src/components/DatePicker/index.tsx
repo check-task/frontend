@@ -1,23 +1,46 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { CalenderIcon } from '../icons/CalendarIcon';
 import { css } from 'styled-system/css';
 import CalendarModal from './CalendarModal';
 import { useClickOutside } from '@/hooks/useClickOutside';
 
-export default function DatePicker() {
+interface DatePickerProps {
+  value?: string | Date;
+  onChange?: (date: Date) => void;
+}
+
+// 날짜 문자열로 온거 Date 객체로 변환 처리
+const parseDate = (value?: string | Date) => {
+  if (!value) return null;
+  const parsed = value instanceof Date ? value : new Date(`${value}T00:00:00`);
+  return parsed;
+};
+
+export default function DatePicker({ value, onChange }: DatePickerProps) {
   // ======= 상태 정의 =======
   const [isOpen, setIsOpen] = useState(false);
   // 확정된 날짜 (기본값: 오늘)
-  const [confirmedDate, setConfirmedDate] = useState<Date>(new Date());
+  const [confirmedDate, setConfirmedDate] = useState<Date>(
+    parseDate(value) ?? new Date(),
+  );
 
   // datepicker 외 화면 클릭하면 닫히도록 처리.
   const pickerRef = useClickOutside<HTMLDivElement>(() => setIsOpen(false));
 
+  // 동기화 코드 추가
+  useEffect(() => {
+    const next = parseDate(value);
+    if (next) {
+      setConfirmedDate(next);
+    }
+  }, [value]);
+
   // 선택한 날짜 저장
   const handleSave = (date: Date) => {
     setConfirmedDate(date);
+    onChange?.(date);
     setIsOpen(false);
   };
 
