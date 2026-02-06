@@ -48,7 +48,9 @@ export const AssignmentCard = ({
           <Card.FolderName>{folderName}</Card.FolderName>
           <Card.DDay>{dDay}</Card.DDay>
         </Card.Left>
-        <Card.Right>
+        <Card.Right
+          css={{ width: isSidebarCollapsed ? '15.75rem' : '14.375rem' }}
+        >
           <Card.AssignmentInfo>
             <Card.AssignmentHeader>
               <Card.AssignmentDot />
@@ -135,18 +137,22 @@ const Card = {
   Left: styled('div', {
     base: stack.raw({
       gap: '3rem',
+      width: '4.3125rem',
     }),
   }),
   Right: styled('div', {
     base: stack.raw({
       gap: '0.75rem',
-      flex: 1,
+      transition: 'width 0.3s ease',
     }),
   }),
   FolderName: styled('span', {
     base: {
       textStyle: 'body3.m',
       color: 'var(--card-color)',
+      overflow: 'hidden',
+      textOverflow: 'ellipsis',
+      whiteSpace: 'nowrap',
     },
   }),
   DDay: styled('div', {
@@ -175,12 +181,16 @@ const Card = {
       height: '1.5rem',
       borderRadius: '50%',
       bg: 'var(--card-color)',
+      flexShrink: 0,
     },
   }),
   AssignmentName: styled('span', {
     base: {
       textStyle: 'body1.m',
       color: 'gray.900',
+      overflow: 'hidden',
+      textOverflow: 'ellipsis',
+      whiteSpace: 'nowrap',
     },
   }),
   AssignmentType: styled('span', {

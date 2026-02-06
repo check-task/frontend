@@ -16,11 +16,11 @@ export const sampleAssignments: SampleAssignment[] = [
   {
     id: '1',
     folderId: '1',
-    folderName: '그만세',
+    folderName: '그림으로 만나는 세상',
     folderColor: 'red',
     dDay: 'D-43',
     dueDate: '2026-01-08',
-    assignmentName: '프로그래밍 1차 과제',
+    assignmentName: '프로그래밍 1차 과제 2차 과제 3차 과제',
     assignmentType: '개인/팀',
     progress: 81,
   },
@@ -38,7 +38,7 @@ export const sampleAssignments: SampleAssignment[] = [
   {
     id: '3',
     folderId: '3',
-    folderName: '프로그래밍',
+    folderName: 'C언어프로그래밍',
     folderColor: 'green',
     dDay: 'D-37',
     dueDate: '2026-01-02',
