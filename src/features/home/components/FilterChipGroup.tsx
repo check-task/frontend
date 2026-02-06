@@ -86,6 +86,7 @@ const Chip = {
       borderRadius: '6.25rem',
       border: '1px solid',
       cursor: 'pointer',
+      maxWidth: '8.9875rem', // 캘린더 넓이 기준으로 5개 들어갈 수 있게
     }),
     variants: {
       color: {
@@ -124,6 +125,7 @@ const Chip = {
       width: '1rem',
       height: '1rem',
       borderRadius: '50%',
+      flexShrink: 0,
     },
     variants: {
       active: {
@@ -138,6 +140,9 @@ const Chip = {
   Text: styled('span', {
     base: {
       textStyle: 'body4.m',
+      overflow: 'hidden',
+      textOverflow: 'ellipsis',
+      whiteSpace: 'nowrap',
     },
     variants: {
       active: {
