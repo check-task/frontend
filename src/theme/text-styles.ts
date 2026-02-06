@@ -4,7 +4,7 @@ export const textStyles = defineTextStyles({
   // HEADING
   h1: {
     value: {
-      fontSize: '2.5rem',
+      fontSize: '2.25rem',
       fontWeight: '500',
       lineHeight: '1.5',
       letterSpacing: '-0.015em',
