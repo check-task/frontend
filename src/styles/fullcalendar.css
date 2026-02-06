@@ -108,7 +108,7 @@
 
 /* 이전/다음 달 날짜 */
 .fc .fc-day-other .fc-daygrid-day-number {
-  color: var(--colors-gray-300);
+  color: var(--colors-gray-500);
 }
 
 .fc .fc-daygrid-event-harness {
