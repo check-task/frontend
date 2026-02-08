@@ -28,3 +28,22 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   return <>{children}</>;
 }
+
+// 로그인 되어있으면 홈으로 리다이렉트
+export function GuestGuard({ children }: AuthProviderProps) {
+  const router = useRouter();
+  const token = useAuthStore((s) => s.accessToken);
+
+  useLayoutEffect(() => {
+    const hasToken = useAuthStore.getState().checkAuth();
+    if (hasToken) {
+      router.replace('/');
+    }
+  }, [router]);
+
+  if (token) {
+    return null;
+  }
+
+  return <>{children}</>;
+}
