@@ -8,22 +8,21 @@ interface AuthProviderProps {
   children: React.ReactNode;
 }
 
+// 로그인 안되어있으면 /login으로 리다이렉트
 export function AuthProvider({ children }: AuthProviderProps) {
   const router = useRouter();
-  const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
-  const checkAuth = useAuthStore((state) => state.checkAuth);
+  const token = useAuthStore((s) => s.accessToken);
 
-  // 초기 마운트 시 localStorage 확인
-  const isAuthenticated = typeof window !== 'undefined' ? checkAuth() : false;
-
-  // 리다이렉트를 더 빨리 시작하기 위해 useLayoutEffect 사용
+  // 마운트 시 localStorage → zustand 동기화 + 리다이렉트
   useLayoutEffect(() => {
-    if (!isAuthenticated && !isLoggedIn) {
+    const hasToken = useAuthStore.getState().checkAuth();
+    if (!hasToken) {
       router.replace('/login');
     }
-  }, [isAuthenticated, isLoggedIn, router]);
+  }, [router]);
 
-  if (!isAuthenticated && !isLoggedIn) {
+  // 리다이렉트 전 보호된 페이지가 깜빡이지 않도록 차단
+  if (!token) {
     return null;
   }
 
