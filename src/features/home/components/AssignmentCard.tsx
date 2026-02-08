@@ -43,8 +43,12 @@ export const AssignmentCard = ({
       css={{ width: isSidebarCollapsed ? '27.375rem' : '22.75rem' }}
     >
       <Card.AccentBar />
-      <Card.Content css={{ gap: isSidebarCollapsed ? '3.875rem' : '0.625rem' }}>
-        <Card.Left>
+      <Card.Content
+        css={{ paddingX: isSidebarCollapsed ? '1.5rem' : '1.25rem' }}
+      >
+        <Card.Left
+          css={{ width: isSidebarCollapsed ? '7.125rem' : '4.375rem' }}
+        >
           <Card.FolderName>{folderName}</Card.FolderName>
           <Card.DDay>{dDay}</Card.DDay>
         </Card.Left>
@@ -128,16 +132,17 @@ const Card = {
   }),
   Content: styled('div', {
     base: hstack.raw({
-      padding: '1.5rem',
+      paddingY: '1.5rem',
       flex: 1,
       alignItems: 'flex-start',
       transition: 'gap 0.3s ease',
+      gap: '1.25rem',
     }),
   }),
   Left: styled('div', {
     base: stack.raw({
       gap: '3rem',
-      width: '4.3125rem',
+      transition: 'width 0.3s ease',
     }),
   }),
   Right: styled('div', {
@@ -162,6 +167,7 @@ const Card = {
       textStyle: 'btn',
       color: 'primary-button-text',
       bg: 'var(--card-color)',
+      width: '4.3125rem',
     },
   }),
   AssignmentInfo: styled('div', {
