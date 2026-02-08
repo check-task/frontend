@@ -3,14 +3,19 @@
 import { useModalStore } from '@/stores/modal-store';
 import { EditProfileModalContent } from './EditProfileModalContent';
 import { styled } from 'styled-system/jsx';
+import type { User } from '@/types/api/user';
 
-export const EditProfileButton = () => {
+interface EditProfileButtonProps {
+  user: User;
+}
+
+export const EditProfileButton = ({ user }: EditProfileButtonProps) => {
   const openModal = useModalStore((state) => state.openModal);
 
   const handleOpen = () => {
     openModal({
       title: '프로필 변경',
-      content: <EditProfileModalContent />,
+      content: <EditProfileModalContent user={user} />,
       headerType: 'withClose',
     });
   };

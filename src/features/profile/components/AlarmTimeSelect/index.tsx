@@ -9,10 +9,12 @@ import { useClickOutside } from '@/hooks/useClickOutside';
 
 interface AlarmTimeSelectProps {
   defaultValue?: number;
+  onChange?: (hour: number) => void;
 }
 
 export const AlarmTimeSelect = ({
   defaultValue = 24,
+  onChange,
 }: AlarmTimeSelectProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedHour, setSelectedHour] = useState(defaultValue);
@@ -21,6 +23,7 @@ export const AlarmTimeSelect = ({
   const handleSelect = (hour: number) => {
     setSelectedHour(hour);
     setIsOpen(false);
+    onChange?.(hour);
   };
 
   // 메뉴 열고 닫기 핸들러
