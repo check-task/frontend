@@ -4,4 +4,6 @@ export interface User {
   phoneNum: string;
   email: string;
   profileImage: string;
+  deadlineAlarm?: number;
+  taskAlarm?: number;
 }
