@@ -6,23 +6,26 @@ import { Button } from '@/components/Button';
 import { useModalStore } from '@/stores/modal-store';
 import { FolderColor } from '@/types/folder';
 import { Modal } from '@/features/profile/components/ModalContent';
+import { useDeleteFolder } from '@/hooks/mutations/useDeleteFolder';
 
 interface DeleteFolderModalContentProps {
+  folderId: number;
   folderName: string;
   folderColor: FolderColor;
-  onDelete?: () => void;
 }
 
 export const DeleteFolderModalContent = ({
+  folderId,
   folderName,
   folderColor,
-  onDelete,
 }: DeleteFolderModalContentProps) => {
   const closeModal = useModalStore((state) => state.closeModal);
+  const deleteFolder = useDeleteFolder();
 
   const handleDelete = () => {
-    onDelete?.();
-    closeModal();
+    deleteFolder.mutate(folderId, {
+      onSuccess: () => closeModal(),
+    });
   };
 
   return (

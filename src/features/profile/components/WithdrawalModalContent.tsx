@@ -3,19 +3,16 @@
 import { Button } from '@/components/Button';
 import { useModalStore } from '@/stores/modal-store';
 import { Modal } from '@/features/profile/components/ModalContent';
+import { useWithdraw } from '@/hooks/mutations/useWithdraw';
 
-interface WithdrawalModalContentProps {
-  onConfirm?: () => void;
-}
-
-export const WithdrawalModalContent = ({
-  onConfirm,
-}: WithdrawalModalContentProps) => {
+export const WithdrawalModalContent = () => {
   const closeModal = useModalStore((state) => state.closeModal);
+  const withdraw = useWithdraw();
 
   const handleConfirm = () => {
-    onConfirm?.();
-    closeModal();
+    withdraw.mutate(undefined, {
+      onSuccess: () => closeModal(),
+    });
   };
 
   return (
