@@ -5,6 +5,7 @@ import { parseUICookie } from '@/lib/parse-ui-cookie';
 import { css } from '../../../styled-system/css';
 import { Modal } from '@/components/Modal';
 import { MainContentWrapper } from './MainContentWrapper';
+import { AuthProvider } from '@/providers/auth-provider';
 
 // 레이아웃 스타일
 const layoutContainerStyle = css({
@@ -31,16 +32,18 @@ export default async function MainLayout({
   const initialUIState = parseUICookie(uiCookie?.value);
 
   return (
-    <div className={layoutContainerStyle}>
-      <Sidebar
-        initialCollapsed={initialUIState.isSidebarCollapsed}
-        initialTheme={initialUIState.theme}
-      />
-      <main className={mainContentStyle}>
-        <HomeButtonBar />
-        <MainContentWrapper>{children}</MainContentWrapper>
-      </main>
-      <Modal />
-    </div>
+    <AuthProvider>
+      <div className={layoutContainerStyle}>
+        <Sidebar
+          initialCollapsed={initialUIState.isSidebarCollapsed}
+          initialTheme={initialUIState.theme}
+        />
+        <main className={mainContentStyle}>
+          <HomeButtonBar />
+          <MainContentWrapper>{children}</MainContentWrapper>
+        </main>
+        <Modal />
+      </div>
+    </AuthProvider>
   );
 }
