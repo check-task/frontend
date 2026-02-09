@@ -62,8 +62,12 @@ export const ModifyAssignmentTask = () => {
 
   // 마감기한 변경 핸들러
   const handleDateChange = (id: number, date: Date) => {
-    // 받은 date를 string 형태로
-    const nextDate = date.toISOString().slice(0, 10);
+    // 받은 date를 로컬 YYYY-MM-DD 형태로
+    // 기존 toISOString 쓰면 UTC 기준이라서 전날이 나올 수 있어 변경
+    const yyyy = date.getFullYear();
+    const mm = String(date.getMonth() + 1).padStart(2, '0');
+    const dd = String(date.getDate()).padStart(2, '0');
+    const nextDate = `${yyyy}-${mm}-${dd}`;
     setTasks((prev) =>
       prev.map((task) =>
         task.id === id ? { ...task, dueDate: nextDate } : task,
