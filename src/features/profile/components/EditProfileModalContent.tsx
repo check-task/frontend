@@ -1,35 +1,83 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { styled } from 'styled-system/jsx';
 import { css } from 'styled-system/css';
 import { Button } from '@/components/Button';
 import { Input } from '@/components/TextField';
 import { CameraIcon } from '@/components/icons/CameraIcon';
 import { Modal } from '@/features/profile/components/ModalContent';
+import { useUpdateProfile } from '@/hooks/mutations/useUpdateProfile';
+import { useModalStore } from '@/stores/modal-store';
+import type { User } from '@/types/api/user';
 
 interface EditProfileModalContentProps {
-  onSave?: () => void;
+  user: User;
 }
 
 export const EditProfileModalContent = ({
-  onSave,
+  user,
 }: EditProfileModalContentProps) => {
-  const [nickname, setNickname] = useState('');
-  const [phone, setPhone] = useState('');
-  const [email, setEmail] = useState('');
+  const closeModal = useModalStore((state) => state.closeModal);
+  const updateProfile = useUpdateProfile();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const [nickname, setNickname] = useState(user.nickname);
+  const [phone, setPhone] = useState(user.phoneNum);
+  const [email, setEmail] = useState(user.email);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(
+    user.profileImage || null,
+  );
+
+  const handleImageClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setImageFile(file);
+      setImagePreview(URL.createObjectURL(file));
+    }
+  };
+
+  const handleSave = () => {
+    const formData = new FormData();
+    formData.append('nickname', nickname);
+    formData.append('phoneNum', phone);
+    formData.append('email', email);
+    if (imageFile) {
+      formData.append('image', imageFile);
+    }
+
+    updateProfile.mutate(formData, {
+      onSuccess: () => closeModal(),
+    });
+  };
 
   return (
     <>
       <Modal.Container gap='large'>
         {/* 프로필 이미지 */}
         <ImageSection>
-          <ImageWrapper>
-            <ProfileImage />
+          <ImageWrapper onClick={handleImageClick}>
+            {imagePreview ? (
+              <ProfileImageActual src={imagePreview} alt={nickname} />
+            ) : (
+              <ProfileImage />
+            )}
             <ImageOverlay>
               <CameraIcon />
             </ImageOverlay>
           </ImageWrapper>
+          <input
+            ref={fileInputRef}
+            type='file'
+            accept='image/*'
+            onChange={handleImageChange}
+            style={{ display: 'none' }}
+          />
         </ImageSection>
 
         {/* 입력 필드들 */}
@@ -71,8 +119,13 @@ export const EditProfileModalContent = ({
       <Button
         variant='fillBlue'
         size='xlarge'
-        onClick={onSave}
-        disabled={!nickname.trim() || !phone.trim() || !email.trim()}
+        onClick={handleSave}
+        disabled={
+          !nickname.trim() ||
+          !phone.trim() ||
+          !email.trim() ||
+          updateProfile.isPending
+        }
         className={css({ marginTop: '2.125rem' })}
       >
         변경사항 저장
@@ -102,6 +155,15 @@ const ProfileImage = styled('div', {
     height: '7.5rem',
     borderRadius: '50%',
     bg: 'blue.100',
+  },
+});
+
+const ProfileImageActual = styled('img', {
+  base: {
+    width: '7.5rem',
+    height: '7.5rem',
+    borderRadius: '50%',
+    objectFit: 'cover',
   },
 });
 

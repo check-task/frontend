@@ -8,3 +8,10 @@ export const FOLDER_COLORS = [
 ] as const;
 
 export type FolderColor = (typeof FOLDER_COLORS)[number];
+
+// 폴더 타입
+export interface Folder {
+  id: number;
+  name: string;
+  color: FolderColor;
+}

@@ -6,11 +6,13 @@ import { PencilIcon } from '@/components/icons/PencilIcon';
 import { FolderColor } from '@/types/folder';
 
 interface EditFolderButtonProps {
+  folderId: number;
   folderName: string;
   folderColor: FolderColor;
 }
 
 export const EditFolderButton = ({
+  folderId,
   folderName,
   folderColor,
 }: EditFolderButtonProps) => {
@@ -22,6 +24,7 @@ export const EditFolderButton = ({
       content: (
         <FolderModalContent
           mode='edit'
+          folderId={folderId}
           initialName={folderName}
           initialColor={folderColor}
         />

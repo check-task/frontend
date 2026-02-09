@@ -10,32 +10,48 @@ import { useModalStore } from '@/stores/modal-store';
 import { FolderCheckMark } from '@/components/icons/FolderCheckMark';
 import { FolderColor, FOLDER_COLORS } from '@/types/folder';
 import { Modal } from '@/features/profile/components/ModalContent';
+import { useCreateFolder } from '@/hooks/mutations/useCreateFolder';
+import { useUpdateFolder } from '@/hooks/mutations/useUpdateFolder';
 
 interface FolderModalContentProps {
   mode: 'add' | 'edit';
+  folderId?: number;
   initialName?: string;
   initialColor?: FolderColor;
-  onSave?: (name: string, color: FolderColor) => void;
 }
 
 export const FolderModalContent = ({
   mode,
+  folderId,
   initialName = '',
   initialColor,
-  onSave,
 }: FolderModalContentProps) => {
   const closeModal = useModalStore((state) => state.closeModal);
+  const createFolder = useCreateFolder();
+  const updateFolder = useUpdateFolder();
+
   const [name, setName] = useState('');
   // 추가는 초기 선택 없음, 수정은 기존 색상 선택
   const [selectedColor, setSelectedColor] = useState<FolderColor | null>(
     mode === 'add' ? null : (initialColor ?? null),
   );
 
+  const isPending = createFolder.isPending || updateFolder.isPending;
+
   const handleSave = () => {
-    if (selectedColor) {
-      onSave?.(name, selectedColor);
+    if (!selectedColor || !name.trim()) return;
+
+    if (mode === 'add') {
+      createFolder.mutate(
+        { folderTitle: name, color: selectedColor },
+        { onSuccess: () => closeModal() },
+      );
+    } else if (mode === 'edit' && folderId) {
+      updateFolder.mutate(
+        { folderId, body: { folderTitle: name, color: selectedColor } },
+        { onSuccess: () => closeModal() },
+      );
     }
-    closeModal();
   };
 
   return (
@@ -77,7 +93,7 @@ export const FolderModalContent = ({
         size='xlarge'
         onClick={handleSave}
         className={css({ marginTop: '2.5rem' })}
-        disabled={!name.trim() || !selectedColor}
+        disabled={!name.trim() || !selectedColor || isPending}
       >
         {mode === 'edit' ? '변경사항 저장' : '저장'}
       </Button>
