@@ -1,10 +1,14 @@
-'use clinet';
+'use client';
 
 import { Button } from '@/components/Button';
 import { useState } from 'react';
 import { css } from 'styled-system/css';
-import { ReferenceFormData } from '../personal/components/PersonalEtc';
 import { Input } from '@/components/TextField';
+
+type ReferenceFormData = {
+  name: string;
+  path: string;
+};
 
 interface EditAssignmentDataModalProps {
   type: 0 | 1; // 0은 url, 1은 파일로 지정
@@ -89,19 +93,4 @@ const fieldStyle = css({
 const labelStyle = css({
   textStyle: 'body3.m',
   color: 'gray.800',
-});
-
-const inputStyle = css({
-  w: '24.125rem',
-  p: '0.81rem 0.75rem',
-  border: '1px solid',
-  borderColor: 'gray.400',
-  borderRadius: '0.25rem',
-  color: 'gray.800', // 임시값
-  _focus: {
-    outline: 'none',
-  },
-  _placeholder: {
-    color: 'gray.600',
-  },
 });

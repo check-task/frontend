@@ -3,9 +3,10 @@
 import { CloseIcon } from '@/components/icons/CloseIcon';
 import { PencilIcon } from '@/components/icons/PencilIcon';
 import { css } from 'styled-system/css';
-import { ReferenceFormData } from '../personal/components/PersonalEtc';
 
-interface AssignmentDataCardProps extends ReferenceFormData {
+interface AssignmentDataCardProps {
+  name: string;
+  path: string;
   onEdit: () => void;
   onDelete: () => void;
 }
