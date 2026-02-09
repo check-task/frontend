@@ -6,6 +6,8 @@ import {
   GetTaskDetailResponse,
   GetTaskListParams,
   GetTaskListResponse,
+  JoinTaskResponse,
+  UpdateTaskPrioritiesRequest,
   Task,
   TaskDetail,
   TaskDetailSubTask,
@@ -150,4 +152,20 @@ export const createTask = async (
     );
   }
   return taskId;
+};
+
+// 팀과제 참여 api 호출
+export const joinTask = async (inviteCode: string) => {
+  const res = await axiosInstance.post<JoinTaskResponse>('/task/join', {
+    inviteCode,
+  });
+
+  return res.data.data;
+};
+
+// 과제 우선순위 일괄 변경 api 호출
+export const updateTaskPriorities = async (
+  orderedTasks: UpdateTaskPrioritiesRequest['orderedTasks'],
+): Promise<void> => {
+  await axiosInstance.patch('/task/priority', { orderedTasks });
 };
