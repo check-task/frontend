@@ -20,7 +20,6 @@ export interface Task {
   taskId: number;
   folderId?: number;
   folderTitle?: string;
-  /** 폴더 색상 HEX (상세 조회 응답) */
   foldercolor?: string;
   title: string;
   type: TaskType; // PERSONAL | TEAM
@@ -241,6 +240,26 @@ export interface UpdateSubTaskDeadlineResponse {
     sub_task_id: number;
     end_date: string; // YYYY-MM-DD
   };
+}
+
+// 팀과제 참여 타입 정의
+export interface JoinTaskRequest {
+  inviteCode: string;
+}
+
+export interface JoinTaskResponse {
+  resultType: 'SUCCESS' | 'FAIL';
+  message: string;
+  data: {
+    task_id: number;
+    task_title: string;
+    member_id: number;
+  };
+}
+
+// 과제 우선순위 변경 타입 정의
+export interface UpdateTaskPrioritiesRequest {
+  orderedTasks: { taskId: number; rank: number }[];
 }
 
 // ============================
