@@ -6,6 +6,7 @@ import type {
   UpdateProfileResponseData,
 } from '@/types/api/profile';
 import axiosInstance from '@/lib/axiosInstance';
+import { resolveFolderColor } from '@/lib/folder-color';
 
 // 내 정보 조회 API 호출
 export const getMyInfo = async (): Promise<{
@@ -28,7 +29,7 @@ export const getMyInfo = async (): Promise<{
     folders: data.folders.map((f) => ({
       id: f.folderId,
       name: f.name,
-      color: f.color,
+      color: resolveFolderColor(f.color),
     })),
   };
 };
