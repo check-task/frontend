@@ -10,6 +10,7 @@ import { EditFolderButton } from '@/features/profile/components/EditFolderButton
 import { DeleteFolderButton } from '@/features/profile/components/DeleteFolderButton';
 import { AlarmTimeSelect } from '@/features/profile/components/AlarmTimeSelect';
 import { sampleFolders } from '@/constants/sampleFolders';
+import { ProfileFooter } from '@/features/profile/components/ProfileFooter';
 
 // 프로필 설정 페이지
 export default function ProfilePage() {
@@ -103,7 +104,7 @@ export default function ProfilePage() {
       </Layout.Section>
 
       {/* 푸터 */}
-      <Layout.Footer>
+      <ProfileFooter>
         <WithdrawalButton />
         <Text.FooterLinks>
           <Text.FooterLink>개인 정보 처리 방침</Text.FooterLink>
@@ -116,7 +117,7 @@ export default function ProfilePage() {
             © 2025, CheckTask, All rights reserved.
           </Text.FooterCopyright>
         </Text.FooterLinks>
-      </Layout.Footer>
+      </ProfileFooter>
     </Layout.Container>
   );
 }
@@ -134,13 +135,6 @@ const Layout = {
   }),
   Section: styled('section', {
     base: stack.raw({ gap: '0.75rem' }),
-  }),
-  Footer: styled('footer', {
-    base: hstack.raw({
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      marginTop: '0.75rem',
-    }),
   }),
 };
 

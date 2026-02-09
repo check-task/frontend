@@ -102,7 +102,7 @@ const cardContainerStyle = css(
     width: '100%',
     _hover: {
       bg: 'blue.50',
-      transition: 'background-color 0.3s ease-out',
+      transition: 'background-color 0.4s ease-out',
     },
   }),
 );
