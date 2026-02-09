@@ -20,20 +20,16 @@ const FOLDER_COLOR_MAP: Record<FolderColor, string> = {
 
 // 과제 타입
 interface Assignment {
-  id: string;
-  folderId: string;
-  folderName: string;
+  id: number;
+  folderId: number;
   folderColor: FolderColor;
-  dDay: string;
   dueDate: string;
   assignmentName: string;
-  assignmentType: string;
-  progress: number;
 }
 
 interface CalendarProps {
   assignments: Assignment[];
-  selectedFolderIds: string[];
+  selectedFolderIds: number[];
 }
 
 export const Calendar = ({ assignments, selectedFolderIds }: CalendarProps) => {
@@ -45,7 +41,7 @@ export const Calendar = ({ assignments, selectedFolderIds }: CalendarProps) => {
   const filteredEvents = assignments
     .filter((assignment) => selectedFolderIds.includes(assignment.folderId))
     .map((assignment) => ({
-      id: assignment.id,
+      id: String(assignment.id), // FullCalendar의 id는 문자열을 요구
       title: assignment.assignmentName,
       start: assignment.dueDate,
       backgroundColor: FOLDER_COLOR_MAP[assignment.folderColor],

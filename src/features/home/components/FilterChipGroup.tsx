@@ -5,15 +5,15 @@ import { hstack } from 'styled-system/patterns';
 import { FolderColor } from '@/types/folder';
 
 interface Assignment {
-  folderId: string;
+  folderId: number;
   folderName: string;
   folderColor: FolderColor;
 }
 
 interface FilterChipGroupProps {
   assignments: Assignment[];
-  selectedIds: string[];
-  onSelectionChange?: (selectedIds: string[]) => void;
+  selectedIds: number[];
+  onSelectionChange?: (selectedIds: number[]) => void;
 }
 
 export const FilterChipGroup = ({
@@ -22,10 +22,10 @@ export const FilterChipGroup = ({
   onSelectionChange,
 }: FilterChipGroupProps) => {
   // 중복 폴더 칩 방지
-  const renderedFolderIds = new Set<string>();
+  const renderedFolderIds = new Set<number>();
 
   // 폴더 선택/해제 토글
-  const toggleFolder = (folderId: string) => {
+  const toggleFolder = (folderId: number) => {
     const next = selectedIds.includes(folderId)
       ? selectedIds.filter((id) => id !== folderId)
       : [...selectedIds, folderId];

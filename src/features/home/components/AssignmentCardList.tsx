@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import {
   DndContext,
   closestCenter,
@@ -21,10 +20,11 @@ import { CSS } from '@dnd-kit/utilities';
 import { styled } from 'styled-system/jsx';
 import { stack } from 'styled-system/patterns';
 import { AssignmentCard } from './AssignmentCard';
+import { useUpdateTaskPriorities } from '@/hooks/mutations/useUpdateTaskPriorities';
 import type { FolderColor } from '@/types/folder';
 
 export interface Assignment {
-  id: string;
+  id: number;
   folderName: string;
   folderColor: FolderColor;
   dDay: string;
@@ -34,7 +34,7 @@ export interface Assignment {
 }
 
 interface AssignmentCardListProps {
-  initialAssignments: Assignment[];
+  assignments: Assignment[];
   isDragDisabled?: boolean;
 }
 
@@ -80,10 +80,10 @@ const SortableAssignmentCard = ({
 };
 
 export const AssignmentCardList = ({
-  initialAssignments,
+  assignments,
   isDragDisabled = false,
 }: AssignmentCardListProps) => {
-  const [assignments, setAssignments] = useState(initialAssignments);
+  const updatePriorities = useUpdateTaskPriorities();
 
   const sensors = useSensors(
     // 마우스/터치 감지
@@ -96,17 +96,21 @@ export const AssignmentCardList = ({
     }),
   );
 
-  // 드래그 완료 시 카드 순서 재정렬
+  // 드래그 완료 시 카드 순서 재정렬 + 우선순위 API 호출
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
 
     if (over && active.id !== over.id) {
-      setAssignments((items) => {
-        const oldIndex = items.findIndex((item) => item.id === active.id);
-        const newIndex = items.findIndex((item) => item.id === over.id);
+      const oldIndex = assignments.findIndex((item) => item.id === active.id);
+      const newIndex = assignments.findIndex((item) => item.id === over.id);
+      const reordered = arrayMove(assignments, oldIndex, newIndex);
 
-        return arrayMove(items, oldIndex, newIndex);
-      });
+      // 새 순서로 우선순위 API 호출
+      const orderedTasks = reordered.map((item, idx) => ({
+        taskId: item.id,
+        rank: idx + 1,
+      }));
+      updatePriorities.mutate(orderedTasks);
     }
   };
 

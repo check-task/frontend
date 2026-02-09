@@ -2,15 +2,19 @@ import { useState } from 'react';
 import { Button } from '@/components/Button';
 import { Input } from '@/components/TextField';
 import { useModalStore } from '@/stores/modal-store';
+import { useJoinTask } from '@/hooks/mutations/useJoinTask';
 import { styled } from 'styled-system/jsx';
 import { stack } from 'styled-system/patterns';
 
 export const JoinAssignmentModalContent = () => {
   const closeModal = useModalStore((state) => state.closeModal);
+  const joinTask = useJoinTask();
   const [inviteCode, setInviteCode] = useState('');
 
   const handleJoin = () => {
-    closeModal();
+    joinTask.mutate(inviteCode, {
+      onSuccess: () => closeModal(),
+    });
   };
 
   return (
@@ -30,7 +34,7 @@ export const JoinAssignmentModalContent = () => {
         variant='fillBlue'
         size='large'
         onClick={handleJoin}
-        disabled={!inviteCode.trim()}
+        disabled={!inviteCode.trim() || joinTask.isPending}
       >
         팀과제 참여
       </Button>
