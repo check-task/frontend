@@ -5,6 +5,7 @@ import { useModalStore } from '@/stores/modal-store';
 import { useUIStore } from '@/stores/ui-store';
 import { css } from 'styled-system/css';
 import { TeamMemberManageModal } from './TeamMemberManageModal';
+import Link from 'next/link';
 
 export const TeamHeaderButton = () => {
   const isSidebarCollapsed = useUIStore((state) => state.isSidebarCollapsed);
@@ -34,15 +35,17 @@ export const TeamHeaderButton = () => {
       >
         팀원관리
       </Button>
-      <Button
-        variant='strokeBlue'
-        size={isSidebarCollapsed ? 'small' : 'tiny'}
-        className={css({
-          transition: 'width 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-        })}
-      >
-        과제수정
-      </Button>
+      <Link href='/assignment/modify'>
+        <Button
+          variant='strokeBlue'
+          size={isSidebarCollapsed ? 'small' : 'tiny'}
+          className={css({
+            transition: 'width 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+          })}
+        >
+          과제수정
+        </Button>
+      </Link>
     </div>
   );
 };

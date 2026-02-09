@@ -10,12 +10,6 @@ import { EditAssignmentDataCardModal } from '../../components/EditAssignmentData
 import { ConfirmDeleteAssignmentDataModal } from '../../components/ConfirmDeleteAssginmentDataModal';
 import type { ReferenceItem } from './PersonalRightContainer';
 
-// 자료 모음집에 사용되는 폼 데이터 타입
-export interface ReferenceFormData {
-  name: string;
-  path: string;
-}
-
 interface PersonalEtcProps {
   items: ReferenceItem[];
 }

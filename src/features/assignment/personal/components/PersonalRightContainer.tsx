@@ -3,6 +3,7 @@
 import { Button } from '@/components/Button';
 import { css } from 'styled-system/css';
 import { PersonalEtc } from './PersonalEtc';
+import Link from 'next/link';
 
 export interface ReferenceItem {
   id: number;
@@ -22,9 +23,11 @@ export const PersonalRightContainer = ({
   return (
     <div className={containerStyle}>
       {/* 추후 링크로 과제 수정 페이지 연결 */}
-      <Button variant='strokeBlue' size='small'>
-        과제수정
-      </Button>
+      <Link href='/assignment/modify'>
+        <Button variant='strokeBlue' size='small'>
+          과제수정
+        </Button>
+      </Link>
       <PersonalEtc items={items} />
     </div>
   );
