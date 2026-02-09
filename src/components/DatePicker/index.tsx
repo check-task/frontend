@@ -105,6 +105,7 @@ const dateTextStyle = cva({
   base: {
     textStyle: 'body1.r',
     cursor: 'default',
+    fontVariantNumeric: 'tabular-nums',
   },
   variants: {
     muted: {
