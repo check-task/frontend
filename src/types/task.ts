@@ -61,6 +61,8 @@ export interface TaskDetailSubTask {
   isAlarm: boolean;
   commentCount: number;
   comments?: TaskDetailSubTaskComment[];
+  /** 담당자 사용자 ID (과제 수정 API용) */
+  assigneeId?: number;
   assigneeName: string;
   assigneeProfileImage?: string;
 }
@@ -176,6 +178,25 @@ export interface CreateTaskResponse {
   resultType: 'SUCCESS' | 'FAIL';
   message: string;
   data: { taskId: number };
+}
+
+// 과제 수정 요청 (PATCH /task/{taskId})
+export interface UpdateTaskSubTaskItem {
+  title: string;
+  endDate: string; // YYYY-MM-DD
+  status: 'PROGRESS' | 'COMPLETE';
+  isAlarm: boolean;
+  assigneeId: number;
+}
+
+export interface UpdateTaskRequest {
+  title: string;
+  deadline: string; // YYYY-MM-DD
+  type: TaskType;
+  status?: string;
+  folderId: number;
+  subTasks: UpdateTaskSubTaskItem[];
+  references: { name: string; url: string }[];
 }
 
 // ============================

@@ -21,7 +21,8 @@ export async function createReferenceData(
   if (payload.name !== undefined) formData.append('name', payload.name);
   if (type === 'url' && payload.url !== undefined)
     formData.append('url', payload.url);
-  if (type === 'file' && payload.file) formData.append('file_url', payload.file);
+  if (type === 'file' && payload.file)
+    formData.append('file_url', payload.file);
 
   const res = await axiosInstance.post<CreateReferenceDataResponse>(
     `/reference/data/${taskId}`,
@@ -29,7 +30,10 @@ export async function createReferenceData(
     {
       params: { type },
       // multipart boundary 자동 설정을 위해 Content-Type 제거
-      headers: { 'Content-Type': undefined } as unknown as Record<string, string>,
+      headers: { 'Content-Type': undefined } as unknown as Record<
+        string,
+        string
+      >,
     },
   );
   return res.data.data;
@@ -50,7 +54,10 @@ export async function updateReferenceData(
     `/reference/data/${taskId}/${referenceId}`,
     formData,
     {
-      headers: { 'Content-Type': undefined } as unknown as Record<string, string>,
+      headers: { 'Content-Type': undefined } as unknown as Record<
+        string,
+        string
+      >,
     },
   );
 
@@ -86,7 +93,7 @@ export async function updateCommunication(
   payload: { name: string; url: string },
 ): Promise<CommunicationItemResponse> {
   const res = await axiosInstance.patch<UpdateCommunicationResponse>(
-    `/modal/communication/${taskId}/${communicationId}`,
+    `/reference/communication/${taskId}/${communicationId}`,
     payload,
   );
   return res.data.data;
@@ -98,6 +105,6 @@ export async function deleteCommunication(
   communicationId: number,
 ): Promise<void> {
   await axiosInstance.delete<DeleteCommunicationResponse>(
-    `/modal/communication/${taskId}/${communicationId}`,
+    `/reference/communication/${taskId}/${communicationId}`,
   );
 }
