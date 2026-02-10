@@ -33,6 +33,7 @@ export const AssignmentSection = ({
 const Container = styled('div', {
   base: stack.raw({
     gap: '1.25rem',
+    width: '27.375rem',
   }),
 });
 
