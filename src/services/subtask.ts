@@ -5,6 +5,9 @@ import {
   UpdateSubTaskStatusResponse,
   CreateSubTaskCommentRequest,
   CreateSubTaskCommentResponse,
+  UpdateCommentRequest,
+  UpdateCommentResponse,
+  DeleteCommentResponse,
 } from '@/types/task';
 import axiosInstance from '@/lib/axiosInstance';
 
@@ -47,5 +50,27 @@ export const createSubTaskComment = async (
     },
   );
 
+  return res.data;
+};
+
+// 댓글 수정 api 호출
+export const updateComment = async (
+  commentId: number,
+  body: UpdateCommentRequest,
+): Promise<UpdateCommentResponse> => {
+  const res = await axiosInstance.patch<UpdateCommentResponse>(
+    `/task/comment/${commentId}`,
+    body,
+  );
+  return res.data;
+};
+
+// 댓글 삭제 api 호출
+export const deleteComment = async (
+  commentId: number,
+): Promise<DeleteCommentResponse> => {
+  const res = await axiosInstance.delete<DeleteCommentResponse>(
+    `/task/comment/${commentId}`,
+  );
   return res.data;
 };

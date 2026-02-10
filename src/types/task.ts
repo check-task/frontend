@@ -208,3 +208,21 @@ export interface CreateSubTaskCommentResponse {
     created_at: string;
   };
 }
+
+// 댓글 수정 요청/응답
+export interface UpdateCommentRequest {
+  content: string;
+}
+
+export interface UpdateCommentResponse {
+  resultType: 'SUCCESS' | 'FAIL';
+  message: string;
+  data: { comment_id: number; content: string } | null;
+}
+
+// 댓글 삭제 응답
+export interface DeleteCommentResponse {
+  resultType: 'SUCCESS' | 'FAIL';
+  message: string;
+  data: null;
+}
