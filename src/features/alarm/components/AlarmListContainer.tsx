@@ -9,6 +9,7 @@ import { useUIStore } from '@/stores/ui-store';
 import { AlarmAllClearButton } from './AlarmAllClearButton';
 import { useInfiniteAlarmList } from '@/hooks/queries/useInfiniteAlarmList';
 import { useMarkAllAlarmRead } from '@/hooks/queries/useMarkAllAlarmRead';
+import Link from 'next/link';
 
 const PAGE_SIZE = 10;
 
@@ -38,6 +39,17 @@ export const AlarmListContainer = () => {
   const visibleAlarms = alarms.filter(
     (alarm) => !hiddenAlarmIds.has(alarm.alarmId),
   );
+
+  // 알림 클릭시 이동할 경로 분기
+  const divideAlarmPath = (alarm: AlarmListItem) => {
+    const taskType = alarm.taskType ?? 'PERSONAL';
+    // 현재 백엔드에서 개인 팀 상태를 안 내려서 무조건 개인으로 이동
+    if (taskType === 'TEAM') {
+      return `/assignment/team/${alarm.taskId}`;
+    }
+
+    return `/assignment/personal/${alarm.taskId}`;
+  };
 
   // 무한 스크롤 구현
   useEffect(() => {
@@ -112,11 +124,12 @@ export const AlarmListContainer = () => {
       ) : (
         <div className={flex({ direction: 'column', gap: '1rem' })}>
           {visibleAlarms.map((alarm) => (
-            <AlarmCard
-              key={alarm.alarmId}
-              {...alarm}
-              onDelete={() => handleDelete(alarm.alarmId)}
-            />
+            <Link key={alarm.alarmId} href={divideAlarmPath(alarm)}>
+              <AlarmCard
+                {...alarm}
+                onDelete={() => handleDelete(alarm.alarmId)}
+              />
+            </Link>
           ))}
         </div>
       )}

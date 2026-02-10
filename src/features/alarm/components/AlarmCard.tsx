@@ -8,6 +8,7 @@ import type { AlarmListItem } from '@/types/alarm';
 
 type AlarmCardProps = AlarmListItem & {
   onDelete?: () => void;
+  onClick?: () => void;
 };
 
 export const AlarmCard = ({
@@ -15,6 +16,7 @@ export const AlarmCard = ({
   alarmContent,
   isRead,
   onDelete,
+  onClick,
 }: AlarmCardProps) => {
   return (
     // 부모 컨테이너에서만 status를 판단하여 전체 투명도를 조절합니다.
@@ -22,6 +24,7 @@ export const AlarmCard = ({
       className={cardContainer({
         status: isRead ? 'done' : 'active',
       })}
+      onClick={onClick}
     >
       <div className={iconWrapper()}>
         <AlarmIcon />
@@ -33,7 +36,10 @@ export const AlarmCard = ({
       </div>
 
       <button
-        onClick={onDelete}
+        onClick={(event) => {
+          event.stopPropagation();
+          onDelete?.();
+        }}
         className={iconWrapper({ type: 'button' })}
         aria-label='알림 삭제'
       >
@@ -55,6 +61,9 @@ const cardContainer = cva({
     gap: '1rem',
     boxShadow: '0 1px 4px rgba(0, 0, 0, 0.16)',
     position: 'relative',
+    _hover: {
+      cursor: 'pointer',
+    },
   },
   variants: {
     // 알림 완료 상태
