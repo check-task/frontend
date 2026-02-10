@@ -76,6 +76,34 @@ export interface GetTaskDetailResponse {
 }
 
 // ============================
+// 과제 생성 타입 정의
+// ============================
+export interface CreateTaskSubTaskRequest {
+  title: string;
+  endDate: string; // YYYY-MM-DD
+}
+
+export interface CreateTaskReferenceRequest {
+  name: string;
+  url: string;
+}
+
+export interface CreateTaskRequest {
+  title: string;
+  folderId: number;
+  deadline: string; // YYYY-MM-DD
+  type: TaskType; // PERSONAL | TEAM
+  subTasks: CreateTaskSubTaskRequest[];
+  references: CreateTaskReferenceRequest[];
+}
+
+export interface CreateTaskResponse {
+  resultType: 'SUCCESS' | 'FAIL';
+  message: string;
+  data: { taskId: number };
+}
+
+// ============================
 // 완료 과제 목록 조회 타입 정의
 // ============================
 export type CompletedTaskType = '개인' | '팀';

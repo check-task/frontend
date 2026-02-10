@@ -1,31 +1,41 @@
 'use client';
 
-import { useState } from 'react';
 import { Input } from '@/components/TextField';
 import { PlusButton } from '@/components/PlusButton';
 import { useModalStore } from '@/stores/modal-store';
 import { AddAssignmentDataModal } from '../../components/AddAssignmentDataModal';
 import { css } from 'styled-system/css';
 
-interface DataItem {
+export interface DataItem {
   id: number;
   type: 0 | 1; // 0: URL, 1: 파일
   name: string;
   path: string;
 }
 
-export const AddAssignmentData = () => {
+interface AddAssignmentDataProps {
+  dataItems: DataItem[];
+  onDataItemsChange: (items: DataItem[]) => void;
+  /** 있으면 모달에서 자료 생성 API 호출 */
+  taskId?: number;
+}
+
+export const AddAssignmentData = ({
+  dataItems,
+  onDataItemsChange,
+  taskId,
+}: AddAssignmentDataProps) => {
   const openModal = useModalStore((state) => state.openModal);
   const closeModal = useModalStore((state) => state.closeModal);
-  const [dataItems, setDataItems] = useState<DataItem[]>([]);
 
   const handleAddData = () => {
     openModal({
       title: '자료 추가',
       content: (
         <AddAssignmentDataModal
+          taskId={taskId}
           onSave={(items) => {
-            setDataItems((prev) => [...prev, ...items]);
+            onDataItemsChange([...dataItems, ...items]);
             closeModal();
           }}
         />
@@ -34,8 +44,10 @@ export const AddAssignmentData = () => {
   };
 
   const handleUpdatePath = (id: number, newPath: string) => {
-    setDataItems((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, path: newPath } : item)),
+    onDataItemsChange(
+      dataItems.map((item) =>
+        item.id === id ? { ...item, path: newPath } : item,
+      ),
     );
   };
 

@@ -4,15 +4,29 @@ import { useState } from 'react';
 import { Checkbox } from '@/components/Checkbox';
 import { css } from 'styled-system/css';
 
-export const CheckboxHeader = () => {
-  const [isTeamProject, setIsTeamProject] = useState(false);
+interface CheckboxHeaderProps {
+  isTeamProject?: boolean;
+  onTeamProjectChange?: (checked: boolean) => void;
+}
+
+export const CheckboxHeader = ({
+  isTeamProject: controlledTeam,
+  onTeamProjectChange,
+}: CheckboxHeaderProps) => {
+  const [internalTeam, setInternalTeam] = useState(false);
+  const isTeamProject =
+    onTeamProjectChange != null ? controlledTeam ?? false : internalTeam;
+  const setTeam =
+    onTeamProjectChange != null
+      ? onTeamProjectChange
+      : setInternalTeam;
 
   return (
     <div className={checkboxWrapperStyle}>
       <div className={checkboxContainerStyle}>
         <Checkbox
           checked={isTeamProject}
-          onChange={(e) => setIsTeamProject(e.target.checked)}
+          onChange={(e) => setTeam(e.target.checked)}
         />
         <p>팀프로젝트</p>
       </div>
