@@ -32,3 +32,15 @@ export interface GetAlarmListResponse {
     };
   };
 }
+
+// ============================
+// 안 읽은 알람 여부 반환 조회 타입 정의
+// ============================
+export interface GetUnreadAlarmCountResponse {
+  resultType: 'SUCCESS' | 'FAIL';
+  message: string;
+  data: {
+    count: number;
+    hasUnread: boolean;
+  };
+}
