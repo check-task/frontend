@@ -19,6 +19,24 @@ export interface CreateReferenceDataResponse {
   data: ReferenceDataItem[];
 }
 
+// 자료 수정 성공 응답
+export interface UpdateReferenceDataResponse {
+  status: number;
+  isSuccess: boolean;
+  code: string;
+  message: string;
+  data: ReferenceDataItem;
+}
+
+// 자료 삭제 성공 응답
+export interface DeleteReferenceDataResponse {
+  status: number;
+  isSuccess: boolean;
+  code: string;
+  message: string;
+  data: null;
+}
+
 // 커뮤니케이션 한 건 (응답)
 export interface CommunicationItemResponse {
   communication_id: number;

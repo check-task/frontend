@@ -11,18 +11,14 @@ import { CommunicationEditIcon } from '@/components/icons/CommunicationEditIcon'
 import { CommunicationDeleteIcon } from '@/components/icons/CommunicationDeleteIcon';
 import { useDeleteCommunication } from '@/hooks/mutations/useDeleteCommunication';
 import { MinutesModal } from './MinutesModal';
+import { ReferenceEditModal } from './ReferenceEditModal';
+import { useDeleteReferenceData } from '@/hooks/mutations/useDeleteReferenceData';
+import { ConfirmDeleteAssignmentDataModal } from '@/features/assignment/components/ConfirmDeleteAssginmentDataModal';
 import type {
   TaskReference,
   TaskCommunication,
   TaskMeetingLog,
 } from '@/types/task';
-
-interface DataItem {
-  id: number;
-  type: 0 | 1;
-  name: string;
-  path: string;
-}
 
 interface TeamEtcProps {
   taskId: number;
@@ -39,14 +35,7 @@ export const TeamEtc = ({
 }: TeamEtcProps) => {
   const { openModal, closeModal } = useModalStore();
   const { mutate: deleteCommunication } = useDeleteCommunication(taskId);
-  const [dataItems, setDataItems] = useState<DataItem[]>(() =>
-    references.map((r, i) => ({
-      id: i + 1,
-      type: 0 as const,
-      name: r.name,
-      path: r.url,
-    })),
-  );
+  const { mutate: deleteReference } = useDeleteReferenceData(taskId);
   const [minutesModalOpen, setMinutesModalOpen] = useState(false);
   const [editingMeetingLog, setEditingMeetingLog] =
     useState<TaskMeetingLog | null>(null);
@@ -85,13 +74,47 @@ export const TeamEtc = ({
     deleteCommunication(item.communicationId);
   };
 
+  const handleOpenReferenceEditModal = (ref: TaskReference) => {
+    const referenceId = ref.referenceId ?? 0;
+    openModal({
+      title: '자료 수정',
+      content: (
+        <ReferenceEditModal
+          taskId={taskId}
+          referenceId={referenceId}
+          initialName={ref.name}
+          initialUrl={ref.url ?? ref.file_url ?? ''}
+          onSuccess={() => closeModal()}
+        />
+      ),
+    });
+  };
+
+  const handleDeleteReference = (ref: TaskReference) => {
+    if (ref.referenceId == null) return;
+    openModal({
+      title: '자료 삭제',
+      headerType: 'none',
+      content: (
+        <ConfirmDeleteAssignmentDataModal
+          highlightText='자료명(파일명.확장자 or URL 경로)'
+          onConfirm={() => {
+            deleteReference(ref.referenceId!);
+            closeModal();
+          }}
+          onCancel={closeModal}
+        />
+      ),
+    });
+  };
+
   const handleOpenDataModal = () => {
     openModal({
       title: '자료 추가',
       content: (
         <AddAssignmentDataModal
-          onSave={(items) => {
-            setDataItems((prev) => [...prev, ...items]);
+          taskId={taskId}
+          onSave={() => {
             closeModal();
           }}
         />
@@ -194,10 +217,43 @@ export const TeamEtc = ({
         </div>
 
         <div className={etcCardContainerStyle}>
-          {dataItems.map((item) => (
-            <div key={item.id} className={etcCardStyle}>
-              <p className={cardTitleStyle}>{item.name}</p>
-              <p className={cardContentStyle}>{item.path}</p>
+          {references.map((ref, index) => (
+            <div
+              key={`ref-${index}-${ref.name}-${ref.url ?? ref.file_url}`}
+              className={referenceCardStyle}
+            >
+              <div className={communicationHeaderStyle}>
+                <p className={cardTitleStyle}>{ref.name}</p>
+                <div className={referenceIconGroupStyle} data-ref-icons>
+                  <button
+                    type='button'
+                    className={communicationIconButtonStyle}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      handleOpenReferenceEditModal(ref);
+                    }}
+                    aria-label='자료 수정'
+                  >
+                    <CommunicationEditIcon />
+                  </button>
+                  <button
+                    type='button'
+                    className={communicationIconButtonStyle}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      handleDeleteReference(ref);
+                    }}
+                    aria-label='자료 삭제'
+                  >
+                    <CommunicationDeleteIcon />
+                  </button>
+                </div>
+              </div>
+              <p className={cardContentStyle}>
+                {ref.url ?? ref.file_url ?? ''}
+              </p>
             </div>
           ))}
         </div>
@@ -280,6 +336,14 @@ const communicationIconGroupStyle = css({
   transition: 'opacity 0.2s ease',
 });
 
+const referenceIconGroupStyle = css({
+  display: 'flex',
+  alignItems: 'center',
+  gap: '0.5rem',
+  opacity: 0,
+  transition: 'opacity 0.2s ease',
+});
+
 const communicationCardStyle = css({
   display: 'flex',
   flexDirection: 'column',
@@ -291,6 +355,22 @@ const communicationCardStyle = css({
   shadow: '0px 1px 4px 0px #00000029',
   _hover: {
     '& [data-comm-icons]': {
+      opacity: 1,
+    },
+  },
+});
+
+const referenceCardStyle = css({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '1.25rem',
+  p: '1rem',
+  bg: 'blue.50',
+  borderRadius: '0.5rem',
+  width: '100%',
+  shadow: '0px 1px 4px 0px #00000029',
+  _hover: {
+    '& [data-ref-icons]': {
       opacity: 1,
     },
   },

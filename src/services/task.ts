@@ -9,6 +9,7 @@ import {
   Task,
   TaskDetail,
   TaskMeetingLog,
+  TaskReference,
 } from '@/types/task';
 import axiosInstance from '@/lib/axiosInstance';
 
@@ -47,6 +48,25 @@ export const getTaskDetail = async (taskId: number): Promise<TaskDetail> => {
         ...c,
         communicationId: c.communicationId ?? c.communication_id,
       }),
+    );
+  }
+  if (data.references?.length) {
+    data.references = data.references.map(
+      (r: TaskReference & { reference_id?: number; id?: number }) => {
+        const raw = r as unknown as Record<string, unknown>;
+        const id =
+          r.referenceId ??
+          r.reference_id ??
+          r.id ??
+          (typeof raw?.reference_id === 'number' ? raw.reference_id : undefined) ??
+          (typeof raw?.id === 'number' ? raw.id : undefined);
+        return {
+          referenceId: id,
+          name: r.name,
+          url: r.url ?? null,
+          file_url: r.file_url ?? null,
+        };
+      },
     );
   }
   if (data.meetingLogs?.length) {

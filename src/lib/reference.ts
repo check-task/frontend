@@ -3,6 +3,8 @@ import type {
   ReferenceDataType,
   CreateReferenceDataResponse,
   ReferenceDataItem,
+  UpdateReferenceDataResponse,
+  DeleteReferenceDataResponse,
   CreateCommunicationResponse,
   CommunicationItemResponse,
   UpdateCommunicationResponse,
@@ -31,6 +33,38 @@ export async function createReferenceData(
     },
   );
   return res.data.data;
+}
+
+// 자료 수정 API 호출 (URL 또는 파일, multipart/form-data)
+export async function updateReferenceData(
+  taskId: number,
+  referenceId: number,
+  payload: { name?: string; url?: string; file?: File },
+): Promise<ReferenceDataItem> {
+  const formData = new FormData();
+  if (payload.name !== undefined) formData.append('name', payload.name);
+  if (payload.url !== undefined) formData.append('url', payload.url);
+  if (payload.file) formData.append('file_url', payload.file);
+
+  const res = await axiosInstance.patch<UpdateReferenceDataResponse>(
+    `/reference/data/${taskId}/${referenceId}`,
+    formData,
+    {
+      headers: { 'Content-Type': undefined } as unknown as Record<string, string>,
+    },
+  );
+
+  return res.data.data;
+}
+
+// 자료 삭제 API 호출
+export async function deleteReferenceData(
+  taskId: number,
+  referenceId: number,
+): Promise<void> {
+  await axiosInstance.delete<DeleteReferenceDataResponse>(
+    `/reference/data/${taskId}/${referenceId}`,
+  );
 }
 
 // 커뮤니케이션 생성 API 호출 (name, url → 전체 커뮤니케이션 목록 반환)

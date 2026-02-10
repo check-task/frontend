@@ -65,10 +65,15 @@ export interface TaskDetailSubTask {
   assigneeProfileImage?: string;
 }
 
-// 자료 모음집 참조 항목
+// 자료 모음집 참조 항목 (과제 상세·자료 생성 응답)
 export interface TaskReference {
+  /** 자료 ID (수정/삭제 시 필요) */
+  referenceId?: number;
   name: string;
-  url: string;
+  /** URL 자료의 경로 (URL형 자료가 아닐 경우 null일 수 있음) */
+  url: string | null;
+  /** 파일 업로드 시 S3 등 URL (과제 상세/자료 생성 응답) */
+  file_url?: string | null;
 }
 
 // 커뮤니케이션 한 건 (상세 조회 응답, 수정/삭제 시 communicationId 필요)
