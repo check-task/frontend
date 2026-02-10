@@ -169,3 +169,11 @@ export const updateTaskPriorities = async (
 ): Promise<void> => {
   await axiosInstance.patch('/task/priority', { orderedTasks });
 };
+
+// 과제 마감일 변경 api 호출
+export const updateTaskDeadline = async (
+  taskId: number,
+  deadline: string,
+): Promise<void> => {
+  await axiosInstance.patch(`/task/${taskId}`, { deadline });
+};
