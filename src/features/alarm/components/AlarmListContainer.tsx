@@ -8,6 +8,7 @@ import type { AlarmListItem } from '@/types/alarm';
 import { useUIStore } from '@/stores/ui-store';
 import { AlarmAllClearButton } from './AlarmAllClearButton';
 import { useInfiniteAlarmList } from '@/hooks/queries/useInfiniteAlarmList';
+import { useMarkAllAlarmRead } from '@/hooks/queries/useMarkAllAlarmRead';
 
 const PAGE_SIZE = 10;
 
@@ -19,9 +20,13 @@ export const AlarmListContainer = () => {
       order: 'desc',
     });
 
+  // 모든 알림 읽음 훅 호출
+  const { mutate: markAllRead } = useMarkAllAlarmRead();
+
   const [hiddenAlarmIds, setHiddenAlarmIds] = useState<Set<number>>(new Set());
   // 무한 스크롤 감지를 위한 Dom 참조
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
+  const didMarkReadRef = useRef(false);
 
   // 중복 제거
   const uniqueById = (items: AlarmListItem[]) =>
@@ -53,6 +58,16 @@ export const AlarmListContainer = () => {
     observer.observe(target);
     return () => observer.disconnect();
   }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
+
+  // 알림 페이지 진입 시 읽음 처리 (뱃지 갱신용)
+  useEffect(() => {
+    if (didMarkReadRef.current) {
+      return;
+    }
+
+    didMarkReadRef.current = true;
+    markAllRead();
+  }, [markAllRead]);
 
   // 개별 알림 삭제 함수
   const handleDelete = (alarmId: number) => {
