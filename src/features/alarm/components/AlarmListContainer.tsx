@@ -10,6 +10,7 @@ import { AlarmAllClearButton } from './AlarmAllClearButton';
 import { useInfiniteAlarmList } from '@/hooks/queries/useInfiniteAlarmList';
 import { useMarkAllAlarmRead } from '@/hooks/queries/useMarkAllAlarmRead';
 import { useDeleteAlarm } from '@/hooks/mutations/useDeleteAlarm';
+import { useDeleteAllAlarms } from '@/hooks/mutations/useDeleteAllAlarms';
 import Link from 'next/link';
 
 const PAGE_SIZE = 10;
@@ -26,6 +27,8 @@ export const AlarmListContainer = () => {
   const { mutate: markAllRead } = useMarkAllAlarmRead();
   // 개별 알림 삭제 훅 호출
   const { mutate: deleteAlarm } = useDeleteAlarm();
+  // 전체 알림 삭제 훅 호출
+  const { mutate: deleteAllAlarms } = useDeleteAllAlarms();
 
   const [hiddenAlarmIds, setHiddenAlarmIds] = useState<Set<number>>(new Set());
   // 무한 스크롤 감지를 위한 Dom 참조
@@ -104,7 +107,11 @@ export const AlarmListContainer = () => {
       return;
     }
 
-    setHiddenAlarmIds(new Set(alarms.map((alarm) => alarm.alarmId)));
+    deleteAllAlarms(undefined, {
+      onSuccess: () => {
+        setHiddenAlarmIds(new Set(alarms.map((alarm) => alarm.alarmId)));
+      },
+    });
   };
 
   return (
