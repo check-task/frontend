@@ -10,20 +10,27 @@ import { EditFolderButton } from '@/features/profile/components/EditFolderButton
 import { DeleteFolderButton } from '@/features/profile/components/DeleteFolderButton';
 import { AlarmTimeSelect } from '@/features/profile/components/AlarmTimeSelect';
 import { useMyInfo } from '@/hooks/queries/useMyInfo';
-import { useUpdateProfile } from '@/hooks/mutations/useUpdateProfile';
+import {
+  useUpdateDeadlineAlarmSetting,
+  useUpdateTaskAlarmSetting,
+} from '@/hooks/mutations/useUpdateAlarmTimeSetting';
 
 export const ManagementSection = () => {
   const { data, isLoading } = useMyInfo();
-  const updateProfile = useUpdateProfile();
+  const updateDeadlineAlarmSetting = useUpdateDeadlineAlarmSetting();
+  const updateTaskAlarmSetting = useUpdateTaskAlarmSetting();
 
   // 알림 시간 변경 핸들러 (즉시 자동저장)
   const handleAlarmChange = (
     field: 'deadlineAlarm' | 'taskAlarm',
     hours: number,
   ) => {
-    const formData = new FormData();
-    formData.append(field, String(hours));
-    updateProfile.mutate(formData);
+    if (field === 'deadlineAlarm') {
+      updateDeadlineAlarmSetting.mutate(hours);
+      return;
+    }
+
+    updateTaskAlarmSetting.mutate(hours);
   };
 
   if (isLoading || !data) {
