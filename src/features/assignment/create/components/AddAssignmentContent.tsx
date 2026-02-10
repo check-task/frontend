@@ -1,19 +1,25 @@
 'use client';
 
 import { Input } from '@/components/TextField';
-import { FolderColorSelect } from './FolderColorSelect';
+import { FolderSelect } from './FolderSelect';
 import DatePicker from '@/components/DatePicker';
 import { css } from 'styled-system/css';
+import type { Folder } from '@/types/folder';
 
 interface AddAssignmentContentProps {
   onNameChange?: (name: string) => void;
-  onColorChange?: (color: string) => void;
-  onDateChange?: (date: Date | null) => void;
+  folders: Folder[];
+  selectedFolderId: number | null;
+  onFolderChange?: (folderId: number) => void;
+  onDateChange?: (date: Date) => void;
 }
 
 export const AddAssignmentContent = ({
   onNameChange,
-  onColorChange,
+  folders,
+  selectedFolderId,
+  onFolderChange,
+  onDateChange,
 }: AddAssignmentContentProps) => {
   return (
     <div className={contentWrapperStyle}>
@@ -29,12 +35,16 @@ export const AddAssignmentContent = ({
 
       <div className={contentItemStyle}>
         <p className={labelTextStyle}>폴더색</p>
-        <FolderColorSelect onChange={onColorChange} />
+        <FolderSelect
+          folders={folders}
+          selectedFolderId={selectedFolderId}
+          onFolderChange={(id) => onFolderChange?.(id)}
+        />
       </div>
 
       <div className={contentItemStyle}>
         <p className={labelTextStyle}>마감일</p>
-        <DatePicker />
+        <DatePicker onChange={(d) => onDateChange?.(d)} />
       </div>
     </div>
   );

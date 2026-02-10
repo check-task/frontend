@@ -1,56 +1,140 @@
 'use client';
 
 import { useState } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { Button } from '@/components/Button';
 import { Divider } from '@/components/Divider';
 import { CheckboxHeader } from './CheckboxHeader';
 import { AddAssignmentContent } from './AddAssignmentContent';
-import { AddAssignmentTask } from './AddAssignmentTask';
-import { AddAssignmentData } from './AddAssignmentData';
+import { AddAssignmentTask, type SubTaskInput } from './AddAssignmentTask';
+import {
+  AddAssignmentData,
+  type DataItem,
+} from './AddAssignmentData';
 import { css } from 'styled-system/css';
+import { useMyInfo } from '@/hooks/queries/useMyInfo';
+import { useCreateTask } from '@/hooks/mutations/useCreateTask';
+import type { TaskType } from '@/types/task';
+
+const formatDate = (d: Date) => d.toISOString().slice(0, 10);
 
 export const CreateAssignmentForm = () => {
+  const router = useRouter();
   const searchParams = useSearchParams();
-  const taskId = searchParams.get('taskId');
-  const [assignmentName, setAssignmentName] = useState('');
-  const [folderColor, setFolderColor] = useState('');
+  const taskIdParam = searchParams.get('taskId');
+  const { data: myInfo } = useMyInfo();
+  const { mutateAsync: createTask, isPending } = useCreateTask();
 
-  const isFormValid = assignmentName.trim() !== '' && folderColor !== '';
+  const [assignmentName, setAssignmentName] = useState('');
+  const [selectedFolderId, setSelectedFolderId] = useState<number | null>(null);
+  const [deadline, setDeadline] = useState<Date | null>(null);
+  const [isTeamProject, setIsTeamProject] = useState(false);
+  const [subTasks, setSubTasks] = useState<SubTaskInput[]>([]);
+  const [dataItems, setDataItems] = useState<DataItem[]>([]);
+  const [saveError, setSaveError] = useState<string | null>(null);
+
+  const folders = myInfo?.folders ?? [];
+  const isFormValid =
+    assignmentName.trim() !== '' &&
+    selectedFolderId != null &&
+    deadline != null;
+
+  const handleCancel = () => {
+    router.push('/assignment');
+  };
+
+  const handleSave = async () => {
+    if (!isFormValid || deadline == null || selectedFolderId == null) return;
+
+    const folderId = selectedFolderId;
+    const type: TaskType = isTeamProject ? 'TEAM' : 'PERSONAL';
+    const payload = {
+      title: assignmentName.trim(),
+      folderId,
+      deadline: formatDate(deadline),
+      type,
+      subTasks: subTasks.map((t) => ({
+        title: t.title,
+        endDate: formatDate(t.endDate),
+      })),
+      references: dataItems
+        .filter((r) => r.type === 0)
+        .map((r) => ({ name: r.name, url: r.path })),
+    };
+
+    setSaveError(null);
+    try {
+      await createTask(payload);
+      const typeParam = type === 'TEAM' ? 'team' : 'personal';
+      router.push(`/assignment?type=${typeParam}`);
+    } catch (err: unknown) {
+      const ax = err as {
+        response?: { data?: { reason?: string; message?: string } };
+        message?: string;
+      };
+      const message =
+        ax.response?.data?.reason ??
+        ax.response?.data?.message ??
+        (typeof ax.message === 'string' ? ax.message : null) ??
+        '과제 생성에 실패했습니다.';
+      setSaveError(message);
+    }
+  };
 
   return (
     <div className={containerStyle}>
-      {/* 제목, 체크박스 */}
       <div className={headerStyle}>
         <h1 className={css({ textStyle: 'h3', color: 'gray.900' })}>
           과제 등록
         </h1>
-        <CheckboxHeader />
-      </div>
-
-      <Divider mt='1.75rem' mb='1.75rem' />
-
-      {/* 과제명, 폴더색, 마감일 */}
-      <AddAssignmentContent
-        onNameChange={setAssignmentName}
-        onColorChange={setFolderColor}
-      />
-
-      <Divider mt='1.75rem' mb='1.75rem' />
-      {/* TASK, 자료 (taskId 있으면 자료 추가 시 API 호출) */}
-      <div className={taskDataWrapperStyle}>
-        <AddAssignmentTask />
-        <AddAssignmentData
-          taskId={taskId ? Number(taskId) : undefined}
+        <CheckboxHeader
+          isTeamProject={isTeamProject}
+          onTeamProjectChange={setIsTeamProject}
         />
       </div>
 
-      {/* 취소, 저장 */}
+      <Divider mt='1.75rem' mb='1.75rem' />
+
+      <AddAssignmentContent
+        onNameChange={setAssignmentName}
+        folders={folders}
+        selectedFolderId={selectedFolderId}
+        onFolderChange={setSelectedFolderId}
+        onDateChange={(d) => setDeadline(d)}
+      />
+
+      <Divider mt='1.75rem' mb='1.75rem' />
+      <div className={taskDataWrapperStyle}>
+        <AddAssignmentTask
+          subTasks={subTasks}
+          onSubTasksChange={setSubTasks}
+        />
+        <AddAssignmentData
+          dataItems={dataItems}
+          onDataItemsChange={setDataItems}
+          taskId={taskIdParam ? Number(taskIdParam) : undefined}
+        />
+      </div>
+
+      {saveError && (
+        <p className={css({ textStyle: 'body3.r', color: 'red.500', mb: '0.5rem' })}>
+          {saveError}
+        </p>
+      )}
       <div className={buttonWrapperStyle}>
-        <Button variant='fillGray' size='xlarge'>
+        <Button
+          variant='fillGray'
+          size='xlarge'
+          onClick={handleCancel}
+        >
           취소
         </Button>
-        <Button variant='fillBlue' size='xlarge' disabled={!isFormValid}>
+        <Button
+          variant='fillBlue'
+          size='xlarge'
+          disabled={!isFormValid || isPending}
+          onClick={handleSave}
+        >
           저장
         </Button>
       </div>

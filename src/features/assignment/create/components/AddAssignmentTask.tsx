@@ -1,19 +1,51 @@
 'use client';
 
-import { useState } from 'react';
 import { PlusButton } from '@/components/PlusButton';
 import { Input } from '@/components/TextField';
 import DatePicker from '@/components/DatePicker';
 import { css } from 'styled-system/css';
 
-export const AddAssignmentTask = () => {
-  const [taskInputs, setTaskInputs] = useState<number[]>([]);
+export interface SubTaskInput {
+  id: number;
+  title: string;
+  endDate: Date;
+}
 
+interface AddAssignmentTaskProps {
+  subTasks: SubTaskInput[];
+  onSubTasksChange: (subTasks: SubTaskInput[]) => void;
+}
+
+export const AddAssignmentTask = ({
+  subTasks,
+  onSubTasksChange,
+}: AddAssignmentTaskProps) => {
   const handleAddTask = () => {
-    setTaskInputs((prev) => [...prev, Date.now()]);
+    onSubTasksChange([
+      ...subTasks,
+      {
+        id: Date.now(),
+        title: '',
+        endDate: new Date(),
+      },
+    ]);
   };
 
-  const showTaskInput = taskInputs.length > 0;
+  const handleUpdate = (
+    id: number,
+    field: 'title' | 'endDate',
+    value: string | Date,
+  ) => {
+    onSubTasksChange(
+      subTasks.map((t) =>
+        t.id === id
+          ? { ...t, [field]: value }
+          : t,
+      ),
+    );
+  };
+
+  const showTaskInput = subTasks.length > 0;
 
   return (
     <div className={taskDataItemStyle}>
@@ -26,9 +58,9 @@ export const AddAssignmentTask = () => {
           flex: showTaskInput ? 1 : 'none',
         })}
       >
-        {taskInputs.map((id) => (
+        {subTasks.map((task) => (
           <div
-            key={id}
+            key={task.id}
             className={css({
               display: 'flex',
               alignItems: 'center',
@@ -39,8 +71,13 @@ export const AddAssignmentTask = () => {
               size='basic'
               placeholder='TASK명을 입력하세요.'
               className={css({ flex: 1 })}
+              value={task.title}
+              onChange={(e) => handleUpdate(task.id, 'title', e.target.value)}
             />
-            <DatePicker />
+            <DatePicker
+              value={task.endDate}
+              onChange={(d) => handleUpdate(task.id, 'endDate', d)}
+            />
           </div>
         ))}
 
