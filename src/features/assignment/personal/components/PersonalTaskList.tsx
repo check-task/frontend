@@ -1,9 +1,11 @@
+import { useState } from 'react';
 import { Checkbox } from '@/components/Checkbox';
 import { css, cva } from 'styled-system/css';
 import { ClockToggle } from '../../components/ClockToggle';
 import DatePicker from '@/components/DatePicker';
 import { useUpdateSubTaskDeadline } from './hooks/useUpdateSubTaskDeadline';
 import { useUpdateSubTaskStatus } from './hooks/useUpdateSubTaskStatus';
+import { useUpdateSubTaskAlarm } from './hooks/useUpdateSubTaskAlarm';
 import { SubTaskStatus } from '@/types/task';
 
 export interface PersonalTaskItem {
@@ -28,6 +30,11 @@ export const PersonalTaskList = ({ taskId, tasks }: PersonalTaskListProps) => {
   const { mutate: mutateDeadline } = useUpdateSubTaskDeadline(taskId);
   // 세부 task 완료 상태 변경 훅 호출
   const { mutate: mutateStatus } = useUpdateSubTaskStatus(taskId);
+  // 세부 task 알림 설정 변경 훅 호출
+  const { mutate: mutateAlarm } = useUpdateSubTaskAlarm(taskId);
+  const [alarmStateMap, setAlarmStateMap] = useState<Record<number, boolean>>(
+    {},
+  );
 
   // 달력 날짜 변경 시 호출 핸들러
   const handleDeadlineChange = (subTaskId: number) => (date: Date) => {
@@ -40,6 +47,12 @@ export const PersonalTaskList = ({ taskId, tasks }: PersonalTaskListProps) => {
       subTaskId,
       status: isChecked ? 'COMPLETE' : 'PROGRESS', // 스웨거 요청에 맞게
     });
+  };
+
+  // 알림 설정 변경 핸들러
+  const handleAlarmToggle = (subTaskId: number) => (next: boolean) => {
+    setAlarmStateMap((prev) => ({ ...prev, [subTaskId]: next }));
+    mutateAlarm({ subTaskId, isAlarm: next });
   };
 
   return (
@@ -90,7 +103,11 @@ export const PersonalTaskList = ({ taskId, tasks }: PersonalTaskListProps) => {
                     muted={isCompleted}
                   />
                   {/* 시계 아이콘은 꺼짐으로 시작됨  */}
-                  <ClockToggle muted={isCompleted} />
+                  <ClockToggle
+                    muted={isCompleted}
+                    isOn={alarmStateMap[task.id] ?? task.isAlarm}
+                    onToggle={handleAlarmToggle(task.id)}
+                  />
                 </div>
               </div>
             </div>
