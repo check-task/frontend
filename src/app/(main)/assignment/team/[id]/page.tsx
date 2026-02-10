@@ -56,6 +56,7 @@ export default function TeamAssignmentDetailPage() {
           title={data.title}
           daysLeft={data.dDay}
           completionRate={data.progressRate}
+          folderColorHex={data.foldercolor}
         />
         <TeamHeaderButton />
       </div>
@@ -69,7 +70,12 @@ export default function TeamAssignmentDetailPage() {
 
       <Divider className={css({ mt: '3.75rem', mb: '3.75rem' })} />
 
-      <TeamEtc references={data.references} />
+      <TeamEtc
+        taskId={data.taskId}
+        references={data.references}
+        communications={data.communications}
+        meetingLogs={data.meetingLogs}
+      />
     </div>
   );
 }

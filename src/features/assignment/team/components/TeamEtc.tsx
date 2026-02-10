@@ -1,18 +1,16 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { PlusButton } from '@/components/PlusButton';
 import { css } from 'styled-system/css';
 import { useModalStore } from '@/stores/modal-store';
 import { TeamCommunicationModal } from './TeamCommunicationModal';
 import { AddAssignmentDataModal } from '@/features/assignment/components/AddAssignmentDataModal';
-import type { TaskReference } from '@/types/task';
-
-interface CommunicationItem {
-  id: number;
-  name: string;
-  url: string;
-}
+import type {
+  TaskReference,
+  TaskCommunication,
+  TaskMeetingLog,
+} from '@/types/task';
 
 interface DataItem {
   id: number;
@@ -22,34 +20,35 @@ interface DataItem {
 }
 
 interface TeamEtcProps {
+  taskId: number;
   references?: TaskReference[];
+  communications?: TaskCommunication[];
+  meetingLogs?: TaskMeetingLog[];
 }
 
-export const TeamEtc = ({ references = [] }: TeamEtcProps) => {
+export const TeamEtc = ({
+  taskId,
+  references = [],
+  communications = [],
+  meetingLogs = [],
+}: TeamEtcProps) => {
   const { openModal, closeModal } = useModalStore();
-  const [communications, setCommunications] = useState<CommunicationItem[]>([]);
-  const [dataItems, setDataItems] = useState<DataItem[]>([]);
-
-  useEffect(() => {
-    if (references.length > 0) {
-      setDataItems(
-        references.map((r, i) => ({
-          id: i + 1,
-          type: 0 as const,
-          name: r.name,
-          path: r.url,
-        })),
-      );
-    }
-  }, [references]);
+  const [dataItems, setDataItems] = useState<DataItem[]>(() =>
+    references.map((r, i) => ({
+      id: i + 1,
+      type: 0 as const,
+      name: r.name,
+      path: r.url,
+    })),
+  );
 
   const handleOpenCommunicationModal = () => {
     openModal({
       title: '커뮤니케이션 추가',
       content: (
         <TeamCommunicationModal
-          onSave={(items) => {
-            setCommunications((prev) => [...prev, ...items]);
+          taskId={taskId}
+          onSave={() => {
             closeModal();
           }}
         />
@@ -82,19 +81,12 @@ export const TeamEtc = ({ references = [] }: TeamEtcProps) => {
         </div>
 
         <div className={etcCardContainerStyle}>
-          {communications.length > 0 ? (
-            communications.map((item) => (
-              <div key={item.id} className={etcCardStyle}>
-                <p className={cardTitleStyle}>{item.name}</p>
-                <p className={cardContentStyle}>{item.url}</p>
-              </div>
-            ))
-          ) : (
-            <div className={etcCardStyle}>
-              <p className={cardTitleStyle}>웬투밋 추가</p>
-              <p className={cardContentStyle}>내용내용내용</p>
+          {communications.map((item, index) => (
+            <div key={`comm-${index}-${item.name}-${item.url}`} className={etcCardStyle}>
+              <p className={cardTitleStyle}>{item.name}</p>
+              <p className={cardContentStyle}>{item.url}</p>
             </div>
-          )}
+          ))}
         </div>
       </div>
 
@@ -105,10 +97,12 @@ export const TeamEtc = ({ references = [] }: TeamEtcProps) => {
         </div>
 
         <div className={etcCardContainerStyle}>
-          <div className={etcCardStyle}>
-            <p className={cardTitleStyle}>웬투밋 추가</p>
-            <p className={cardContentStyle}>내용내용내용</p>
-          </div>
+          {meetingLogs.map((item, index) => (
+            <div key={`log-${index}-${item.name ?? ''}-${item.url ?? ''}`} className={etcCardStyle}>
+              {item.name != null && <p className={cardTitleStyle}>{item.name}</p>}
+              {item.url != null && <p className={cardContentStyle}>{item.url}</p>}
+            </div>
+          ))}
         </div>
       </div>
 
@@ -119,19 +113,12 @@ export const TeamEtc = ({ references = [] }: TeamEtcProps) => {
         </div>
 
         <div className={etcCardContainerStyle}>
-          {dataItems.length > 0 ? (
-            dataItems.map((item) => (
-              <div key={item.id} className={etcCardStyle}>
-                <p className={cardTitleStyle}>{item.name}</p>
-                <p className={cardContentStyle}>{item.path}</p>
-              </div>
-            ))
-          ) : (
-            <div className={etcCardStyle}>
-              <p className={cardTitleStyle}>웬투밋 추가</p>
-              <p className={cardContentStyle}>내용내용내용</p>
+          {dataItems.map((item) => (
+            <div key={item.id} className={etcCardStyle}>
+              <p className={cardTitleStyle}>{item.name}</p>
+              <p className={cardContentStyle}>{item.path}</p>
             </div>
-          )}
+          ))}
         </div>
       </div>
     </div>

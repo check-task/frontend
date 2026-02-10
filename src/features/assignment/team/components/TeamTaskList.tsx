@@ -9,7 +9,11 @@ import { TeamTaskManager } from './TeamTaskManager';
 import DatePicker from '@/components/DatePicker';
 import { Input } from '@/components/TextField';
 import { CommentEditDropdown } from './CommentEditDropdown';
-import type { TaskDetailSubTask, SubTaskStatus } from '@/types/task';
+import type {
+  TaskDetailSubTask,
+  TaskDetailSubTaskComment,
+  SubTaskStatus,
+} from '@/types/task';
 import { useUpdateTeamSubTaskStatus } from './hooks/useUpdateSubTaskStatus';
 import { useCreateSubTaskComment } from './hooks/useCreateSubTaskComment';
 import { useMyInfo } from '@/hooks/queries/useMyInfo';
@@ -22,10 +26,19 @@ interface TeamTaskListProps {
 const TeamTaskList = ({ taskId, subTasks = [] }: TeamTaskListProps) => {
   const [openComments, setOpenComments] = useState<{ [key: number]: boolean }>({});
   const [commentInputs, setCommentInputs] = useState<{ [key: number]: string }>({});
-  const [commentsBySubTask, setCommentsBySubTask] = useState<{ [key: number]: string[] }>({});
+  const [pendingComments, setPendingComments] = useState<
+    Record<number, TaskDetailSubTaskComment[]>
+  >({});
   const { mutate: mutateStatus } = useUpdateTeamSubTaskStatus(taskId);
   const { mutate: createComment } = useCreateSubTaskComment(taskId);
   const { data: myInfo } = useMyInfo();
+
+  const getDisplayComments = (task: TaskDetailSubTask): TaskDetailSubTaskComment[] => {
+    const fromApi = task.comments ?? [];
+    const pending = pendingComments[task.subTaskId] ?? [];
+    const fromApiContents = new Set(fromApi.map((c) => c.content));
+    return [...fromApi, ...pending.filter((p) => !fromApiContents.has(p.content))];
+  };
 
   const handleStatusChange = (subTaskId: number, isChecked: boolean) => {
     const nextStatus: SubTaskStatus = isChecked ? 'COMPLETED' : 'PROGRESS';
@@ -43,16 +56,23 @@ const TeamTaskList = ({ taskId, subTasks = [] }: TeamTaskListProps) => {
   const handleCommentSubmit = (subTaskId: number) => {
     const content = commentInputs[subTaskId]?.trim();
     const userId = myInfo?.user.id;
-    if (!content || !userId) return;
+    if (!content || !userId || !myInfo) return;
 
     createComment(
       { subTaskId, userId, content },
       {
         onSuccess: () => {
           setCommentInputs((prev) => ({ ...prev, [subTaskId]: '' }));
-          setCommentsBySubTask((prev) => ({
+          const newComment: TaskDetailSubTaskComment = {
+            commentId: -1,
+            content,
+            writer: myInfo.user.nickname ?? '',
+            profileImage: myInfo.user.profileImage ?? '',
+            createdAt: '방금',
+          };
+          setPendingComments((prev) => ({
             ...prev,
-            [subTaskId]: [...(prev[subTaskId] ?? []), content],
+            [subTaskId]: [...(prev[subTaskId] ?? []), newComment],
           }));
         },
       },
@@ -66,7 +86,7 @@ const TeamTaskList = ({ taskId, subTasks = [] }: TeamTaskListProps) => {
           subTasks.map((task) => {
             const isCompleted = task.status === 'COMPLETED';
             const commentOpen = openComments[task.subTaskId] ?? false;
-            const comments = commentsBySubTask[task.subTaskId] ?? [];
+            const comments = getDisplayComments(task);
             return (
               <div key={task.subTaskId}>
                 <div className={taskItemContainerStyle({ checked: isCompleted })}>
@@ -96,7 +116,10 @@ const TeamTaskList = ({ taskId, subTasks = [] }: TeamTaskListProps) => {
                     <p className={managerLabelStyle({ checked: isCompleted })}>
                       담당:
                     </p>
-                    <TeamTaskManager manager={task.assigneeName} />
+                    <TeamTaskManager
+                      manager={task.assigneeName}
+                      profileImage={task.assigneeProfileImage}
+                    />
                   </div>
                 </div>
                 {commentOpen && (
@@ -128,14 +151,21 @@ const TeamTaskList = ({ taskId, subTasks = [] }: TeamTaskListProps) => {
                     <div className={commentItemContainerStyle}>
                       {comments.length > 0 ? (
                         comments.map((comment, index) => (
-                          <div key={index} className={commentItemStyle}>
+                          <div
+                            key={
+                              comment.commentId >= 0
+                                ? comment.commentId
+                                : `pending-${task.subTaskId}-${index}`
+                            }
+                            className={commentItemStyle}
+                          >
                             <div className={commentItemHeaderStyle}>
                               <div
                                 className={commentItemHeaderProfileStyle}
                                 style={
-                                  myInfo?.user.profileImage
+                                  comment.profileImage
                                     ? {
-                                        backgroundImage: `url(${myInfo.user.profileImage})`,
+                                        backgroundImage: `url(${comment.profileImage})`,
                                         backgroundSize: 'cover',
                                         backgroundPosition: 'center',
                                       }
@@ -143,7 +173,7 @@ const TeamTaskList = ({ taskId, subTasks = [] }: TeamTaskListProps) => {
                                 }
                               />
                               <p className={commentItemHeaderCommentStyle}>
-                                {comment}
+                                {comment.content}
                               </p>
                             </div>
                             <div className={commentItemEtcStyle}>

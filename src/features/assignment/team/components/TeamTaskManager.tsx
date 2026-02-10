@@ -2,9 +2,10 @@ import { css } from 'styled-system/css';
 
 interface TeamTaskManagerProps {
   manager?: string;
+  profileImage?: string;
 }
 
-export const TeamTaskManager = ({ manager }: TeamTaskManagerProps) => {
+export const TeamTaskManager = ({ manager, profileImage }: TeamTaskManagerProps) => {
   const hasManager = !!manager && manager !== 'none';
   const isEmpty = !manager || manager === 'none';
 
@@ -17,6 +18,15 @@ export const TeamTaskManager = ({ manager }: TeamTaskManagerProps) => {
       <p
         className={
           isEmpty ? teamTaskManagerIconEmptyStyle : teamTaskManagerIconStyle
+        }
+        style={
+          profileImage
+            ? {
+                backgroundImage: `url(${profileImage})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+              }
+            : undefined
         }
       />
       <p className={css({ textStyle: 'body2.r', color: 'gray.800' })}>
