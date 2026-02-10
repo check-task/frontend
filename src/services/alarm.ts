@@ -4,6 +4,8 @@ import type {
   GetAlarmListParams,
   GetAlarmListResponse,
   GetUnreadAlarmCountResponse,
+  UpdateAlarmSettingRequest,
+  UpdateAlarmSettingResponse,
   UpdateSubTaskAlarmRequest,
   UpdateSubTaskAlarmResponse,
 } from '@/types/alarm';
@@ -59,6 +61,25 @@ export const deleteAlarm = async (alarmId: number): Promise<void> => {
 // 전체 알림 삭제 api 호출
 export const deleteAllAlarms = async (): Promise<void> => {
   await axiosInstance.delete('/alarm');
+};
+
+// 알림 시간 설정 변경 api 호출
+export const updateDeadlineAlarmSetting = async (
+  hours: number,
+): Promise<void> => {
+  const body: UpdateAlarmSettingRequest = { deadlineAlarm: hours };
+  await axiosInstance.patch<UpdateAlarmSettingResponse>(
+    '/alarm/settings/deadline',
+    body,
+  );
+};
+
+export const updateTaskAlarmSetting = async (hours: number): Promise<void> => {
+  const body: UpdateAlarmSettingRequest = { taskAlarm: hours };
+  await axiosInstance.patch<UpdateAlarmSettingResponse>(
+    '/alarm/settings/task',
+    body,
+  );
 };
 
 // 세부 과제 알림 설정 변경 api 호출
