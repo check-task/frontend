@@ -47,3 +47,19 @@ export interface GetUnreadAlarmCountResponse {
     hasUnread: boolean;
   };
 }
+
+// ============================
+// 세부 과제 알림 설정 변경 타입 정의
+// ============================
+export interface UpdateSubTaskAlarmRequest {
+  isAlarm: boolean;
+}
+
+export interface UpdateSubTaskAlarmResponse {
+  resultType: 'SUCCESS' | 'FAIL';
+  message: string;
+  data: {
+    subTaskId: number;
+    isAlarm: boolean;
+  };
+}
