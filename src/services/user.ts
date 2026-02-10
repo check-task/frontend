@@ -28,7 +28,7 @@ export const getMyInfo = async (): Promise<{
     },
     folders: data.folders.map((f) => ({
       id: f.folderId,
-      name: f.name,
+      name: f.folderTitle,
       color: resolveFolderColor(f.color),
     })),
   };

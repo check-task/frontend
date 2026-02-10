@@ -1,5 +1,3 @@
-import type { FolderColor } from '@/types/folder';
-
 // 내 정보 조회 타입 정의
 export interface GetMyInfoResponse {
   resultType: 'SUCCESS' | 'FAIL';
@@ -17,8 +15,8 @@ export interface GetMyInfoResponseData {
   taskAlarm: number;
   folders: Array<{
     folderId: number;
-    name: string;
-    color: FolderColor;
+    folderTitle: string;
+    color: string;
   }>;
 }
 
