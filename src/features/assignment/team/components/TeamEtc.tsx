@@ -5,7 +5,11 @@ import { PlusButton } from '@/components/PlusButton';
 import { css } from 'styled-system/css';
 import { useModalStore } from '@/stores/modal-store';
 import { TeamCommunicationModal } from './TeamCommunicationModal';
+import { TeamCommunicationEditModal } from './TeamCommunicationEditModal';
 import { AddAssignmentDataModal } from '@/features/assignment/components/AddAssignmentDataModal';
+import { CommunicationEditIcon } from '@/components/icons/CommunicationEditIcon';
+import { CommunicationDeleteIcon } from '@/components/icons/CommunicationDeleteIcon';
+import { useDeleteCommunication } from '@/hooks/mutations/useDeleteCommunication';
 import type {
   TaskReference,
   TaskCommunication,
@@ -33,6 +37,7 @@ export const TeamEtc = ({
   meetingLogs = [],
 }: TeamEtcProps) => {
   const { openModal, closeModal } = useModalStore();
+  const { mutate: deleteCommunication } = useDeleteCommunication(taskId);
   const [dataItems, setDataItems] = useState<DataItem[]>(() =>
     references.map((r, i) => ({
       id: i + 1,
@@ -54,6 +59,26 @@ export const TeamEtc = ({
         />
       ),
     });
+  };
+
+  const handleOpenEditModal = (item: TaskCommunication) => {
+    openModal({
+      title: '커뮤니케이션 수정',
+      content: (
+        <TeamCommunicationEditModal
+          taskId={taskId}
+          communicationId={item.communicationId ?? 0}
+          initialName={item.name}
+          initialUrl={item.url}
+          onSuccess={() => closeModal()}
+        />
+      ),
+    });
+  };
+
+  const handleDeleteCommunication = (item: TaskCommunication) => {
+    if (item.communicationId == null) return;
+    deleteCommunication(item.communicationId);
   };
 
   const handleOpenDataModal = () => {
@@ -82,8 +107,39 @@ export const TeamEtc = ({
 
         <div className={etcCardContainerStyle}>
           {communications.map((item, index) => (
-            <div key={`comm-${index}-${item.name}-${item.url}`} className={etcCardStyle}>
-              <p className={cardTitleStyle}>{item.name}</p>
+            <div
+              key={`comm-${index}-${item.name}-${item.url}-${item.communicationId ?? ''}`}
+              className={communicationCardStyle}
+            >
+              <div className={communicationHeaderStyle}>
+                <p className={cardTitleStyle}>{item.name}</p>
+                <div className={communicationIconGroupStyle} data-comm-icons>
+                  <button
+                    type='button'
+                    className={communicationIconButtonStyle}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      handleOpenEditModal(item);
+                    }}
+                    aria-label='커뮤니케이션 수정'
+                  >
+                    <CommunicationEditIcon />
+                  </button>
+                  <button
+                    type='button'
+                    className={communicationIconButtonStyle}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      handleDeleteCommunication(item);
+                    }}
+                    aria-label='커뮤니케이션 삭제'
+                  >
+                    <CommunicationDeleteIcon />
+                  </button>
+                </div>
+              </div>
               <p className={cardContentStyle}>{item.url}</p>
             </div>
           ))}
@@ -98,9 +154,16 @@ export const TeamEtc = ({
 
         <div className={etcCardContainerStyle}>
           {meetingLogs.map((item, index) => (
-            <div key={`log-${index}-${item.name ?? ''}-${item.url ?? ''}`} className={etcCardStyle}>
-              {item.name != null && <p className={cardTitleStyle}>{item.name}</p>}
-              {item.url != null && <p className={cardContentStyle}>{item.url}</p>}
+            <div
+              key={`log-${index}-${item.name ?? ''}-${item.url ?? ''}`}
+              className={etcCardStyle}
+            >
+              {item.name != null && (
+                <p className={cardTitleStyle}>{item.name}</p>
+              )}
+              {item.url != null && (
+                <p className={cardContentStyle}>{item.url}</p>
+              )}
             </div>
           ))}
         </div>
@@ -162,6 +225,47 @@ const etcCardStyle = css({
   borderRadius: '0.5rem',
   width: '100%',
   shadow: '0px 1px 4px 0px #00000029',
+});
+
+// 커뮤니케이션 카드
+const communicationIconGroupStyle = css({
+  display: 'flex',
+  alignItems: 'center',
+  gap: '0.5rem',
+  opacity: 0,
+  transition: 'opacity 0.2s ease',
+});
+
+const communicationCardStyle = css({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '1.25rem',
+  p: '1rem',
+  bg: 'blue.50',
+  borderRadius: '0.5rem',
+  width: '100%',
+  shadow: '0px 1px 4px 0px #00000029',
+  _hover: {
+    '& [data-comm-icons]': {
+      opacity: 1,
+    },
+  },
+});
+
+const communicationHeaderStyle = css({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+});
+
+const communicationIconButtonStyle = css({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  cursor: 'pointer',
+  padding: 0,
+  border: 'none',
+  background: 'transparent',
 });
 
 const cardTitleStyle = css({

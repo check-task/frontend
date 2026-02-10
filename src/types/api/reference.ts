@@ -34,3 +34,21 @@ export interface CreateCommunicationResponse {
   message: string;
   data: CommunicationItemResponse[];
 }
+
+// 커뮤니케이션 수정 성공 응답
+export interface UpdateCommunicationResponse {
+  status: number;
+  isSuccess: boolean;
+  code: string;
+  message: string;
+  data: CommunicationItemResponse;
+}
+
+// 커뮤니케이션 삭제 성공 응답
+export interface DeleteCommunicationResponse {
+  status: number;
+  isSuccess: boolean;
+  code: string;
+  message: string;
+  data: null;
+}

@@ -5,6 +5,8 @@ import type {
   ReferenceDataItem,
   CreateCommunicationResponse,
   CommunicationItemResponse,
+  UpdateCommunicationResponse,
+  DeleteCommunicationResponse,
 } from '@/types/api/reference';
 
 // 자료 생성 API 호출 (URL 또는 파일, multipart/form-data)
@@ -41,4 +43,27 @@ export async function createCommunication(
     payload,
   );
   return res.data.data;
+}
+
+// 커뮤니케이션 수정 API 호출
+export async function updateCommunication(
+  taskId: number,
+  communicationId: number,
+  payload: { name: string; url: string },
+): Promise<CommunicationItemResponse> {
+  const res = await axiosInstance.patch<UpdateCommunicationResponse>(
+    `/modal/communication/${taskId}/${communicationId}`,
+    payload,
+  );
+  return res.data.data;
+}
+
+// 커뮤니케이션 삭제 API 호출
+export async function deleteCommunication(
+  taskId: number,
+  communicationId: number,
+): Promise<void> {
+  await axiosInstance.delete<DeleteCommunicationResponse>(
+    `/modal/communication/${taskId}/${communicationId}`,
+  );
 }

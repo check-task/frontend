@@ -34,12 +34,21 @@ export const getCompletedTaskList = async (): Promise<CompletedTask[]> => {
   return res.data?.data?.tasks ?? [];
 };
 
-// 과제 상세 조회 api 호출
+// 과제 상세 조회 api 호출 (communications에 communication_id → communicationId 매핑)
 export const getTaskDetail = async (taskId: number): Promise<TaskDetail> => {
   const res = await axiosInstance.get<GetTaskDetailResponse>(
     `${TASK_BASE}/${taskId}`,
   );
-  return res.data.data;
+  const data = res.data.data;
+  if (data.communications?.length) {
+    data.communications = data.communications.map(
+      (c: { communication_id?: number; communicationId?: number; name: string; url: string }) => ({
+        ...c,
+        communicationId: c.communicationId ?? c.communication_id,
+      }),
+    );
+  }
+  return data;
 };
 
 // 과제 생성 api 호출 (201 응답 시 data.taskId 반환, 응답 형태 다양하게 처리)

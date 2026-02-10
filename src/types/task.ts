@@ -71,8 +71,9 @@ export interface TaskReference {
   url: string;
 }
 
-// 커뮤니케이션 한 건 (상세 조회 응답)
+// 커뮤니케이션 한 건 (상세 조회 응답, 수정/삭제 시 communicationId 필요)
 export interface TaskCommunication {
+  communicationId?: number;
   name: string;
   url: string;
 }
