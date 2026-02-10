@@ -264,6 +264,22 @@ export interface UpdateSubTaskStatusResponse {
 }
 
 // ============================
+// 세부 TASK 담당자 설정 타입 정의
+// ============================
+export interface UpdateSubTaskAssigneeRequest {
+  assigneeId: number;
+}
+
+export interface UpdateSubTaskAssigneeResponse {
+  resultType: 'SUCCESS' | 'FAIL';
+  message: string;
+  data: {
+    sub_task_id: number;
+    assignee_id: number;
+  };
+}
+
+// ============================
 // 세부 TASK 댓글 생성 타입 정의
 // ============================
 export interface CreateSubTaskCommentRequest {

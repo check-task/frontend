@@ -3,6 +3,8 @@ import {
   UpdateSubTaskDeadlineResponse,
   UpdateSubTaskStatusRequest,
   UpdateSubTaskStatusResponse,
+  UpdateSubTaskAssigneeRequest,
+  UpdateSubTaskAssigneeResponse,
   CreateSubTaskCommentRequest,
   CreateSubTaskCommentResponse,
   UpdateCommentRequest,
@@ -31,6 +33,19 @@ export const updateSubTaskStatus = async (
 ): Promise<UpdateSubTaskStatusResponse> => {
   const res = await axiosInstance.patch<UpdateSubTaskStatusResponse>(
     `/task/subtask/${subTaskId}/status`,
+    body,
+  );
+
+  return res.data;
+};
+
+// 세부 TASK 담당자 설정 api 호출 (PATCH /task/subtask/{subTaskId}/assignee)
+export const updateSubTaskAssignee = async (
+  subTaskId: number,
+  body: UpdateSubTaskAssigneeRequest,
+): Promise<UpdateSubTaskAssigneeResponse> => {
+  const res = await axiosInstance.patch<UpdateSubTaskAssigneeResponse>(
+    `/task/subtask/${subTaskId}/assignee`,
     body,
   );
 

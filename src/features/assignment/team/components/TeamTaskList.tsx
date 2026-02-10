@@ -10,58 +10,24 @@ import DatePicker from '@/components/DatePicker';
 import { Input } from '@/components/TextField';
 import { CommentEditDropdown } from './CommentEditDropdown';
 import type {
-  TaskDetail,
   TaskDetailSubTask,
   TaskDetailSubTaskComment,
   SubTaskStatus,
 } from '@/types/task';
-import type { UpdateTaskRequest } from '@/types/task';
 import { useUpdateTeamSubTaskStatus } from './hooks/useUpdateSubTaskStatus';
 import { useUpdateTeamSubTaskDeadline } from './hooks/useUpdateSubTaskDeadline';
+import { useUpdateSubTaskAssignee } from './hooks/useUpdateSubTaskAssignee';
 import { useCreateSubTaskComment } from './hooks/useCreateSubTaskComment';
 import { useUpdateComment } from './hooks/useUpdateComment';
 import { useDeleteComment } from './hooks/useDeleteComment';
-import { useUpdateTask } from '@/hooks/mutations/useUpdateTask';
 import { useMyInfo } from '@/hooks/queries/useMyInfo';
-
-function buildUpdateTaskBody(
-  taskDetail: TaskDetail,
-  subTaskId: number,
-  assigneeId: number,
-): UpdateTaskRequest {
-  return {
-    title: taskDetail.title,
-    deadline: taskDetail.deadline,
-    type: taskDetail.type,
-    status: (taskDetail as TaskDetail & { status?: string }).status ?? 'PROGRESS',
-    folderId: taskDetail.folderId ?? 0,
-    subTasks: taskDetail.subTasks.map((st) => ({
-      title: st.title,
-      endDate: st.deadline,
-      status: st.status === 'COMPLETED' ? 'COMPLETE' : 'PROGRESS',
-      isAlarm: st.isAlarm,
-      assigneeId:
-        st.subTaskId === subTaskId ? assigneeId : (st.assigneeId ?? 0),
-    })),
-    references: (taskDetail.references ?? []).map((r) => ({
-      name: r.name,
-      url: r.url ?? '',
-    })),
-  };
-}
 
 interface TeamTaskListProps {
   taskId: number;
-  /** 과제 수정 API 호출 시 필요 (담당자 변경 유지) */
-  taskDetail?: TaskDetail;
   subTasks?: TaskDetailSubTask[];
 }
 
-const TeamTaskList = ({
-  taskId,
-  taskDetail,
-  subTasks = [],
-}: TeamTaskListProps) => {
+const TeamTaskList = ({ taskId, subTasks = [] }: TeamTaskListProps) => {
   const [openComments, setOpenComments] = useState<{ [key: number]: boolean }>({});
   const [commentInputs, setCommentInputs] = useState<{ [key: number]: string }>({});
   const [pendingComments, setPendingComments] = useState<
@@ -71,16 +37,14 @@ const TeamTaskList = ({
   const [editingContent, setEditingContent] = useState('');
   const { mutate: mutateStatus } = useUpdateTeamSubTaskStatus(taskId);
   const { mutate: mutateDeadline } = useUpdateTeamSubTaskDeadline(taskId);
-  const { mutate: updateTask } = useUpdateTask(taskId);
+  const { mutate: updateAssignee } = useUpdateSubTaskAssignee(taskId);
   const { mutate: createComment } = useCreateSubTaskComment(taskId);
   const { mutateAsync: updateComment } = useUpdateComment(taskId);
   const { mutate: deleteComment } = useDeleteComment(taskId);
   const { data: myInfo } = useMyInfo();
 
   const handleSelectAssignee = (subTaskId: number, assigneeId: number) => {
-    if (!taskDetail) return;
-    const body = buildUpdateTaskBody(taskDetail, subTaskId, assigneeId);
-    updateTask(body);
+    updateAssignee({ subTaskId, assigneeId });
   };
 
   // createdAt을 yy.mm.dd, hh:mm 으로 분리 (각각 0.25rem 간격용)
@@ -249,7 +213,7 @@ const TeamTaskList = ({
                       profileImage={task.assigneeProfileImage}
                       members={[]}
                       onSelectMember={(_, assigneeId) => {
-                        if (assigneeId != null && taskDetail)
+                        if (assigneeId != null)
                           handleSelectAssignee(task.subTaskId, assigneeId);
                       }}
                     />

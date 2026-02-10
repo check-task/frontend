@@ -65,11 +65,7 @@ export default function TeamAssignmentDetailPage() {
         <h2 className={css({ textStyle: 'h4', color: 'gray.900' })}>
           TASK 목록
         </h2>
-        <TeamTaskList
-          taskId={data.taskId}
-          taskDetail={data}
-          subTasks={data.subTasks}
-        />
+        <TeamTaskList taskId={data.taskId} subTasks={data.subTasks} />
       </div>
 
       <Divider className={css({ mt: '3.75rem', mb: '3.75rem' })} />
