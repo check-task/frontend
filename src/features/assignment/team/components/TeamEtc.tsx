@@ -153,17 +153,13 @@ export const TeamEtc = ({
         </div>
 
         <div className={etcCardContainerStyle}>
-          {meetingLogs.map((item, index) => (
+          {meetingLogs.map((item) => (
             <div
-              key={`log-${index}-${item.name ?? ''}-${item.url ?? ''}`}
+              key={`log-${item.logId}-${item.date}`}
               className={etcCardStyle}
             >
-              {item.name != null && (
-                <p className={cardTitleStyle}>{item.name}</p>
-              )}
-              {item.url != null && (
-                <p className={cardContentStyle}>{item.url}</p>
-              )}
+              <p className={cardTitleStyle}>회의록 #{item.logId}</p>
+              <p className={cardContentStyle}>{item.date}</p>
             </div>
           ))}
         </div>

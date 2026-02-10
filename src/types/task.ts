@@ -80,8 +80,8 @@ export interface TaskCommunication {
 
 // 회의록 한 건 (상세 조회 응답)
 export interface TaskMeetingLog {
-  name?: string;
-  url?: string;
+  logId: number;
+  date: string; // YYYY-MM-DD
 }
 
 // 세부 과제 정보
