@@ -4,36 +4,23 @@ import { css, cva } from 'styled-system/css';
 import { flex } from 'styled-system/patterns';
 import { AlarmIcon } from '@/components/icons/AlarmIcon';
 import { AlarmCloseIcon } from '@/components/icons/AlarmCloseIcon';
+import type { AlarmListItem } from '@/types/alarm';
 
-export interface AlarmData {
-  id: number;
-  taskTitle: string;
-  remainingTime: number;
-  progressRate: number;
-  isDone?: boolean;
-}
-
-interface AlarmCardProps extends AlarmData {
+type AlarmCardProps = AlarmListItem & {
   onDelete?: () => void;
-}
+};
 
 export const AlarmCard = ({
-  id,
-  taskTitle,
-  remainingTime,
-  progressRate,
-  isDone = false,
+  title,
+  alarmContent,
+  isRead,
   onDelete,
 }: AlarmCardProps) => {
-  // 고정멘트 작성
-  const deadlineText = `'${taskTitle}'의 마감까지 ${remainingTime}시간 남았어요!`;
-  const progressText = `현재 ${progressRate}% 완성 중이에요. 빨리 끝내고 쉬어요!`;
-
   return (
     // 부모 컨테이너에서만 status를 판단하여 전체 투명도를 조절합니다.
     <div
       className={cardContainer({
-        status: isDone ? 'done' : 'active',
+        status: isRead ? 'done' : 'active',
       })}
     >
       <div className={iconWrapper()}>
@@ -41,8 +28,8 @@ export const AlarmCard = ({
       </div>
 
       <div className={textContent}>
-        <h4 className={deadlineStyle}>{deadlineText}</h4>
-        <p className={progressStyle}>{progressText}</p>
+        <h4 className={titleStyle}>{title}</h4>
+        <p className={contentStyle}>{alarmContent}</p>
       </div>
 
       <button
@@ -108,12 +95,12 @@ const textContent = flex({
   gap: '0.5rem',
 });
 
-const deadlineStyle = css({
+const titleStyle = css({
   textStyle: 'body1.m',
   color: 'gray.900',
 });
 
-const progressStyle = css({
+const contentStyle = css({
   textStyle: 'body3.r',
   color: 'gray.600',
 });
