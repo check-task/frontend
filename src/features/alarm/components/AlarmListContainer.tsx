@@ -9,6 +9,7 @@ import { useUIStore } from '@/stores/ui-store';
 import { AlarmAllClearButton } from './AlarmAllClearButton';
 import { useInfiniteAlarmList } from '@/hooks/queries/useInfiniteAlarmList';
 import { useMarkAllAlarmRead } from '@/hooks/queries/useMarkAllAlarmRead';
+import { useDeleteAlarm } from '@/hooks/mutations/useDeleteAlarm';
 import Link from 'next/link';
 
 const PAGE_SIZE = 10;
@@ -23,6 +24,8 @@ export const AlarmListContainer = () => {
 
   // 모든 알림 읽음 훅 호출
   const { mutate: markAllRead } = useMarkAllAlarmRead();
+  // 개별 알림 삭제 훅 호출
+  const { mutate: deleteAlarm } = useDeleteAlarm();
 
   const [hiddenAlarmIds, setHiddenAlarmIds] = useState<Set<number>>(new Set());
   // 무한 스크롤 감지를 위한 Dom 참조
@@ -83,10 +86,15 @@ export const AlarmListContainer = () => {
 
   // 개별 알림 삭제 함수
   const handleDelete = (alarmId: number) => {
-    setHiddenAlarmIds((prev) => {
-      const next = new Set(prev);
-      next.add(alarmId);
-      return next;
+    deleteAlarm(alarmId, {
+      onSuccess: () => {
+        // ux 즉시 반영을 위해..
+        setHiddenAlarmIds((prev) => {
+          const next = new Set(prev);
+          next.add(alarmId);
+          return next;
+        });
+      },
     });
   };
 

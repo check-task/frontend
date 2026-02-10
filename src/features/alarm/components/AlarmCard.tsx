@@ -7,7 +7,7 @@ import { AlarmCloseIcon } from '@/components/icons/AlarmCloseIcon';
 import type { AlarmListItem } from '@/types/alarm';
 
 type AlarmCardProps = AlarmListItem & {
-  onDelete?: () => void;
+  onDelete?: (event: React.MouseEvent<HTMLButtonElement>) => void;
   onClick?: () => void;
 };
 
@@ -37,8 +37,9 @@ export const AlarmCard = ({
 
       <button
         onClick={(event) => {
+          event.preventDefault();
           event.stopPropagation();
-          onDelete?.();
+          onDelete?.(event);
         }}
         className={iconWrapper({ type: 'button' })}
         aria-label='알림 삭제'
