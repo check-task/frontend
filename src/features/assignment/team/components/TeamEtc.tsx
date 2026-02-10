@@ -189,7 +189,7 @@ export const TeamEtc = ({
         <div className={etcCardContainerStyle}>
           {meetingLogs.map((item, index) => (
             <div
-              key={`log-${item.logId}-${item.date}`}
+              key={`log-${item.logId}-${item.date}-${index}`}
               className={etcCardStyle}
             >
               <p className={cardTitleStyle}>
