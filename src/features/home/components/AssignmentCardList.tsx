@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   DndContext,
   closestCenter,
@@ -21,10 +21,11 @@ import { CSS } from '@dnd-kit/utilities';
 import { styled } from 'styled-system/jsx';
 import { stack } from 'styled-system/patterns';
 import { AssignmentCard } from './AssignmentCard';
+import { useUpdateTaskPriorities } from '@/hooks/mutations/useUpdateTaskPriorities';
 import type { FolderColor } from '@/types/folder';
 
 export interface Assignment {
-  id: string;
+  id: number;
   folderName: string;
   folderColor: FolderColor;
   dDay: string;
@@ -34,7 +35,7 @@ export interface Assignment {
 }
 
 interface AssignmentCardListProps {
-  initialAssignments: Assignment[];
+  assignments: Assignment[];
   isDragDisabled?: boolean;
 }
 
@@ -80,10 +81,16 @@ const SortableAssignmentCard = ({
 };
 
 export const AssignmentCardList = ({
-  initialAssignments,
+  assignments,
   isDragDisabled = false,
 }: AssignmentCardListProps) => {
-  const [assignments, setAssignments] = useState(initialAssignments);
+  const updatePriorities = useUpdateTaskPriorities();
+  // 드래그 시 즉각적인 UI 반영을 위한 로컬 상태
+  const [items, setItems] = useState(assignments);
+
+  useEffect(() => {
+    setItems(assignments);
+  }, [assignments]);
 
   const sensors = useSensors(
     // 마우스/터치 감지
@@ -96,17 +103,24 @@ export const AssignmentCardList = ({
     }),
   );
 
-  // 드래그 완료 시 카드 순서 재정렬
+  // 드래그 완료 시 카드 순서 재정렬 + 우선순위 API 호출
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
 
     if (over && active.id !== over.id) {
-      setAssignments((items) => {
-        const oldIndex = items.findIndex((item) => item.id === active.id);
-        const newIndex = items.findIndex((item) => item.id === over.id);
+      const oldIndex = items.findIndex((item) => item.id === active.id);
+      const newIndex = items.findIndex((item) => item.id === over.id);
+      const reordered = arrayMove(items, oldIndex, newIndex);
 
-        return arrayMove(items, oldIndex, newIndex);
-      });
+      // 즉시 로컬 상태 반영
+      setItems(reordered);
+
+      // 새 순서로 우선순위 API 호출
+      const orderedTasks = reordered.map((item, idx) => ({
+        taskId: item.id,
+        rank: idx + 1,
+      }));
+      updatePriorities.mutate(orderedTasks);
     }
   };
 
@@ -117,11 +131,11 @@ export const AssignmentCardList = ({
       onDragEnd={handleDragEnd}
     >
       <SortableContext
-        items={assignments.map((a) => a.id)}
+        items={items.map((a) => a.id)}
         strategy={verticalListSortingStrategy}
       >
         <Container>
-          {assignments.map((assignment, index) => (
+          {items.map((assignment, index) => (
             <SortableAssignmentCard
               key={assignment.id}
               assignment={assignment}

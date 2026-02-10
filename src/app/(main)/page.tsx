@@ -3,7 +3,6 @@ import { hstack, stack } from 'styled-system/patterns';
 import { DateSelectorWithPicker } from '@/features/home/components/DateSelectorWithPicker';
 import { ButtonGroup } from '@/features/home/components/ButtonGroup';
 import { HomeContent } from '@/features/home/components/HomeContent';
-import { sampleAssignments } from '@/constants/sampleAssignments';
 
 export default function Home() {
   return (
@@ -15,7 +14,7 @@ export default function Home() {
       </Container.Header>
 
       {/* 폴더 필터 + 캘린더 + 과제목록 */}
-      <HomeContent assignments={sampleAssignments} />
+      <HomeContent />
     </Container.Page>
   );
 }

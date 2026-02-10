@@ -1,37 +1,33 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { styled } from 'styled-system/jsx';
 import { hstack } from 'styled-system/patterns';
 import { FilterChipGroup } from '@/features/home/components/FilterChipGroup';
 import { Calendar } from '@/features/home/components/Calendar';
 import { AssignmentSection } from '@/features/home/components/AssignmentSection';
-import type { FolderColor } from '@/types/folder';
+import { useHomeTaskList } from '@/hooks/queries/useHomeTaskList';
+import type { SortType } from '@/features/home/components/SortTabs';
+import type { TaskSort } from '@/types/task';
 
-// 과제 타입
-interface Assignment {
-  id: string;
-  folderId: string;
-  folderName: string;
-  folderColor: FolderColor;
-  dDay: string;
-  dueDate: string;
-  assignmentName: string;
-  assignmentType: string;
-  progress: number;
-}
+// SortTabs의 SortType → 백엔드 TaskSort 매핑
+const SORT_MAP: Record<SortType, TaskSort> = {
+  priority: 'PRIORITY',
+  deadline: 'DEADLINE',
+  progress: 'PROGRESSRATE',
+};
 
-interface HomeContentProps {
-  assignments: Assignment[];
-}
+export const HomeContent = () => {
+  const [sortType, setSortType] = useState<SortType>('priority');
+  const { data: assignments = [] } = useHomeTaskList(SORT_MAP[sortType]);
 
-export const HomeContent = ({ assignments }: HomeContentProps) => {
   // 처음에는 모든 폴더가 선택되어 있음
-  const allFolderIds = [
-    ...new Set(assignments.map((assignment) => assignment.folderId)),
-  ];
+  const allFolderIds = useMemo(
+    () => [...new Set(assignments.map((a) => a.folderId))],
+    [assignments],
+  );
   const [selectedFolderIds, setSelectedFolderIds] =
-    useState<string[]>(allFolderIds);
+    useState<number[]>(allFolderIds);
 
   return (
     <>
@@ -53,7 +49,11 @@ export const HomeContent = ({ assignments }: HomeContentProps) => {
         </Container.Calendar>
 
         {/* 과제목록 */}
-        <AssignmentSection initialAssignments={assignments} />
+        <AssignmentSection
+          assignments={assignments}
+          sortType={sortType}
+          onSortChange={setSortType}
+        />
       </Container.Main>
     </>
   );
