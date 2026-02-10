@@ -53,3 +53,8 @@ export const markAllAlarmRead = async (): Promise<void> => {
 export const deleteAlarm = async (alarmId: number): Promise<void> => {
   await axiosInstance.delete(`/alarm/${alarmId}`);
 };
+
+// 전체 알림 삭제 api 호출
+export const deleteAllAlarms = async (): Promise<void> => {
+  await axiosInstance.delete('/alarm');
+};
