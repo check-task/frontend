@@ -16,6 +16,8 @@ import type {
 } from '@/types/task';
 import { useUpdateTeamSubTaskStatus } from './hooks/useUpdateSubTaskStatus';
 import { useCreateSubTaskComment } from './hooks/useCreateSubTaskComment';
+import { useUpdateComment } from './hooks/useUpdateComment';
+import { useDeleteComment } from './hooks/useDeleteComment';
 import { useMyInfo } from '@/hooks/queries/useMyInfo';
 
 interface TeamTaskListProps {
@@ -29,8 +31,12 @@ const TeamTaskList = ({ taskId, subTasks = [] }: TeamTaskListProps) => {
   const [pendingComments, setPendingComments] = useState<
     Record<number, TaskDetailSubTaskComment[]>
   >({});
+  const [editingCommentId, setEditingCommentId] = useState<number | null>(null);
+  const [editingContent, setEditingContent] = useState('');
   const { mutate: mutateStatus } = useUpdateTeamSubTaskStatus(taskId);
   const { mutate: createComment } = useCreateSubTaskComment(taskId);
+  const { mutateAsync: updateComment } = useUpdateComment(taskId);
+  const { mutate: deleteComment } = useDeleteComment(taskId);
   const { data: myInfo } = useMyInfo();
 
   const getDisplayComments = (task: TaskDetailSubTask): TaskDetailSubTaskComment[] => {
@@ -51,6 +57,37 @@ const TeamTaskList = ({ taskId, subTasks = [] }: TeamTaskListProps) => {
 
   const handleCommentChange = (subTaskId: number, value: string) => {
     setCommentInputs((prev) => ({ ...prev, [subTaskId]: value }));
+  };
+
+  const handleStartEditComment = (commentId: number, content: string) => {
+    if (commentId < 0) return;
+    setEditingCommentId(commentId);
+    setEditingContent(content);
+  };
+
+  const handleSubmitEditComment = (commentId: number) => {
+    const content = editingContent.trim();
+    if (commentId < 0 || !content) return;
+    updateComment({ commentId, content }).then(() => {
+      setEditingCommentId(null);
+      setEditingContent('');
+    });
+  };
+
+  const handleDeleteComment = (
+    comment: TaskDetailSubTaskComment,
+    subTaskId: number,
+  ) => {
+    if (comment.commentId >= 0) {
+      deleteComment(comment.commentId);
+    } else {
+      setPendingComments((prev) => ({
+        ...prev,
+        [subTaskId]: (prev[subTaskId] ?? []).filter(
+          (c) => c.commentId !== comment.commentId,
+        ),
+      }));
+    }
   };
 
   const handleCommentSubmit = (subTaskId: number) => {
@@ -150,37 +187,78 @@ const TeamTaskList = ({ taskId, subTasks = [] }: TeamTaskListProps) => {
                     </div>
                     <div className={commentItemContainerStyle}>
                       {comments.length > 0 ? (
-                        comments.map((comment, index) => (
-                          <div
-                            key={
-                              comment.commentId >= 0
-                                ? comment.commentId
-                                : `pending-${task.subTaskId}-${index}`
-                            }
-                            className={commentItemStyle}
-                          >
-                            <div className={commentItemHeaderStyle}>
-                              <div
-                                className={commentItemHeaderProfileStyle}
-                                style={
-                                  comment.profileImage
-                                    ? {
-                                        backgroundImage: `url(${comment.profileImage})`,
-                                        backgroundSize: 'cover',
-                                        backgroundPosition: 'center',
+                        comments.map((comment, index) => {
+                          const isEditing =
+                            comment.commentId >= 0 &&
+                            editingCommentId === comment.commentId;
+                          return (
+                            <div
+                              key={
+                                comment.commentId >= 0
+                                  ? comment.commentId
+                                  : `pending-${task.subTaskId}-${index}`
+                              }
+                              className={commentItemStyle}
+                            >
+                              <div className={commentItemHeaderStyle}>
+                                <div
+                                  className={commentItemHeaderProfileStyle}
+                                  style={
+                                    comment.profileImage
+                                      ? {
+                                          backgroundImage: `url(${comment.profileImage})`,
+                                          backgroundSize: 'cover',
+                                          backgroundPosition: 'center',
+                                        }
+                                      : undefined
+                                  }
+                                />
+                                {isEditing ? (
+                                  <Input
+                                    size="basic"
+                                    value={editingContent}
+                                    onChange={(e) =>
+                                      setEditingContent(e.target.value)
+                                    }
+                                    onKeyDown={(e) => {
+                                      if (e.key === 'Enter') {
+                                        e.preventDefault();
+                                        handleSubmitEditComment(
+                                          comment.commentId,
+                                        );
                                       }
-                                    : undefined
-                                }
-                              />
-                              <p className={commentItemHeaderCommentStyle}>
-                                {comment.content}
-                              </p>
+                                      if (e.key === 'Escape') {
+                                        setEditingCommentId(null);
+                                        setEditingContent('');
+                                      }
+                                    }}
+                                    className={commentEditInputStyle}
+                                    autoFocus
+                                  />
+                                ) : (
+                                  <p className={commentItemHeaderCommentStyle}>
+                                    {comment.content}
+                                  </p>
+                                )}
+                              </div>
+                              {!isEditing && (
+                                <div className={commentItemEtcStyle}>
+                                  <CommentEditDropdown
+                                    onEditComment={() =>
+                                      handleStartEditComment(
+                                        comment.commentId,
+                                        comment.content,
+                                      )
+                                    }
+                                    onDeleteComment={() =>
+                                      handleDeleteComment(comment, task.subTaskId)
+                                    }
+                                  />
+                                </div>
+                              )}
                             </div>
-                            <div className={commentItemEtcStyle}>
-                              <CommentEditDropdown />
-                            </div>
-                          </div>
-                        ))
+                          );
+                        })
                       ) : (
                         <div className={commentItemStyle}>
                           <div className={commentItemHeaderStyle}>
@@ -420,6 +498,11 @@ const commentItemHeaderProfileStyle = css({
 const commentItemHeaderCommentStyle = css({
   textStyle: 'body3',
   color: 'gray.700',
+});
+
+const commentEditInputStyle = css({
+  flex: 1,
+  minWidth: 0,
 });
 
 const commentItemEtcStyle = css({
