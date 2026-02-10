@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import {
   DndContext,
   closestCenter,
@@ -84,6 +85,12 @@ export const AssignmentCardList = ({
   isDragDisabled = false,
 }: AssignmentCardListProps) => {
   const updatePriorities = useUpdateTaskPriorities();
+  // 드래그 시 즉각적인 UI 반영을 위한 로컬 상태
+  const [items, setItems] = useState(assignments);
+
+  useEffect(() => {
+    setItems(assignments);
+  }, [assignments]);
 
   const sensors = useSensors(
     // 마우스/터치 감지
@@ -101,9 +108,12 @@ export const AssignmentCardList = ({
     const { active, over } = event;
 
     if (over && active.id !== over.id) {
-      const oldIndex = assignments.findIndex((item) => item.id === active.id);
-      const newIndex = assignments.findIndex((item) => item.id === over.id);
-      const reordered = arrayMove(assignments, oldIndex, newIndex);
+      const oldIndex = items.findIndex((item) => item.id === active.id);
+      const newIndex = items.findIndex((item) => item.id === over.id);
+      const reordered = arrayMove(items, oldIndex, newIndex);
+
+      // 즉시 로컬 상태 반영
+      setItems(reordered);
 
       // 새 순서로 우선순위 API 호출
       const orderedTasks = reordered.map((item, idx) => ({
@@ -121,11 +131,11 @@ export const AssignmentCardList = ({
       onDragEnd={handleDragEnd}
     >
       <SortableContext
-        items={assignments.map((a) => a.id)}
+        items={items.map((a) => a.id)}
         strategy={verticalListSortingStrategy}
       >
         <Container>
-          {assignments.map((assignment, index) => (
+          {items.map((assignment, index) => (
             <SortableAssignmentCard
               key={assignment.id}
               assignment={assignment}
