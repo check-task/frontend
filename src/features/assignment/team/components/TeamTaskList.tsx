@@ -15,6 +15,7 @@ import type {
   SubTaskStatus,
 } from '@/types/task';
 import { useUpdateTeamSubTaskStatus } from './hooks/useUpdateSubTaskStatus';
+import { useUpdateTeamSubTaskDeadline } from './hooks/useUpdateSubTaskDeadline';
 import { useCreateSubTaskComment } from './hooks/useCreateSubTaskComment';
 import { useUpdateComment } from './hooks/useUpdateComment';
 import { useDeleteComment } from './hooks/useDeleteComment';
@@ -34,6 +35,7 @@ const TeamTaskList = ({ taskId, subTasks = [] }: TeamTaskListProps) => {
   const [editingCommentId, setEditingCommentId] = useState<number | null>(null);
   const [editingContent, setEditingContent] = useState('');
   const { mutate: mutateStatus } = useUpdateTeamSubTaskStatus(taskId);
+  const { mutate: mutateDeadline } = useUpdateTeamSubTaskDeadline(taskId);
   const { mutate: createComment } = useCreateSubTaskComment(taskId);
   const { mutateAsync: updateComment } = useUpdateComment(taskId);
   const { mutate: deleteComment } = useDeleteComment(taskId);
@@ -81,6 +83,17 @@ const TeamTaskList = ({ taskId, subTasks = [] }: TeamTaskListProps) => {
   const handleStatusChange = (subTaskId: number, isChecked: boolean) => {
     const nextStatus: SubTaskStatus = isChecked ? 'COMPLETED' : 'PROGRESS';
     mutateStatus({ subTaskId, status: nextStatus === 'COMPLETED' ? 'COMPLETE' : 'PROGRESS' });
+  };
+
+  const toYYYYMMDD = (d: Date): string => {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+  };
+
+  const handleDeadlineChange = (subTaskId: number, date: Date) => {
+    mutateDeadline({ subTaskId, endDate: toYYYYMMDD(date) });
   };
 
   const handleCommentToggle = (taskId: number) => {
@@ -172,7 +185,11 @@ const TeamTaskList = ({ taskId, subTasks = [] }: TeamTaskListProps) => {
                       </p>
                     </div>
                     <div className={taskComponentsStyle({ checked: isCompleted })}>
-                      <DatePicker value={task.deadline} muted={isCompleted} />
+                      <DatePicker
+                        value={task.deadline}
+                        onChange={(date) => handleDeadlineChange(task.subTaskId, date)}
+                        muted={isCompleted}
+                      />
                       <ClockToggle muted={isCompleted} />
                       <CommentButton
                         isOpen={commentOpen}
