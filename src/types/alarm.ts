@@ -49,6 +49,28 @@ export interface GetUnreadAlarmCountResponse {
 }
 
 // ============================
+// 알림 시간 설정 변경 타입 정의
+// ============================
+export type AlarmSettingKey = 'deadlineAlarm' | 'taskAlarm';
+
+export interface UpdateAlarmSettingRequest {
+  deadlineAlarm?: number;
+  taskAlarm?: number;
+}
+
+export interface UpdateAlarmSettingResponse {
+  resultType: 'SUCCESS' | 'FAIL';
+  message: string;
+  data: {
+    user: {
+      userId: number;
+      deadlineAlarm?: number;
+      taskAlarm?: number;
+    };
+  };
+}
+
+// ============================
 // 세부 과제 알림 설정 변경 타입 정의
 // ============================
 export interface UpdateSubTaskAlarmRequest {
