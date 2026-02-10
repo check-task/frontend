@@ -133,9 +133,9 @@ export const AlarmListContainer = () => {
 
       {/* 알림 카드 리스트 */}
       {isLoading ? (
-        <div>불러오는 중...</div>
+        <div className={css({ textAlign: 'center' })}>불러오는 중...</div>
       ) : visibleAlarms.length === 0 ? (
-        <div>알림이 없습니다.</div>
+        <div className={css({ textAlign: 'center' })}>알림이 없습니다.</div>
       ) : (
         <div className={flex({ direction: 'column', gap: '1rem' })}>
           {visibleAlarms.map((alarm) => (
