@@ -48,3 +48,8 @@ export const getUnreadAlarmCount = async (): Promise<{
 export const markAllAlarmRead = async (): Promise<void> => {
   await axiosInstance.patch('/alarm');
 };
+
+// 개별 알림 삭제 api 호출
+export const deleteAlarm = async (alarmId: number): Promise<void> => {
+  await axiosInstance.delete(`/alarm/${alarmId}`);
+};
