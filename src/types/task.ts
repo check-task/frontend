@@ -166,3 +166,22 @@ export interface UpdateSubTaskStatusResponse {
     status: CompletedTaskStatus; // '완료' | '미완료'
   };
 }
+
+// ============================
+// 세부 TASK 댓글 생성 타입 정의
+// ============================
+export interface CreateSubTaskCommentRequest {
+  userId: number;
+  content: string;
+}
+
+export interface CreateSubTaskCommentResponse {
+  resultType: 'SUCCESS' | 'FAIL';
+  message: string;
+  data: {
+    comment_id: number;
+    sub_task_id: number;
+    content: string;
+    created_at: string;
+  };
+}

@@ -11,6 +11,8 @@ import { Input } from '@/components/TextField';
 import { CommentEditDropdown } from './CommentEditDropdown';
 import type { TaskDetailSubTask, SubTaskStatus } from '@/types/task';
 import { useUpdateTeamSubTaskStatus } from './hooks/useUpdateSubTaskStatus';
+import { useCreateSubTaskComment } from './hooks/useCreateSubTaskComment';
+import { useMyInfo } from '@/hooks/queries/useMyInfo';
 
 interface TeamTaskListProps {
   taskId: number;
@@ -19,7 +21,11 @@ interface TeamTaskListProps {
 
 const TeamTaskList = ({ taskId, subTasks = [] }: TeamTaskListProps) => {
   const [openComments, setOpenComments] = useState<{ [key: number]: boolean }>({});
+  const [commentInputs, setCommentInputs] = useState<{ [key: number]: string }>({});
+  const [commentsBySubTask, setCommentsBySubTask] = useState<{ [key: number]: string[] }>({});
   const { mutate: mutateStatus } = useUpdateTeamSubTaskStatus(taskId);
+  const { mutate: createComment } = useCreateSubTaskComment(taskId);
+  const { data: myInfo } = useMyInfo();
 
   const handleStatusChange = (subTaskId: number, isChecked: boolean) => {
     const nextStatus: SubTaskStatus = isChecked ? 'COMPLETED' : 'PROGRESS';
@@ -30,6 +36,29 @@ const TeamTaskList = ({ taskId, subTasks = [] }: TeamTaskListProps) => {
     setOpenComments((prev) => ({ ...prev, [taskId]: !prev[taskId] }));
   };
 
+  const handleCommentChange = (subTaskId: number, value: string) => {
+    setCommentInputs((prev) => ({ ...prev, [subTaskId]: value }));
+  };
+
+  const handleCommentSubmit = (subTaskId: number) => {
+    const content = commentInputs[subTaskId]?.trim();
+    const userId = myInfo?.user.id;
+    if (!content || !userId) return;
+
+    createComment(
+      { subTaskId, userId, content },
+      {
+        onSuccess: () => {
+          setCommentInputs((prev) => ({ ...prev, [subTaskId]: '' }));
+          setCommentsBySubTask((prev) => ({
+            ...prev,
+            [subTaskId]: [...(prev[subTaskId] ?? []), content],
+          }));
+        },
+      },
+    );
+  };
+
   return (
     <div className={teamTaskListContainerStyle}>
       <div className={teamTaskListStyle}>
@@ -37,6 +66,7 @@ const TeamTaskList = ({ taskId, subTasks = [] }: TeamTaskListProps) => {
           subTasks.map((task) => {
             const isCompleted = task.status === 'COMPLETED';
             const commentOpen = openComments[task.subTaskId] ?? false;
+            const comments = commentsBySubTask[task.subTaskId] ?? [];
             return (
               <div key={task.subTaskId}>
                 <div className={taskItemContainerStyle({ checked: isCompleted })}>
@@ -76,19 +106,75 @@ const TeamTaskList = ({ taskId, subTasks = [] }: TeamTaskListProps) => {
                         size='basic'
                         placeholder='댓글 추가'
                         className={commentInputStyle}
+                        value={commentInputs[task.subTaskId] ?? ''}
+                        onChange={(e) =>
+                          handleCommentChange(task.subTaskId, e.target.value)
+                        }
                       />
-                      <div className={inputProfileIconStyle} />
+                      <div
+                        className={inputProfileIconStyle}
+                        style={
+                          myInfo?.user.profileImage
+                            ? {
+                                backgroundImage: `url(${myInfo.user.profileImage})`,
+                                backgroundSize: 'cover',
+                                backgroundPosition: 'center',
+                              }
+                            : undefined
+                        }
+                        onClick={() => handleCommentSubmit(task.subTaskId)}
+                      />
                     </div>
                     <div className={commentItemContainerStyle}>
-                      <div className={commentItemStyle}>
-                        <div className={commentItemHeaderStyle}>
-                          <div className={commentItemHeaderProfileStyle} />
-                          <p className={commentItemHeaderCommentStyle}>댓글을 입력해주세요.</p>
+                      {comments.length > 0 ? (
+                        comments.map((comment, index) => (
+                          <div key={index} className={commentItemStyle}>
+                            <div className={commentItemHeaderStyle}>
+                              <div
+                                className={commentItemHeaderProfileStyle}
+                                style={
+                                  myInfo?.user.profileImage
+                                    ? {
+                                        backgroundImage: `url(${myInfo.user.profileImage})`,
+                                        backgroundSize: 'cover',
+                                        backgroundPosition: 'center',
+                                      }
+                                    : undefined
+                                }
+                              />
+                              <p className={commentItemHeaderCommentStyle}>
+                                {comment}
+                              </p>
+                            </div>
+                            <div className={commentItemEtcStyle}>
+                              <CommentEditDropdown />
+                            </div>
+                          </div>
+                        ))
+                      ) : (
+                        <div className={commentItemStyle}>
+                          <div className={commentItemHeaderStyle}>
+                            <div
+                              className={commentItemHeaderProfileStyle}
+                              style={
+                                myInfo?.user.profileImage
+                                  ? {
+                                      backgroundImage: `url(${myInfo.user.profileImage})`,
+                                      backgroundSize: 'cover',
+                                      backgroundPosition: 'center',
+                                    }
+                                  : undefined
+                              }
+                            />
+                            <p className={commentItemHeaderCommentStyle}>
+                              댓글을 입력해주세요.
+                            </p>
+                          </div>
+                          <div className={commentItemEtcStyle}>
+                            <CommentEditDropdown />
+                          </div>
                         </div>
-                        <div className={commentItemEtcStyle}>
-                          <CommentEditDropdown />
-                        </div>
-                      </div>
+                      )}
                     </div>
                   </div>
                 )}
@@ -269,7 +355,8 @@ const inputProfileIconStyle = css({
   h: '1.5rem',
   borderRadius: '100%',
   bg: 'blue.100',
-  pointerEvents: 'none',
+  cursor: 'pointer',
+  overflow: 'hidden',
 });
 
 const commentItemContainerStyle = css({

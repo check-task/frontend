@@ -3,6 +3,8 @@ import {
   UpdateSubTaskDeadlineResponse,
   UpdateSubTaskStatusRequest,
   UpdateSubTaskStatusResponse,
+  CreateSubTaskCommentRequest,
+  CreateSubTaskCommentResponse,
 } from '@/types/task';
 import axiosInstance from '@/lib/axiosInstance';
 
@@ -27,6 +29,22 @@ export const updateSubTaskStatus = async (
   const res = await axiosInstance.patch<UpdateSubTaskStatusResponse>(
     `/task/subtask/${subTaskId}/status`,
     body,
+  );
+
+  return res.data;
+};
+
+// 세부 TASK 댓글 생성 api 호출
+export const createSubTaskComment = async (
+  subTaskId: number,
+  body: CreateSubTaskCommentRequest,
+): Promise<CreateSubTaskCommentResponse> => {
+  const res = await axiosInstance.post<CreateSubTaskCommentResponse>(
+    `/task/subtask/${subTaskId}/comments`,
+    {
+      user_id: body.userId,
+      content: body.content,
+    },
   );
 
   return res.data;
