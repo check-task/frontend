@@ -8,6 +8,7 @@ import {
   GetTaskListResponse,
   Task,
   TaskDetail,
+  TaskMeetingLog,
 } from '@/types/task';
 import axiosInstance from '@/lib/axiosInstance';
 
@@ -46,6 +47,22 @@ export const getTaskDetail = async (taskId: number): Promise<TaskDetail> => {
         ...c,
         communicationId: c.communicationId ?? c.communication_id,
       }),
+    );
+  }
+  if (data.meetingLogs?.length) {
+    data.meetingLogs = data.meetingLogs.map(
+      (m: TaskMeetingLog & { log_id?: number }) => {
+        const dateStr = typeof m.date === 'string' && m.date.includes('T')
+          ? m.date.slice(0, 10)
+          : m.date;
+        return {
+          logId: m.logId ?? m.log_id ?? 0,
+          date: dateStr,
+          agenda: m.agenda,
+          conclusion: m.conclusion,
+          discussion: m.discussion,
+        };
+      },
     );
   }
   return data;

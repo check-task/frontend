@@ -10,6 +10,7 @@ import { AddAssignmentDataModal } from '@/features/assignment/components/AddAssi
 import { CommunicationEditIcon } from '@/components/icons/CommunicationEditIcon';
 import { CommunicationDeleteIcon } from '@/components/icons/CommunicationDeleteIcon';
 import { useDeleteCommunication } from '@/hooks/mutations/useDeleteCommunication';
+import { MinutesModal } from './MinutesModal';
 import type {
   TaskReference,
   TaskCommunication,
@@ -46,6 +47,9 @@ export const TeamEtc = ({
       path: r.url,
     })),
   );
+  const [minutesModalOpen, setMinutesModalOpen] = useState(false);
+  const [editingMeetingLog, setEditingMeetingLog] =
+    useState<TaskMeetingLog | null>(null);
 
   const handleOpenCommunicationModal = () => {
     openModal({
@@ -149,17 +153,35 @@ export const TeamEtc = ({
       <div className={etcTypeContainerStyle}>
         <div className={etcTypeTitleStyle}>
           <p className={etcTitleStyle}>회의록 모음집</p>
-          <PlusButton>회의록 추가</PlusButton>
+          <PlusButton
+            onClick={() => {
+              setEditingMeetingLog(null);
+              setMinutesModalOpen(true);
+            }}
+          >
+            회의록 추가
+          </PlusButton>
         </div>
 
         <div className={etcCardContainerStyle}>
-          {meetingLogs.map((item) => (
+          {meetingLogs.map((item, index) => (
             <div
               key={`log-${item.logId}-${item.date}`}
               className={etcCardStyle}
             >
-              <p className={cardTitleStyle}>회의록 #{item.logId}</p>
-              <p className={cardContentStyle}>{item.date}</p>
+              <p className={cardTitleStyle}>
+                {item.agenda ?? `${index + 1}주차 회의록`}
+              </p>
+              <button
+                type='button'
+                className={meetingLogDetailLinkStyle}
+                onClick={() => {
+                  setEditingMeetingLog(item);
+                  setMinutesModalOpen(true);
+                }}
+              >
+                자세히보기
+              </button>
             </div>
           ))}
         </div>
@@ -180,6 +202,32 @@ export const TeamEtc = ({
           ))}
         </div>
       </div>
+
+      <MinutesModal
+        key={
+          minutesModalOpen
+            ? (editingMeetingLog?.logId ?? 'new')
+            : 'closed'
+        }
+        open={minutesModalOpen}
+        onClose={() => {
+          setMinutesModalOpen(false);
+          setEditingMeetingLog(null);
+        }}
+        taskId={taskId}
+        editLog={
+          editingMeetingLog
+            ? {
+                logId: editingMeetingLog.logId,
+                date: editingMeetingLog.date,
+                agenda: editingMeetingLog.agenda ?? '',
+                conclusion: editingMeetingLog.conclusion ?? '',
+                discussion: editingMeetingLog.discussion ?? '',
+              }
+            : undefined
+        }
+        onSuccess={() => setMinutesModalOpen(false)}
+      />
     </div>
   );
 };
@@ -273,6 +321,17 @@ const cardContentStyle = css({
   textStyle: 'body3.r',
   color: 'gray.600',
   textDecoration: 'underline',
+});
+
+const meetingLogDetailLinkStyle = css({
+  textStyle: 'body3.r',
+  color: 'gray.700',
+  textDecoration: 'underline',
+  background: 'none',
+  border: 'none',
+  padding: 0,
+  cursor: 'pointer',
+  textAlign: 'left',
 });
 
 const etcTitleStyle = css({

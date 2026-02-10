@@ -78,10 +78,56 @@ export interface TaskCommunication {
   url: string;
 }
 
-// 회의록 한 건 (상세 조회 응답)
+// 회의록 한 건 (상세 조회 응답, 생성/수정 후 목록 포함)
 export interface TaskMeetingLog {
   logId: number;
   date: string; // YYYY-MM-DD
+  agenda?: string;
+  conclusion?: string;
+  discussion?: string;
+}
+
+// 회의록 생성 요청
+export interface CreateMeetingLogRequest {
+  date: string; // YYYY-MM-DD
+  agenda: string;
+  conclusion: string;
+  discussion: string;
+}
+
+// 회의록 한 건 (API 응답: log_id 등)
+export interface MeetingLogItemResponse {
+  log_id: number;
+  date: string;
+  agenda: string;
+  conclusion: string;
+  discussion: string;
+}
+
+// 회의록 생성 응답 (전체 목록 반환)
+export interface CreateMeetingLogResponse {
+  status: number;
+  isSuccess: boolean;
+  code: string;
+  message: string;
+  data: MeetingLogItemResponse[];
+}
+
+// 회의록 수정 요청
+export interface UpdateMeetingLogRequest {
+  date: string;
+  agenda: string;
+  conclusion: string;
+  discussion?: string;
+}
+
+// 회의록 수정 응답
+export interface UpdateMeetingLogResponse {
+  status: number;
+  isSuccess: boolean;
+  code: string;
+  message: string;
+  data: MeetingLogItemResponse;
 }
 
 // 세부 과제 정보
