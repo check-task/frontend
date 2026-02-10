@@ -9,125 +9,88 @@ import { TeamTaskManager } from './TeamTaskManager';
 import DatePicker from '@/components/DatePicker';
 import { Input } from '@/components/TextField';
 import { CommentEditDropdown } from './CommentEditDropdown';
+import type { TaskDetailSubTask } from '@/types/task';
 
-const TeamTaskList = () => {
-  const [checkedTasks, setCheckedTasks] = useState<{ [key: number]: boolean }>(
-    {},
-  );
-  const [openComments, setOpenComments] = useState<{ [key: number]: boolean }>(
-    {},
-  );
+interface TeamTaskListProps {
+  subTasks?: TaskDetailSubTask[];
+}
+
+const TeamTaskList = ({ subTasks = [] }: TeamTaskListProps) => {
+  const [checkedTasks, setCheckedTasks] = useState<{ [key: number]: boolean }>({});
+  const [openComments, setOpenComments] = useState<{ [key: number]: boolean }>({});
 
   const handleCheckboxChange = (taskId: number) => {
-    setCheckedTasks((prev) => ({
-      ...prev,
-      [taskId]: !prev[taskId],
-    }));
+    setCheckedTasks((prev) => ({ ...prev, [taskId]: !prev[taskId] }));
   };
 
   const handleCommentToggle = (taskId: number) => {
-    setOpenComments((prev) => ({
-      ...prev,
-      [taskId]: !prev[taskId],
-    }));
+    setOpenComments((prev) => ({ ...prev, [taskId]: !prev[taskId] }));
   };
-
-  // TODO: 데이터 연동 후 방식 변경
-  const task1Checked = checkedTasks[1] || false;
-  const task2Checked = checkedTasks[2] || false;
-  const task1CommentOpen = openComments[1] || false;
-  const task2CommentOpen = openComments[2] || false;
 
   return (
     <div className={teamTaskListContainerStyle}>
       <div className={teamTaskListStyle}>
-        <div className={taskItemContainerStyle({ checked: task1Checked })}>
-          <div className={teamTaskItemTitleStyle}>
-            <div className={teamTaskItemCheckTitleStyle}>
-              <Checkbox
-                checked={task1Checked}
-                onChange={() => handleCheckboxChange(1)}
-              />
-              <p className={taskTextStyle({ checked: task1Checked })}>
-                프로젝트 세팅
-              </p>
-            </div>
-            <div className={taskComponentsStyle({ checked: task1Checked })}>
-              <DatePicker />
-              <ClockToggle />
-              <CommentButton
-                isOpen={task1CommentOpen}
-                onClick={() => handleCommentToggle(1)}
-                commentCount={1}
-              />
-            </div>
-          </div>
-
-          <div className={managerContainerStyle({ checked: task1Checked })}>
-            <p className={managerLabelStyle({ checked: task1Checked })}>
-              담당:
-            </p>
-            <TeamTaskManager manager='두현우' />
-          </div>
-        </div>
-
-        {task1CommentOpen && (
-          <div className={commentSectionStyle}>
-            <div className={inputWrapperStyle}>
-              <Input
-                size='basic'
-                placeholder='댓글 추가'
-                className={commentInputStyle}
-              />
-              <div className={inputProfileIconStyle} />
-            </div>
-            <div className={commentItemContainerStyle}>
-              <div className={commentItemStyle}>
-                <div className={commentItemHeaderStyle}>
-                  <div className={commentItemHeaderProfileStyle} />
-                  <p className={commentItemHeaderCommentStyle}>
-                    수고하셨습니다!
-                  </p>
+        {subTasks.length > 0 ? (
+          subTasks.map((task) => {
+            const checked = checkedTasks[task.subTaskId] ?? false;
+            const commentOpen = openComments[task.subTaskId] ?? false;
+            return (
+              <div key={task.subTaskId}>
+                <div className={taskItemContainerStyle({ checked })}>
+                  <div className={teamTaskItemTitleStyle}>
+                    <div className={teamTaskItemCheckTitleStyle}>
+                      <Checkbox
+                        checked={checked}
+                        onChange={() => handleCheckboxChange(task.subTaskId)}
+                      />
+                      <p className={taskTextStyle({ checked })}>{task.title}</p>
+                    </div>
+                    <div className={taskComponentsStyle({ checked })}>
+                      <DatePicker value={task.deadline} />
+                      <ClockToggle />
+                      <CommentButton
+                        isOpen={commentOpen}
+                        onClick={() => handleCommentToggle(task.subTaskId)}
+                        commentCount={task.commentCount}
+                      />
+                    </div>
+                  </div>
+                  <div className={managerContainerStyle({ checked })}>
+                    <p className={managerLabelStyle({ checked })}>담당:</p>
+                    <TeamTaskManager manager={task.assigneeName} />
+                  </div>
                 </div>
-
-                <div className={commentItemEtcStyle}>
-                  <p>26.01.29 00:00</p>
-                  <CommentEditDropdown />
-                </div>
+                {commentOpen && (
+                  <div className={commentSectionStyle}>
+                    <div className={inputWrapperStyle}>
+                      <Input
+                        size='basic'
+                        placeholder='댓글 추가'
+                        className={commentInputStyle}
+                      />
+                      <div className={inputProfileIconStyle} />
+                    </div>
+                    <div className={commentItemContainerStyle}>
+                      <div className={commentItemStyle}>
+                        <div className={commentItemHeaderStyle}>
+                          <div className={commentItemHeaderProfileStyle} />
+                          <p className={commentItemHeaderCommentStyle}>댓글을 입력해주세요.</p>
+                        </div>
+                        <div className={commentItemEtcStyle}>
+                          <CommentEditDropdown />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
-            </div>
+            );
+          })
+        ) : (
+          <div className={css({ textStyle: 'body3.r', color: 'gray.500' })}>
+            등록된 TASK가 없습니다.
           </div>
         )}
-
-        <div className={taskItemContainerStyle({ checked: task2Checked })}>
-          <div className={teamTaskItemTitleStyle}>
-            <div className={teamTaskItemCheckTitleStyle}>
-              <Checkbox
-                checked={task2Checked}
-                onChange={() => handleCheckboxChange(2)}
-              />
-              <p className={taskTextStyle({ checked: task2Checked })}>
-                프로젝트 세팅
-              </p>
-            </div>
-            <div className={taskComponentsStyle({ checked: task2Checked })}>
-              <DatePicker />
-              <ClockToggle />
-              <CommentButton
-                isOpen={task2CommentOpen}
-                onClick={() => handleCommentToggle(2)}
-                commentCount={0}
-              />
-            </div>
-          </div>
-
-          <div className={managerContainerStyle({ checked: task2Checked })}>
-            <p className={managerLabelStyle({ checked: task2Checked })}>
-              담당:
-            </p>
-            <TeamTaskManager />
-          </div>
-        </div>
       </div>
     </div>
   );

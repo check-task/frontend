@@ -11,7 +11,8 @@ import {
 } from '@/types/task';
 import axiosInstance from '@/lib/axiosInstance';
 
-// baseURL에 /api/v1 포함 여부에 따라 경로만 사용 (user: /user/me, folder: /user/folder 와 동일 패턴)
+// baseURL(NEXT_PUBLIC_API_URL)에 /api/v1 가 포함되어 있다고 가정하고
+// 여기서는 순수 path('/task')만 사용합니다.
 const TASK_BASE = '/task';
 
 // 과제 목록 조회 api 호출

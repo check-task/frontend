@@ -1,18 +1,62 @@
+'use client';
+
+import { useParams } from 'next/navigation';
 import { Divider } from '@/components/Divider';
 import { Header } from '@/features/assignment/team/components/TeamHeader';
 import { TeamHeaderButton } from '@/features/assignment/team/components/TeamHeaderButtonGroup';
 import { TeamEtc } from '@/features/assignment/team/components/TeamEtc';
 import TeamTaskList from '@/features/assignment/team/components/TeamTaskList';
-import React from 'react';
 import { css } from 'styled-system/css';
+import { useTeamTaskDetail } from '@/features/assignment/team/components/hooks/useTeamTaskDetail';
 
-const page = () => {
-  const completionRate = 80; // TODO: 실제 데이터로 교체
+export default function TeamAssignmentDetailPage() {
+  const params = useParams();
+  const taskId = Number(params?.id);
+  const { data, isLoading, isError, error } = useTeamTaskDetail(taskId);
+
+  if (isLoading || !data) {
+    return (
+      <div className={containerStyle}>
+        <div
+          className={css({
+            py: '3rem',
+            textStyle: 'body1.m',
+            color: 'gray.600',
+          })}
+        >
+          {isLoading ? '로딩 중...' : '과제 정보를 불러올 수 없습니다.'}
+        </div>
+      </div>
+    );
+  }
+
+  if (isError) {
+    const message =
+      (error as { response?: { data?: { reason?: string } } })?.response?.data
+        ?.reason ?? '과제를 찾을 수 없습니다.';
+    return (
+      <div className={containerStyle}>
+        <div
+          className={css({
+            py: '3rem',
+            textStyle: 'body1.m',
+            color: 'red.500',
+          })}
+        >
+          {message}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={containerStyle}>
       <div className={headerContainerStyle}>
-        <Header completionRate={completionRate} />
+        <Header
+          title={data.title}
+          daysLeft={data.dDay}
+          completionRate={data.progressRate}
+        />
         <TeamHeaderButton />
       </div>
 
@@ -20,15 +64,15 @@ const page = () => {
         <h2 className={css({ textStyle: 'h4', color: 'gray.900' })}>
           TASK 목록
         </h2>
-        <TeamTaskList />
+        <TeamTaskList subTasks={data.subTasks} />
       </div>
 
       <Divider className={css({ mt: '3.75rem', mb: '3.75rem' })} />
 
-      <TeamEtc />
+      <TeamEtc references={data.references} />
     </div>
   );
-};
+}
 
 const containerStyle = css({
   display: 'flex',
@@ -53,5 +97,3 @@ const taskContainerStyle = css({
   gap: '1.25rem',
   width: '100%',
 });
-
-export default page;

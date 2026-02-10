@@ -18,7 +18,7 @@ export async function createReferenceData(
   if (type === 'file' && payload.file) formData.append('file_url', payload.file);
 
   const res = await axiosInstance.post<CreateReferenceDataResponse>(
-    `/api/v1/reference/data/${taskId}`,
+    `/reference/data/${taskId}`,
     formData,
     {
       params: { type },
