@@ -39,6 +39,38 @@ const TeamTaskList = ({ taskId, subTasks = [] }: TeamTaskListProps) => {
   const { mutate: deleteComment } = useDeleteComment(taskId);
   const { data: myInfo } = useMyInfo();
 
+  // createdAt을 yy.mm.dd, hh:mm 으로 분리 (각각 0.25rem 간격용)
+  const formatCommentCreatedAt = (
+    createdAt: string,
+  ): { date: string; time: string } => {
+    const trimmed = createdAt.trim();
+    const isoMatch = trimmed.match(
+      /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/,
+    );
+    const dotMatch = trimmed.match(
+      /^(\d{4})[.-](\d{1,2})[.-](\d{1,2})(?:\s+(\d{1,2}):(\d{1,2}))?/,
+    );
+    if (isoMatch) {
+      const [, y, m, d, h, min] = isoMatch;
+      return {
+        date: `${y!.slice(-2)}.${m!}.${d!}`,
+        time: `${h!.padStart(2, '0')}:${min!.padStart(2, '0')}`,
+      };
+    }
+    if (dotMatch) {
+      const [, y, m, d, h, min] = dotMatch;
+      const yy = y!.slice(-2);
+      const mm = m!.padStart(2, '0');
+      const dd = d!.padStart(2, '0');
+      const time =
+        h != null && min != null
+          ? `${h.padStart(2, '0')}:${min.padStart(2, '0')}`
+          : '--:--';
+      return { date: `${yy}.${mm}.${dd}`, time };
+    }
+    return { date: trimmed, time: '--:--' };
+  };
+
   const getDisplayComments = (task: TaskDetailSubTask): TaskDetailSubTaskComment[] => {
     const fromApi = task.comments ?? [];
     const pending = pendingComments[task.subTaskId] ?? [];
@@ -241,9 +273,21 @@ const TeamTaskList = ({ taskId, subTasks = [] }: TeamTaskListProps) => {
                                   </p>
                                 )}
                               </div>
-                              {!isEditing && (
-                                <div className={commentItemEtcStyle}>
-                                  <CommentEditDropdown
+                              {!isEditing && (() => {
+                                const { date, time } = formatCommentCreatedAt(
+                                  comment.createdAt,
+                                );
+                                return (
+                                  <div className={commentItemEtcStyle}>
+                                    <div className={commentDateTimeWrapperStyle}>
+                                      <span className={commentCreatedAtStyle}>
+                                        {date}
+                                      </span>
+                                      <span className={commentCreatedAtStyle}>
+                                        {time}
+                                      </span>
+                                    </div>
+                                    <CommentEditDropdown
                                     onEditComment={() =>
                                       handleStartEditComment(
                                         comment.commentId,
@@ -254,8 +298,9 @@ const TeamTaskList = ({ taskId, subTasks = [] }: TeamTaskListProps) => {
                                       handleDeleteComment(comment, task.subTaskId)
                                     }
                                   />
-                                </div>
-                              )}
+                                  </div>
+                                );
+                              })()}
                             </div>
                           );
                         })
@@ -508,7 +553,17 @@ const commentEditInputStyle = css({
 const commentItemEtcStyle = css({
   display: 'flex',
   alignItems: 'center',
-  textStyle: 'body4.r',
+  gap: '0.25rem',
+});
+
+const commentDateTimeWrapperStyle = css({
+  display: 'flex',
+  alignItems: 'center',
+  gap: '0.25rem',
+});
+
+const commentCreatedAtStyle = css({
+  fontSize: '0.875rem',
   color: 'gray.400',
 });
 
