@@ -9,18 +9,21 @@ import { TeamTaskManager } from './TeamTaskManager';
 import DatePicker from '@/components/DatePicker';
 import { Input } from '@/components/TextField';
 import { CommentEditDropdown } from './CommentEditDropdown';
-import type { TaskDetailSubTask } from '@/types/task';
+import type { TaskDetailSubTask, SubTaskStatus } from '@/types/task';
+import { useUpdateTeamSubTaskStatus } from './hooks/useUpdateSubTaskStatus';
 
 interface TeamTaskListProps {
+  taskId: number;
   subTasks?: TaskDetailSubTask[];
 }
 
-const TeamTaskList = ({ subTasks = [] }: TeamTaskListProps) => {
-  const [checkedTasks, setCheckedTasks] = useState<{ [key: number]: boolean }>({});
+const TeamTaskList = ({ taskId, subTasks = [] }: TeamTaskListProps) => {
   const [openComments, setOpenComments] = useState<{ [key: number]: boolean }>({});
+  const { mutate: mutateStatus } = useUpdateTeamSubTaskStatus(taskId);
 
-  const handleCheckboxChange = (taskId: number) => {
-    setCheckedTasks((prev) => ({ ...prev, [taskId]: !prev[taskId] }));
+  const handleStatusChange = (subTaskId: number, isChecked: boolean) => {
+    const nextStatus: SubTaskStatus = isChecked ? 'COMPLETED' : 'PROGRESS';
+    mutateStatus({ subTaskId, status: nextStatus === 'COMPLETED' ? 'COMPLETE' : 'PROGRESS' });
   };
 
   const handleCommentToggle = (taskId: number) => {
@@ -32,22 +35,26 @@ const TeamTaskList = ({ subTasks = [] }: TeamTaskListProps) => {
       <div className={teamTaskListStyle}>
         {subTasks.length > 0 ? (
           subTasks.map((task) => {
-            const checked = checkedTasks[task.subTaskId] ?? false;
+            const isCompleted = task.status === 'COMPLETED';
             const commentOpen = openComments[task.subTaskId] ?? false;
             return (
               <div key={task.subTaskId}>
-                <div className={taskItemContainerStyle({ checked })}>
+                <div className={taskItemContainerStyle({ checked: isCompleted })}>
                   <div className={teamTaskItemTitleStyle}>
                     <div className={teamTaskItemCheckTitleStyle}>
                       <Checkbox
-                        checked={checked}
-                        onChange={() => handleCheckboxChange(task.subTaskId)}
+                        checked={isCompleted}
+                        onChange={(e) =>
+                          handleStatusChange(task.subTaskId, e.target.checked)
+                        }
                       />
-                      <p className={taskTextStyle({ checked })}>{task.title}</p>
+                      <p className={taskTextStyle({ checked: isCompleted })}>
+                        {task.title}
+                      </p>
                     </div>
-                    <div className={taskComponentsStyle({ checked })}>
-                      <DatePicker value={task.deadline} />
-                      <ClockToggle />
+                    <div className={taskComponentsStyle({ checked: isCompleted })}>
+                      <DatePicker value={task.deadline} muted={isCompleted} />
+                      <ClockToggle muted={isCompleted} />
                       <CommentButton
                         isOpen={commentOpen}
                         onClick={() => handleCommentToggle(task.subTaskId)}
@@ -55,8 +62,10 @@ const TeamTaskList = ({ subTasks = [] }: TeamTaskListProps) => {
                       />
                     </div>
                   </div>
-                  <div className={managerContainerStyle({ checked })}>
-                    <p className={managerLabelStyle({ checked })}>담당:</p>
+                  <div className={managerContainerStyle({ checked: isCompleted })}>
+                    <p className={managerLabelStyle({ checked: isCompleted })}>
+                      담당:
+                    </p>
                     <TeamTaskManager manager={task.assigneeName} />
                   </div>
                 </div>

@@ -56,7 +56,7 @@ const containerStyle = css({
   gap: '1.88rem', // 제목과 완료율 사이 간격(아니면 1.75)
   justifyContent: 'space-between',
   transition: 'all 0.3s ease-in-out',
-  w: '100%',
+  w: '43.25rem',
 });
 
 // 폴더 색상 + 제목 + 디데이
