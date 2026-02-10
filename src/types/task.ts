@@ -20,6 +20,8 @@ export interface Task {
   taskId: number;
   folderId?: number;
   folderTitle?: string;
+  /** 폴더 색상 HEX (상세 조회 응답) */
+  foldercolor?: string;
   title: string;
   type: TaskType; // PERSONAL | TEAM
   deadline: string; // YYYY-MM-DD
@@ -41,6 +43,15 @@ export interface GetTaskListResponse {
 // 세부 TASK 상태 (과제 상세 응답)
 export type SubTaskStatus = 'PROGRESS' | 'COMPLETED';
 
+// 세부 과제 댓글 한 건 (상세 조회 응답)
+export interface TaskDetailSubTaskComment {
+  commentId: number;
+  content: string;
+  writer: string;
+  profileImage: string;
+  createdAt: string;
+}
+
 // Task 목록에 보여지는 세부 과제 항목
 export interface TaskDetailSubTask {
   subTaskId: number;
@@ -49,22 +60,88 @@ export interface TaskDetailSubTask {
   status: SubTaskStatus;
   isAlarm: boolean;
   commentCount: number;
+  comments?: TaskDetailSubTaskComment[];
+  /** 담당자 사용자 ID (과제 수정 API용) */
+  assigneeId?: number;
   assigneeName: string;
+  assigneeProfileImage?: string;
 }
 
-// 자료 모음집 참조 항목
+// 자료 모음집 참조 항목 (과제 상세·자료 생성 응답)
 export interface TaskReference {
+  /** 자료 ID (수정/삭제 시 필요) */
+  referenceId?: number;
+  name: string;
+  /** URL 자료의 경로 (URL형 자료가 아닐 경우 null일 수 있음) */
+  url: string | null;
+  /** 파일 업로드 시 S3 등 URL (과제 상세/자료 생성 응답) */
+  file_url?: string | null;
+}
+
+// 커뮤니케이션 한 건 (상세 조회 응답, 수정/삭제 시 communicationId 필요)
+export interface TaskCommunication {
+  communicationId?: number;
   name: string;
   url: string;
 }
 
+// 회의록 한 건 (상세 조회 응답, 생성/수정 후 목록 포함)
+export interface TaskMeetingLog {
+  logId: number;
+  date: string; // YYYY-MM-DD
+  agenda?: string;
+  conclusion?: string;
+  discussion?: string;
+}
+
+// 회의록 생성 요청
+export interface CreateMeetingLogRequest {
+  date: string; // YYYY-MM-DD
+  agenda: string;
+  conclusion: string;
+  discussion: string;
+}
+
+// 회의록 한 건 (API 응답: log_id 등)
+export interface MeetingLogItemResponse {
+  log_id: number;
+  date: string;
+  agenda: string;
+  conclusion: string;
+  discussion: string;
+}
+
+// 회의록 생성 응답 (전체 목록 반환)
+export interface CreateMeetingLogResponse {
+  status: number;
+  isSuccess: boolean;
+  code: string;
+  message: string;
+  data: MeetingLogItemResponse[];
+}
+
+// 회의록 수정 요청
+export interface UpdateMeetingLogRequest {
+  date: string;
+  agenda: string;
+  conclusion: string;
+  discussion?: string;
+}
+
+// 회의록 수정 응답
+export interface UpdateMeetingLogResponse {
+  status: number;
+  isSuccess: boolean;
+  code: string;
+  message: string;
+  data: MeetingLogItemResponse;
+}
+
 // 세부 과제 정보
-// communications, meetingLogs는 개인에서는 사용 안해서 일단은 unknown[] 처리
-// 옵셔널 처리 해두어서 추후 확장하시면 될 듯 합니다.
 export interface TaskDetail extends Task {
   subTasks: TaskDetailSubTask[];
-  communications?: unknown[];
-  meetingLogs?: unknown[];
+  communications?: TaskCommunication[];
+  meetingLogs?: TaskMeetingLog[];
   references: TaskReference[];
 }
 
@@ -101,6 +178,25 @@ export interface CreateTaskResponse {
   resultType: 'SUCCESS' | 'FAIL';
   message: string;
   data: { taskId: number };
+}
+
+// 과제 수정 요청 (PATCH /task/{taskId})
+export interface UpdateTaskSubTaskItem {
+  title: string;
+  endDate: string; // YYYY-MM-DD
+  status: 'PROGRESS' | 'COMPLETE';
+  isAlarm: boolean;
+  assigneeId: number;
+}
+
+export interface UpdateTaskRequest {
+  title: string;
+  deadline: string; // YYYY-MM-DD
+  type: TaskType;
+  status?: string;
+  folderId: number;
+  subTasks: UpdateTaskSubTaskItem[];
+  references: { name: string; url: string }[];
 }
 
 // ============================
@@ -165,4 +261,57 @@ export interface UpdateSubTaskStatusResponse {
     sub_task_id: number;
     status: CompletedTaskStatus; // '완료' | '미완료'
   };
+}
+
+// ============================
+// 세부 TASK 담당자 설정 타입 정의
+// ============================
+export interface UpdateSubTaskAssigneeRequest {
+  assigneeId: number;
+}
+
+export interface UpdateSubTaskAssigneeResponse {
+  resultType: 'SUCCESS' | 'FAIL';
+  message: string;
+  data: {
+    sub_task_id: number;
+    assignee_id: number;
+  };
+}
+
+// ============================
+// 세부 TASK 댓글 생성 타입 정의
+// ============================
+export interface CreateSubTaskCommentRequest {
+  userId: number;
+  content: string;
+}
+
+export interface CreateSubTaskCommentResponse {
+  resultType: 'SUCCESS' | 'FAIL';
+  message: string;
+  data: {
+    comment_id: number;
+    sub_task_id: number;
+    content: string;
+    created_at: string;
+  };
+}
+
+// 댓글 수정 요청/응답
+export interface UpdateCommentRequest {
+  content: string;
+}
+
+export interface UpdateCommentResponse {
+  resultType: 'SUCCESS' | 'FAIL';
+  message: string;
+  data: { comment_id: number; content: string } | null;
+}
+
+// 댓글 삭제 응답
+export interface DeleteCommentResponse {
+  resultType: 'SUCCESS' | 'FAIL';
+  message: string;
+  data: null;
 }

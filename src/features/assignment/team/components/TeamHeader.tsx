@@ -1,6 +1,9 @@
 'use client';
 
-import { FolderClassification } from '@/features/assignment/components/FolderClassification';
+import {
+  FolderClassification,
+  colorMap,
+} from '@/features/assignment/components/FolderClassification';
 import { CompletionProgressBar } from '@/features/assignment/components/CompletionProgressBar';
 import { css } from 'styled-system/css';
 
@@ -35,7 +38,12 @@ export const Header = ({
           <p className={css({ textStyle: 'h2', color: 'gray.900' })}>{title}</p>
         </div>
 
-        <p className={css({ textStyle: 'h4', color: 'sub.01.100' })}>
+        <p
+          className={css({
+            textStyle: 'h4',
+            color: colorMap[folderColor],
+          })}
+        >
           {daysLeft}
         </p>
       </div>

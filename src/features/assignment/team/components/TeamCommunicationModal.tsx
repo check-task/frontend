@@ -5,6 +5,7 @@ import { Button } from '@/components/Button';
 import { Divider } from '@/components/Divider';
 import { Input } from '@/components/TextField';
 import { AddURLDataButton } from '@/features/assignment/create/components/AddURLDataButton';
+import { useCreateCommunication } from '@/hooks/mutations/useCreateCommunication';
 import { css } from 'styled-system/css';
 
 interface CommunicationItem {
@@ -14,15 +15,19 @@ interface CommunicationItem {
 }
 
 interface TeamCommunicationModalProps {
+  taskId: number;
   onSave?: (items: CommunicationItem[]) => void;
 }
 
 export const TeamCommunicationModal = ({
+  taskId,
   onSave,
 }: TeamCommunicationModalProps) => {
   const [inputGroups, setInputGroups] = useState<
     Array<{ id: number; name: string; url: string }>
   >(() => [{ id: Date.now(), name: '', url: '' }]);
+
+  const { mutateAsync: createCommunication } = useCreateCommunication(taskId);
 
   const handleAddInput = () => {
     setInputGroups((prev) => [...prev, { id: Date.now(), name: '', url: '' }]);
@@ -40,15 +45,26 @@ export const TeamCommunicationModal = ({
     );
   };
 
-  const handleSave = () => {
-    const items: CommunicationItem[] = inputGroups
-      .filter((group) => group.name.trim() && group.url.trim())
-      .map((group) => ({
-        id: group.id,
-        name: group.name,
-        url: group.url,
+  const handleSave = async () => {
+    const validGroups = inputGroups.filter(
+      (group) => group.name.trim() && group.url.trim(),
+    );
+
+    let latest: CommunicationItem[] = [];
+
+    for (const group of validGroups) {
+      const data = await createCommunication({
+        name: group.name.trim(),
+        url: group.url.trim(),
+      });
+      latest = data.map((item) => ({
+        id: item.communication_id,
+        name: item.name,
+        url: item.url,
       }));
-    onSave?.(items);
+    }
+
+    onSave?.(latest);
   };
 
   return (

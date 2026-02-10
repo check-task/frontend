@@ -10,11 +10,10 @@ import {
 
 interface HeaderProps {
   completionRate: number;
-  // ============================
-  // 폴더 색상은 백엔드 수정 후에 추후 반영 예정
-  // 현재는 기본값 01로 설정
-  // ============================
+  /** 폴더 색상 토큰 (01~05). folderColorHex 없을 때 사용 */
   folderColor?: FolderColor;
+  /** 폴더 색상 HEX (상세 조회 API foldercolor). 있으면 이걸로 표시 */
+  folderColorHex?: string;
   title: string;
   daysLeft: string;
 }
@@ -22,18 +21,37 @@ interface HeaderProps {
 export const PersonalHeader = ({
   completionRate,
   folderColor = '01',
+  folderColorHex,
   title,
   daysLeft,
 }: HeaderProps) => {
+  const useHex = !!folderColorHex;
   return (
     <div className={containerStyle}>
       <div className={titleStyle}>
         <div className={titleContentStyle}>
-          <FolderClassification color={folderColor} />
+          {useHex ? (
+            <div
+              className={css({
+                width: '2.5rem',
+                height: '2.5rem',
+                borderRadius: '50%',
+              })}
+              style={{ backgroundColor: folderColorHex }}
+            />
+          ) : (
+            <FolderClassification color={folderColor} />
+          )}
           <p className={css({ textStyle: 'h2', color: 'gray.900' })}>{title}</p>
         </div>
 
-        <p className={css({ textStyle: 'h4', color: colorMap[folderColor] })}>
+        <p
+          className={css({
+            textStyle: 'h4',
+            ...(useHex ? {} : { color: colorMap[folderColor] }),
+          })}
+          style={useHex ? { color: folderColorHex } : undefined}
+        >
           {daysLeft}
         </p>
       </div>
@@ -56,7 +74,7 @@ const containerStyle = css({
   gap: '1.88rem', // 제목과 완료율 사이 간격(아니면 1.75)
   justifyContent: 'space-between',
   transition: 'all 0.3s ease-in-out',
-  w: '100%',
+  w: '43.25rem',
 });
 
 // 폴더 색상 + 제목 + 디데이

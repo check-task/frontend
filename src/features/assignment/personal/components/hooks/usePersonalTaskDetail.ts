@@ -20,7 +20,8 @@ const mapToPersonalView = (data: TaskDetail): PersonalTaskDetailView => {
     id: index + 1,
     type: 0,
     name: ref.name,
-    path: ref.url,
+    // URL 자료면 url, 파일 자료면 file_url 사용 (null 방지)
+    path: ref.url ?? ref.file_url ?? '',
   }));
 
   // Task목록에 사용되는 데이터 형태에 맞게 매핑
