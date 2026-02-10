@@ -2,6 +2,8 @@
 // 알림 목록 조회 타입 정의
 // ============================
 export type AlarmOrder = 'asc' | 'desc';
+// 이거는 임시입니다 > 백엔드한테 부탁해야하는 상태
+export type AlarmTaskType = 'PERSONAL' | 'TEAM';
 
 export interface AlarmListItem {
   alarmId: number;
@@ -10,6 +12,7 @@ export interface AlarmListItem {
   isRead: boolean;
   alarmDate: string;
   taskId: number;
+  taskType?: AlarmTaskType;
   subTaskId: number | null;
 }
 
