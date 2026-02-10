@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { Button } from '@/components/Button';
 import { Divider } from '@/components/Divider';
 import { CheckboxHeader } from './CheckboxHeader';
@@ -10,6 +11,8 @@ import { AddAssignmentData } from './AddAssignmentData';
 import { css } from 'styled-system/css';
 
 export const CreateAssignmentForm = () => {
+  const searchParams = useSearchParams();
+  const taskId = searchParams.get('taskId');
   const [assignmentName, setAssignmentName] = useState('');
   const [folderColor, setFolderColor] = useState('');
 
@@ -34,11 +37,12 @@ export const CreateAssignmentForm = () => {
       />
 
       <Divider mt='1.75rem' mb='1.75rem' />
-
-      {/* TASK, 자료 */}
+      {/* TASK, 자료 (taskId 있으면 자료 추가 시 API 호출) */}
       <div className={taskDataWrapperStyle}>
         <AddAssignmentTask />
-        <AddAssignmentData />
+        <AddAssignmentData
+          taskId={taskId ? Number(taskId) : undefined}
+        />
       </div>
 
       {/* 취소, 저장 */}

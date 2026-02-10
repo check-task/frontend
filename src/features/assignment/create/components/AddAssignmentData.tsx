@@ -14,7 +14,12 @@ interface DataItem {
   path: string;
 }
 
-export const AddAssignmentData = () => {
+interface AddAssignmentDataProps {
+  /** 있으면 모달에서 자료 생성 API 호출 */
+  taskId?: number;
+}
+
+export const AddAssignmentData = ({ taskId }: AddAssignmentDataProps) => {
   const openModal = useModalStore((state) => state.openModal);
   const closeModal = useModalStore((state) => state.closeModal);
   const [dataItems, setDataItems] = useState<DataItem[]>([]);
@@ -24,6 +29,7 @@ export const AddAssignmentData = () => {
       title: '자료 추가',
       content: (
         <AddAssignmentDataModal
+          taskId={taskId}
           onSave={(items) => {
             setDataItems((prev) => [...prev, ...items]);
             closeModal();
