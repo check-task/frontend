@@ -18,3 +18,19 @@ export interface CreateReferenceDataResponse {
   message: string;
   data: ReferenceDataItem[];
 }
+
+// 커뮤니케이션 한 건 (응답)
+export interface CommunicationItemResponse {
+  communication_id: number;
+  name: string;
+  url: string;
+}
+
+// 커뮤니케이션 생성 성공 응답 (해당 과제의 전체 커뮤니케이션 목록 반환)
+export interface CreateCommunicationResponse {
+  status: number;
+  isSuccess: boolean;
+  code: string;
+  message: string;
+  data: CommunicationItemResponse[];
+}

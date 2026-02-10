@@ -20,6 +20,8 @@ export interface Task {
   taskId: number;
   folderId?: number;
   folderTitle?: string;
+  /** 폴더 색상 HEX (상세 조회 응답) */
+  foldercolor?: string;
   title: string;
   type: TaskType; // PERSONAL | TEAM
   deadline: string; // YYYY-MM-DD
@@ -41,6 +43,15 @@ export interface GetTaskListResponse {
 // 세부 TASK 상태 (과제 상세 응답)
 export type SubTaskStatus = 'PROGRESS' | 'COMPLETED';
 
+// 세부 과제 댓글 한 건 (상세 조회 응답)
+export interface TaskDetailSubTaskComment {
+  commentId: number;
+  content: string;
+  writer: string;
+  profileImage: string;
+  createdAt: string;
+}
+
 // Task 목록에 보여지는 세부 과제 항목
 export interface TaskDetailSubTask {
   subTaskId: number;
@@ -49,7 +60,9 @@ export interface TaskDetailSubTask {
   status: SubTaskStatus;
   isAlarm: boolean;
   commentCount: number;
+  comments?: TaskDetailSubTaskComment[];
   assigneeName: string;
+  assigneeProfileImage?: string;
 }
 
 // 자료 모음집 참조 항목
@@ -58,13 +71,23 @@ export interface TaskReference {
   url: string;
 }
 
+// 커뮤니케이션 한 건 (상세 조회 응답)
+export interface TaskCommunication {
+  name: string;
+  url: string;
+}
+
+// 회의록 한 건 (상세 조회 응답)
+export interface TaskMeetingLog {
+  name?: string;
+  url?: string;
+}
+
 // 세부 과제 정보
-// communications, meetingLogs는 개인에서는 사용 안해서 일단은 unknown[] 처리
-// 옵셔널 처리 해두어서 추후 확장하시면 될 듯 합니다.
 export interface TaskDetail extends Task {
   subTasks: TaskDetailSubTask[];
-  communications?: unknown[];
-  meetingLogs?: unknown[];
+  communications?: TaskCommunication[];
+  meetingLogs?: TaskMeetingLog[];
   references: TaskReference[];
 }
 
