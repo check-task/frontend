@@ -3,6 +3,7 @@ import type {
   AlarmListItem,
   GetAlarmListParams,
   GetAlarmListResponse,
+  GetUnreadAlarmCountResponse,
 } from '@/types/alarm';
 
 // 알림 목록 조회 api 호출
@@ -25,4 +26,25 @@ export const getAlarmList = async (
 
   // 데이터랑 다음 페이지 정보 함께 반환
   return { alarmList, nextCursor };
+};
+
+// 안읽은 알림 여부 조회 api 호출
+export const getUnreadAlarmCount = async (): Promise<{
+  count: number;
+  hasUnread: boolean;
+}> => {
+  const res = await axiosInstance.get<GetUnreadAlarmCountResponse>(
+    '/alarm/unread-count',
+  );
+
+  const data = res.data.data;
+  return {
+    count: data.count ?? 0,
+    hasUnread: data.hasUnread ?? false,
+  };
+};
+
+// 모든 알림 읽음 처리 api 호출
+export const markAllAlarmRead = async (): Promise<void> => {
+  await axiosInstance.patch('/alarm');
 };
