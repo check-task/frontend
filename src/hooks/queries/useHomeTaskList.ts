@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import { getTaskList } from '@/services/task';
 import { resolveFolderColor } from '@/lib/folder-color';
 import type { FolderColor } from '@/types/folder';
@@ -21,6 +21,7 @@ export interface HomeAssignment {
 export const useHomeTaskList = (sort?: TaskSort) => {
   return useQuery({
     queryKey: ['taskList', { sort }],
+    placeholderData: keepPreviousData,
     queryFn: async (): Promise<HomeAssignment[]> => {
       const tasks = await getTaskList(sort ? { sort } : undefined);
 
