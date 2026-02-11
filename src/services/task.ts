@@ -181,3 +181,18 @@ export const updateTaskDeadline = async (
 ): Promise<void> => {
   await axiosInstance.patch(`/task/${taskId}`, { deadline });
 };
+
+// 팀원 초대 링크 생성 api 호출 (POST /task/{taskId}/invitation)
+export interface CreateInvitationResponse {
+  invite_code: string;
+  invite_expired: string;
+}
+
+export const createInvitationLink = async (
+  taskId: number,
+): Promise<CreateInvitationResponse> => {
+  const res = await axiosInstance.post<{
+    data: CreateInvitationResponse;
+  }>(`${TASK_BASE}/${taskId}/invitation`);
+  return res.data?.data ?? { invite_code: '', invite_expired: '' };
+};

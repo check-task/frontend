@@ -58,7 +58,7 @@ export default function TeamAssignmentDetailPage() {
           completionRate={data.progressRate}
           folderColorHex={data.foldercolor}
         />
-        <TeamHeaderButton />
+        <TeamHeaderButton taskId={data.taskId} />
       </div>
 
       <div className={taskContainerStyle}>

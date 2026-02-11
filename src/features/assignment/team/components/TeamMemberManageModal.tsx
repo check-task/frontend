@@ -1,9 +1,36 @@
+'use client';
+
+import { useEffect, useState } from 'react';
 import { css } from 'styled-system/css';
 import { TeamMemberManageModalItem } from './TeamMemberManageModalItem';
 import { Divider } from '@/components/Divider';
 import { Input } from '@/components/TextField';
+import { useCreateInvitationLink } from '@/hooks/mutations/useCreateInvitationLink';
 
-export const TeamMemberManageModal = () => {
+interface TeamMemberManageModalProps {
+  taskId: number;
+}
+
+export const TeamMemberManageModal = ({
+  taskId,
+}: TeamMemberManageModalProps) => {
+  const [inviteCode, setInviteCode] = useState('');
+  const { mutateAsync: createInvitation, isPending } =
+    useCreateInvitationLink(taskId);
+
+  useEffect(() => {
+    createInvitation()
+      .then((data) => setInviteCode(data.invite_code))
+      .catch(() => setInviteCode(''));
+    // 모달 오픈 시 1회만 초대코드 생성
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [taskId]);
+
+  const handleCopy = () => {
+    if (!inviteCode) return;
+    navigator.clipboard.writeText(inviteCode).catch(() => {});
+  };
+
   return (
     <div className={modalContentStyle}>
       <div className={modalContentItemStyle}>
@@ -35,8 +62,21 @@ export const TeamMemberManageModal = () => {
       <div className={inviteCodeStyle}>
         <p className={inviteCodeTitleStyle}>팀 과제 초대</p>
         <div className={inviteCodeItemStyle}>
-          <Input size='modal' placeholder='초대코드' width='100%' />
-          <button className={copyButtonStyle}>복사</button>
+          <Input
+            size='modal'
+            placeholder={isPending ? '초대코드 생성 중...' : '초대코드'}
+            width='100%'
+            value={inviteCode}
+            readOnly
+          />
+          <button
+            type='button'
+            className={copyButtonStyle}
+            onClick={handleCopy}
+            disabled={!inviteCode || isPending}
+          >
+            복사
+          </button>
         </div>
       </div>
     </div>
@@ -83,4 +123,11 @@ const copyButtonStyle = css({
   borderRadius: '0.25rem',
   textAlign: 'center',
   cursor: 'pointer',
+  _disabled: {
+    opacity: 0.5,
+    cursor: 'not-allowed',
+  },
+  _hover: {
+    bg: '#1D6BDD',
+  },
 });
