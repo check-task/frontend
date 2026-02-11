@@ -12,6 +12,7 @@ import { FolderColor, FOLDER_COLORS } from '@/types/folder';
 import { Modal } from '@/features/profile/components/ModalContent';
 import { useCreateFolder } from '@/hooks/mutations/useCreateFolder';
 import { useUpdateFolder } from '@/hooks/mutations/useUpdateFolder';
+import { useMyInfo } from '@/hooks/queries/useMyInfo';
 
 interface FolderModalContentProps {
   mode: 'add' | 'edit';
@@ -29,6 +30,12 @@ export const FolderModalContent = ({
   const closeModal = useModalStore((state) => state.closeModal);
   const createFolder = useCreateFolder();
   const updateFolder = useUpdateFolder();
+  const { data } = useMyInfo();
+
+  // 현재 사용 중인 폴더 색상 목록
+  const usedColors = (data?.folders ?? [])
+    .filter((f) => f.id !== folderId)
+    .map((f) => f.color);
 
   const [name, setName] = useState('');
   // 추가는 초기 선택 없음, 수정은 기존 색상 선택
@@ -40,6 +47,11 @@ export const FolderModalContent = ({
 
   const handleSave = () => {
     if (!selectedColor || !name.trim()) return;
+
+    if (usedColors.includes(selectedColor)) {
+      alert('이미 사용 중인 폴더 색상입니다.');
+      return;
+    }
 
     if (mode === 'add') {
       createFolder.mutate(
