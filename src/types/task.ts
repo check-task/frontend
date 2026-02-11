@@ -12,6 +12,7 @@ export interface GetTaskListParams {
   type?: TaskType;
   folderId?: number;
   sort?: TaskSort;
+  status?: string;
 }
 
 // 과제 기본 정보

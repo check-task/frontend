@@ -56,9 +56,9 @@ export const HomeContent = () => {
           />
         </Container.Calendar>
 
-        {/* 과제목록 */}
+        {/* 과제목록 (마감 지나지 않은 과제만) */}
         <AssignmentSection
-          assignments={assignments}
+          assignments={assignments.filter((a) => !a.dDay.includes('+'))}
           sortType={sortType}
           onSortChange={setSortType}
         />
