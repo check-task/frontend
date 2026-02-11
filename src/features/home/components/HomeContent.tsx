@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { styled } from 'styled-system/jsx';
 import { hstack } from 'styled-system/patterns';
 import { FilterChipGroup } from '@/features/home/components/FilterChipGroup';
@@ -28,6 +28,11 @@ export const HomeContent = () => {
   );
   const [selectedFolderIds, setSelectedFolderIds] =
     useState<number[]>(allFolderIds);
+
+  // 데이터 로드 후 모든 폴더 기본 선택
+  useEffect(() => {
+    setSelectedFolderIds(allFolderIds);
+  }, [allFolderIds]);
 
   return (
     <>
