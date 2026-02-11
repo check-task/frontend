@@ -482,7 +482,7 @@ const taskItemContainerStyle = cva({
 
 const taskTextStyle = cva({
   base: {
-    textStyle: 'body1',
+    textStyle: 'body1.r',
     transition: 'all 0.2s ease',
   },
   variants: {
