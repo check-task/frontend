@@ -111,10 +111,19 @@ export const ModifyAssignmentForm = () => {
 
       {/* 취소, 저장 */}
       <div className={buttonWrapperStyle}>
-        <Button variant='fillGray' size='xlarge'>
+        <Button
+          variant='fillGray'
+          size={isSidebarCollapsed ? 'xlarge' : 'medium'}
+          className={buttonSizeTransitionStyle}
+        >
           취소
         </Button>
-        <Button variant='fillBlue' size='xlarge' disabled={!isFormValid}>
+        <Button
+          variant='fillBlue'
+          size={isSidebarCollapsed ? 'xlarge' : 'medium'}
+          className={buttonSizeTransitionStyle}
+          disabled={!isFormValid}
+        >
           저장
         </Button>
       </div>
@@ -168,8 +177,10 @@ const deleteAssignmentButtonStyle = css({
 
 const buttonWrapperStyle = css({
   display: 'flex',
-  justifyContent: 'space-between',
+  gap: '1.25rem',
   mt: '3.75rem',
-  w: '100%',
-  maxW: '49.625rem',
+});
+
+const buttonSizeTransitionStyle = css({
+  transition: 'width 0.3s ease, padding 0.3s ease',
 });
