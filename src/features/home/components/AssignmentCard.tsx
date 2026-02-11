@@ -37,11 +37,7 @@ export const AssignmentCard = ({
   const brightness = getBrightness(index);
 
   return (
-    <Card.Wrapper
-      color={folderColor}
-      brightness={brightness}
-      css={{ width: isSidebarCollapsed ? '27.375rem' : '22.75rem' }}
-    >
+    <Card.Wrapper color={folderColor} brightness={brightness}>
       <Card.AccentBar />
       <Card.Content
         css={{ paddingX: isSidebarCollapsed ? '1.5rem' : '1.25rem' }}
@@ -162,12 +158,13 @@ const Card = {
   }),
   DDay: styled('div', {
     base: {
-      padding: '0.25rem 0.75rem',
+      paddingY: '0.25rem',
       borderRadius: '0.25rem',
       textStyle: 'btn',
       color: 'primary-button-text',
       bg: 'var(--card-color)',
       width: '4.3125rem',
+      textAlign: 'center',
     },
   }),
   AssignmentInfo: styled('div', {
