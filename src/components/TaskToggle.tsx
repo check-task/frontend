@@ -122,10 +122,11 @@ export const countStyle = cva({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    // 패딩값은 임의로 설정
-    px: '0.5rem',
+    px: '0.25rem', // 좌우 패딩 px기준 4
     minW: '1.375rem',
     h: '1.375rem',
+    fontVariantNumeric: 'normal',
+    textAlign: 'center',
     borderRadius: '0.25rem',
     textStyle: 'body4.m',
     transition: 'none',
