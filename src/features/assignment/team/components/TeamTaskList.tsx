@@ -25,11 +25,20 @@ import { useMyInfo } from '@/hooks/queries/useMyInfo';
 interface TeamTaskListProps {
   taskId: number;
   subTasks?: TaskDetailSubTask[];
+  maxDate?: string | Date;
 }
 
-const TeamTaskList = ({ taskId, subTasks = [] }: TeamTaskListProps) => {
-  const [openComments, setOpenComments] = useState<{ [key: number]: boolean }>({});
-  const [commentInputs, setCommentInputs] = useState<{ [key: number]: string }>({});
+const TeamTaskList = ({
+  taskId,
+  subTasks = [],
+  maxDate,
+}: TeamTaskListProps) => {
+  const [openComments, setOpenComments] = useState<{ [key: number]: boolean }>(
+    {},
+  );
+  const [commentInputs, setCommentInputs] = useState<{ [key: number]: string }>(
+    {},
+  );
   const [pendingComments, setPendingComments] = useState<
     Record<number, TaskDetailSubTaskComment[]>
   >({});
@@ -52,9 +61,7 @@ const TeamTaskList = ({ taskId, subTasks = [] }: TeamTaskListProps) => {
     createdAt: string,
   ): { date: string; time: string } => {
     const trimmed = createdAt.trim();
-    const isoMatch = trimmed.match(
-      /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/,
-    );
+    const isoMatch = trimmed.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/);
     const dotMatch = trimmed.match(
       /^(\d{4})[.-](\d{1,2})[.-](\d{1,2})(?:\s+(\d{1,2}):(\d{1,2}))?/,
     );
@@ -79,16 +86,24 @@ const TeamTaskList = ({ taskId, subTasks = [] }: TeamTaskListProps) => {
     return { date: trimmed, time: '--:--' };
   };
 
-  const getDisplayComments = (task: TaskDetailSubTask): TaskDetailSubTaskComment[] => {
+  const getDisplayComments = (
+    task: TaskDetailSubTask,
+  ): TaskDetailSubTaskComment[] => {
     const fromApi = task.comments ?? [];
     const pending = pendingComments[task.subTaskId] ?? [];
     const fromApiContents = new Set(fromApi.map((c) => c.content));
-    return [...fromApi, ...pending.filter((p) => !fromApiContents.has(p.content))];
+    return [
+      ...fromApi,
+      ...pending.filter((p) => !fromApiContents.has(p.content)),
+    ];
   };
 
   const handleStatusChange = (subTaskId: number, isChecked: boolean) => {
     const nextStatus: SubTaskStatus = isChecked ? 'COMPLETED' : 'PROGRESS';
-    mutateStatus({ subTaskId, status: nextStatus === 'COMPLETED' ? 'COMPLETE' : 'PROGRESS' });
+    mutateStatus({
+      subTaskId,
+      status: nextStatus === 'COMPLETED' ? 'COMPLETE' : 'PROGRESS',
+    });
   };
 
   const toYYYYMMDD = (d: Date): string => {
@@ -177,7 +192,9 @@ const TeamTaskList = ({ taskId, subTasks = [] }: TeamTaskListProps) => {
             const comments = getDisplayComments(task);
             return (
               <div key={task.subTaskId}>
-                <div className={taskItemContainerStyle({ checked: isCompleted })}>
+                <div
+                  className={taskItemContainerStyle({ checked: isCompleted })}
+                >
                   <div className={teamTaskItemTitleStyle}>
                     <div className={teamTaskItemCheckTitleStyle}>
                       <Checkbox
@@ -190,11 +207,16 @@ const TeamTaskList = ({ taskId, subTasks = [] }: TeamTaskListProps) => {
                         {task.title}
                       </p>
                     </div>
-                    <div className={taskComponentsStyle({ checked: isCompleted })}>
+                    <div
+                      className={taskComponentsStyle({ checked: isCompleted })}
+                    >
                       <DatePicker
                         value={task.deadline}
-                        onChange={(date) => handleDeadlineChange(task.subTaskId, date)}
+                        onChange={(date) =>
+                          handleDeadlineChange(task.subTaskId, date)
+                        }
                         muted={isCompleted}
+                        maxDate={maxDate}
                       />
                       <ClockToggle muted={isCompleted} />
                       <CommentButton
@@ -204,7 +226,9 @@ const TeamTaskList = ({ taskId, subTasks = [] }: TeamTaskListProps) => {
                       />
                     </div>
                   </div>
-                  <div className={managerContainerStyle({ checked: isCompleted })}>
+                  <div
+                    className={managerContainerStyle({ checked: isCompleted })}
+                  >
                     <p className={managerLabelStyle({ checked: isCompleted })}>
                       담당:
                     </p>
@@ -275,7 +299,7 @@ const TeamTaskList = ({ taskId, subTasks = [] }: TeamTaskListProps) => {
                                 />
                                 {isEditing ? (
                                   <Input
-                                    size="basic"
+                                    size='basic'
                                     value={editingContent}
                                     onChange={(e) =>
                                       setEditingContent(e.target.value)
@@ -301,34 +325,40 @@ const TeamTaskList = ({ taskId, subTasks = [] }: TeamTaskListProps) => {
                                   </p>
                                 )}
                               </div>
-                              {!isEditing && (() => {
-                                const { date, time } = formatCommentCreatedAt(
-                                  comment.createdAt,
-                                );
-                                return (
-                                  <div className={commentItemEtcStyle}>
-                                    <div className={commentDateTimeWrapperStyle}>
-                                      <span className={commentCreatedAtStyle}>
-                                        {date}
-                                      </span>
-                                      <span className={commentCreatedAtStyle}>
-                                        {time}
-                                      </span>
+                              {!isEditing &&
+                                (() => {
+                                  const { date, time } = formatCommentCreatedAt(
+                                    comment.createdAt,
+                                  );
+                                  return (
+                                    <div className={commentItemEtcStyle}>
+                                      <div
+                                        className={commentDateTimeWrapperStyle}
+                                      >
+                                        <span className={commentCreatedAtStyle}>
+                                          {date}
+                                        </span>
+                                        <span className={commentCreatedAtStyle}>
+                                          {time}
+                                        </span>
+                                      </div>
+                                      <CommentEditDropdown
+                                        onEditComment={() =>
+                                          handleStartEditComment(
+                                            comment.commentId,
+                                            comment.content,
+                                          )
+                                        }
+                                        onDeleteComment={() =>
+                                          handleDeleteComment(
+                                            comment,
+                                            task.subTaskId,
+                                          )
+                                        }
+                                      />
                                     </div>
-                                    <CommentEditDropdown
-                                    onEditComment={() =>
-                                      handleStartEditComment(
-                                        comment.commentId,
-                                        comment.content,
-                                      )
-                                    }
-                                    onDeleteComment={() =>
-                                      handleDeleteComment(comment, task.subTaskId)
-                                    }
-                                  />
-                                  </div>
-                                );
-                              })()}
+                                  );
+                                })()}
                             </div>
                           );
                         })
