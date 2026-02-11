@@ -22,7 +22,7 @@ const ITEMS = [
     hoveredSrc: '/PersonalHovered.svg',
     width: 158,
     height: 42,
-    href: '/',
+    href: '/assignment?type=personal',
   },
   {
     id: 'team',
@@ -31,7 +31,7 @@ const ITEMS = [
     hoveredSrc: '/TeamHovered.svg',
     width: 158,
     height: 42,
-    href: '/assignment/team',
+    href: '/assignment?type=team',
   },
 ] as const;
 
@@ -44,7 +44,7 @@ export const SidebarClicked = () => {
         <Link
           key={item.id}
           href={item.href}
-          className={itemLinkStyle}
+          className={item.id === 'create' ? createItemLinkStyle : itemLinkStyle}
           onMouseEnter={() => setHoveredId(item.id)}
           onMouseLeave={() => setHoveredId(null)}
         >
@@ -69,4 +69,10 @@ const sidebarClickedStyle = css({
 const itemLinkStyle = css({
   display: 'block',
   cursor: 'pointer',
+});
+
+const createItemLinkStyle = css({
+  display: 'block',
+  cursor: 'pointer',
+  transform: 'translateY(0.0625rem)',
 });
