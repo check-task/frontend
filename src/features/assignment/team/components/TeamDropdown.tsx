@@ -114,7 +114,6 @@ const iconWrapperStyle = (isOpen: boolean) =>
     alignItems: 'center',
     justifyContent: 'center',
     transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
-    transition: 'transform 0.3s ease',
   });
 
 const dropdownContainerStyle = css({
