@@ -22,6 +22,7 @@ import { useUpdateSubTaskAssignee } from './hooks/useUpdateSubTaskAssignee';
 import { useCreateSubTaskComment } from './hooks/useCreateSubTaskComment';
 import { useUpdateComment } from './hooks/useUpdateComment';
 import { useDeleteComment } from './hooks/useDeleteComment';
+import { useUpdateSubTaskAlarm } from '@/features/assignment/personal/components/hooks/useUpdateSubTaskAlarm';
 import { useMyInfo } from '@/hooks/queries/useMyInfo';
 import { AddTaskButton } from './AddTaskButton';
 
@@ -53,6 +54,7 @@ const TeamTaskList = ({ taskId, subTasks = [] }: TeamTaskListProps) => {
   const { mutate: mutateStatus } = useUpdateTeamSubTaskStatus(taskId);
   const { mutate: mutateDeadline } = useUpdateTeamSubTaskDeadline(taskId);
   const { mutate: updateAssignee } = useUpdateSubTaskAssignee(taskId);
+  const { mutate: updateSubTaskAlarm } = useUpdateSubTaskAlarm(taskId);
   const { mutate: createComment } = useCreateSubTaskComment(taskId);
   const { mutateAsync: updateComment } = useUpdateComment(taskId);
   const { mutate: deleteComment } = useDeleteComment(taskId);
@@ -258,7 +260,16 @@ const TeamTaskList = ({ taskId, subTasks = [] }: TeamTaskListProps) => {
                         }
                         muted={isCompleted}
                       />
-                      <ClockToggle muted={isCompleted} />
+                      <ClockToggle
+                        muted={isCompleted}
+                        isOn={task.isAlarm}
+                        onToggle={(next) =>
+                          updateSubTaskAlarm({
+                            subTaskId: task.subTaskId,
+                            isAlarm: next,
+                          })
+                        }
+                      />
                       <CommentButton
                         isOpen={commentOpen}
                         onClick={() => handleCommentToggle(task.subTaskId)}

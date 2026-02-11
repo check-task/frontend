@@ -71,6 +71,24 @@ export interface UpdateAlarmSettingResponse {
 }
 
 // ============================
+// 과제 알림 여부 수정 (PATCH /alarm/task/{taskId})
+// ============================
+export interface UpdateTaskAlarmRequest {
+  isAlarm: boolean;
+}
+
+export interface UpdateTaskAlarmResponse {
+  resultType: 'SUCCESS' | 'FAIL';
+  message: string;
+  data: {
+    task: {
+      taskId: number;
+      isAlarm: boolean;
+    };
+  };
+}
+
+// ============================
 // 세부 과제 알림 설정 변경 타입 정의
 // ============================
 export interface UpdateSubTaskAlarmRequest {
