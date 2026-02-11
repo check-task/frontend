@@ -7,10 +7,7 @@ import { useUpdateSubTaskDeadline } from './hooks/useUpdateSubTaskDeadline';
 import { useUpdateSubTaskStatus } from './hooks/useUpdateSubTaskStatus';
 import { useUpdateSubTaskAlarm } from './hooks/useUpdateSubTaskAlarm';
 import { SubTaskStatus } from '@/types/task';
-import { PlusIcon } from '@/components/icons/PlusIcon';
-import { Input } from '@/components/TextField';
-import { CheckMark } from '@/components/icons/CheckMark';
-import { CloseIcon } from '@/components/icons/CloseIcon';
+import { TaskAddForm } from '@/features/assignment/components/TaskAddForm';
 
 export interface PersonalTaskItem {
   id: number;
@@ -44,18 +41,6 @@ export const PersonalTaskList = ({
   const [alarmStateMap, setAlarmStateMap] = useState<Record<number, boolean>>(
     {},
   );
-
-  // 단일 과제 등록 상태 추가
-  const [isAdding, setIsAdding] = useState(false); // 입력 폼 활성화 상태
-  const [taskName, setTaskName] = useState(''); // 입력 필드 값
-
-  // 단일 과제 추가 핸들러
-  const handleAddTask = () => setIsAdding(true);
-  // 단일 과제 추가 취소 핸들러
-  const handleCancelTask = () => {
-    setIsAdding(false);
-    setTaskName('');
-  };
 
   // 달력 날짜 변경 시 호출 핸들러
   const handleDeadlineChange = (subTaskId: number) => (date: Date) => {
@@ -140,50 +125,7 @@ export const PersonalTaskList = ({
           })}
         </div>
       )}
-      <div className={TaskAddWrapperStyle}>
-        {!isAdding ? (
-          // 세부 과제 추가 버튼 상태
-          <button className={TaskAddButtonStyle} onClick={handleAddTask}>
-            <PlusIcon className={iconStyle} />
-            <p className={TaskAddButtonTextStyle}>세부과제 추가</p>
-          </button>
-        ) : (
-          // 입력 폼 상태
-          <div className={InputFormContainerStyle}>
-            <div className={InputRowStyle}>
-              <Input
-                size='basic'
-                className={css({ flex: 1 })}
-                placeholder='TASK명을 입력하세요.'
-                value={taskName}
-                onChange={(e) => setTaskName(e.target.value)}
-                autoFocus
-              />
-              <DatePicker />
-            </div>
-            <div className={ButtonGroupStyle}>
-              <button className={ButtonStyle({ type: 'save' })}>
-                <div>
-                  <CheckMark
-                    variant='blue'
-                    className={css({ width: '0.75rem', height: '0.75rem' })}
-                  />
-                </div>
-                저장
-              </button>
-              <button
-                className={ButtonStyle({ type: 'cancel' })}
-                onClick={handleCancelTask}
-              >
-                <div>
-                  <CloseIcon size={20} strokeWidth={1} color='gray.600' />
-                </div>
-                취소
-              </button>
-            </div>
-          </div>
-        )}
-      </div>
+      <TaskAddForm maxDate={maxDate} />
     </div>
   );
 };
@@ -318,84 +260,4 @@ const rightContentWrapperStyle = css({
   justifyContent: 'space-between',
   gap: '2.25rem',
   width: '12rem', // 직접 계산
-});
-
-//  일단추가
-// 세부 과제 추가 영역 전체 wrapper
-const TaskAddWrapperStyle = css({
-  width: '100%',
-  mt: '1.5rem',
-});
-
-// '+ 세부과제 추가' 컨테이너
-const TaskAddButtonStyle = css({
-  display: 'flex',
-  alignItems: 'center',
-  gap: '0.25rem',
-  cursor: 'pointer',
-  pr: '0.5rem',
-});
-
-// 세부 과제 추가 텍스트 스타일
-const TaskAddButtonTextStyle = css({
-  textStyle: 'body3.r',
-  color: 'gray.500',
-});
-
-// + 아이콘 스타일
-const iconStyle = css({
-  w: '1.25rem',
-  h: '1.25rem',
-  color: 'gray.500',
-});
-
-// 입력 폼 컨테이너
-const InputFormContainerStyle = css({
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '1rem', // 입력창과 버튼 사이 간격
-  w: '100%',
-});
-
-// 입력창과 날짜가 있는 행
-const InputRowStyle = css({
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-  gap: '1rem',
-});
-
-// 하단 버튼(저장/취소) 행
-const ButtonGroupStyle = css({
-  display: 'flex',
-  gap: '0.75rem', // 버튼 사이 간격
-});
-
-// 저장/취소 공통 버튼 스타일
-const ButtonStyle = cva({
-  // 공통 스타일
-  base: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '0.25rem',
-    padding: '0.5rem 1rem 0.5rem 0.7rem',
-    borderRadius: '2.5rem',
-    textStyle: 'body3.m',
-    cursor: 'pointer',
-    border: '1px solid',
-  },
-
-  variants: {
-    type: {
-      //  저장버튼 스타일
-      save: {
-        borderColor: 'blue.500',
-        color: 'blue.500',
-      },
-      cancel: {
-        borderColor: 'gray.100',
-        color: 'gray.600',
-      },
-    },
-  },
 });
