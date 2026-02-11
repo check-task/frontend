@@ -16,6 +16,9 @@ const pathStyle = cva({
       white: {
         stroke: 'white',
       },
+      blue: {
+        stroke: 'blue.500',
+      },
     },
   },
   defaultVariants: {
@@ -24,12 +27,14 @@ const pathStyle = cva({
 });
 
 interface CheckMarkProps {
-  variant?: 'gray' | 'black' | 'white';
+  variant?: 'gray' | 'black' | 'white' | 'blue';
+  className?: string;
 }
 
-export const CheckMark = ({ variant = 'gray' }: CheckMarkProps) => {
+export const CheckMark = ({ variant = 'gray', className }: CheckMarkProps) => {
   return (
     <svg
+      className={className}
       xmlns='http://www.w3.org/2000/svg'
       width='15'
       height='15'
