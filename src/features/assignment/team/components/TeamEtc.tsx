@@ -205,7 +205,18 @@ export const TeamEtc = ({
                   </button>
                 </div>
               </div>
-              <p className={cardContentStyle}>{item.url}</p>
+              {item.url ? (
+                <a
+                  href={item.url.startsWith('http') ? item.url : `https://${item.url}`}
+                  target='_blank'
+                  rel='noopener noreferrer'
+                  className={cardContentStyle}
+                >
+                  {item.url}
+                </a>
+              ) : (
+                <p className={cardContentStyle}>{item.url}</p>
+              )}
             </div>
           ))}
         </div>
@@ -318,9 +329,24 @@ export const TeamEtc = ({
                   </button>
                 </div>
               </div>
-              <p className={cardContentStyle}>
-                {ref.url ?? ref.file_url ?? ''}
-              </p>
+              {(ref.url ?? ref.file_url) ? (
+                <a
+                  href={
+                    (ref.url ?? ref.file_url)!.startsWith('http')
+                      ? (ref.url ?? ref.file_url)!
+                      : `https://${ref.url ?? ref.file_url}`
+                  }
+                  target='_blank'
+                  rel='noopener noreferrer'
+                  className={cardContentStyle}
+                >
+                  {ref.url ?? ref.file_url ?? ''}
+                </a>
+              ) : (
+                <p className={cardContentStyle}>
+                  {ref.url ?? ref.file_url ?? ''}
+                </p>
+              )}
             </div>
           ))}
         </div>
