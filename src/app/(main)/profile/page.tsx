@@ -20,8 +20,6 @@ export default function ProfilePage() {
           <Divider />
           <Text.FooterLink>사이트 이용 약관</Text.FooterLink>
           <Divider />
-          <Text.FooterLink>쿠키 기본 설정</Text.FooterLink>
-          <Divider />
           <Text.FooterCopyright>
             © 2025, CheckTask, All rights reserved.
           </Text.FooterCopyright>
