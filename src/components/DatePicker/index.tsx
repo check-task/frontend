@@ -71,6 +71,8 @@ export default function DatePicker({
         type='button'
         className={css({
           cursor: 'pointer',
+          display: 'flex',
+          alignItems: 'center',
         })}
         onClick={() => setIsOpen(!isOpen)}
       >
@@ -116,7 +118,8 @@ const dateTextStyle = cva({
     textStyle: 'body1.r',
     cursor: 'pointer',
     fontVariantNumeric: 'normal',
-    display: 'inline-block',
+    display: 'inline-flex',
+    alignItems: 'center',
     width: '5rem',
     textAlign: 'left',
     backgroundColor: 'transparent',
