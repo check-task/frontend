@@ -65,10 +65,7 @@ export const AddAssignmentDataModal = ({
   );
 
   const handleAddInput = () => {
-    setInputGroups((prev) => [
-      ...prev,
-      { id: Date.now(), name: '', path: '' },
-    ]);
+    setInputGroups((prev) => [...prev, { id: Date.now(), name: '', path: '' }]);
   };
 
   const handleInputChange = (
@@ -125,64 +122,66 @@ export const AddAssignmentDataModal = ({
     const isFile = selectedType === 1;
 
     return (
-      <div className={inputContainerStyle}>
-        {inputGroups.map((group, index) => (
-          <div key={group.id}>
-            {index > 0 && <Divider mt='1.25rem' mb='1.25rem' />}
+      <>
+        <div className={scrollableListStyle}>
+          {inputGroups.map((group, index) => (
+            <div key={group.id}>
+              {index > 0 && <Divider mt='1.25rem' mb='1.25rem' />}
 
-            <div className={inputGroupStyle}>
-              <div className={inputWrapperStyle}>
-                <label className={labelStyle}>{text.nameLabel}</label>
-                <Input
-                  size='modal'
-                  placeholder={text.namePlaceholder}
-                  value={group.name}
-                  onChange={(e) =>
-                    handleInputChange(group.id, 'name', e.target.value)
-                  }
-                />
-              </div>
+              <div className={inputGroupStyle}>
+                <div className={inputWrapperStyle}>
+                  <label className={labelStyle}>{text.nameLabel}</label>
+                  <Input
+                    size='modal'
+                    placeholder={text.namePlaceholder}
+                    value={group.name}
+                    onChange={(e) =>
+                      handleInputChange(group.id, 'name', e.target.value)
+                    }
+                  />
+                </div>
 
-              <div className={inputWrapperStyle}>
-                <label className={labelStyle}>{text.pathLabel}</label>
-                {isFile ? (
-                  <>
-                    <input
-                      type='file'
-                      id={`file-${group.id}`}
-                      className={hiddenFileInputStyle}
-                      onChange={(e) =>
-                        handleFileChange(
-                          group.id,
-                          e.target.files?.[0] ?? null,
-                        )
-                      }
-                    />
+                <div className={inputWrapperStyle}>
+                  <label className={labelStyle}>{text.pathLabel}</label>
+                  {isFile ? (
+                    <>
+                      <input
+                        type='file'
+                        id={`file-${group.id}`}
+                        className={hiddenFileInputStyle}
+                        onChange={(e) =>
+                          handleFileChange(
+                            group.id,
+                            e.target.files?.[0] ?? null,
+                          )
+                        }
+                      />
+                      <Input
+                        size='modal'
+                        placeholder={text.pathPlaceholder}
+                        value={group.path}
+                        readOnly
+                        className={fileInputTriggerStyle}
+                        onClick={() =>
+                          document.getElementById(`file-${group.id}`)?.click()
+                        }
+                      />
+                    </>
+                  ) : (
                     <Input
                       size='modal'
                       placeholder={text.pathPlaceholder}
                       value={group.path}
-                      readOnly
-                      className={fileInputTriggerStyle}
-                      onClick={() =>
-                        document.getElementById(`file-${group.id}`)?.click()
+                      onChange={(e) =>
+                        handleInputChange(group.id, 'path', e.target.value)
                       }
                     />
-                  </>
-                ) : (
-                  <Input
-                    size='modal'
-                    placeholder={text.pathPlaceholder}
-                    value={group.path}
-                    onChange={(e) =>
-                      handleInputChange(group.id, 'path', e.target.value)
-                    }
-                  />
-                )}
+                  )}
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
 
         <div className={css({ mt: '1rem', mb: '2.5rem' })}>
           <AddURLDataButton
@@ -190,7 +189,7 @@ export const AddAssignmentDataModal = ({
             onClick={handleAddInput}
           />
         </div>
-      </div>
+      </>
     );
   };
 
@@ -213,7 +212,7 @@ export const AddAssignmentDataModal = ({
         ]}
         onToggle={(index) => setSelectedType(index as 0 | 1)}
       />
-      {renderInputGroups()}
+      <div className={inputContainerStyle}>{renderInputGroups()}</div>
       <Button
         variant='fillBlue'
         size='xlarge'
@@ -241,6 +240,15 @@ const inputContainerStyle = css({
   flexDirection: 'column',
   width: '100%',
   mt: '1.75rem',
+});
+
+// 파일명/파일경로 목록만 스크롤 — 3개 이상일 때 스크롤
+const scrollableListStyle = css({
+  display: 'flex',
+  flexDirection: 'column',
+  width: '100%',
+  maxHeight: '26rem', // 3개부터 스크롤
+  overflowY: 'auto',
 });
 
 // 입력 그룹 한 묶음
