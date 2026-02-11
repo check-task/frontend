@@ -125,7 +125,7 @@ export const PersonalTaskList = ({
           })}
         </div>
       )}
-      <TaskAddForm maxDate={maxDate} />
+      <TaskAddForm taskId={taskId} maxDate={maxDate} />
     </div>
   );
 };
