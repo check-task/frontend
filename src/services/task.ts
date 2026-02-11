@@ -196,3 +196,43 @@ export const createInvitationLink = async (
   }>(`${TASK_BASE}/${taskId}/invitation`);
   return res.data?.data ?? { invite_code: '', invite_expired: '' };
 };
+
+// 팀원 목록 (역할: 0 = Member, 1 = Owner, 만든 사람은 Owner)
+export interface TaskMember {
+  memberId: number;
+  name: string;
+  profileImage?: string | null;
+  role: 0 | 1; // 0: Member, 1: Owner
+}
+
+type TaskMemberRaw = TaskMember & {
+  member_id?: number;
+  profile_image?: string | null;
+};
+
+export const getTaskMembers = async (
+  taskId: number,
+): Promise<TaskMember[]> => {
+  const res = await axiosInstance.get<{
+    data: { members?: TaskMemberRaw[] };
+  }>(`${TASK_BASE}/${taskId}/members`);
+  const raw = res.data?.data?.members;
+  if (!Array.isArray(raw)) return [];
+  return raw.map((m) => ({
+    memberId: m.memberId ?? m.member_id ?? 0,
+    name: m.name ?? (m as { nickname?: string }).nickname ?? '',
+    profileImage: m.profileImage ?? m.profile_image ?? null,
+    role: m.role === 1 ? 1 : 0,
+  }));
+};
+
+// 팀원 역할 수정 (PATCH /task/{taskId}/member/{memberId})
+export const updateMemberRole = async (
+  taskId: number,
+  memberId: number,
+  role: 0 | 1,
+): Promise<void> => {
+  await axiosInstance.patch(`${TASK_BASE}/${taskId}/member/${memberId}`, {
+    role,
+  });
+};

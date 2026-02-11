@@ -1,32 +1,63 @@
 import { css } from 'styled-system/css';
 import { TeamMemberDropdown } from './TeamDropdown';
 
+export type MemberRole = 'Owner' | 'Member';
+
 interface TeamMemberManageModalItemProps {
-  nickname: string;
-  role: string;
-  onSetLeader?: () => void;
+  memberId: number;
+  name: string;
+  profileImage?: string | null;
+  role: MemberRole;
+  /** Owner만 true — 역할 드롭다운 표시 및 변경 가능 */
+  canChangeRole: boolean;
+  onRoleChange?: (memberId: number, role: MemberRole) => void;
   onDeleteMember?: () => void;
 }
 
 export const TeamMemberManageModalItem = ({
-  nickname,
+  memberId,
+  name,
+  profileImage,
   role,
-  onSetLeader,
-  onDeleteMember,
+  canChangeRole,
+  onRoleChange,
 }: TeamMemberManageModalItemProps) => {
   return (
     <div className={modalContentItemStyle}>
       <div className={modalContentItemTitleStyle}>
-        <div className={modalContentItemTitleIconStyle} />
-        <p>{nickname}</p>
+        <div
+          className={modalContentItemTitleIconStyle}
+          style={
+            profileImage
+              ? {
+                  backgroundImage: `url(${profileImage})`,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                }
+              : undefined
+          }
+        >
+          {!profileImage && (
+            <span className={profilePlaceholderTextStyle}>
+              {name.slice(0, 1).toUpperCase()}
+            </span>
+          )}
+        </div>
+        <p>{name}</p>
       </div>
 
       <div className={modalContentItemMemberStyle}>
-        <p>{role}</p>
-        <TeamMemberDropdown
-          onSetLeader={onSetLeader}
-          onDeleteMember={onDeleteMember}
-        />
+        {canChangeRole ? (
+          <TeamMemberDropdown
+            role={role}
+            onRoleChange={(newRole) => onRoleChange?.(memberId, newRole)}
+            disabled={false}
+          />
+        ) : (
+          <p className={css({ textStyle: 'body3.r', color: 'gray.900' })}>
+            {role}
+          </p>
+        )}
       </div>
     </div>
   );
@@ -50,8 +81,18 @@ const modalContentItemTitleStyle = css({
 const modalContentItemTitleIconStyle = css({
   width: '1.5rem',
   height: '1.5rem',
+  minWidth: '1.5rem',
   borderRadius: 'full',
   bg: 'blue.100',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  overflow: 'hidden',
+});
+
+const profilePlaceholderTextStyle = css({
+  textStyle: 'body4.m',
+  color: 'gray.600',
 });
 
 const modalContentItemMemberStyle = css({

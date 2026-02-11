@@ -2,21 +2,35 @@
 
 import { useEffect, useState } from 'react';
 import { css } from 'styled-system/css';
-import { TeamMemberManageModalItem } from './TeamMemberManageModalItem';
+import { TeamMemberManageModalItem, type MemberRole } from './TeamMemberManageModalItem';
 import { Divider } from '@/components/Divider';
 import { Input } from '@/components/TextField';
 import { useCreateInvitationLink } from '@/hooks/mutations/useCreateInvitationLink';
+import { useTaskMembers } from '@/hooks/queries/useTaskMembers';
+import { useUpdateMemberRole } from '@/hooks/mutations/useUpdateMemberRole';
+import { useMyInfo } from '@/hooks/queries/useMyInfo';
 
 interface TeamMemberManageModalProps {
   taskId: number;
 }
 
+const roleFromApi = (role: 0 | 1): MemberRole => (role === 1 ? 'Owner' : 'Member');
+
 export const TeamMemberManageModal = ({
   taskId,
 }: TeamMemberManageModalProps) => {
   const [inviteCode, setInviteCode] = useState('');
+  const { data: myInfo } = useMyInfo();
+  const { data: membersData } = useTaskMembers(taskId);
   const { mutateAsync: createInvitation, isPending } =
     useCreateInvitationLink(taskId);
+  const { mutate: updateRole } = useUpdateMemberRole(taskId);
+
+  const members = membersData ?? [];
+  const currentUserId = myInfo?.user?.id;
+  const isCurrentUserOwner = members.some(
+    (m) => m.role === 1 && m.memberId === currentUserId,
+  );
 
   useEffect(() => {
     createInvitation()
@@ -31,30 +45,30 @@ export const TeamMemberManageModal = ({
     navigator.clipboard.writeText(inviteCode).catch(() => {});
   };
 
+  const handleRoleChange = (memberId: number, newRole: MemberRole) => {
+    updateRole({ memberId, role: newRole === 'Owner' ? 1 : 0 });
+  };
+
   return (
     <div className={modalContentStyle}>
       <div className={modalContentItemStyle}>
-        {/* TODO: 팀원 초대 버튼 모달 타이틀에 추가 */}
-        <TeamMemberManageModalItem
-          nickname='멤버 닉네임'
-          role='Owner'
-          onSetLeader={() => console.log('팀장으로 설정')}
-          onDeleteMember={() => console.log('팀원 삭제')}
-        />
-
-        <TeamMemberManageModalItem
-          nickname='멤버 닉네임'
-          role='Member'
-          onSetLeader={() => console.log('팀장으로 설정')}
-          onDeleteMember={() => console.log('팀원 삭제')}
-        />
-
-        <TeamMemberManageModalItem
-          nickname='멤버 닉네임'
-          role='Member'
-          onSetLeader={() => console.log('팀장으로 설정')}
-          onDeleteMember={() => console.log('팀원 삭제')}
-        />
+        {members.length === 0 ? (
+          <p className={css({ textStyle: 'body3.r', color: 'gray.500' })}>
+            팀원 목록을 불러오는 중입니다.
+          </p>
+        ) : (
+          members.map((member) => (
+            <TeamMemberManageModalItem
+              key={member.memberId}
+              memberId={member.memberId}
+              name={member.name}
+              profileImage={member.profileImage}
+              role={roleFromApi(member.role)}
+              canChangeRole={isCurrentUserOwner}
+              onRoleChange={handleRoleChange}
+            />
+          ))
+        )}
       </div>
 
       <Divider />
