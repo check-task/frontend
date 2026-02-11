@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
+import { isAxiosError } from 'axios';
 import { css } from 'styled-system/css';
 import { center } from 'styled-system/patterns';
 import { ModalCheckIcon } from '@/components/icons/ModalCheckIcon';
@@ -19,11 +20,17 @@ function toDateString(d: Date): string {
   return `${y}-${m}-${day}`;
 }
 
+// YYYY-MM-DD → MM.DD (헤더 표시용)
+function toMMDD(dateStr: string): string {
+  if (!dateStr || dateStr.length < 10) return 'MM.DD';
+  return `${dateStr.slice(5, 7)}.${dateStr.slice(8, 10)}`;
+}
+
 interface MinutesModalProps {
   open: boolean;
   onClose: () => void;
   taskId: number;
-  /** 수정 모드일 때 전달 (상세 조회에 없을 수 있어 agenda/conclusion/discussion는 선택) */
+  /*  수정 모드일 때 전달 */
   editLog?: {
     logId: number;
     date: string;
@@ -56,6 +63,26 @@ const headerStyle = css({
   justifyContent: 'space-between',
   width: 'full',
   pb: '1rem',
+  color: 'gray.900',
+  textStyle: 'body1.m',
+});
+
+const checkButtonStyle = css({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  padding: '0.5rem',
+  minWidth: '2.5rem',
+  minHeight: '2.5rem',
+  background: 'transparent',
+  border: 'none',
+  cursor: 'pointer',
+  position: 'relative',
+  zIndex: 1,
+  _disabled: {
+    cursor: 'not-allowed',
+    opacity: 0.6,
+  },
 });
 
 const datePickerContainerStyle = css({
@@ -78,6 +105,13 @@ const contentItemStyle = css({
 
 const contentItemLabelStyle = css({
   textStyle: 'body2.r',
+  color: 'gray.900',
+});
+
+const validationErrorStyle = css({
+  textStyle: 'body3.r',
+  color: 'red.500',
+  mb: '0.5rem',
 });
 
 export const MinutesModal = ({
@@ -94,6 +128,9 @@ export const MinutesModal = ({
   const [agenda, setAgenda] = useState(editLog?.agenda ?? '');
   const [conclusion, setConclusion] = useState(editLog?.conclusion ?? '');
   const [discussion, setDiscussion] = useState(editLog?.discussion ?? '');
+  const [validationError, setValidationError] = useState<string | null>(null);
+
+  // 부모에서 key로 모달을 열 때마다 새로 마운트하므로 open/editLog 기준 초기 state만 사용
 
   const { mutateAsync: createLog, isPending: isCreating } =
     useCreateMeetingLog(taskId);
@@ -108,13 +145,21 @@ export const MinutesModal = ({
   };
 
   const handleCheckClick = async () => {
+    setValidationError(null);
+    const agendaVal = agenda.trim();
+    const conclusionVal = conclusion.trim();
+    const discussionVal = discussion.trim();
+    if (!agendaVal || !conclusionVal || !discussionVal) {
+      setValidationError('안건, 결과, 논의를 모두 입력해주세요.');
+      return;
+    }
+    // API는 대부분 YYYY-MM-DD 형식 사용 (dateStr이 이미 YYYY-MM-DD)
     const payload = {
       date: dateStr,
-      agenda: agenda.trim(),
-      conclusion: conclusion.trim(),
-      discussion: discussion.trim(),
+      agenda: agendaVal,
+      conclusion: conclusionVal,
+      discussion: discussionVal,
     };
-    if (!payload.agenda || !payload.conclusion || !payload.discussion) return;
     try {
       if (isEdit && editLog) {
         await updateLog({
@@ -126,8 +171,15 @@ export const MinutesModal = ({
       }
       onSuccess?.();
       onClose();
-    } catch {
-      // 에러 시 모달 유지 (필요 시 토스트 등 추가)
+    } catch (err) {
+      let message = '저장에 실패했습니다. 다시 시도해주세요.';
+      if (isAxiosError(err) && err.response?.data) {
+        const d = err.response.data as { message?: string; msg?: string; error?: string };
+        message = d.message ?? d.msg ?? d.error ?? message;
+      } else if (err instanceof Error) {
+        message = err.message;
+      }
+      setValidationError(message);
     }
   };
 
@@ -148,10 +200,16 @@ export const MinutesModal = ({
     <div className={overlayStyle} onClick={handleOverlayClick}>
       <div className={modalContainerStyle} onClick={handleBoxClick}>
         <header className={headerStyle}>
-          <span>MM.DD 회의록</span>
+          <span>{toMMDD(dateStr)} 회의록</span>
           <button
             type='button'
-            onClick={handleCheckClick}
+            className={checkButtonStyle}
+            onClick={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
+              handleCheckClick();
+            }}
+            onMouseDown={(e) => e.stopPropagation()}
             aria-label='저장'
             disabled={isPending}
           >
@@ -164,6 +222,9 @@ export const MinutesModal = ({
           <DatePicker value={dateStr} onChange={handleDateChange} />
         </div>
 
+        {validationError && (
+          <p className={validationErrorStyle}>{validationError}</p>
+        )}
         <div className={contentContainerStyle}>
           <div className={contentItemStyle}>
             <label className={contentItemLabelStyle}>안건</label>

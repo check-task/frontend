@@ -274,7 +274,7 @@ const TeamTaskList = ({ taskId, subTasks = [] }: TeamTaskListProps) => {
                     </p>
                     <TeamTaskManager
                       manager={task.assigneeName}
-                      profileImage={task.assigneeProfileImage}
+                      profileImage={task.assigneeProfileImage ?? undefined}
                       members={[]}
                       onSelectMember={(_, assigneeId) => {
                         if (assigneeId != null)

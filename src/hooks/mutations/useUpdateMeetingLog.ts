@@ -31,6 +31,7 @@ export const useUpdateMeetingLog = (taskId: number) => {
     }: UpdateMeetingLogRequest & { logId: number }) =>
       updateMeetingLog(taskId, logId, body),
     onSuccess: (updatedLog) => {
+      if (!updatedLog) return;
       const mapped = mapMeetingLogItem(updatedLog);
       queryClient.setQueryData(
         ['taskDetail', taskId],

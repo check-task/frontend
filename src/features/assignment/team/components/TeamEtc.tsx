@@ -34,6 +34,11 @@ export const TeamEtc = ({
   meetingLogs = [],
 }: TeamEtcProps) => {
   const { openModal, closeModal } = useModalStore();
+
+  const toMMDD = (dateStr: string) =>
+    dateStr && dateStr.length >= 10
+      ? `${dateStr.slice(5, 7)}.${dateStr.slice(8, 10)}`
+      : '';
   const { mutate: deleteCommunication } = useDeleteCommunication(taskId);
   const { mutate: deleteReference } = useDeleteReferenceData(taskId);
   const [minutesModalOpen, setMinutesModalOpen] = useState(false);
@@ -71,7 +76,20 @@ export const TeamEtc = ({
 
   const handleDeleteCommunication = (item: TaskCommunication) => {
     if (item.communicationId == null) return;
-    deleteCommunication(item.communicationId);
+    openModal({
+      title: '커뮤니케이션 삭제',
+      headerType: 'none',
+      content: (
+        <ConfirmDeleteAssignmentDataModal
+          highlightText={item.name}
+          onConfirm={() => {
+            deleteCommunication(item.communicationId!);
+            closeModal();
+          }}
+          onCancel={closeModal}
+        />
+      ),
+    });
   };
 
   const handleOpenReferenceEditModal = (ref: TaskReference) => {
@@ -97,10 +115,30 @@ export const TeamEtc = ({
       headerType: 'none',
       content: (
         <ConfirmDeleteAssignmentDataModal
-          highlightText='자료명(파일명.확장자 or URL 경로)'
+          highlightText={ref.name}
           onConfirm={() => {
             deleteReference(ref.referenceId!);
             closeModal();
+          }}
+          onCancel={closeModal}
+        />
+      ),
+    });
+  };
+
+  const getMeetingLogCardTitle = (item: TaskMeetingLog, index: number) =>
+    toMMDD(item.date) ? `${toMMDD(item.date)} 회의록` : `${index + 1}주차 회의록`;
+
+  const handleDeleteMeetingLog = (item: TaskMeetingLog, index: number) => {
+    openModal({
+      title: '회의록 삭제',
+      headerType: 'none',
+      content: (
+        <ConfirmDeleteAssignmentDataModal
+          highlightText={getMeetingLogCardTitle(item, index)}
+          onConfirm={() => {
+            closeModal();
+            // TODO: 회의록 삭제 API 연동
           }}
           onCancel={closeModal}
         />
@@ -190,11 +228,40 @@ export const TeamEtc = ({
           {meetingLogs.map((item, index) => (
             <div
               key={`log-${item.logId}-${item.date}-${index}`}
-              className={etcCardStyle}
+              className={meetingLogCardStyle}
             >
-              <p className={cardTitleStyle}>
-                {item.agenda ?? `${index + 1}주차 회의록`}
-              </p>
+              <div className={communicationHeaderStyle}>
+                <p className={cardTitleStyle}>
+                  {toMMDD(item.date) ? `${toMMDD(item.date)} 회의록` : `${index + 1}주차 회의록`}
+                </p>
+                <div className={meetingLogIconGroupStyle} data-meeting-log-icons>
+                  <button
+                    type='button'
+                    className={communicationIconButtonStyle}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setEditingMeetingLog(item);
+                      setMinutesModalOpen(true);
+                    }}
+                    aria-label='회의록 수정'
+                  >
+                    <CommunicationEditIcon />
+                  </button>
+                  <button
+                    type='button'
+                    className={communicationIconButtonStyle}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      handleDeleteMeetingLog(item, index);
+                    }}
+                    aria-label='회의록 삭제'
+                  >
+                    <CommunicationDeleteIcon />
+                  </button>
+                </div>
+              </div>
               <button
                 type='button'
                 className={meetingLogDetailLinkStyle}
@@ -316,7 +383,15 @@ const etcCardContainerStyle = css({
   width: '100%',
 });
 
-const etcCardStyle = css({
+const meetingLogIconGroupStyle = css({
+  display: 'flex',
+  alignItems: 'center',
+  gap: '0.5rem',
+  opacity: 0,
+  transition: 'opacity 0.2s ease',
+});
+
+const meetingLogCardStyle = css({
   display: 'flex',
   flexDirection: 'column',
   gap: '1.25rem',
@@ -325,6 +400,11 @@ const etcCardStyle = css({
   borderRadius: '0.5rem',
   width: '100%',
   shadow: '0px 1px 4px 0px #00000029',
+  _hover: {
+    '& [data-meeting-log-icons]': {
+      opacity: 1,
+    },
+  },
 });
 
 // 커뮤니케이션 카드
