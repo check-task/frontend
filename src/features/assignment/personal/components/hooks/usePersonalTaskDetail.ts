@@ -8,6 +8,7 @@ import type { ReferenceItem } from '@/features/assignment/personal/components/Pe
 export interface PersonalTaskDetailView {
   taskId: number; // 세부 과제 수정을 위해 추가
   title: string;
+  deadline: string;
   dDay: string;
   progressRate: number;
   tasks: PersonalTaskItem[];
@@ -36,6 +37,7 @@ const mapToPersonalView = (data: TaskDetail): PersonalTaskDetailView => {
   return {
     taskId: data.taskId,
     title: data.title,
+    deadline: data.deadline,
     dDay: data.dDay,
     progressRate: data.progressRate,
     tasks,
