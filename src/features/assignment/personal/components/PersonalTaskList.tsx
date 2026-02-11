@@ -62,64 +62,68 @@ export const PersonalTaskList = ({
 
   return (
     <div className={PersonalTaskListContainerStyle}>
-      <div className={PersonalTaskListStyle}>
-        {tasks.map((task) => {
-          const isLongTitle = task.title.length >= 23;
-          // 완료 여부를 UI에서 사용하기 위함
-          // 리스트 한줄을 기준으로 처리하려 했는데 아이콘 부분이 처리가 안되어서  개별 요소로 보냄
-          const isCompleted = task.status === 'COMPLETED';
+      {tasks.length === 0 ? (
+        <div className={emptyStateStyle}>등록된 task가 없습니다.</div>
+      ) : (
+        <div className={PersonalTaskListStyle}>
+          {tasks.map((task) => {
+            const isLongTitle = task.title.length >= 23;
+            // 완료 여부를 UI에서 사용하기 위함
+            // 리스트 한줄을 기준으로 처리하려 했는데 아이콘 부분이 처리가 안되어서  개별 요소로 보냄
+            const isCompleted = task.status === 'COMPLETED';
 
-          return (
-            <div key={task.id} className={PersonalTaskItemContainerStyle}>
-              {/* 왼쪽: 체크박스 + 제목 */}
-              <div
-                className={PersonalTaskItemLeftStyle({
-                  align: isLongTitle ? 'top' : 'center',
-                })}
-              >
+            return (
+              <div key={task.id} className={PersonalTaskItemContainerStyle}>
+                {/* 왼쪽: 체크박스 + 제목 */}
                 <div
-                  className={checkboxWrapperStyle({
+                  className={PersonalTaskItemLeftStyle({
                     align: isLongTitle ? 'top' : 'center',
                   })}
                 >
-                  <Checkbox
-                    checked={isCompleted}
-                    variant='black'
-                    onChange={(event) =>
-                      handleStatusChange(task.id, event.target.checked)
-                    }
-                  />
+                  <div
+                    className={checkboxWrapperStyle({
+                      align: isLongTitle ? 'top' : 'center',
+                    })}
+                  >
+                    <Checkbox
+                      checked={isCompleted}
+                      variant='black'
+                      onChange={(event) =>
+                        handleStatusChange(task.id, event.target.checked)
+                      }
+                    />
+                  </div>
+                  <p className={taskTextStyle({ completed: isCompleted })}>
+                    {task.title}
+                  </p>
                 </div>
-                <p className={taskTextStyle({ completed: isCompleted })}>
-                  {task.title}
-                </p>
-              </div>
 
-              {/* 오른쪽: 달력 + 시계토글 */}
-              <div
-                className={teamTaskItemRightStyle({
-                  align: isLongTitle ? 'top' : 'center',
-                })}
-              >
-                <div className={rightContentWrapperStyle}>
-                  <DatePicker
-                    value={task.deadline}
-                    onChange={handleDeadlineChange(task.id)}
-                    muted={isCompleted}
-                    maxDate={maxDate}
-                  />
-                  {/* 시계 아이콘은 꺼짐으로 시작됨  */}
-                  <ClockToggle
-                    muted={isCompleted}
-                    isOn={alarmStateMap[task.id] ?? task.isAlarm}
-                    onToggle={handleAlarmToggle(task.id)}
-                  />
+                {/* 오른쪽: 달력 + 시계토글 */}
+                <div
+                  className={teamTaskItemRightStyle({
+                    align: isLongTitle ? 'top' : 'center',
+                  })}
+                >
+                  <div className={rightContentWrapperStyle}>
+                    <DatePicker
+                      value={task.deadline}
+                      onChange={handleDeadlineChange(task.id)}
+                      muted={isCompleted}
+                      maxDate={maxDate}
+                    />
+                    {/* 시계 아이콘은 꺼짐으로 시작됨  */}
+                    <ClockToggle
+                      muted={isCompleted}
+                      isOn={alarmStateMap[task.id] ?? task.isAlarm}
+                      onToggle={handleAlarmToggle(task.id)}
+                    />
+                  </div>
                 </div>
               </div>
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 };
@@ -141,6 +145,12 @@ const PersonalTaskListStyle = css({
   display: 'flex',
   flexDirection: 'column',
   gap: '1.75rem', // 각 리스트 사이 간격
+});
+
+// 리스트 비어 있을 때 문구 스타일
+const emptyStateStyle = css({
+  textStyle: 'body3.r',
+  color: 'gray.500',
 });
 
 // 각 리스트를 왼쪽 오른쪽으로 구분
