@@ -1,30 +1,44 @@
 import { css } from 'styled-system/css';
 import { TeamMemberManageModalItem } from './TeamMemberManageModalItem';
+import { Divider } from '@/components/Divider';
+import { Input } from '@/components/TextField';
 
 export const TeamMemberManageModal = () => {
   return (
     <div className={modalContentStyle}>
-      {/* TODO: 팀원 초대 버튼 모달 타이틀에 추가 */}
-      <TeamMemberManageModalItem
-        nickname='멤버 닉네임'
-        role='Owner'
-        onSetLeader={() => console.log('팀장으로 설정')}
-        onDeleteMember={() => console.log('팀원 삭제')}
-      />
+      <div className={modalContentItemStyle}>
+        {/* TODO: 팀원 초대 버튼 모달 타이틀에 추가 */}
+        <TeamMemberManageModalItem
+          nickname='멤버 닉네임'
+          role='Owner'
+          onSetLeader={() => console.log('팀장으로 설정')}
+          onDeleteMember={() => console.log('팀원 삭제')}
+        />
 
-      <TeamMemberManageModalItem
-        nickname='멤버 닉네임'
-        role='Member'
-        onSetLeader={() => console.log('팀장으로 설정')}
-        onDeleteMember={() => console.log('팀원 삭제')}
-      />
+        <TeamMemberManageModalItem
+          nickname='멤버 닉네임'
+          role='Member'
+          onSetLeader={() => console.log('팀장으로 설정')}
+          onDeleteMember={() => console.log('팀원 삭제')}
+        />
 
-      <TeamMemberManageModalItem
-        nickname='멤버 닉네임'
-        role='Member'
-        onSetLeader={() => console.log('팀장으로 설정')}
-        onDeleteMember={() => console.log('팀원 삭제')}
-      />
+        <TeamMemberManageModalItem
+          nickname='멤버 닉네임'
+          role='Member'
+          onSetLeader={() => console.log('팀장으로 설정')}
+          onDeleteMember={() => console.log('팀원 삭제')}
+        />
+      </div>
+
+      <Divider />
+
+      <div className={inviteCodeStyle}>
+        <p className={inviteCodeTitleStyle}>팀 과제 초대</p>
+        <div className={inviteCodeItemStyle}>
+          <Input size='modal' placeholder='초대코드' width='100%' />
+          <button className={copyButtonStyle}>복사</button>
+        </div>
+      </div>
     </div>
   );
 };
@@ -32,6 +46,41 @@ export const TeamMemberManageModal = () => {
 const modalContentStyle = css({
   display: 'flex',
   flexDirection: 'column',
+  gap: '1.75rem',
+});
+
+const modalContentItemStyle = css({
+  display: 'flex',
+  flexDirection: 'column',
   gap: '1.5rem',
-  pt: '1.75rem',
+  mt: '1.75rem',
+});
+
+const inviteCodeStyle = css({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '0.75rem',
+});
+
+const inviteCodeItemStyle = css({
+  display: 'flex',
+  alignItems: 'center',
+  gap: '0.75rem',
+  justifyContent: 'space-between',
+});
+
+const inviteCodeTitleStyle = css({
+  textStyle: 'body3.m',
+  color: 'gray.900',
+});
+
+const copyButtonStyle = css({
+  textStyle: 'body3.m',
+  color: 'primary-button-text',
+  bg: 'primary',
+  width: '4.375rem',
+  height: '2.875rem',
+  borderRadius: '0.25rem',
+  textAlign: 'center',
+  cursor: 'pointer',
 });
