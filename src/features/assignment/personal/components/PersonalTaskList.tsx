@@ -19,13 +19,18 @@ export interface PersonalTaskItem {
 interface PersonalTaskListProps {
   taskId: number;
   tasks: PersonalTaskItem[];
+  maxDate?: string | Date;
 }
 
 // Api형태에 맞게 Date형태를 YYYY-MM-DD 문자열로 변환
 const formatDate = (date: Date) => date.toLocaleDateString('en-CA');
 
 // Task 목록
-export const PersonalTaskList = ({ taskId, tasks }: PersonalTaskListProps) => {
+export const PersonalTaskList = ({
+  taskId,
+  tasks,
+  maxDate,
+}: PersonalTaskListProps) => {
   // 세부 task 마감일 변경 훅 호출
   const { mutate: mutateDeadline } = useUpdateSubTaskDeadline(taskId);
   // 세부 task 완료 상태 변경 훅 호출
@@ -101,6 +106,7 @@ export const PersonalTaskList = ({ taskId, tasks }: PersonalTaskListProps) => {
                     value={task.deadline}
                     onChange={handleDeadlineChange(task.id)}
                     muted={isCompleted}
+                    maxDate={maxDate}
                   />
                   {/* 시계 아이콘은 꺼짐으로 시작됨  */}
                   <ClockToggle

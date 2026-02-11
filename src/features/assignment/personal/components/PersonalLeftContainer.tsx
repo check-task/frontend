@@ -8,6 +8,7 @@ import { PersonalTaskList, type PersonalTaskItem } from './PersonalTaskList';
 interface PersonalLeftContainerProps {
   // 헤더 정보
   title: string;
+  deadline: string;
   daysLeft: string;
   completionRate: number;
   taskId: number;
@@ -18,6 +19,7 @@ interface PersonalLeftContainerProps {
 // 페이지 기준 왼쪽 영역 (헤더+ task 목록)
 export const PersonalLeftContainer = ({
   title,
+  deadline,
   daysLeft,
   completionRate,
   taskId,
@@ -37,10 +39,7 @@ export const PersonalLeftContainer = ({
           <h2 className={css({ textStyle: 'h4', color: 'gray.900' })}>
             TASK 목록
           </h2>
-          <PersonalTaskList
-            taskId={taskId}
-            tasks={tasks}
-          />
+          <PersonalTaskList taskId={taskId} tasks={tasks} maxDate={deadline} />
         </div>
       </div>
     </div>
