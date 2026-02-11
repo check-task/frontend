@@ -311,6 +311,27 @@ export interface UpdateSubTaskAssigneeResponse {
 }
 
 // ============================
+// 단일 세부 과제 추가 타입 정의
+// ============================
+export interface CreateSubTaskRequest {
+  title: string;
+  deadline: string; // YYYY-MM-DD
+  isAlarm: boolean;
+}
+
+export interface CreateSubTaskResponse {
+  resultType: 'SUCCESS' | 'FAIL';
+  message: string;
+  data: {
+    subTaskId: number;
+    title: string;
+    deadline: string;
+    status: string;
+    assigneeName: string;
+  };
+}
+
+// ============================
 // 세부 TASK 댓글 생성 타입 정의
 // ============================
 export interface CreateSubTaskCommentRequest {

@@ -1,5 +1,7 @@
 import {
   CompletedTask,
+  CreateSubTaskRequest,
+  CreateSubTaskResponse,
   CreateTaskRequest,
   CreateTaskResponse,
   GetCompletedTaskListResponse,
@@ -180,6 +182,18 @@ export const updateTaskDeadline = async (
   deadline: string,
 ): Promise<void> => {
   await axiosInstance.patch(`/task/${taskId}`, { deadline });
+};
+
+// 단일 세부 과제 추가 api 호출 (POST /task/{taskId}/subTask)
+export const createSubTask = async (
+  taskId: number,
+  body: CreateSubTaskRequest,
+): Promise<CreateSubTaskResponse['data']> => {
+  const res = await axiosInstance.post<CreateSubTaskResponse>(
+    `${TASK_BASE}/${taskId}/subTask`,
+    body,
+  );
+  return res.data?.data ?? { subTaskId: 0, title: '', deadline: '', status: 'PENDING', assigneeName: '' };
 };
 
 // 팀원 초대 링크 생성 api 호출 (POST /task/{taskId}/invitation)

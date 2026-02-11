@@ -23,6 +23,7 @@ import { useCreateSubTaskComment } from './hooks/useCreateSubTaskComment';
 import { useUpdateComment } from './hooks/useUpdateComment';
 import { useDeleteComment } from './hooks/useDeleteComment';
 import { useMyInfo } from '@/hooks/queries/useMyInfo';
+import { AddTaskButton } from './AddTaskButton';
 
 const getCommentId = (
   c: TaskDetailSubTaskComment & { comment_id?: number; id?: number },
@@ -424,6 +425,7 @@ const TeamTaskList = ({ taskId, subTasks = [] }: TeamTaskListProps) => {
             등록된 TASK가 없습니다.
           </div>
         )}
+        <AddTaskButton taskId={taskId} />
       </div>
     </div>
   );
