@@ -5,6 +5,8 @@ import {
   UpdateSubTaskStatusResponse,
   UpdateSubTaskAssigneeRequest,
   UpdateSubTaskAssigneeResponse,
+  CreateSubTaskRequest,
+  CreateSubTaskResponse,
   CreateSubTaskCommentRequest,
   CreateSubTaskCommentResponse,
   UpdateCommentRequest,
@@ -33,6 +35,19 @@ export const updateSubTaskStatus = async (
 ): Promise<UpdateSubTaskStatusResponse> => {
   const res = await axiosInstance.patch<UpdateSubTaskStatusResponse>(
     `/task/subtask/${subTaskId}/status`,
+    body,
+  );
+
+  return res.data;
+};
+
+// 단일 세부 TASK 생성 api 호출
+export const createSubTask = async (
+  taskId: number,
+  body: CreateSubTaskRequest,
+): Promise<CreateSubTaskResponse> => {
+  const res = await axiosInstance.post<CreateSubTaskResponse>(
+    `/task/${taskId}/subTask`,
     body,
   );
 
