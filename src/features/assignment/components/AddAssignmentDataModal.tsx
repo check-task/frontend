@@ -60,15 +60,19 @@ export const AddAssignmentDataModal = ({
   ]);
   const { mutateAsync: createReference } = useCreateReferenceData(taskId ?? 0); // taskId 없으면 0으로 훅만 호출
 
-  const isSaveDisabled = !inputGroups.some(
-    (g) => g.name.trim() || g.path.trim() || g.file,
-  );
+  // 저장 버튼 활성화 조건
+  // 모든 입력 그룹에 값이 있어야 가능
+  const isSaveDisabled =
+    inputGroups.length === 0 ||
+    inputGroups.some((g) => {
+      if (selectedType === 0) {
+        return !g.name.trim() || !g.path.trim();
+      }
+      return !g.name.trim() || !g.file;
+    });
 
   const handleAddInput = () => {
-    setInputGroups((prev) => [
-      ...prev,
-      { id: Date.now(), name: '', path: '' },
-    ]);
+    setInputGroups((prev) => [...prev, { id: Date.now(), name: '', path: '' }]);
   };
 
   const handleInputChange = (
@@ -152,10 +156,7 @@ export const AddAssignmentDataModal = ({
                       id={`file-${group.id}`}
                       className={hiddenFileInputStyle}
                       onChange={(e) =>
-                        handleFileChange(
-                          group.id,
-                          e.target.files?.[0] ?? null,
-                        )
+                        handleFileChange(group.id, e.target.files?.[0] ?? null)
                       }
                     />
                     <Input
@@ -239,8 +240,27 @@ const containerStyle = css({
 const inputContainerStyle = css({
   display: 'flex',
   flexDirection: 'column',
-  width: '100%',
+  width: 'calc(100% + 1.25rem)',
   mt: '1.75rem',
+  maxH: '26rem',
+  overflowY: 'auto',
+  pr: '1rem',
+  scrollbarGutter: 'stable',
+  boxSizing: 'border-box',
+
+  // 스크롤바 스타일 초기화 및 스타일 설정
+  '&::-webkit-scrollbar': {
+    width: '0.25rem',
+  },
+  '&::-webkit-scrollbar-button': {
+    width: 0,
+    height: 0,
+    display: 'none !important',
+  },
+  '&::-webkit-scrollbar-thumb': {
+    background: 'gray.200',
+    borderRadius: '6.25rem',
+  },
 });
 
 // 입력 그룹 한 묶음
