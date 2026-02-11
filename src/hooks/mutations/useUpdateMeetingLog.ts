@@ -31,20 +31,22 @@ export const useUpdateMeetingLog = (taskId: number) => {
     }: UpdateMeetingLogRequest & { logId: number }) =>
       updateMeetingLog(taskId, logId, body),
     onSuccess: (updatedLog) => {
-      if (!updatedLog) return;
-      const mapped = mapMeetingLogItem(updatedLog);
-      queryClient.setQueryData(
-        ['taskDetail', taskId],
-        (prev: { meetingLogs?: TaskMeetingLog[] } | undefined) => {
-          if (!prev?.meetingLogs) return prev;
-          return {
-            ...prev,
-            meetingLogs: prev.meetingLogs.map((log) =>
-              log.logId === mapped.logId ? mapped : log,
-            ),
-          };
-        },
-      );
+      if (updatedLog) {
+        const mapped = mapMeetingLogItem(updatedLog);
+        queryClient.setQueryData(
+          ['taskDetail', taskId],
+          (prev: { meetingLogs?: TaskMeetingLog[] } | undefined) => {
+            if (!prev?.meetingLogs) return prev;
+            return {
+              ...prev,
+              meetingLogs: prev.meetingLogs.map((log) =>
+                log.logId === mapped.logId ? mapped : log,
+              ),
+            };
+          },
+        );
+      }
+      queryClient.invalidateQueries({ queryKey: ['taskDetail', taskId] });
     },
   });
 };
