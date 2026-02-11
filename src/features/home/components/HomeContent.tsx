@@ -19,7 +19,9 @@ const SORT_MAP: Record<SortType, TaskSort> = {
 
 export const HomeContent = () => {
   const [sortType, setSortType] = useState<SortType>('priority');
-  const { data: assignments = [] } = useHomeTaskList(SORT_MAP[sortType]);
+  const { data } = useHomeTaskList(SORT_MAP[sortType]);
+  const assignments = useMemo(() => data?.assignments ?? [], [data]);
+  const subTasks = useMemo(() => data?.subTasks ?? [], [data]);
 
   // 처음에는 모든 폴더가 선택되어 있음
   const allFolderIds = useMemo(
@@ -49,6 +51,7 @@ export const HomeContent = () => {
         <Container.Calendar>
           <Calendar
             assignments={assignments}
+            subTasks={subTasks}
             selectedFolderIds={selectedFolderIds}
           />
         </Container.Calendar>

@@ -28,11 +28,23 @@ export interface Task {
   progressRate: number; // 0 ~ 100
 }
 
+// 과제 목록 내 세부과제 항목
+export interface SubTaskListItem {
+  subTaskId: number;
+  taskId: number;
+  title: string;
+  status: string;
+  deadline: string;
+}
+
 // 과제 목록 조회 응답
 export interface GetTaskListResponse {
   resultType: 'SUCCESS' | 'FAIL';
   message: string;
-  data: Task[];
+  data: {
+    task: Task[];
+    subTask: SubTaskListItem[];
+  };
 }
 
 // ============================
