@@ -9,6 +9,7 @@ import { useClickOutside } from '@/hooks/useClickOutside';
 interface DatePickerProps {
   value?: string | Date;
   onChange?: (date: Date) => void;
+  maxDate?: string | Date;
   muted?: boolean; // 데이트 피커는 공용이니까 불리언으로 처리
 }
 
@@ -22,6 +23,7 @@ const parseDate = (value?: string | Date) => {
 export default function DatePicker({
   value,
   onChange,
+  maxDate,
   muted = false,
 }: DatePickerProps) {
   // ======= 상태 정의 =======
@@ -60,6 +62,8 @@ export default function DatePicker({
       .slice(0, -1);
   };
 
+  const parsedMaxDate = parseDate(maxDate);
+
   return (
     <div ref={pickerRef} className={containerStyle}>
       {/* 캘린더 아이콘 버튼 처리 */}
@@ -74,9 +78,14 @@ export default function DatePicker({
         <CalenderIcon muted={muted} />
       </button>
       <div>
-        <span className={dateTextStyle({ muted })}>
+        <button
+          type='button'
+          className={dateTextStyle({ muted })}
+          // 숫자부분도 클릭시 열리도록
+          onClick={() => setIsOpen(!isOpen)}
+        >
           {formatDate(confirmedDate)}
-        </span>
+        </button>
       </div>
 
       {/* 달력 모달 */}
@@ -85,6 +94,7 @@ export default function DatePicker({
           onClose={() => setIsOpen(false)}
           onSave={handleSave}
           initialDate={confirmedDate}
+          maxDate={parsedMaxDate ?? undefined}
         />
       )}
     </div>
@@ -104,8 +114,14 @@ const containerStyle = css({
 const dateTextStyle = cva({
   base: {
     textStyle: 'body1.r',
-    cursor: 'default',
-    fontVariantNumeric: 'tabular-nums',
+    cursor: 'pointer',
+    fontVariantNumeric: 'normal',
+    display: 'inline-block',
+    width: '5rem',
+    textAlign: 'left',
+    backgroundColor: 'transparent',
+    border: 'none',
+    padding: 0,
   },
   variants: {
     muted: {
