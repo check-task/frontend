@@ -179,5 +179,5 @@ export const updateTaskDeadline = async (
   taskId: number,
   deadline: string,
 ): Promise<void> => {
-  await axiosInstance.patch(`/task/${taskId}`, { deadline });
+  await axiosInstance.patch(`/task/${taskId}/deadline`, { deadline });
 };
