@@ -37,11 +37,7 @@ export const AssignmentCard = ({
   const brightness = getBrightness(index);
 
   return (
-    <Card.Wrapper
-      color={folderColor}
-      brightness={brightness}
-      css={{ width: isSidebarCollapsed ? '27.375rem' : '22.75rem' }}
-    >
+    <Card.Wrapper color={folderColor} brightness={brightness}>
       <Card.AccentBar />
       <Card.Content
         css={{ paddingX: isSidebarCollapsed ? '1.5rem' : '1.25rem' }}
