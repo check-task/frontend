@@ -249,8 +249,17 @@ const modalWrapper = css({
     '&:not(.react-calendar__month-view__days__day--neighboringMonth) abbr': {
       color: 'gray.400 !important',
       opacity: '1 !important', // 브라우저가 흐리게 만드는 것 방지
+      // 취소선 추가
+      textDecoration: 'line-through !important',
+      textDecorationColor: 'gray.400',
+      textDecorationThickness: '1px',
     },
     cursor: 'not-allowed !important',
+    // 비활성화 이면서 이웃한 달
+    '&.react-calendar__month-view__days__day--neighboringMonth abbr': {
+      color: 'gray.400 !important',
+      textDecoration: 'line-through !important',
+    },
   },
 });
 
