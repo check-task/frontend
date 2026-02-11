@@ -8,6 +8,7 @@ import {
   GetTaskListResponse,
   JoinTaskResponse,
   UpdateTaskPrioritiesRequest,
+  SubTaskListItem,
   Task,
   TaskDetail,
   TaskDetailSubTask,
@@ -21,15 +22,18 @@ import axiosInstance from '@/lib/axiosInstance';
 // 여기서는 순수 path('/task')만 사용합니다.
 const TASK_BASE = '/task';
 
-// 과제 목록 조회 api 호출
+// 과제 목록 조회 api 호출 (task + subTask 분리 구조)
 export const getTaskList = async (
   params?: GetTaskListParams,
-): Promise<Task[]> => {
+): Promise<{ task: Task[]; subTask: SubTaskListItem[] }> => {
   const res = await axiosInstance.get<GetTaskListResponse>(TASK_BASE, {
     params,
   });
   const data = res.data?.data;
-  return Array.isArray(data) ? data : [];
+  return {
+    task: data?.task ?? [],
+    subTask: data?.subTask ?? [],
+  };
 };
 
 // 완료 과제 목록 조회 api 호출

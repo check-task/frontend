@@ -4,6 +4,7 @@ import { styled } from 'styled-system/jsx';
 import { hstack, stack } from 'styled-system/patterns';
 import { SortTabs, SortType } from './SortTabs';
 import { AssignmentCardList, Assignment } from './AssignmentCardList';
+import { useUIStore } from '@/stores/ui-store';
 
 interface AssignmentSectionProps {
   assignments: Assignment[];
@@ -16,8 +17,10 @@ export const AssignmentSection = ({
   sortType,
   onSortChange,
 }: AssignmentSectionProps) => {
+  const isSidebarCollapsed = useUIStore((state) => state.isSidebarCollapsed);
+
   return (
-    <Container>
+    <Container css={{ width: isSidebarCollapsed ? '27.375rem' : '22.75rem' }}>
       <Header>
         <Title>과제목록</Title>
         <SortTabs activeTab={sortType} onTabChange={onSortChange} />
@@ -33,7 +36,7 @@ export const AssignmentSection = ({
 const Container = styled('div', {
   base: stack.raw({
     gap: '1.25rem',
-    width: '27.375rem',
+    transition: 'width 0.3s ease',
   }),
 });
 

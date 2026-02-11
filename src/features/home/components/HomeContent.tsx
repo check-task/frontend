@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { styled } from 'styled-system/jsx';
 import { hstack } from 'styled-system/patterns';
 import { FilterChipGroup } from '@/features/home/components/FilterChipGroup';
@@ -19,7 +19,9 @@ const SORT_MAP: Record<SortType, TaskSort> = {
 
 export const HomeContent = () => {
   const [sortType, setSortType] = useState<SortType>('priority');
-  const { data: assignments = [] } = useHomeTaskList(SORT_MAP[sortType]);
+  const { data } = useHomeTaskList(SORT_MAP[sortType]);
+  const assignments = useMemo(() => data?.assignments ?? [], [data]);
+  const subTasks = useMemo(() => data?.subTasks ?? [], [data]);
 
   // 처음에는 모든 폴더가 선택되어 있음
   const allFolderIds = useMemo(
@@ -28,6 +30,11 @@ export const HomeContent = () => {
   );
   const [selectedFolderIds, setSelectedFolderIds] =
     useState<number[]>(allFolderIds);
+
+  // 데이터 로드 후 모든 폴더 기본 선택
+  useEffect(() => {
+    setSelectedFolderIds(allFolderIds);
+  }, [allFolderIds]);
 
   return (
     <>
@@ -44,6 +51,7 @@ export const HomeContent = () => {
         <Container.Calendar>
           <Calendar
             assignments={assignments}
+            subTasks={subTasks}
             selectedFolderIds={selectedFolderIds}
           />
         </Container.Calendar>
