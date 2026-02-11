@@ -91,6 +91,7 @@ export const Calendar = ({
       title: st.title,
       start: st.dueDate,
       backgroundColor: FOLDER_COLOR_MAP[st.folderColor],
+      classNames: ['fc-subtask-event'],
     }));
 
   const filteredEvents = [...taskEvents, ...subTaskEvents];
