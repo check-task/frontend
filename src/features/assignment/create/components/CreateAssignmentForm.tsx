@@ -7,10 +7,7 @@ import { Divider } from '@/components/Divider';
 import { CheckboxHeader } from './CheckboxHeader';
 import { AddAssignmentContent } from './AddAssignmentContent';
 import { AddAssignmentTask, type SubTaskInput } from './AddAssignmentTask';
-import {
-  AddAssignmentData,
-  type DataItem,
-} from './AddAssignmentData';
+import { AddAssignmentData, type DataItem } from './AddAssignmentData';
 import { css } from 'styled-system/css';
 import { useMyInfo } from '@/hooks/queries/useMyInfo';
 import { useCreateTask } from '@/hooks/mutations/useCreateTask';
@@ -108,6 +105,7 @@ export const CreateAssignmentForm = () => {
         <AddAssignmentTask
           subTasks={subTasks}
           onSubTasksChange={setSubTasks}
+          maxDate={deadline}
         />
         <AddAssignmentData
           dataItems={dataItems}
@@ -117,16 +115,18 @@ export const CreateAssignmentForm = () => {
       </div>
 
       {saveError && (
-        <p className={css({ textStyle: 'body3.r', color: 'red.500', mb: '0.5rem' })}>
+        <p
+          className={css({
+            textStyle: 'body3.r',
+            color: 'red.500',
+            mb: '0.5rem',
+          })}
+        >
           {saveError}
         </p>
       )}
       <div className={buttonWrapperStyle}>
-        <Button
-          variant='fillGray'
-          size='xlarge'
-          onClick={handleCancel}
-        >
+        <Button variant='fillGray' size='xlarge' onClick={handleCancel}>
           취소
         </Button>
         <Button
