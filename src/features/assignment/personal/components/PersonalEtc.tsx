@@ -7,6 +7,7 @@ import { AddAssignmentDataModal } from '@/features/assignment/components/AddAssi
 import { AssignmentDataCard } from '@/features/assignment/components/AssignmentDataCard'; // 공용 컴포넌트 임포트
 import { EditAssignmentDataCardModal } from '../../components/EditAssignmentDataCardModal';
 import { ConfirmDeleteAssignmentDataModal } from '../../components/ConfirmDeleteAssginmentDataModal';
+import { useDeleteReferenceData } from '@/hooks/mutations/useDeleteReferenceData';
 import type { ReferenceItem } from './PersonalRightContainer';
 
 interface PersonalEtcProps {
@@ -17,6 +18,7 @@ interface PersonalEtcProps {
 export const PersonalEtc = ({ taskId, items }: PersonalEtcProps) => {
   // close 저장 누를 때 닫으려면 필요
   const { openModal, closeModal } = useModalStore();
+  const { mutate: deleteReference } = useDeleteReferenceData(taskId);
 
   // 자료 모음집 추가 모달 핸들러
   const handleOpenDataModal = () => {
@@ -58,6 +60,7 @@ export const PersonalEtc = ({ taskId, items }: PersonalEtcProps) => {
         <ConfirmDeleteAssignmentDataModal
           highlightText='자료명(파일명.확장자 or URL 경로)'
           onConfirm={() => {
+            deleteReference(item.id);
             closeModal();
           }}
           onCancel={closeModal}
