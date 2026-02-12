@@ -442,7 +442,7 @@ const TeamTaskList = ({
             등록된 TASK가 없습니다.
           </div>
         )}
-        <AddTaskButton taskId={taskId} />
+        <AddTaskButton taskId={taskId} maxDate={maxDate} />
       </div>
     </div>
   );

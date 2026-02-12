@@ -168,6 +168,13 @@ export interface GetTaskDetailResponse {
   data: TaskDetail;
 }
 
+// 과제 삭제 응답
+export interface DeleteTaskResponse {
+  resultType: 'SUCCESS' | 'FAIL';
+  message: string;
+  data: null;
+}
+
 // ============================
 // 과제 생성 타입 정의
 // ============================
@@ -200,7 +207,7 @@ export interface CreateTaskResponse {
 export interface UpdateTaskSubTaskItem {
   title: string;
   endDate: string; // YYYY-MM-DD
-  status: 'PROGRESS' | 'COMPLETE';
+  status: 'PROGRESS' | 'COMPLETED';
   isAlarm: boolean;
   assigneeId: number;
 }
@@ -209,10 +216,12 @@ export interface UpdateTaskRequest {
   title: string;
   deadline: string; // YYYY-MM-DD
   type: TaskType;
-  status?: string;
+  status?: TaskStatus;
   folderId: number;
   subTasks: UpdateTaskSubTaskItem[];
   references: { name: string; url: string }[];
+  fileNames?: string[] | string;
+  files?: File[];
 }
 
 // ============================

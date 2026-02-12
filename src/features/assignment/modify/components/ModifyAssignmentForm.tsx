@@ -1,53 +1,171 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/Button';
 import { Divider } from '@/components/Divider';
 import { CheckboxHeader } from '../../create/components/CheckboxHeader'; // create있는거 그대로 사용
 import { ModifyAssignmentContent } from './ModifyAssignmentContent';
-import { ModifyAssignmentTask } from './ModifyAssignmentTask';
-import { ModifyAssignmentData } from './ModifyAssignmentData';
+import {
+  ModifyAssignmentTask,
+  type ModifyTaskItem,
+} from './ModifyAssignmentTask';
+import {
+  ModifyAssignmentData,
+  type ModifyDataItem,
+} from './ModifyAssignmentData';
 import { css, cva } from 'styled-system/css';
 import { useUIStore } from '@/stores/ui-store';
 import { useModalStore } from '@/stores/modal-store';
 import { ConfirmDeleteAssignmentDataModal } from '../../components/ConfirmDeleteAssginmentDataModal';
-import { sampleAssignments } from '@/constants/sampleAssignments'; // 임시 데이터
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useTeamTaskDetail } from '@/features/assignment/team/components/hooks/useTeamTaskDetail';
+import { resolveFolderColor } from '@/lib/folder-color';
+import { useMyInfo } from '@/hooks/queries/useMyInfo';
+import { useUpdateTask } from '@/hooks/mutations/useUpdateTask';
+import { useDeleteTask } from '@/hooks/mutations/useDeleteTask';
+import type { TaskStatus, TaskType, UpdateTaskRequest } from '@/types/task';
 
-// 더미 데이터에서 red 값으로 받아서 이를 토큰값으로 변환
-// 토큰값으로 변환한건 FolderColor 타입에 맞추기 위해서
-const folderColorTokenMap = {
-  red: 'sub.01.100',
-  yellow: 'sub.02.100',
-  green: 'sub.03.100',
-  purple: 'sub.04.100',
-  black: 'sub.05.100',
-} as const;
+const getFolderIdFromColor = (
+  folderColor: string | undefined,
+  folders: { id: number; color: string }[],
+): number | null => {
+  if (!folderColor) return null;
+  const normalized = folderColor.startsWith('#')
+    ? resolveFolderColor(folderColor)
+    : folderColor;
+  if (!normalized) return null;
+  return folders.find((folder) => folder.color === normalized)?.id ?? null;
+};
 
 // 과제 수정 전체 컴포넌트
 export const ModifyAssignmentForm = () => {
   // 사이드바 상태 가져오기
+  const router = useRouter();
   const isSidebarCollapsed = useUIStore((state) => state.isSidebarCollapsed);
   const { openModal, closeModal } = useModalStore();
-
-  // 더미데이터에서 임시로 첫번째 데이터 불러오기
-  const defaultAssignment = sampleAssignments[0];
+  const searchParams = useSearchParams();
+  const taskId = Number(searchParams?.get('taskId'));
+  const { data } = useTeamTaskDetail(taskId);
+  const { data: myInfo } = useMyInfo();
+  const folders = myInfo?.folders ?? [];
+  const initializedTaskIdRef = useRef<number | null>(null);
+  const updateTaskId = Number.isFinite(taskId) ? taskId : 0;
+  const { mutateAsync: updateTask, isPending } = useUpdateTask(updateTaskId);
+  const { mutateAsync: deleteTask } = useDeleteTask(updateTaskId);
 
   // 과제 수정 페이지이므로 기본값 세팅
-  const [assignmentName, setAssignmentName] = useState(
-    defaultAssignment?.assignmentName ?? '',
-  );
-  const [folderColor, setFolderColor] = useState(
-    defaultAssignment?.folderColor
-      ? folderColorTokenMap[defaultAssignment.folderColor] //
-      : '',
-  );
-  const [dueDate, setDueDate] = useState<Date | null>(
-    defaultAssignment?.dueDate
-      ? new Date(`${defaultAssignment.dueDate}T00:00:00`)
-      : null,
-  );
+  const [assignmentName, setAssignmentName] = useState('');
+  const [selectedFolderId, setSelectedFolderId] = useState<number | null>(null);
+  const [dueDate, setDueDate] = useState<Date | null>(null);
+  const [tasks, setTasks] = useState<ModifyTaskItem[]>([]);
+  const [dataItems, setDataItems] = useState<ModifyDataItem[]>([]);
+  const [isTeamProject, setIsTeamProject] = useState(false);
 
-  const isFormValid = assignmentName.trim() !== '' && folderColor !== '';
+  useEffect(() => {
+    if (!data?.taskId || initializedTaskIdRef.current === data.taskId) return;
+    if (data.folderId == null && folders.length === 0) return;
+    const resolvedFolderId =
+      data.folderId ?? getFolderIdFromColor(data.foldercolor, folders);
+    setAssignmentName(data.title ?? '');
+    setSelectedFolderId(resolvedFolderId);
+    setDueDate(data.deadline ? new Date(`${data.deadline}T00:00:00`) : null);
+    setIsTeamProject(data.type === 'TEAM');
+    initializedTaskIdRef.current = data.taskId;
+  }, [data, folders]);
+
+  const initialTasks = data?.subTasks?.map((task) => ({
+    id: task.subTaskId,
+    title: task.title,
+    dueDate: task.deadline,
+    status: task.status,
+    isAlarm: task.isAlarm,
+    assigneeId: task.assigneeId ?? 0,
+  }));
+
+  const initialDataItems = data?.references?.map((ref, index) => ({
+    id: ref.referenceId ?? index + 1,
+    type: (ref.file_url ? 1 : 0) as 0 | 1,
+    name: ref.name,
+    path: ref.url ?? ref.file_url ?? '',
+  }));
+
+  const isFormValid = assignmentName.trim() !== '' && selectedFolderId != null;
+
+  const toYYYYMMDD = (d: Date) => {
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+  };
+
+  const ensureStatus = (status?: TaskStatus): TaskStatus =>
+    status === 'COMPLETED' ? 'COMPLETED' : 'PROGRESS';
+
+  const handleCancel = () => {
+    if (!Number.isFinite(taskId) || taskId <= 0) {
+      router.push('/assignment');
+      return;
+    }
+
+    const isTeam = data?.type ? data.type === 'TEAM' : isTeamProject;
+    const detailType = isTeam ? 'team' : 'personal';
+    router.push(`/assignment/${detailType}/${taskId}`);
+  };
+
+  const handleSave = async () => {
+    if (!isFormValid || dueDate == null || selectedFolderId == null) return;
+    const type: TaskType = isTeamProject ? 'TEAM' : 'PERSONAL';
+    const mergeReferences = (
+      items: Array<{ name: string; url: string }>,
+    ): Array<{ name: string; url: string }> => {
+      const merged = new Map<string, { name: string; url: string }>();
+      items.forEach((item) => {
+        const key = `${item.name.trim()}|${item.url.trim()}`;
+        merged.set(key, { name: item.name.trim(), url: item.url.trim() });
+      });
+      return Array.from(merged.values()).filter((item) => item.url !== '');
+    };
+
+    const localUrlRefs = dataItems
+      .filter((item) => item.type === 0)
+      .map((item) => ({ name: item.name, url: item.path }));
+
+    const existingFileRefs = dataItems
+      .filter((item) => item.type === 1 && item.id > 0)
+      .map((item) => ({ name: item.name, url: item.path }));
+
+    const references = mergeReferences([...existingFileRefs, ...localUrlRefs]);
+
+    const newFileItems = dataItems.filter(
+      (item) => item.type === 1 && item.id < 0 && item.file,
+    );
+
+    const payload: UpdateTaskRequest = {
+      title: assignmentName.trim(),
+      deadline: toYYYYMMDD(dueDate),
+      type,
+      status: ensureStatus(data?.status),
+      folderId: selectedFolderId,
+      subTasks: tasks
+        .filter((task) => task.title.trim() !== '')
+        .map((task) => ({
+          title: task.title.trim(),
+          endDate: task.dueDate ?? '',
+          status: ensureStatus(task.status),
+          isAlarm: task.isAlarm ?? false,
+          assigneeId: task.assigneeId ?? 0,
+        })),
+      references,
+      fileNames: newFileItems.map((item) => item.name),
+      files: newFileItems
+        .map((item) => item.file)
+        .filter((file): file is File => Boolean(file)),
+    };
+
+    await updateTask(payload);
+    const detailType = type === 'TEAM' ? 'team' : 'personal';
+    router.push(`/assignment/${detailType}/${taskId}`);
+  };
 
   // 과제 삭제 모달 핸들러
   const handleOpenDeleteAssignmentModal = () => {
@@ -57,8 +175,12 @@ export const ModifyAssignmentForm = () => {
       content: (
         <ConfirmDeleteAssignmentDataModal
           highlightText={assignmentName || '과제'}
-          onConfirm={() => {
+          onConfirm={async () => {
+            if (updateTaskId > 0) {
+              await deleteTask();
+            }
             closeModal();
+            router.push('/assignment');
           }}
           onCancel={closeModal}
         />
@@ -74,7 +196,10 @@ export const ModifyAssignmentForm = () => {
           과제 수정
         </h1>
         {/* create->component에 있는걸로 사용 */}
-        <CheckboxHeader />
+        <CheckboxHeader
+          isTeamProject={isTeamProject}
+          onTeamProjectChange={setIsTeamProject}
+        />
       </div>
 
       <Divider mt='1.75rem' mb='1.75rem' />
@@ -83,10 +208,11 @@ export const ModifyAssignmentForm = () => {
       {/* 과제 수정에서는 기본 입력값을 불러오기 위해 이름, 색상, 마감일 전달 */}
       <ModifyAssignmentContent
         name={assignmentName}
-        color={folderColor}
+        folders={folders}
+        selectedFolderId={selectedFolderId}
         date={dueDate}
         onNameChange={setAssignmentName}
-        onColorChange={setFolderColor}
+        onFolderChange={setSelectedFolderId}
         onDateChange={setDueDate}
       />
 
@@ -95,9 +221,18 @@ export const ModifyAssignmentForm = () => {
       {/* TASK, 자료 */}
       <div className={taskDataWrapperStyle}>
         {/* TASK 추가 */}
-        <ModifyAssignmentTask />
+        <ModifyAssignmentTask
+          taskId={data?.taskId ?? taskId}
+          initialTasks={initialTasks}
+          onTasksChange={setTasks}
+          maxDate={dueDate}
+        />
         {/* 자료 추가 */}
-        <ModifyAssignmentData />
+        <ModifyAssignmentData
+          taskId={data?.taskId ?? taskId}
+          initialItems={initialDataItems}
+          onItemsChange={setDataItems}
+        />
       </div>
 
       {/* 과제 삭제 버튼 추가 및 모달 연결 */}
@@ -115,6 +250,7 @@ export const ModifyAssignmentForm = () => {
           variant='fillGray'
           size={isSidebarCollapsed ? 'xlarge' : 'medium'}
           className={buttonSizeTransitionStyle}
+          onClick={handleCancel}
         >
           취소
         </Button>
@@ -122,7 +258,8 @@ export const ModifyAssignmentForm = () => {
           variant='fillBlue'
           size={isSidebarCollapsed ? 'xlarge' : 'medium'}
           className={buttonSizeTransitionStyle}
-          disabled={!isFormValid}
+          disabled={!isFormValid || isPending}
+          onClick={handleSave}
         >
           저장
         </Button>

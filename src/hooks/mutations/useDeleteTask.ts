@@ -1,16 +1,15 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { updateTask } from '@/services/task';
-import type { UpdateTaskRequest } from '@/types/task';
+import { deleteTask } from '@/services/task';
 
-export const useUpdateTask = (taskId: number) => {
+export const useDeleteTask = (taskId: number) => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (body: UpdateTaskRequest) => updateTask(taskId, body),
+    mutationFn: () => deleteTask(taskId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['taskDetail', taskId] });
       queryClient.invalidateQueries({ queryKey: ['taskList'], exact: false });
       queryClient.invalidateQueries({ queryKey: ['completedTaskList'] });
+      queryClient.invalidateQueries({ queryKey: ['taskDetail', taskId] });
     },
   });
 };

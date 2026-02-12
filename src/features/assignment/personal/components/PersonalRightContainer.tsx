@@ -24,8 +24,8 @@ export const PersonalRightContainer = ({
 }: PersonalRightContainerProps) => {
   return (
     <div className={containerStyle}>
-      {/* 추후 링크로 과제 수정 페이지 연결 */}
-      <Link href='/assignment/modify'>
+      {/* 과제 수정에서 해당 과제를 조회하기 위해 taskId 전달 */}
+      <Link href={`/assignment/modify?taskId=${taskId}`}>
         <Button variant='strokeBlue' size='small'>
           과제수정
         </Button>

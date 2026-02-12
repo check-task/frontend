@@ -18,12 +18,23 @@ const toYYYYMMDD = (d: Date): string => {
 
 interface AddTaskButtonProps {
   taskId: number;
+  maxDate?: string | Date;
 }
 
-export const AddTaskButton = ({ taskId }: AddTaskButtonProps) => {
+const getDefaultDeadline = (maxDate?: string | Date): Date => {
+  const today = new Date();
+  if (!maxDate) return today;
+  const max = typeof maxDate === 'string' ? new Date(maxDate) : maxDate;
+  if (Number.isNaN(max.getTime())) return today;
+  return today > max ? max : today;
+};
+
+export const AddTaskButton = ({ taskId, maxDate }: AddTaskButtonProps) => {
   const [isInputVisible, setIsInputVisible] = useState(false);
   const [value, setValue] = useState('');
-  const [deadline, setDeadline] = useState<Date>(() => new Date());
+  const [deadline, setDeadline] = useState<Date>(() =>
+    getDefaultDeadline(maxDate),
+  );
   const [saveError, setSaveError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const { mutate: createSubTask, isPending } = useCreateSubTask(taskId);
@@ -37,7 +48,7 @@ export const AddTaskButton = ({ taskId }: AddTaskButtonProps) => {
   const closeAndClear = () => {
     setIsInputVisible(false);
     setValue('');
-    setDeadline(new Date());
+    setDeadline(getDefaultDeadline(maxDate));
     setSaveError(null);
   };
 
@@ -57,8 +68,12 @@ export const AddTaskButton = ({ taskId }: AddTaskButtonProps) => {
       {
         onSuccess: closeAndClear,
         onError: (err: Error) => {
-          const ax = err as unknown as { response?: { data?: { reason?: string } } };
-          setSaveError(ax?.response?.data?.reason ?? '세부과제 추가에 실패했습니다.');
+          const ax = err as unknown as {
+            response?: { data?: { reason?: string } };
+          };
+          setSaveError(
+            ax?.response?.data?.reason ?? '세부과제 추가에 실패했습니다.',
+          );
         },
       },
     );
@@ -83,13 +98,12 @@ export const AddTaskButton = ({ taskId }: AddTaskButtonProps) => {
           <DatePicker
             value={deadline}
             onChange={(d) => setDeadline(d)}
+            maxDate={maxDate}
           />
         </div>
 
         <div className={buttonGroupStyle}>
-          {saveError && (
-            <p className={errorTextStyle}>{saveError}</p>
-          )}
+          {saveError && <p className={errorTextStyle}>{saveError}</p>}
           <div className={buttonContainerStyle}>
             <button
               type='button'
@@ -121,6 +135,7 @@ export const AddTaskButton = ({ taskId }: AddTaskButtonProps) => {
       className={addTaskButtonStyle}
       onClick={() => {
         setSaveError(null);
+        setDeadline(getDefaultDeadline(maxDate));
         setIsInputVisible(true);
       }}
     >

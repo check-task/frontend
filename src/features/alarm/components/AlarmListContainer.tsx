@@ -133,7 +133,7 @@ export const AlarmListContainer = () => {
 
       {/* 알림 카드 리스트 */}
       {isLoading ? (
-        <div className={css({ textAlign: 'center' })}>불러오는 중...</div>
+        <div className={css({ textAlign: 'center' })}>불러오는 중입니다.</div>
       ) : visibleAlarms.length === 0 ? (
         <div className={css({ textAlign: 'center' })}>알림이 없습니다.</div>
       ) : (
@@ -149,7 +149,13 @@ export const AlarmListContainer = () => {
         </div>
       )}
       <div ref={loadMoreRef} />
-      {isFetchingNextPage && <div>불러오는 중...</div>}
+      {isFetchingNextPage && (
+        <div
+          className={css({ textAlign: 'center', pt: '2rem', width: '100%' })}
+        >
+          불러오는 중입니다.
+        </div>
+      )}
     </div>
   );
 };
@@ -159,6 +165,7 @@ const containerStyle = cva({
   base: {
     display: 'flex',
     flexDirection: 'column',
+    color: 'gray.400',
     marginX: 'auto',
     marginY: '3.25rem',
     transition: 'width 0.3s ease-in-out',

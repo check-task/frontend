@@ -23,7 +23,7 @@ export const AddAssignmentTask = ({
   maxDate,
 }: AddAssignmentTaskProps) => {
   const handleAddTask = () => {
-    const defaultEndDate = maxDate ?? new Date();
+    const defaultEndDate = new Date();
     onSubTasksChange([
       ...subTasks,
       {
