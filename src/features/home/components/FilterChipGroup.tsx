@@ -1,5 +1,6 @@
 'use client';
 
+import { useMemo } from 'react';
 import { styled } from 'styled-system/jsx';
 import { hstack } from 'styled-system/patterns';
 import { FolderColor } from '@/types/folder';
@@ -21,8 +22,17 @@ export const FilterChipGroup = ({
   selectedIds,
   onSelectionChange,
 }: FilterChipGroupProps) => {
-  // 중복 폴더 칩 방지
-  const renderedFolderIds = new Set<number>();
+  // 중복 제거 + folderId 기준 고정 순서 정렬
+  const folders = useMemo(() => {
+    const seen = new Set<number>();
+    return assignments
+      .filter((a) => {
+        if (seen.has(a.folderId)) return false;
+        seen.add(a.folderId);
+        return true;
+      })
+      .sort((a, b) => a.folderId - b.folderId);
+  }, [assignments]);
 
   // 폴더 선택/해제 토글
   const toggleFolder = (folderId: number) => {
@@ -34,20 +44,16 @@ export const FilterChipGroup = ({
 
   return (
     <Container>
-      {assignments.map((assignment) => {
-        if (renderedFolderIds.has(assignment.folderId)) return null;
-        renderedFolderIds.add(assignment.folderId);
-        return (
-          <FilterChip
-            key={assignment.folderId}
-            color={assignment.folderColor}
-            active={selectedIds.includes(assignment.folderId)}
-            onClick={() => toggleFolder(assignment.folderId)}
-          >
-            {assignment.folderName}
-          </FilterChip>
-        );
-      })}
+      {folders.map((folder) => (
+        <FilterChip
+          key={folder.folderId}
+          color={folder.folderColor}
+          active={selectedIds.includes(folder.folderId)}
+          onClick={() => toggleFolder(folder.folderId)}
+        >
+          {folder.folderName}
+        </FilterChip>
+      ))}
     </Container>
   );
 };
