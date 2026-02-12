@@ -1,6 +1,5 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import { PlusButton } from '@/components/PlusButton';
 import { css } from 'styled-system/css';
 import { useModalStore } from '@/stores/modal-store';
@@ -18,11 +17,6 @@ interface PersonalEtcProps {
 export const PersonalEtc = ({ taskId, items }: PersonalEtcProps) => {
   // close 저장 누를 때 닫으려면 필요
   const { openModal, closeModal } = useModalStore();
-  const [dataItems, setDataItems] = useState<ReferenceItem[]>(items);
-
-  useEffect(() => {
-    setDataItems(items);
-  }, [items]);
 
   // 자료 모음집 추가 모달 핸들러
   const handleOpenDataModal = () => {
@@ -32,7 +26,6 @@ export const PersonalEtc = ({ taskId, items }: PersonalEtcProps) => {
         <AddAssignmentDataModal
           taskId={taskId}
           onSave={(items) => {
-            setDataItems(items);
             closeModal();
           }}
         />
@@ -49,12 +42,6 @@ export const PersonalEtc = ({ taskId, items }: PersonalEtcProps) => {
           type={item.type} // 타입 전달 0,1 형태에 따라 문구 다르게
           defaultValue={{ name: item.name, path: item.path }} // 이미 작성되어 있던 기본값
           onSave={(updated) => {
-            setDataItems((prev) =>
-              prev.map((data) =>
-                // 수정된 id이면 기존값은 그대로에 업데이트 된 내용만 덮어씀
-                data.id === item.id ? { ...data, ...updated } : data,
-              ),
-            );
             closeModal();
           }}
         />
@@ -71,7 +58,6 @@ export const PersonalEtc = ({ taskId, items }: PersonalEtcProps) => {
         <ConfirmDeleteAssignmentDataModal
           highlightText='자료명(파일명.확장자 or URL 경로)'
           onConfirm={() => {
-            setDataItems((prev) => prev.filter((data) => data.id !== item.id));
             closeModal();
           }}
           onCancel={closeModal}
@@ -88,7 +74,7 @@ export const PersonalEtc = ({ taskId, items }: PersonalEtcProps) => {
       </div>
 
       <div className={etcCardContainerStyle}>
-        {dataItems.map((item) => (
+        {items.map((item) => (
           <AssignmentDataCard
             key={item.id}
             name={item.name}
