@@ -39,6 +39,8 @@ export const EditAssignmentDataCardModal = ({
   // 파일명이랑 경로 기본값으로 설정
   const [name, setName] = useState(defaultValue.name);
   const [path, setPath] = useState(defaultValue.path);
+  // input값이 기본값과 다른지 확인
+  const isDirty = name !== defaultValue.name || path !== defaultValue.path;
 
   const text = MODAL_TEXT[type];
 
@@ -68,6 +70,7 @@ export const EditAssignmentDataCardModal = ({
         variant='fillBlue'
         size='xlarge'
         onClick={() => onSave({ name, path })}
+        disabled={!isDirty}
       >
         변경사항 저장
       </Button>

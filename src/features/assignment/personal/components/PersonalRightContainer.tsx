@@ -30,7 +30,7 @@ export const PersonalRightContainer = ({
           과제수정
         </Button>
       </Link>
-      <PersonalEtc items={items} />
+      <PersonalEtc taskId={taskId} items={items} />
     </div>
   );
 };

@@ -7,6 +7,7 @@ import { useUpdateSubTaskDeadline } from './hooks/useUpdateSubTaskDeadline';
 import { useUpdateSubTaskStatus } from './hooks/useUpdateSubTaskStatus';
 import { useUpdateSubTaskAlarm } from './hooks/useUpdateSubTaskAlarm';
 import { SubTaskStatus } from '@/types/task';
+import { TaskAddForm } from '@/features/assignment/components/TaskAddForm';
 
 export interface PersonalTaskItem {
   id: number;
@@ -19,13 +20,18 @@ export interface PersonalTaskItem {
 interface PersonalTaskListProps {
   taskId: number;
   tasks: PersonalTaskItem[];
+  maxDate?: string | Date;
 }
 
 // Api형태에 맞게 Date형태를 YYYY-MM-DD 문자열로 변환
 const formatDate = (date: Date) => date.toLocaleDateString('en-CA');
 
 // Task 목록
-export const PersonalTaskList = ({ taskId, tasks }: PersonalTaskListProps) => {
+export const PersonalTaskList = ({
+  taskId,
+  tasks,
+  maxDate,
+}: PersonalTaskListProps) => {
   // 세부 task 마감일 변경 훅 호출
   const { mutate: mutateDeadline } = useUpdateSubTaskDeadline(taskId);
   // 세부 task 완료 상태 변경 훅 호출
@@ -57,63 +63,69 @@ export const PersonalTaskList = ({ taskId, tasks }: PersonalTaskListProps) => {
 
   return (
     <div className={PersonalTaskListContainerStyle}>
-      <div className={PersonalTaskListStyle}>
-        {tasks.map((task) => {
-          const isLongTitle = task.title.length >= 23;
-          // 완료 여부를 UI에서 사용하기 위함
-          // 리스트 한줄을 기준으로 처리하려 했는데 아이콘 부분이 처리가 안되어서  개별 요소로 보냄
-          const isCompleted = task.status === 'COMPLETED';
+      {tasks.length === 0 ? (
+        <div className={emptyStateStyle}>등록된 task가 없습니다.</div>
+      ) : (
+        <div className={PersonalTaskListStyle}>
+          {tasks.map((task) => {
+            const isLongTitle = task.title.length >= 23;
+            // 완료 여부를 UI에서 사용하기 위함
+            // 리스트 한줄을 기준으로 처리하려 했는데 아이콘 부분이 처리가 안되어서  개별 요소로 보냄
+            const isCompleted = task.status === 'COMPLETED';
 
-          return (
-            <div key={task.id} className={PersonalTaskItemContainerStyle}>
-              {/* 왼쪽: 체크박스 + 제목 */}
-              <div
-                className={PersonalTaskItemLeftStyle({
-                  align: isLongTitle ? 'top' : 'center',
-                })}
-              >
+            return (
+              <div key={task.id} className={PersonalTaskItemContainerStyle}>
+                {/* 왼쪽: 체크박스 + 제목 */}
                 <div
-                  className={checkboxWrapperStyle({
+                  className={PersonalTaskItemLeftStyle({
                     align: isLongTitle ? 'top' : 'center',
                   })}
                 >
-                  <Checkbox
-                    checked={isCompleted}
-                    variant='black'
-                    onChange={(event) =>
-                      handleStatusChange(task.id, event.target.checked)
-                    }
-                  />
+                  <div
+                    className={checkboxWrapperStyle({
+                      align: isLongTitle ? 'top' : 'center',
+                    })}
+                  >
+                    <Checkbox
+                      checked={isCompleted}
+                      variant='black'
+                      onChange={(event) =>
+                        handleStatusChange(task.id, event.target.checked)
+                      }
+                    />
+                  </div>
+                  <p className={taskTextStyle({ completed: isCompleted })}>
+                    {task.title}
+                  </p>
                 </div>
-                <p className={taskTextStyle({ completed: isCompleted })}>
-                  {task.title}
-                </p>
-              </div>
 
-              {/* 오른쪽: 달력 + 시계토글 */}
-              <div
-                className={teamTaskItemRightStyle({
-                  align: isLongTitle ? 'top' : 'center',
-                })}
-              >
-                <div className={rightContentWrapperStyle}>
-                  <DatePicker
-                    value={task.deadline}
-                    onChange={handleDeadlineChange(task.id)}
-                    muted={isCompleted}
-                  />
-                  {/* 시계 아이콘은 꺼짐으로 시작됨  */}
-                  <ClockToggle
-                    muted={isCompleted}
-                    isOn={alarmStateMap[task.id] ?? task.isAlarm}
-                    onToggle={handleAlarmToggle(task.id)}
-                  />
+                {/* 오른쪽: 달력 + 시계토글 */}
+                <div
+                  className={teamTaskItemRightStyle({
+                    align: isLongTitle ? 'top' : 'center',
+                  })}
+                >
+                  <div className={rightContentWrapperStyle}>
+                    <DatePicker
+                      value={task.deadline}
+                      onChange={handleDeadlineChange(task.id)}
+                      muted={isCompleted}
+                      maxDate={maxDate}
+                    />
+                    {/* 시계 아이콘은 꺼짐으로 시작됨  */}
+                    <ClockToggle
+                      muted={isCompleted}
+                      isOn={alarmStateMap[task.id] ?? task.isAlarm}
+                      onToggle={handleAlarmToggle(task.id)}
+                    />
+                  </div>
                 </div>
               </div>
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
+      )}
+      <TaskAddForm taskId={taskId} maxDate={maxDate} />
     </div>
   );
 };
@@ -137,10 +149,15 @@ const PersonalTaskListStyle = css({
   gap: '1.75rem', // 각 리스트 사이 간격
 });
 
+// 리스트 비어 있을 때 문구 스타일
+const emptyStateStyle = css({
+  textStyle: 'body3.r',
+  color: 'gray.500',
+});
+
 // 각 리스트를 왼쪽 오른쪽으로 구분
 const PersonalTaskItemContainerStyle = css({
   display: 'flex',
-  // alignItems: 'center',
   justifyContent: 'space-between',
 });
 

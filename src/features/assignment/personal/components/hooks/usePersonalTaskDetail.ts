@@ -8,8 +8,10 @@ import type { ReferenceItem } from '@/features/assignment/personal/components/Pe
 export interface PersonalTaskDetailView {
   taskId: number; // 세부 과제 수정을 위해 추가
   title: string;
+  deadline: string;
   dDay: string;
   progressRate: number;
+  folderColorHex?: string;
   tasks: PersonalTaskItem[];
   items: ReferenceItem[];
 }
@@ -17,7 +19,7 @@ export interface PersonalTaskDetailView {
 const mapToPersonalView = (data: TaskDetail): PersonalTaskDetailView => {
   // 자료 모음집 항목에 맞게 매핑
   const items: ReferenceItem[] = data.references.map((ref, index) => ({
-    id: index + 1,
+    id: ref.referenceId ?? index + 1,
     type: 0,
     name: ref.name,
     // URL 자료면 url, 파일 자료면 file_url 사용 (null 방지)
@@ -36,8 +38,10 @@ const mapToPersonalView = (data: TaskDetail): PersonalTaskDetailView => {
   return {
     taskId: data.taskId,
     title: data.title,
+    deadline: data.deadline,
     dDay: data.dDay,
     progressRate: data.progressRate,
+    folderColorHex: data.foldercolor,
     tasks,
     items,
   };

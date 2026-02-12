@@ -14,19 +14,22 @@ export interface SubTaskInput {
 interface AddAssignmentTaskProps {
   subTasks: SubTaskInput[];
   onSubTasksChange: (subTasks: SubTaskInput[]) => void;
+  maxDate?: Date | null;
 }
 
 export const AddAssignmentTask = ({
   subTasks,
   onSubTasksChange,
+  maxDate,
 }: AddAssignmentTaskProps) => {
   const handleAddTask = () => {
+    const defaultEndDate = maxDate ?? new Date();
     onSubTasksChange([
       ...subTasks,
       {
         id: Date.now(),
         title: '',
-        endDate: new Date(),
+        endDate: defaultEndDate,
       },
     ]);
   };
@@ -37,11 +40,7 @@ export const AddAssignmentTask = ({
     value: string | Date,
   ) => {
     onSubTasksChange(
-      subTasks.map((t) =>
-        t.id === id
-          ? { ...t, [field]: value }
-          : t,
-      ),
+      subTasks.map((t) => (t.id === id ? { ...t, [field]: value } : t)),
     );
   };
 
@@ -77,6 +76,7 @@ export const AddAssignmentTask = ({
             <DatePicker
               value={task.endDate}
               onChange={(d) => handleUpdate(task.id, 'endDate', d)}
+              maxDate={maxDate ?? undefined}
             />
           </div>
         ))}

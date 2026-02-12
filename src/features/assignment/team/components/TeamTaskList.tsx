@@ -33,9 +33,14 @@ const getCommentId = (
 interface TeamTaskListProps {
   taskId: number;
   subTasks?: TaskDetailSubTask[];
+  maxDate?: string | Date;
 }
 
-const TeamTaskList = ({ taskId, subTasks = [] }: TeamTaskListProps) => {
+const TeamTaskList = ({
+  taskId,
+  subTasks = [],
+  maxDate,
+}: TeamTaskListProps) => {
   const [openComments, setOpenComments] = useState<{ [key: number]: boolean }>(
     {},
   );
@@ -259,6 +264,7 @@ const TeamTaskList = ({ taskId, subTasks = [] }: TeamTaskListProps) => {
                           handleDeadlineChange(task.subTaskId, date)
                         }
                         muted={isCompleted}
+                        maxDate={maxDate}
                       />
                       <ClockToggle
                         muted={isCompleted}

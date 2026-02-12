@@ -14,12 +14,15 @@ interface CalenderModalProps {
   onSave: (date: Date) => void;
   // 초기 날짜를 받기 위함
   initialDate: Date;
+  // 세부 목록 날짜 선택시 이후 날짜 제한을 위해 추가
+  maxDate?: Date;
 }
 
 export default function CalendarModal({
   onClose,
   onSave,
   initialDate,
+  maxDate,
 }: CalenderModalProps) {
   // 선택된 날짜
   const [selectedDate, setSelectedDate] = useState<Date | null>(initialDate);
@@ -38,6 +41,7 @@ export default function CalendarModal({
         calendarType='gregory'
         onChange={handleDateChange}
         value={selectedDate}
+        maxDate={maxDate}
         maxDetail='month' // 달 뷰로 고정
         minDetail='month'
         nextLabel={<DatepickerNextIcon />}
@@ -206,6 +210,8 @@ const modalWrapper = css({
       width: '2.40388rem !important ',
       height: '2.40388rem !important',
       borderRadius: '50% !important',
+      transition:
+        'background-color 0.2s ease, color 0.2s ease, opacity 0.2s ease',
     },
 
     // 기본 주말 빨강색 없애기
@@ -220,17 +226,39 @@ const modalWrapper = css({
     '& abbr': {
       bg: 'primary !important',
       color: 'bg !important',
+      // 디졸브 느낌 나도록
+      animationName: 'fade-in',
+      animationDuration: '0.5s',
+      animationTimingFunction: 'ease',
     },
   },
 
   // 이웃한 달 날짜들
+  // gray.600 으로 수정
   '& .react-calendar__month-view__days__day--neighboringMonth': {
-    color: 'gray.400 !important',
-    opacity: 0.38,
+    color: 'gray.600 !important',
 
     // 이웃한 달이면 주말도 연하게 (중첩)
     '&.react-calendar__month-view__days__day--weekend': {
+      color: 'gray.600 !important',
+    },
+  },
+
+  // 마감일 이후 날짜 비활성화
+  '& .react-calendar__tile:disabled': {
+    '&:not(.react-calendar__month-view__days__day--neighboringMonth) abbr': {
       color: 'gray.400 !important',
+      opacity: '1 !important', // 브라우저가 흐리게 만드는 것 방지
+      // 취소선 추가
+      textDecoration: 'line-through !important',
+      textDecorationColor: 'gray.400',
+      textDecorationThickness: '1px',
+    },
+    cursor: 'not-allowed !important',
+    // 비활성화 이면서 이웃한 달
+    '&.react-calendar__month-view__days__day--neighboringMonth abbr': {
+      color: 'gray.400 !important',
+      textDecoration: 'line-through !important',
     },
   },
 });
