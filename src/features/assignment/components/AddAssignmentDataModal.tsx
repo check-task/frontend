@@ -240,27 +240,27 @@ const containerStyle = css({
 const inputContainerStyle = css({
   display: 'flex',
   flexDirection: 'column',
-  width: 'calc(100% + 1.25rem)',
-  mt: '1.75rem',
-  maxH: '26rem',
-  overflowY: 'auto',
-  pr: '1rem',
-  scrollbarGutter: 'stable',
-  boxSizing: 'border-box',
+  // width: 'calc(100% + 1.25rem)',
+  // mt: '1.75rem',
+  // maxH: '26rem',
+  // overflowY: 'auto',
+  // pr: '1rem',
+  // scrollbarGutter: 'stable',
+  // boxSizing: 'border-box',
 
   // 스크롤바 스타일 초기화 및 스타일 설정
-  '&::-webkit-scrollbar': {
-    width: '0.25rem',
-  },
-  '&::-webkit-scrollbar-button': {
-    width: 0,
-    height: 0,
-    display: 'none !important',
-  },
-  '&::-webkit-scrollbar-thumb': {
-    background: 'gray.200',
-    borderRadius: '6.25rem',
-  },
+  // '&::-webkit-scrollbar': {
+  //   width: '0.25rem',
+  // },
+  // '&::-webkit-scrollbar-button': {
+  //   width: 0,
+  //   height: 0,
+  //   display: 'none !important',
+  // },
+  // '&::-webkit-scrollbar-thumb': {
+  //   background: 'gray.200',
+  //   borderRadius: '6.25rem',
+  // },
 });
 
 // 입력 그룹 한 묶음

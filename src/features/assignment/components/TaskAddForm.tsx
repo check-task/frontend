@@ -7,7 +7,7 @@ import { Input } from '@/components/TextField';
 import { CheckMark } from '@/components/icons/CheckMark';
 import { CloseIcon } from '@/components/icons/CloseIcon';
 import DatePicker from '@/components/DatePicker';
-import { useCreateSubTask } from '@/features/assignment/personal/components/hooks/useCreateSubTask';
+// import { useCreateSubTask } from '@/features/assignment/personal/components/hooks/useCreateSubTask';
 
 interface TaskAddFormProps {
   taskId: number;
@@ -24,7 +24,7 @@ export const TaskAddForm = ({ taskId, maxDate }: TaskAddFormProps) => {
   // 선택된 날짜 상태 추가
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   // 세부과제 생성 훅 호출
-  const { mutate: createSubTask } = useCreateSubTask(taskId);
+  // const { mutate: createSubTask } = useCreateSubTask(taskId);
 
   const handleAddTask = () => setIsAdding(true);
   const handleCancelTask = () => {
@@ -39,20 +39,20 @@ export const TaskAddForm = ({ taskId, maxDate }: TaskAddFormProps) => {
     if (!title) return;
 
     // 세부과제 생성 호출
-    createSubTask(
-      {
-        title,
-        deadline: formatDate(selectedDate),
-        isAlarm: true,
-      },
-      {
-        onSuccess: () => {
-          setIsAdding(false); // 입력 폼 닫기
-          setTaskName('');
-          setSelectedDate(new Date());
-        },
-      },
-    );
+    // createSubTask(
+    //   {
+    //     title,
+    //     deadline: formatDate(selectedDate),
+    //     isAlarm: true,
+    //   },
+    //   {
+    //     onSuccess: () => {
+    //       setIsAdding(false); // 입력 폼 닫기
+    //       setTaskName('');
+    //       setSelectedDate(new Date());
+    //     },
+    //   },
+    // );
   };
 
   return (

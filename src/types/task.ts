@@ -258,19 +258,19 @@ export interface UpdateSubTaskDeadlineResponse {
 // 단일 세부 TASK 생성 타입 정의
 // ============================
 
-export interface CreateSubTaskRequest {
-  title: string;
-  deadline: string; // YYYY-MM-DD
-  isAlarm: boolean;
-}
+// export interface CreateSubTaskRequest {
+//   title: string;
+//   deadline: string; // YYYY-MM-DD
+//   isAlarm: boolean;
+// }
 
-export interface CreateSubTaskResponse {
-  resultType: 'SUCCESS' | 'FAIL';
-  message: string;
-  data?: {
-    subTaskId: number;
-  };
-}
+// export interface CreateSubTaskResponse {
+//   resultType: 'SUCCESS' | 'FAIL';
+//   message: string;
+//   data?: {
+//     subTaskId: number;
+//   };
+// }
 
 // 팀과제 참여 타입 정의
 export interface JoinTaskRequest {
