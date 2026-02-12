@@ -149,7 +149,13 @@ export const AlarmListContainer = () => {
         </div>
       )}
       <div ref={loadMoreRef} />
-      {isFetchingNextPage && <div>불러오는 중...</div>}
+      {isFetchingNextPage && (
+        <div
+          className={css({ textAlign: 'center', pt: '2rem', width: '100%' })}
+        >
+          불러오는 중입니다.
+        </div>
+      )}
     </div>
   );
 };
