@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { PlusButton } from '@/components/PlusButton';
 import { Textarea } from '@/components/TextField';
 import DatePicker from '@/components/DatePicker';
-import { css } from 'styled-system/css';
+import { css, cva } from 'styled-system/css';
 import { CloseIcon } from '@/components/icons/CloseIcon';
 import { useModalStore } from '@/stores/modal-store';
 import { ConfirmDeleteAssignmentDataModal } from '../../components/ConfirmDeleteAssginmentDataModal';
@@ -140,62 +140,55 @@ export const ModifyAssignmentTask = ({
   return (
     <div className={taskDataItemStyle}>
       <p className={labelTextStyle}>TASK</p>
-      <div
-        ref={listRef} // 여기에 ref 연결하여 아래 모든 textarea 변화 감지
-        className={css({
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '1rem',
-          flex: showTaskInput ? 1 : 'none',
-        })}
-      >
-        {tasks.map((task) => (
-          <div
-            key={task.id}
-            className={css({
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.5rem',
-            })}
-          >
-            <Textarea
-              size='basic'
-              placeholder='TASK명을 입력하세요.'
-              className={css({
-                flex: 1,
-                overflow: 'hidden',
-              })}
-              value={task.title}
-              onChange={(e) => {
-                handleTitleChange(task.id, e.target.value);
-                autoResize(e.currentTarget); // 입력된 결과에 따라 즉시 높이 조절
-              }}
-            />
-            <DatePicker
-              value={task.dueDate}
-              onChange={(date) => handleDateChange(task.id, date)}
-              maxDate={maxDate ?? undefined}
-            />
-            <button
-              type='button'
-              className={removeButtonStyle}
-              onClick={() => handleOpenDeleteModal(task)}
-              aria-label='자료 삭제'
-            >
-              <CloseIcon size='2rem' color='gray.600' />
-            </button>
-          </div>
-        ))}
-
-        <PlusButton
-          onClick={handleAddTask}
-          className={css({
-            alignSelf: showTaskInput ? 'flex-start' : 'auto',
-            marginTop: showTaskInput ? '1.25rem' : '0',
-          })}
+      <div className={taskContentStyle({ hasTasks: showTaskInput })}>
+        <div
+          ref={listRef} // 여기에 ref 연결하여 아래 모든 textarea 변화 감지
+          className={taskListStyle}
         >
-          TASK 추가하기
-        </PlusButton>
+          {tasks.map((task) => (
+            <div
+              key={task.id}
+              className={css({
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+              })}
+            >
+              <Textarea
+                size='basic'
+                placeholder='TASK명을 입력하세요.'
+                className={css({
+                  flex: 1,
+                  overflow: 'hidden',
+                })}
+                value={task.title}
+                onChange={(e) => {
+                  handleTitleChange(task.id, e.target.value);
+                  autoResize(e.currentTarget); // 입력된 결과에 따라 즉시 높이 조절
+                }}
+              />
+              <DatePicker
+                value={task.dueDate}
+                onChange={(date) => handleDateChange(task.id, date)}
+                maxDate={maxDate ?? undefined}
+              />
+              <button
+                type='button'
+                className={removeButtonStyle}
+                onClick={() => handleOpenDeleteModal(task)}
+                aria-label='자료 삭제'
+              >
+                <CloseIcon size='2rem' color='gray.600' />
+              </button>
+            </div>
+          ))}
+        </div>
+
+        <div className={addButtonWrapperStyle({ hasTasks: showTaskInput })}>
+          <PlusButton onClick={handleAddTask} className={buttonWrapperStyle}>
+            TASK 추가하기
+          </PlusButton>
+        </div>
       </div>
     </div>
   );
@@ -212,6 +205,45 @@ const taskDataItemStyle = css({
   alignItems: 'flex-start',
 });
 
+const taskContentStyle = cva({
+  base: {
+    display: 'flex',
+    flexDirection: 'column',
+  },
+  variants: {
+    hasTasks: {
+      true: {
+        flex: 1,
+      },
+      false: {
+        flex: 'none',
+      },
+    },
+  },
+});
+
+const taskListStyle = css({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '1rem',
+});
+
+const addButtonWrapperStyle = cva({
+  base: {
+    display: 'flex',
+  },
+  variants: {
+    hasTasks: {
+      true: {
+        marginTop: '1.25rem',
+      },
+      false: {
+        marginTop: '0',
+      },
+    },
+  },
+});
+
 const removeButtonStyle = css({
   display: 'inline-flex',
   alignItems: 'center',
@@ -219,4 +251,9 @@ const removeButtonStyle = css({
   _hover: {
     cursor: 'pointer',
   },
+});
+
+const buttonWrapperStyle = css({
+  display: 'flex',
+  width: 'fit-content',
 });

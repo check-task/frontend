@@ -239,6 +239,7 @@ const dataContainerStyle = css({
   flexDirection: 'column',
   gap: '1.25rem',
   flex: 1,
+  mb: '1.25rem',
 });
 
 const dataItemStyle = css({
@@ -268,5 +269,4 @@ const buttonWrapperStyle = css({
   display: 'flex',
   width: 'fit-content',
   ml: '1rem',
-  mt: '1.25rem',
 });
