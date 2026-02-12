@@ -219,6 +219,7 @@ export const ModifyAssignmentForm = () => {
           taskId={data?.taskId ?? taskId}
           initialTasks={initialTasks}
           onTasksChange={setTasks}
+          maxDate={dueDate}
         />
         {/* 자료 추가 */}
         <ModifyAssignmentData

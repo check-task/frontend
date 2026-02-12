@@ -22,6 +22,7 @@ interface ModifyAssignmentTaskProps {
   initialTasks?: ModifyTaskItem[];
   taskId?: number;
   onTasksChange?: (tasks: ModifyTaskItem[]) => void;
+  maxDate?: Date | null;
 }
 
 // Task 목록 부분 컴포넌트 create->AddAssignmentTask 참고
@@ -29,6 +30,7 @@ export const ModifyAssignmentTask = ({
   initialTasks,
   taskId,
   onTasksChange,
+  maxDate,
 }: ModifyAssignmentTaskProps) => {
   // 모달 스토어
   const { openModal, closeModal } = useModalStore();
@@ -172,6 +174,7 @@ export const ModifyAssignmentTask = ({
             <DatePicker
               value={task.dueDate}
               onChange={(date) => handleDateChange(task.id, date)}
+              maxDate={maxDate ?? undefined}
             />
             <button
               type='button'
