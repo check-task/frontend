@@ -5,7 +5,6 @@ import { PlusButton } from '@/components/PlusButton';
 import { Textarea } from '@/components/TextField';
 import DatePicker from '@/components/DatePicker';
 import { css } from 'styled-system/css';
-import { dummyPersonalTasks } from '@/constants/PersonalTaskMock';
 import { CloseIcon } from '@/components/icons/CloseIcon';
 import { useModalStore } from '@/stores/modal-store';
 import { ConfirmDeleteAssignmentDataModal } from '../../components/ConfirmDeleteAssginmentDataModal';
@@ -16,12 +15,22 @@ interface TaskItem {
   dueDate?: string; // 서버에서 strig 형태로 받음
 }
 
+interface ModifyAssignmentTaskProps {
+  initialTasks?: TaskItem[];
+  taskId?: number;
+}
+
 // Task 목록 부분 컴포넌트 create->AddAssignmentTask 참고
-export const ModifyAssignmentTask = () => {
+export const ModifyAssignmentTask = ({
+  initialTasks,
+  taskId,
+}: ModifyAssignmentTaskProps) => {
   // 모달 스토어
   const { openModal, closeModal } = useModalStore();
-  // task 더미 데이터로 초기화
-  const [tasks, setTasks] = useState<TaskItem[]>(dummyPersonalTasks);
+  const [tasks, setTasks] = useState<TaskItem[]>([]);
+  const [initializedTaskId, setInitializedTaskId] = useState<number | null>(
+    null,
+  );
   const listRef = useRef<HTMLDivElement | null>(null);
 
   // Task에서 텍스트에 따라 높이 자동 조절 처리
@@ -36,6 +45,14 @@ export const ModifyAssignmentTask = () => {
     if (!root) return;
     root.querySelectorAll<HTMLTextAreaElement>('textarea').forEach(autoResize);
   };
+
+  // 초기값 세팅- 이미 같은 taskId로 세팅된 경우는 덮어쓰지 않음
+  useEffect(() => {
+    if (taskId == null || initialTasks === undefined) return;
+    if (initializedTaskId === taskId) return;
+    setTasks(initialTasks);
+    setInitializedTaskId(taskId);
+  }, [initialTasks, initializedTaskId, taskId]);
 
   useEffect(() => {
     resizeAll();

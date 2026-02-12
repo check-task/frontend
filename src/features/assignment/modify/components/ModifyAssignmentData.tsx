@@ -1,12 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Input } from '@/components/TextField';
 import { PlusButton } from '@/components/PlusButton';
 import { useModalStore } from '@/stores/modal-store';
 import { AddAssignmentDataModal } from '../../components/AddAssignmentDataModal';
 import { css } from 'styled-system/css';
-import { DUMMY_DATA } from '@/constants/AssignmentDataCardMock';
 import { CloseIcon } from '@/components/icons/CloseIcon';
 import { EditAssignmentDataCardModal } from '../../components/EditAssignmentDataCardModal';
 import { ConfirmDeleteAssignmentDataModal } from '../../components/ConfirmDeleteAssginmentDataModal';
@@ -18,11 +17,28 @@ interface DataItem {
   path: string;
 }
 
-export const ModifyAssignmentData = () => {
+interface ModifyAssignmentDataProps {
+  initialItems?: DataItem[];
+  taskId?: number;
+}
+
+export const ModifyAssignmentData = ({
+  initialItems,
+  taskId,
+}: ModifyAssignmentDataProps) => {
   const openModal = useModalStore((state) => state.openModal);
   const closeModal = useModalStore((state) => state.closeModal);
-  // DUMMY_DATA로 초기화
-  const [dataItems, setDataItems] = useState<DataItem[]>(DUMMY_DATA);
+  const [dataItems, setDataItems] = useState<DataItem[]>([]);
+  const [initializedTaskId, setInitializedTaskId] = useState<number | null>(
+    null,
+  );
+
+  useEffect(() => {
+    if (taskId == null || initialItems === undefined) return;
+    if (initializedTaskId === taskId) return;
+    setDataItems(initialItems);
+    setInitializedTaskId(taskId);
+  }, [initialItems, initializedTaskId, taskId]);
 
   // 자료 모음집 추가 모달 핸들러
   const handleAddData = () => {

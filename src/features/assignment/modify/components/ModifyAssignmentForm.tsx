@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/Button';
 import { Divider } from '@/components/Divider';
 import { CheckboxHeader } from '../../create/components/CheckboxHeader'; // create있는거 그대로 사용
@@ -11,7 +11,9 @@ import { css, cva } from 'styled-system/css';
 import { useUIStore } from '@/stores/ui-store';
 import { useModalStore } from '@/stores/modal-store';
 import { ConfirmDeleteAssignmentDataModal } from '../../components/ConfirmDeleteAssginmentDataModal';
-import { sampleAssignments } from '@/constants/sampleAssignments'; // 임시 데이터
+import { useSearchParams } from 'next/navigation';
+import { useTeamTaskDetail } from '@/features/assignment/team/components/hooks/useTeamTaskDetail';
+import { resolveFolderColor } from '@/lib/folder-color';
 
 // 더미 데이터에서 red 값으로 받아서 이를 토큰값으로 변환
 // 토큰값으로 변환한건 FolderColor 타입에 맞추기 위해서
@@ -23,29 +25,53 @@ const folderColorTokenMap = {
   black: 'sub.05.100',
 } as const;
 
+const getFolderColorToken = (folderColor?: string): string => {
+  if (!folderColor) return '';
+  if (folderColor in folderColorTokenMap) {
+    return folderColorTokenMap[folderColor as keyof typeof folderColorTokenMap];
+  }
+  if (folderColor.startsWith('#')) {
+    const resolved = resolveFolderColor(folderColor);
+    return resolved ? folderColorTokenMap[resolved] : '';
+  }
+  return '';
+};
+
 // 과제 수정 전체 컴포넌트
 export const ModifyAssignmentForm = () => {
   // 사이드바 상태 가져오기
   const isSidebarCollapsed = useUIStore((state) => state.isSidebarCollapsed);
   const { openModal, closeModal } = useModalStore();
-
-  // 더미데이터에서 임시로 첫번째 데이터 불러오기
-  const defaultAssignment = sampleAssignments[0];
+  const searchParams = useSearchParams();
+  const taskId = Number(searchParams?.get('taskId'));
+  const { data } = useTeamTaskDetail(taskId);
+  const initializedTaskIdRef = useRef<number | null>(null);
 
   // 과제 수정 페이지이므로 기본값 세팅
-  const [assignmentName, setAssignmentName] = useState(
-    defaultAssignment?.assignmentName ?? '',
-  );
-  const [folderColor, setFolderColor] = useState(
-    defaultAssignment?.folderColor
-      ? folderColorTokenMap[defaultAssignment.folderColor] //
-      : '',
-  );
-  const [dueDate, setDueDate] = useState<Date | null>(
-    defaultAssignment?.dueDate
-      ? new Date(`${defaultAssignment.dueDate}T00:00:00`)
-      : null,
-  );
+  const [assignmentName, setAssignmentName] = useState('');
+  const [folderColor, setFolderColor] = useState('');
+  const [dueDate, setDueDate] = useState<Date | null>(null);
+
+  useEffect(() => {
+    if (!data?.taskId || initializedTaskIdRef.current === data.taskId) return;
+    setAssignmentName(data.title ?? '');
+    setFolderColor(getFolderColorToken(data.foldercolor));
+    setDueDate(data.deadline ? new Date(`${data.deadline}T00:00:00`) : null);
+    initializedTaskIdRef.current = data.taskId;
+  }, [data]);
+
+  const initialTasks = data?.subTasks?.map((task) => ({
+    id: task.subTaskId,
+    title: task.title,
+    dueDate: task.deadline,
+  }));
+
+  const initialDataItems = data?.references?.map((ref, index) => ({
+    id: ref.referenceId ?? index + 1,
+    type: (ref.file_url ? 1 : 0) as 0 | 1,
+    name: ref.name,
+    path: ref.url ?? ref.file_url ?? '',
+  }));
 
   const isFormValid = assignmentName.trim() !== '' && folderColor !== '';
 
@@ -95,9 +121,15 @@ export const ModifyAssignmentForm = () => {
       {/* TASK, 자료 */}
       <div className={taskDataWrapperStyle}>
         {/* TASK 추가 */}
-        <ModifyAssignmentTask />
+        <ModifyAssignmentTask
+          taskId={data?.taskId ?? taskId}
+          initialTasks={initialTasks}
+        />
         {/* 자료 추가 */}
-        <ModifyAssignmentData />
+        <ModifyAssignmentData
+          taskId={data?.taskId ?? taskId}
+          initialItems={initialDataItems}
+        />
       </div>
 
       {/* 과제 삭제 버튼 추가 및 모달 연결 */}
