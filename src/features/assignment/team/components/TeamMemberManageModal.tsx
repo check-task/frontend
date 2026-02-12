@@ -2,7 +2,10 @@
 
 import { useEffect, useState } from 'react';
 import { css } from 'styled-system/css';
-import { TeamMemberManageModalItem, type MemberRole } from './TeamMemberManageModalItem';
+import {
+  TeamMemberManageModalItem,
+  type MemberRole,
+} from './TeamMemberManageModalItem';
 import { Divider } from '@/components/Divider';
 import { Input } from '@/components/TextField';
 import { useCreateInvitationLink } from '@/hooks/mutations/useCreateInvitationLink';
@@ -14,7 +17,8 @@ interface TeamMemberManageModalProps {
   taskId: number;
 }
 
-const roleFromApi = (role: 0 | 1): MemberRole => (role === 1 ? 'Owner' : 'Member');
+const roleFromApi = (role: 0 | 1): MemberRole =>
+  role === 1 ? 'Owner' : 'Member';
 
 export const TeamMemberManageModal = ({
   taskId,
@@ -57,9 +61,9 @@ export const TeamMemberManageModal = ({
             팀원 목록을 불러오는 중입니다.
           </p>
         ) : (
-          members.map((member) => (
+          members.map((member, index) => (
             <TeamMemberManageModalItem
-              key={member.memberId}
+              key={`member-${member.memberId}-${index}`}
               memberId={member.memberId}
               name={member.name}
               profileImage={member.profileImage}

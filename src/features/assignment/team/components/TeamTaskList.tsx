@@ -26,6 +26,10 @@ import { useUpdateSubTaskAlarm } from '@/features/assignment/personal/components
 import { useTaskMembers } from '@/hooks/queries/useTaskMembers';
 import { useMyInfo } from '@/hooks/queries/useMyInfo';
 import { AddTaskButton } from './AddTaskButton';
+import {
+  getSocket,
+  COMMENT_SEND_EVENTS,
+} from '@/lib/socket';
 
 const getCommentId = (
   c: TaskDetailSubTaskComment & { comment_id?: number; id?: number },
@@ -163,13 +167,25 @@ const TeamTaskList = ({
     setEditingContent(content);
   };
 
-  const handleSubmitEditComment = (commentId: number) => {
+  const handleSubmitEditComment = (commentId: number, subTaskId: number) => {
     const content = editingContent.trim();
     if (commentId < 0 || !content) return;
-    updateComment({ commentId, content }).then(() => {
+    const socket = getSocket();
+    if (socket?.connected) {
+      socket.emit(COMMENT_SEND_EVENTS.UPDATE, {
+        taskId,
+        subTaskId,
+        commentId,
+        content,
+      });
       setEditingCommentId(null);
       setEditingContent('');
-    });
+    } else {
+      updateComment({ commentId, content }).then(() => {
+        setEditingCommentId(null);
+        setEditingContent('');
+      });
+    }
   };
 
   const handleDeleteComment = (
@@ -198,16 +214,25 @@ const TeamTaskList = ({
           ),
         };
       });
-      deleteComment(commentId, {
-        onError: () => {
-          setDeletedCommentIds((prev) => {
-            const next = new Set(prev);
-            next.delete(commentId);
-            return next;
-          });
-          queryClient.invalidateQueries({ queryKey: ['taskDetail', taskId] });
-        },
-      });
+      const socket = getSocket();
+      if (socket?.connected) {
+        socket.emit(COMMENT_SEND_EVENTS.DELETE, {
+          taskId,
+          subTaskId,
+          commentId,
+        });
+      } else {
+        deleteComment(commentId, {
+          onError: () => {
+            setDeletedCommentIds((prev) => {
+              const next = new Set(prev);
+              next.delete(commentId);
+              return next;
+            });
+            queryClient.invalidateQueries({ queryKey: ['taskDetail', taskId] });
+          },
+        });
+      }
     } else {
       setPendingComments((prev) => ({
         ...prev,
@@ -218,30 +243,41 @@ const TeamTaskList = ({
     }
   };
 
+  const applyOptimisticNewComment = (subTaskId: number, content: string) => {
+    if (!myInfo) return;
+    setCommentInputs((prev) => ({ ...prev, [subTaskId]: '' }));
+    const newComment: TaskDetailSubTaskComment = {
+      commentId: -1,
+      content,
+      writer: myInfo.user.nickname ?? '',
+      profileImage: myInfo.user.profileImage ?? '',
+      createdAt: '방금',
+    };
+    setPendingComments((prev) => ({
+      ...prev,
+      [subTaskId]: [...(prev[subTaskId] ?? []), newComment],
+    }));
+  };
+
   const handleCommentSubmit = (subTaskId: number) => {
     const content = commentInputs[subTaskId]?.trim();
     const userId = myInfo?.user.id;
     if (!content || !userId || !myInfo) return;
 
-    createComment(
-      { subTaskId, userId, content },
-      {
-        onSuccess: () => {
-          setCommentInputs((prev) => ({ ...prev, [subTaskId]: '' }));
-          const newComment: TaskDetailSubTaskComment = {
-            commentId: -1,
-            content,
-            writer: myInfo.user.nickname ?? '',
-            profileImage: myInfo.user.profileImage ?? '',
-            createdAt: '방금',
-          };
-          setPendingComments((prev) => ({
-            ...prev,
-            [subTaskId]: [...(prev[subTaskId] ?? []), newComment],
-          }));
-        },
-      },
-    );
+    const socket = getSocket();
+    if (socket?.connected) {
+      socket.emit(COMMENT_SEND_EVENTS.CREATE, {
+        taskId,
+        subTaskId,
+        content,
+      });
+      applyOptimisticNewComment(subTaskId, content);
+    } else {
+      createComment(
+        { subTaskId, userId, content },
+        { onSuccess: () => applyOptimisticNewComment(subTaskId, content) },
+      );
+    }
   };
 
   return (
@@ -387,7 +423,7 @@ const TeamTaskList = ({
                                     onKeyDown={(e) => {
                                       if (e.key === 'Enter') {
                                         e.preventDefault();
-                                        handleSubmitEditComment(id);
+                                        handleSubmitEditComment(id, task.subTaskId);
                                       }
                                       if (e.key === 'Escape') {
                                         setEditingCommentId(null);

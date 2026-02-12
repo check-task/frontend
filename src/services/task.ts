@@ -258,6 +258,7 @@ export interface TaskMember {
 }
 
 type TaskMemberRaw = TaskMember & {
+  id?: number;
   member_id?: number;
   profile_image?: string | null;
 };
@@ -269,7 +270,7 @@ export const getTaskMembers = async (taskId: number): Promise<TaskMember[]> => {
   const raw = res.data?.data?.members;
   if (!Array.isArray(raw)) return [];
   return raw.map((m) => ({
-    memberId: m.memberId ?? m.member_id ?? 0,
+    memberId: m.memberId ?? m.member_id ?? m.id ?? 0,
     name: m.name ?? (m as { nickname?: string }).nickname ?? '',
     profileImage: m.profileImage ?? m.profile_image ?? null,
     role: m.role === 1 ? 1 : 0,

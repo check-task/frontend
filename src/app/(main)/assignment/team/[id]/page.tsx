@@ -8,11 +8,14 @@ import { TeamEtc } from '@/features/assignment/team/components/TeamEtc';
 import TeamTaskList from '@/features/assignment/team/components/TeamTaskList';
 import { css } from 'styled-system/css';
 import { useTeamTaskDetail } from '@/features/assignment/team/components/hooks/useTeamTaskDetail';
+import { useTaskRoomSocket } from '@/features/assignment/team/hooks/useTaskRoomSocket';
 
 export default function TeamAssignmentDetailPage() {
   const params = useParams();
   const taskId = Number(params?.id);
   const { data, isLoading, isError, error } = useTeamTaskDetail(taskId);
+
+  useTaskRoomSocket(taskId);
 
   if (isLoading || !data) {
     return (
