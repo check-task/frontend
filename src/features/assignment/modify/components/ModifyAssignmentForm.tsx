@@ -23,6 +23,7 @@ import { resolveFolderColor } from '@/lib/folder-color';
 import { useMyInfo } from '@/hooks/queries/useMyInfo';
 import { useUpdateTask } from '@/hooks/mutations/useUpdateTask';
 import { useCreateReferenceData } from '@/hooks/mutations/useCreateReferenceData';
+import { useDeleteTask } from '@/hooks/mutations/useDeleteTask';
 import type { TaskStatus, TaskType, UpdateTaskRequest } from '@/types/task';
 
 const getFolderIdFromColor = (
@@ -53,6 +54,7 @@ export const ModifyAssignmentForm = () => {
   const { mutateAsync: updateTask, isPending } = useUpdateTask(updateTaskId);
   const { mutateAsync: createReferenceData } =
     useCreateReferenceData(updateTaskId);
+  const { mutateAsync: deleteTask } = useDeleteTask(updateTaskId);
 
   // 과제 수정 페이지이므로 기본값 세팅
   const [assignmentName, setAssignmentName] = useState('');
@@ -173,8 +175,12 @@ export const ModifyAssignmentForm = () => {
       content: (
         <ConfirmDeleteAssignmentDataModal
           highlightText={assignmentName || '과제'}
-          onConfirm={() => {
+          onConfirm={async () => {
+            if (updateTaskId > 0) {
+              await deleteTask();
+            }
             closeModal();
+            router.push('/assignment');
           }}
           onCancel={closeModal}
         />
