@@ -200,7 +200,7 @@ export interface CreateTaskResponse {
 export interface UpdateTaskSubTaskItem {
   title: string;
   endDate: string; // YYYY-MM-DD
-  status: 'PROGRESS' | 'COMPLETE';
+  status: 'PROGRESS' | 'COMPLETED';
   isAlarm: boolean;
   assigneeId: number;
 }
@@ -209,7 +209,7 @@ export interface UpdateTaskRequest {
   title: string;
   deadline: string; // YYYY-MM-DD
   type: TaskType;
-  status?: string;
+  status?: TaskStatus;
   folderId: number;
   subTasks: UpdateTaskSubTaskItem[];
   references: { name: string; url: string }[];
