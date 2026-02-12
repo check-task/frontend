@@ -11,10 +11,11 @@ import { ConfirmDeleteAssignmentDataModal } from '../../components/ConfirmDelete
 import type { ReferenceItem } from './PersonalRightContainer';
 
 interface PersonalEtcProps {
+  taskId: number;
   items: ReferenceItem[];
 }
 
-export const PersonalEtc = ({ items }: PersonalEtcProps) => {
+export const PersonalEtc = ({ taskId, items }: PersonalEtcProps) => {
   // close 저장 누를 때 닫으려면 필요
   const { openModal, closeModal } = useModalStore();
   const [dataItems, setDataItems] = useState<ReferenceItem[]>(items);
@@ -29,8 +30,9 @@ export const PersonalEtc = ({ items }: PersonalEtcProps) => {
       title: '자료 추가',
       content: (
         <AddAssignmentDataModal
+          taskId={taskId}
           onSave={(items) => {
-            setDataItems((prev) => [...prev, ...items]);
+            setDataItems(items);
             closeModal();
           }}
         />

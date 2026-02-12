@@ -32,7 +32,7 @@ export default function PersonalPage() {
           folderColorHex={data.folderColorHex}
           tasks={data.tasks}
         />
-        <PersonalRightContainer items={data.items} />
+        <PersonalRightContainer taskId={data.taskId} items={data.items} />
       </div>
     </div>
   );
