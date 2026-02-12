@@ -10,17 +10,25 @@ import DatePicker from '@/components/DatePicker';
 import { Input } from '@/components/TextField';
 import { CommentEditDropdown } from './CommentEditDropdown';
 import type {
+  TaskDetail,
   TaskDetailSubTask,
   TaskDetailSubTaskComment,
   SubTaskStatus,
 } from '@/types/task';
+import { useQueryClient } from '@tanstack/react-query';
 import { useUpdateTeamSubTaskStatus } from './hooks/useUpdateSubTaskStatus';
 import { useUpdateTeamSubTaskDeadline } from './hooks/useUpdateSubTaskDeadline';
 import { useUpdateSubTaskAssignee } from './hooks/useUpdateSubTaskAssignee';
 import { useCreateSubTaskComment } from './hooks/useCreateSubTaskComment';
 import { useUpdateComment } from './hooks/useUpdateComment';
 import { useDeleteComment } from './hooks/useDeleteComment';
+import { useUpdateSubTaskAlarm } from '@/features/assignment/personal/components/hooks/useUpdateSubTaskAlarm';
 import { useMyInfo } from '@/hooks/queries/useMyInfo';
+import { AddTaskButton } from './AddTaskButton';
+
+const getCommentId = (
+  c: TaskDetailSubTaskComment & { comment_id?: number; id?: number },
+) => c.commentId ?? c.comment_id ?? c.id ?? -1;
 
 interface TeamTaskListProps {
   taskId: number;
@@ -28,16 +36,25 @@ interface TeamTaskListProps {
 }
 
 const TeamTaskList = ({ taskId, subTasks = [] }: TeamTaskListProps) => {
-  const [openComments, setOpenComments] = useState<{ [key: number]: boolean }>({});
-  const [commentInputs, setCommentInputs] = useState<{ [key: number]: string }>({});
+  const [openComments, setOpenComments] = useState<{ [key: number]: boolean }>(
+    {},
+  );
+  const [commentInputs, setCommentInputs] = useState<{ [key: number]: string }>(
+    {},
+  );
   const [pendingComments, setPendingComments] = useState<
     Record<number, TaskDetailSubTaskComment[]>
   >({});
   const [editingCommentId, setEditingCommentId] = useState<number | null>(null);
   const [editingContent, setEditingContent] = useState('');
+  const [deletedCommentIds, setDeletedCommentIds] = useState<Set<number>>(
+    () => new Set(),
+  );
+  const queryClient = useQueryClient();
   const { mutate: mutateStatus } = useUpdateTeamSubTaskStatus(taskId);
   const { mutate: mutateDeadline } = useUpdateTeamSubTaskDeadline(taskId);
   const { mutate: updateAssignee } = useUpdateSubTaskAssignee(taskId);
+  const { mutate: updateSubTaskAlarm } = useUpdateSubTaskAlarm(taskId);
   const { mutate: createComment } = useCreateSubTaskComment(taskId);
   const { mutateAsync: updateComment } = useUpdateComment(taskId);
   const { mutate: deleteComment } = useDeleteComment(taskId);
@@ -52,9 +69,7 @@ const TeamTaskList = ({ taskId, subTasks = [] }: TeamTaskListProps) => {
     createdAt: string,
   ): { date: string; time: string } => {
     const trimmed = createdAt.trim();
-    const isoMatch = trimmed.match(
-      /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/,
-    );
+    const isoMatch = trimmed.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/);
     const dotMatch = trimmed.match(
       /^(\d{4})[.-](\d{1,2})[.-](\d{1,2})(?:\s+(\d{1,2}):(\d{1,2}))?/,
     );
@@ -79,16 +94,29 @@ const TeamTaskList = ({ taskId, subTasks = [] }: TeamTaskListProps) => {
     return { date: trimmed, time: '--:--' };
   };
 
-  const getDisplayComments = (task: TaskDetailSubTask): TaskDetailSubTaskComment[] => {
-    const fromApi = task.comments ?? [];
+  const getDisplayComments = (
+    task: TaskDetailSubTask,
+  ): TaskDetailSubTaskComment[] => {
+    const fromApi = (task.comments ?? []).filter(
+      (c) =>
+        !deletedCommentIds.has(
+          getCommentId(c as TaskDetailSubTaskComment & { comment_id?: number }),
+        ),
+    );
     const pending = pendingComments[task.subTaskId] ?? [];
     const fromApiContents = new Set(fromApi.map((c) => c.content));
-    return [...fromApi, ...pending.filter((p) => !fromApiContents.has(p.content))];
+    return [
+      ...fromApi,
+      ...pending.filter((p) => !fromApiContents.has(p.content)),
+    ];
   };
 
   const handleStatusChange = (subTaskId: number, isChecked: boolean) => {
     const nextStatus: SubTaskStatus = isChecked ? 'COMPLETED' : 'PROGRESS';
-    mutateStatus({ subTaskId, status: nextStatus === 'COMPLETED' ? 'COMPLETE' : 'PROGRESS' });
+    mutateStatus({
+      subTaskId,
+      status: nextStatus === 'COMPLETED' ? 'COMPLETE' : 'PROGRESS',
+    });
   };
 
   const toYYYYMMDD = (d: Date): string => {
@@ -126,11 +154,41 @@ const TeamTaskList = ({ taskId, subTasks = [] }: TeamTaskListProps) => {
   };
 
   const handleDeleteComment = (
-    comment: TaskDetailSubTaskComment,
+    comment: TaskDetailSubTaskComment & { comment_id?: number },
     subTaskId: number,
   ) => {
-    if (comment.commentId >= 0) {
-      deleteComment(comment.commentId);
+    const commentId = getCommentId(comment);
+    if (commentId >= 0) {
+      setDeletedCommentIds((prev) => new Set(prev).add(commentId));
+      queryClient.setQueryData<TaskDetail>(['taskDetail', taskId], (old) => {
+        if (!old?.subTasks) return old;
+        return {
+          ...old,
+          subTasks: old.subTasks.map((st) =>
+            st.subTaskId !== subTaskId
+              ? st
+              : {
+                  ...st,
+                  comments: (st.comments ?? []).filter(
+                    (c) =>
+                      getCommentId(
+                        c as TaskDetailSubTaskComment & { comment_id?: number },
+                      ) !== commentId,
+                  ),
+                },
+          ),
+        };
+      });
+      deleteComment(commentId, {
+        onError: () => {
+          setDeletedCommentIds((prev) => {
+            const next = new Set(prev);
+            next.delete(commentId);
+            return next;
+          });
+          queryClient.invalidateQueries({ queryKey: ['taskDetail', taskId] });
+        },
+      });
     } else {
       setPendingComments((prev) => ({
         ...prev,
@@ -177,7 +235,9 @@ const TeamTaskList = ({ taskId, subTasks = [] }: TeamTaskListProps) => {
             const comments = getDisplayComments(task);
             return (
               <div key={task.subTaskId}>
-                <div className={taskItemContainerStyle({ checked: isCompleted })}>
+                <div
+                  className={taskItemContainerStyle({ checked: isCompleted })}
+                >
                   <div className={teamTaskItemTitleStyle}>
                     <div className={teamTaskItemCheckTitleStyle}>
                       <Checkbox
@@ -190,13 +250,26 @@ const TeamTaskList = ({ taskId, subTasks = [] }: TeamTaskListProps) => {
                         {task.title}
                       </p>
                     </div>
-                    <div className={taskComponentsStyle({ checked: isCompleted })}>
+                    <div
+                      className={taskComponentsStyle({ checked: isCompleted })}
+                    >
                       <DatePicker
                         value={task.deadline}
-                        onChange={(date) => handleDeadlineChange(task.subTaskId, date)}
+                        onChange={(date) =>
+                          handleDeadlineChange(task.subTaskId, date)
+                        }
                         muted={isCompleted}
                       />
-                      <ClockToggle muted={isCompleted} />
+                      <ClockToggle
+                        muted={isCompleted}
+                        isOn={task.isAlarm}
+                        onToggle={(next) =>
+                          updateSubTaskAlarm({
+                            subTaskId: task.subTaskId,
+                            isAlarm: next,
+                          })
+                        }
+                      />
                       <CommentButton
                         isOpen={commentOpen}
                         onClick={() => handleCommentToggle(task.subTaskId)}
@@ -204,13 +277,15 @@ const TeamTaskList = ({ taskId, subTasks = [] }: TeamTaskListProps) => {
                       />
                     </div>
                   </div>
-                  <div className={managerContainerStyle({ checked: isCompleted })}>
+                  <div
+                    className={managerContainerStyle({ checked: isCompleted })}
+                  >
                     <p className={managerLabelStyle({ checked: isCompleted })}>
                       담당:
                     </p>
                     <TeamTaskManager
                       manager={task.assigneeName}
-                      profileImage={task.assigneeProfileImage}
+                      profileImage={task.assigneeProfileImage ?? undefined}
                       members={[]}
                       onSelectMember={(_, assigneeId) => {
                         if (assigneeId != null)
@@ -230,6 +305,12 @@ const TeamTaskList = ({ taskId, subTasks = [] }: TeamTaskListProps) => {
                         onChange={(e) =>
                           handleCommentChange(task.subTaskId, e.target.value)
                         }
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault();
+                            handleCommentSubmit(task.subTaskId);
+                          }
+                        }}
                       />
                       <div
                         className={inputProfileIconStyle}
@@ -248,14 +329,17 @@ const TeamTaskList = ({ taskId, subTasks = [] }: TeamTaskListProps) => {
                     <div className={commentItemContainerStyle}>
                       {comments.length > 0 ? (
                         comments.map((comment, index) => {
-                          const isEditing =
-                            comment.commentId >= 0 &&
-                            editingCommentId === comment.commentId;
+                          const commentWithId =
+                            comment as TaskDetailSubTaskComment & {
+                              comment_id?: number;
+                            };
+                          const id = getCommentId(commentWithId);
+                          const isEditing = id >= 0 && editingCommentId === id;
                           return (
                             <div
                               key={
-                                comment.commentId >= 0
-                                  ? comment.commentId
+                                id >= 0
+                                  ? id
                                   : `pending-${task.subTaskId}-${index}`
                               }
                               className={commentItemStyle}
@@ -275,7 +359,7 @@ const TeamTaskList = ({ taskId, subTasks = [] }: TeamTaskListProps) => {
                                 />
                                 {isEditing ? (
                                   <Input
-                                    size="basic"
+                                    size='basic'
                                     value={editingContent}
                                     onChange={(e) =>
                                       setEditingContent(e.target.value)
@@ -283,9 +367,7 @@ const TeamTaskList = ({ taskId, subTasks = [] }: TeamTaskListProps) => {
                                     onKeyDown={(e) => {
                                       if (e.key === 'Enter') {
                                         e.preventDefault();
-                                        handleSubmitEditComment(
-                                          comment.commentId,
-                                        );
+                                        handleSubmitEditComment(id);
                                       }
                                       if (e.key === 'Escape') {
                                         setEditingCommentId(null);
@@ -301,60 +383,47 @@ const TeamTaskList = ({ taskId, subTasks = [] }: TeamTaskListProps) => {
                                   </p>
                                 )}
                               </div>
-                              {!isEditing && (() => {
-                                const { date, time } = formatCommentCreatedAt(
-                                  comment.createdAt,
-                                );
-                                return (
-                                  <div className={commentItemEtcStyle}>
-                                    <div className={commentDateTimeWrapperStyle}>
-                                      <span className={commentCreatedAtStyle}>
-                                        {date}
-                                      </span>
-                                      <span className={commentCreatedAtStyle}>
-                                        {time}
-                                      </span>
+                              {!isEditing &&
+                                (() => {
+                                  const { date, time } = formatCommentCreatedAt(
+                                    comment.createdAt,
+                                  );
+                                  return (
+                                    <div className={commentItemEtcStyle}>
+                                      <div
+                                        className={commentDateTimeWrapperStyle}
+                                      >
+                                        <span className={commentCreatedAtStyle}>
+                                          {date}
+                                        </span>
+                                        <span className={commentCreatedAtStyle}>
+                                          {time}
+                                        </span>
+                                      </div>
+                                      <CommentEditDropdown
+                                        onEditComment={() =>
+                                          handleStartEditComment(
+                                            id,
+                                            comment.content,
+                                          )
+                                        }
+                                        onDeleteComment={() =>
+                                          handleDeleteComment(
+                                            comment,
+                                            task.subTaskId,
+                                          )
+                                        }
+                                      />
                                     </div>
-                                    <CommentEditDropdown
-                                    onEditComment={() =>
-                                      handleStartEditComment(
-                                        comment.commentId,
-                                        comment.content,
-                                      )
-                                    }
-                                    onDeleteComment={() =>
-                                      handleDeleteComment(comment, task.subTaskId)
-                                    }
-                                  />
-                                  </div>
-                                );
-                              })()}
+                                  );
+                                })()}
                             </div>
                           );
                         })
                       ) : (
-                        <div className={commentItemStyle}>
-                          <div className={commentItemHeaderStyle}>
-                            <div
-                              className={commentItemHeaderProfileStyle}
-                              style={
-                                myInfo?.user.profileImage
-                                  ? {
-                                      backgroundImage: `url(${myInfo.user.profileImage})`,
-                                      backgroundSize: 'cover',
-                                      backgroundPosition: 'center',
-                                    }
-                                  : undefined
-                              }
-                            />
-                            <p className={commentItemHeaderCommentStyle}>
-                              댓글을 입력해주세요.
-                            </p>
-                          </div>
-                          <div className={commentItemEtcStyle}>
-                            <CommentEditDropdown />
-                          </div>
-                        </div>
+                        <p className={emptyCommentMessageStyle}>
+                          등록된 댓글이 없습니다.
+                        </p>
                       )}
                     </div>
                   </div>
@@ -367,6 +436,7 @@ const TeamTaskList = ({ taskId, subTasks = [] }: TeamTaskListProps) => {
             등록된 TASK가 없습니다.
           </div>
         )}
+        <AddTaskButton taskId={taskId} />
       </div>
     </div>
   );
@@ -423,7 +493,7 @@ const taskItemContainerStyle = cva({
 
 const taskTextStyle = cva({
   base: {
-    textStyle: 'body1',
+    textStyle: 'body1.r',
     transition: 'all 0.2s ease',
   },
   variants: {
@@ -511,7 +581,7 @@ const commentSectionStyle = css({
   display: 'flex',
   flexDirection: 'column',
   gap: '1.25rem',
-  w: '36.375rem',
+  w: '37.5rem',
   h: 'auto',
   ml: '2.25rem',
 });
@@ -538,6 +608,12 @@ const inputProfileIconStyle = css({
   bg: 'blue.100',
   cursor: 'pointer',
   overflow: 'hidden',
+});
+
+const emptyCommentMessageStyle = css({
+  textStyle: 'body3.r',
+  color: 'gray.500',
+  width: '100%',
 });
 
 const commentItemContainerStyle = css({

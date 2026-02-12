@@ -6,6 +6,8 @@ import type {
   GetUnreadAlarmCountResponse,
   UpdateAlarmSettingRequest,
   UpdateAlarmSettingResponse,
+  UpdateTaskAlarmRequest,
+  UpdateTaskAlarmResponse,
   UpdateSubTaskAlarmRequest,
   UpdateSubTaskAlarmResponse,
 } from '@/types/alarm';
@@ -78,6 +80,17 @@ export const updateTaskAlarmSetting = async (hours: number): Promise<void> => {
   const body: UpdateAlarmSettingRequest = { taskAlarm: hours };
   await axiosInstance.patch<UpdateAlarmSettingResponse>(
     '/alarm/settings/task',
+    body,
+  );
+};
+
+// 과제 알림 여부 수정 (PATCH /alarm/task/{taskId})
+export const updateTaskAlarm = async (
+  taskId: number,
+  body: UpdateTaskAlarmRequest,
+): Promise<void> => {
+  await axiosInstance.patch<UpdateTaskAlarmResponse>(
+    `/alarm/task/${taskId}`,
     body,
   );
 };

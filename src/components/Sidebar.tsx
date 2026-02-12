@@ -1,5 +1,6 @@
 'use client';
 
+import { createPortal } from 'react-dom';
 import { AssignmentButton } from './AssignmentButton';
 import { SidebarLogoButton } from './SidebarLogoButton';
 import { CompletedAssignmentButton } from './CompletedAssignmentButton';
@@ -11,16 +12,24 @@ import { SidebarCloseButton } from './SidebarCloseButton';
 import { useEffect, useState, useRef } from 'react';
 import { useUIStore } from '@/stores/ui-store';
 import { SidebarHooks } from './SidebarHooks';
+import { SidebarClicked } from './SidebarClicked';
 
 interface SidebarProps {
   initialCollapsed: boolean;
   initialTheme: 'light' | 'dark';
 }
 
+const SIDEBAR_WIDTH_COLLAPSED = '3.75rem';
+const SIDEBAR_WIDTH_EXPANDED = '15rem';
+
 export const Sidebar = ({ initialCollapsed, initialTheme }: SidebarProps) => {
   // 서버 초기값을 로컬 상태로 관리
   const [isCollapsed, setIsCollapsed] = useState(initialCollapsed);
   const [isHydrated, setIsHydrated] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [dropdownTop, setDropdownTop] = useState(0);
+  const assignmentRef = useRef<HTMLDivElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Zustand store에서 액션과 상태 가져오기
   const storeCollapsed = useUIStore((state) => state.isSidebarCollapsed);
@@ -63,6 +72,7 @@ export const Sidebar = ({ initialCollapsed, initialTheme }: SidebarProps) => {
   };
 
   const handleExpand = () => {
+    setIsDropdownOpen(false);
     if (isHydrated) {
       setSidebarCollapsed(false);
     } else {
@@ -77,6 +87,35 @@ export const Sidebar = ({ initialCollapsed, initialTheme }: SidebarProps) => {
       handleCollapse();
     }
   };
+
+  const handleAssignmentClick = () => {
+    if (!isSidebarCollapsed) return;
+    if (!isDropdownOpen && assignmentRef.current) {
+      const rect = assignmentRef.current.getBoundingClientRect();
+      setDropdownTop(rect.top);
+    }
+    setIsDropdownOpen((prev) => !prev);
+  };
+
+  useEffect(() => {
+    if (!isDropdownOpen) return;
+    const handleClickOutside = (e: MouseEvent) => {
+      const target = e.target as Node;
+      if (
+        assignmentRef.current?.contains(target) ||
+        dropdownRef.current?.contains(target)
+      ) {
+        return;
+      }
+      setIsDropdownOpen(false);
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isDropdownOpen]);
+
+  const sidebarWidth = isSidebarCollapsed
+    ? SIDEBAR_WIDTH_COLLAPSED
+    : SIDEBAR_WIDTH_EXPANDED;
 
   return (
     <div className={sidebarStyleVariant({ collapsed: isSidebarCollapsed })}>
@@ -96,8 +135,11 @@ export const Sidebar = ({ initialCollapsed, initialTheme }: SidebarProps) => {
       </div>
 
       <div className={contentStyle}>
-        <div>
-          <AssignmentButton collapsed={isSidebarCollapsed} />
+        <div ref={assignmentRef} className={assignmentBlockStyle}>
+          <AssignmentButton
+            collapsed={isSidebarCollapsed}
+            onClick={isSidebarCollapsed ? handleAssignmentClick : undefined}
+          />
           <SidebarHooks collapsed={isSidebarCollapsed} />
         </div>
         <CompletedAssignmentButton collapsed={isSidebarCollapsed} />
@@ -106,6 +148,23 @@ export const Sidebar = ({ initialCollapsed, initialTheme }: SidebarProps) => {
       </div>
 
       <LogoutButton collapsed={isSidebarCollapsed} />
+
+      {typeof window !== 'undefined' &&
+        isSidebarCollapsed &&
+        isDropdownOpen &&
+        createPortal(
+          <div
+            ref={dropdownRef}
+            className={dropdownPanelStyle}
+            style={{
+              left: sidebarWidth,
+              top: dropdownTop,
+            }}
+          >
+            <SidebarClicked />
+          </div>,
+          document.body,
+        )}
     </div>
   );
 };
@@ -155,4 +214,17 @@ const contentStyle = css({
   gap: '1.75rem',
   flex: 1,
   mt: '2.5rem',
+});
+
+const assignmentBlockStyle = css({
+  position: 'relative',
+});
+
+const dropdownPanelStyle = css({
+  position: 'fixed',
+  zIndex: 'dropdown',
+  transform: 'translateY(-14)',
+  pl: 0,
+  pr: '0.5rem',
+  py: '0.5rem',
 });

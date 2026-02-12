@@ -1,11 +1,22 @@
 import { useState } from 'react';
-import { css } from 'styled-system/css';
+import { css, cx } from 'styled-system/css';
 import { DropdownIcon } from '@/components/icons/DropdownIcon';
 
-interface TeamMemberDropdownProps {
+type RoleType = 'Owner' | 'Member';
+
+interface TeamMemberDropdownPropsBase {
   onSetLeader?: () => void;
   onDeleteMember?: () => void;
 }
+
+interface TeamMemberDropdownPropsRole {
+  role: RoleType;
+  onRoleChange?: (role: RoleType) => void;
+  disabled?: boolean;
+}
+
+type TeamMemberDropdownProps = TeamMemberDropdownPropsBase &
+  Partial<TeamMemberDropdownPropsRole>;
 
 interface CommentDropdownProps {
   onEditComment?: () => void;
@@ -15,10 +26,15 @@ interface CommentDropdownProps {
 export const TeamMemberDropdown = ({
   onSetLeader,
   onDeleteMember,
+  role,
+  onRoleChange,
+  disabled = false,
 }: TeamMemberDropdownProps) => {
   const [isOpen, setIsOpen] = useState(false);
+  const isRoleMode = role !== undefined && onRoleChange !== undefined;
 
   const handleToggle = () => {
+    if (disabled) return;
     setIsOpen(!isOpen);
   };
 
@@ -31,6 +47,51 @@ export const TeamMemberDropdown = ({
     onDeleteMember?.();
     setIsOpen(false);
   };
+
+  const handleRoleSelect = (newRole: RoleType) => {
+    onRoleChange?.(newRole);
+    setIsOpen(false);
+  };
+
+  if (isRoleMode) {
+    return (
+      <div className={dropdownWrapperStyle}>
+        <button
+          type="button"
+          className={cx(dropdownButtonStyle, roleDropdownButtonStyle)}
+          onClick={handleToggle}
+          disabled={disabled}
+          aria-expanded={isOpen}
+        >
+          {role}
+          <div className={iconWrapperStyle(isOpen)}>
+            <DropdownIcon />
+          </div>
+        </button>
+        {isOpen && (
+          <div className={dropdownContainerStyle}>
+            <div
+              className={dropdownItemStyle}
+              onClick={() => handleRoleSelect('Owner')}
+              role="option"
+              aria-selected={role === 'Owner'}
+            >
+              Owner
+            </div>
+            <div className={dividerStyle} />
+            <div
+              className={dropdownItemStyle}
+              onClick={() => handleRoleSelect('Member')}
+              role="option"
+              aria-selected={role === 'Member'}
+            >
+              Member
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div className={dropdownWrapperStyle}>
@@ -106,6 +167,12 @@ const dropdownButtonStyle = css({
   alignItems: 'center',
   justifyContent: 'center',
   cursor: 'pointer',
+});
+
+const roleDropdownButtonStyle = css({
+  gap: '0.25rem',
+  textStyle: 'body3.r',
+  color: 'gray.900',
 });
 
 const iconWrapperStyle = (isOpen: boolean) =>

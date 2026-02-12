@@ -53,10 +53,12 @@ export const CreateAssignmentForm = () => {
       folderId,
       deadline: formatDate(deadline),
       type,
-      subTasks: subTasks.map((t) => ({
-        title: t.title,
-        endDate: formatDate(t.endDate),
-      })),
+      subTasks: subTasks
+        .filter((t) => t.title.trim() !== '')
+        .map((t) => ({
+          title: t.title.trim(),
+          endDate: formatDate(t.endDate),
+        })),
       references: dataItems
         .filter((r) => r.type === 0)
         .map((r) => ({ name: r.name, url: r.path })),

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Checkbox } from '@/components/Checkbox';
+import { SelectTeamProjectCheckbox } from './SelectTeamProjectCheckbox';
 import { css } from 'styled-system/css';
 
 interface CheckboxHeaderProps {
@@ -24,7 +25,7 @@ export const CheckboxHeader = ({
   return (
     <div className={checkboxWrapperStyle}>
       <div className={checkboxContainerStyle}>
-        <Checkbox
+        <SelectTeamProjectCheckbox
           checked={isTeamProject}
           onChange={(e) => setTeam(e.target.checked)}
         />

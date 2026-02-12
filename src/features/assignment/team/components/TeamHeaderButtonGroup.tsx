@@ -7,14 +7,18 @@ import { css } from 'styled-system/css';
 import { TeamMemberManageModal } from './TeamMemberManageModal';
 import Link from 'next/link';
 
-export const TeamHeaderButton = () => {
+interface TeamHeaderButtonProps {
+  taskId: number;
+}
+
+export const TeamHeaderButton = ({ taskId }: TeamHeaderButtonProps) => {
   const isSidebarCollapsed = useUIStore((state) => state.isSidebarCollapsed);
   const openModal = useModalStore((state) => state.openModal);
 
   const handleTeamMemberManageClick = () => {
     openModal({
       title: '팀원 관리',
-      content: <TeamMemberManageModal />,
+      content: <TeamMemberManageModal taskId={taskId} />,
     });
   };
 

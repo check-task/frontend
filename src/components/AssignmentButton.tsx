@@ -3,6 +3,7 @@ import { AssignmentIcon } from './icons/AssignmentIcon';
 
 interface AssignmentButtonProps {
   collapsed?: boolean;
+  onClick?: () => void;
 }
 
 const buttonStyle = cva({
@@ -50,8 +51,9 @@ const textStyle = cva({
 
 export const AssignmentButton = ({
   collapsed = false,
+  onClick,
 }: AssignmentButtonProps) => (
-  <button className={buttonStyle()}>
+  <button type="button" className={buttonStyle()} onClick={onClick}>
     <div className={iconWrapperStyle()}>
       <AssignmentIcon />
     </div>
