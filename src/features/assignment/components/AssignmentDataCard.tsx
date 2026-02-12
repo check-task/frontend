@@ -18,6 +18,8 @@ export const AssignmentDataCard = ({
   onEdit,
   onDelete,
 }: AssignmentDataCardProps) => {
+  const isUrl = /^https?:\/\//i.test(path);
+
   return (
     <div className={`group ${cardStyle}`}>
       <div className={headerStyle}>
@@ -32,7 +34,19 @@ export const AssignmentDataCard = ({
           </button>
         </div>
       </div>
-      <p className={cardContentStyle}>{path}</p>
+      {/* url인경우는 a태그로 변경 */}
+      {isUrl ? (
+        <a
+          className={cardContentStyle}
+          href={path}
+          target='_blank'
+          rel='noreferrer'
+        >
+          {path}
+        </a>
+      ) : (
+        <p className={cardContentStyle}>{path}</p>
+      )}
     </div>
   );
 };
