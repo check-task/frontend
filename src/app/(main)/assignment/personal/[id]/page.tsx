@@ -29,6 +29,7 @@ export default function PersonalPage() {
           deadline={data.deadline}
           daysLeft={data.dDay}
           completionRate={data.progressRate}
+          folderColorHex={data.folderColorHex}
           tasks={data.tasks}
         />
         <PersonalRightContainer items={data.items} />

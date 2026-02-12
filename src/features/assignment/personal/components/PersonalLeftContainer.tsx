@@ -11,6 +11,7 @@ interface PersonalLeftContainerProps {
   deadline: string;
   daysLeft: string;
   completionRate: number;
+  folderColorHex?: string;
   taskId: number;
   // task 목록
   tasks: PersonalTaskItem[];
@@ -22,6 +23,7 @@ export const PersonalLeftContainer = ({
   deadline,
   daysLeft,
   completionRate,
+  folderColorHex,
   taskId,
   tasks,
 }: PersonalLeftContainerProps) => {
@@ -34,6 +36,7 @@ export const PersonalLeftContainer = ({
           completionRate={completionRate}
           title={title}
           daysLeft={daysLeft}
+          folderColorHex={folderColorHex}
         />
         <div className={taskContainerStyle}>
           <h2 className={css({ textStyle: 'h4', color: 'gray.900' })}>

@@ -11,6 +11,7 @@ export interface PersonalTaskDetailView {
   deadline: string;
   dDay: string;
   progressRate: number;
+  folderColorHex?: string;
   tasks: PersonalTaskItem[];
   items: ReferenceItem[];
 }
@@ -40,6 +41,7 @@ const mapToPersonalView = (data: TaskDetail): PersonalTaskDetailView => {
     deadline: data.deadline,
     dDay: data.dDay,
     progressRate: data.progressRate,
+    folderColorHex: data.foldercolor,
     tasks,
     items,
   };
