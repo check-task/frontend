@@ -126,6 +126,25 @@ export const Calendar = ({
     router.push(`/assignment/${type}/${taskId}`);
   };
 
+  // 세부과제를 과제 마감일 이후로 드롭 못하도록 제한
+  const handleEventAllow = (
+    dropInfo: { startStr: string },
+    draggedEvent: { id: string } | null,
+  ) => {
+    if (!draggedEvent) return false;
+    const eventId = draggedEvent.id;
+    if (!eventId.startsWith('sub-')) return true;
+
+    const subTaskId = Number(eventId.replace('sub-', ''));
+    const sub = subItems.find((s) => s.subTaskId === subTaskId);
+    if (!sub) return false;
+
+    const parent = items.find((a) => a.id === sub.taskId);
+    if (!parent) return false;
+
+    return dropInfo.startStr <= parent.dueDate;
+  };
+
   // 캘린더에서 이벤트 드래그 시 마감일 변경 (과제 / 세부과제 구분)
   const handleEventDrop = (info: EventDropArg) => {
     const eventId = info.event.id;
@@ -166,6 +185,7 @@ export const Calendar = ({
       events={filteredEvents}
       editable={true}
       droppable={true}
+      eventAllow={handleEventAllow}
       eventDrop={handleEventDrop}
       eventClick={handleEventClick}
       headerToolbar={false}
