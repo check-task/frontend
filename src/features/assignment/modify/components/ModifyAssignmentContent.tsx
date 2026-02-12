@@ -1,16 +1,18 @@
 'use client';
 
 import { Input } from '@/components/TextField';
-import { FolderColorSelect } from '../../create/components/FolderColorSelect';
+import { FolderSelect } from '../../create/components/FolderSelect';
 import DatePicker from '@/components/DatePicker';
 import { css } from 'styled-system/css';
+import type { Folder } from '@/types/folder';
 
 interface ModifyAssignmentContentProps {
   name?: string;
-  color?: string;
+  folders: Folder[];
+  selectedFolderId: number | null;
   date?: string | Date | null;
   onNameChange?: (name: string) => void;
-  onColorChange?: (color: string) => void;
+  onFolderChange?: (folderId: number) => void;
   onDateChange?: (date: Date | null) => void;
 }
 
@@ -18,10 +20,11 @@ interface ModifyAssignmentContentProps {
 // 수정 페이지에서는 기본값을 전달 받도록
 export const ModifyAssignmentContent = ({
   name,
-  color,
+  folders,
+  selectedFolderId,
   date,
   onNameChange,
-  onColorChange,
+  onFolderChange,
   onDateChange,
 }: ModifyAssignmentContentProps) => {
   return (
@@ -40,8 +43,11 @@ export const ModifyAssignmentContent = ({
 
       <div className={contentItemStyle}>
         <p className={labelTextStyle}>폴더색</p>
-        {/* 폴더 기본값 전달 */}
-        <FolderColorSelect value={color} onChange={onColorChange} />
+        <FolderSelect
+          folders={folders}
+          selectedFolderId={selectedFolderId}
+          onFolderChange={(id) => onFolderChange?.(id)}
+        />
       </div>
 
       <div className={contentItemStyle}>
