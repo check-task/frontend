@@ -9,25 +9,30 @@ import { CloseIcon } from '@/components/icons/CloseIcon';
 import { useModalStore } from '@/stores/modal-store';
 import { ConfirmDeleteAssignmentDataModal } from '../../components/ConfirmDeleteAssginmentDataModal';
 
-interface TaskItem {
+export interface ModifyTaskItem {
   id: number;
   title: string;
   dueDate?: string; // 서버에서 strig 형태로 받음
+  status?: 'PROGRESS' | 'COMPLETED';
+  isAlarm?: boolean;
+  assigneeId?: number;
 }
 
 interface ModifyAssignmentTaskProps {
-  initialTasks?: TaskItem[];
+  initialTasks?: ModifyTaskItem[];
   taskId?: number;
+  onTasksChange?: (tasks: ModifyTaskItem[]) => void;
 }
 
 // Task 목록 부분 컴포넌트 create->AddAssignmentTask 참고
 export const ModifyAssignmentTask = ({
   initialTasks,
   taskId,
+  onTasksChange,
 }: ModifyAssignmentTaskProps) => {
   // 모달 스토어
   const { openModal, closeModal } = useModalStore();
-  const [tasks, setTasks] = useState<TaskItem[]>([]);
+  const [tasks, setTasks] = useState<ModifyTaskItem[]>([]);
   const [initializedTaskId, setInitializedTaskId] = useState<number | null>(
     null,
   );
@@ -55,6 +60,10 @@ export const ModifyAssignmentTask = ({
   }, [initialTasks, initializedTaskId, taskId]);
 
   useEffect(() => {
+    onTasksChange?.(tasks);
+  }, [onTasksChange, tasks]);
+
+  useEffect(() => {
     resizeAll();
     const root = listRef.current;
     if (!root) return;
@@ -67,7 +76,16 @@ export const ModifyAssignmentTask = ({
 
   // TASK 추가 핸들러
   const handleAddTask = () => {
-    setTasks((prev) => [...prev, { id: Date.now(), title: '' }]);
+    setTasks((prev) => [
+      ...prev,
+      {
+        id: Date.now(),
+        title: '',
+        status: 'PROGRESS',
+        isAlarm: false,
+        assigneeId: 0,
+      },
+    ]);
   };
 
   // TASK명 변경 핸들러
@@ -98,7 +116,7 @@ export const ModifyAssignmentTask = ({
   };
 
   // TASK 삭제 모달 열림 핸들러
-  const handleOpenDeleteModal = (task: TaskItem) => {
+  const handleOpenDeleteModal = (task: ModifyTaskItem) => {
     openModal({
       title: 'TASK 삭제',
       headerType: 'none',
