@@ -8,6 +8,7 @@ import { AssignmentDataCard } from '@/features/assignment/components/AssignmentD
 import { EditAssignmentDataCardModal } from '../../components/EditAssignmentDataCardModal';
 import { ConfirmDeleteAssignmentDataModal } from '../../components/ConfirmDeleteAssginmentDataModal';
 import { useDeleteReferenceData } from '@/hooks/mutations/useDeleteReferenceData';
+import { useUpdateReferenceData } from '@/hooks/mutations/useUpdateReferenceData';
 import type { ReferenceItem } from './PersonalRightContainer';
 
 interface PersonalEtcProps {
@@ -19,6 +20,7 @@ export const PersonalEtc = ({ taskId, items }: PersonalEtcProps) => {
   // close 저장 누를 때 닫으려면 필요
   const { openModal, closeModal } = useModalStore();
   const { mutate: deleteReference } = useDeleteReferenceData(taskId);
+  const { mutateAsync: updateReference } = useUpdateReferenceData(taskId);
 
   // 자료 모음집 추가 모달 핸들러
   const handleOpenDataModal = () => {
@@ -43,7 +45,12 @@ export const PersonalEtc = ({ taskId, items }: PersonalEtcProps) => {
         <EditAssignmentDataCardModal
           type={item.type} // 타입 전달 0,1 형태에 따라 문구 다르게
           defaultValue={{ name: item.name, path: item.path }} // 이미 작성되어 있던 기본값
-          onSave={(updated) => {
+          onSave={async (updated) => {
+            await updateReference({
+              referenceId: item.id,
+              name: updated.name.trim(),
+              url: updated.path.trim(),
+            });
             closeModal();
           }}
         />
