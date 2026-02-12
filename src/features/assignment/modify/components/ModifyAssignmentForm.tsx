@@ -22,7 +22,6 @@ import { useTeamTaskDetail } from '@/features/assignment/team/components/hooks/u
 import { resolveFolderColor } from '@/lib/folder-color';
 import { useMyInfo } from '@/hooks/queries/useMyInfo';
 import { useUpdateTask } from '@/hooks/mutations/useUpdateTask';
-import { useCreateReferenceData } from '@/hooks/mutations/useCreateReferenceData';
 import { useDeleteTask } from '@/hooks/mutations/useDeleteTask';
 import type { TaskStatus, TaskType, UpdateTaskRequest } from '@/types/task';
 
@@ -52,8 +51,6 @@ export const ModifyAssignmentForm = () => {
   const initializedTaskIdRef = useRef<number | null>(null);
   const updateTaskId = Number.isFinite(taskId) ? taskId : 0;
   const { mutateAsync: updateTask, isPending } = useUpdateTask(updateTaskId);
-  const { mutateAsync: createReferenceData } =
-    useCreateReferenceData(updateTaskId);
   const { mutateAsync: deleteTask } = useDeleteTask(updateTaskId);
 
   // 과제 수정 페이지이므로 기본값 세팅
@@ -105,7 +102,14 @@ export const ModifyAssignmentForm = () => {
     status === 'COMPLETED' ? 'COMPLETED' : 'PROGRESS';
 
   const handleCancel = () => {
-    router.push('/assignment');
+    if (!Number.isFinite(taskId) || taskId <= 0) {
+      router.push('/assignment');
+      return;
+    }
+
+    const isTeam = data?.type ? data.type === 'TEAM' : isTeamProject;
+    const detailType = isTeam ? 'team' : 'personal';
+    router.push(`/assignment/${detailType}/${taskId}`);
   };
 
   const handleSave = async () => {
@@ -132,6 +136,10 @@ export const ModifyAssignmentForm = () => {
 
     const references = mergeReferences([...existingFileRefs, ...localUrlRefs]);
 
+    const newFileItems = dataItems.filter(
+      (item) => item.type === 1 && item.id < 0 && item.file,
+    );
+
     const payload: UpdateTaskRequest = {
       title: assignmentName.trim(),
       deadline: toYYYYMMDD(dueDate),
@@ -148,21 +156,13 @@ export const ModifyAssignmentForm = () => {
           assigneeId: task.assigneeId ?? 0,
         })),
       references,
+      fileNames: newFileItems.map((item) => item.name),
+      files: newFileItems
+        .map((item) => item.file)
+        .filter((file): file is File => Boolean(file)),
     };
 
     await updateTask(payload);
-
-    if (updateTaskId > 0) {
-      const newFileItems = dataItems.filter(
-        (item) => item.type === 1 && item.id < 0 && item.file,
-      );
-      for (const item of newFileItems) {
-        await createReferenceData({
-          type: 'file',
-          payload: { name: item.name, file: item.file },
-        });
-      }
-    }
     const detailType = type === 'TEAM' ? 'team' : 'personal';
     router.push(`/assignment/${detailType}/${taskId}`);
   };

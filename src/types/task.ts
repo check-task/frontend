@@ -220,6 +220,8 @@ export interface UpdateTaskRequest {
   folderId: number;
   subTasks: UpdateTaskSubTaskItem[];
   references: { name: string; url: string }[];
+  fileNames?: string[] | string;
+  files?: File[];
 }
 
 // ============================

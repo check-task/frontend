@@ -140,7 +140,31 @@ export const updateTask = async (
   taskId: number,
   body: UpdateTaskRequest,
 ): Promise<void> => {
-  await axiosInstance.patch(`${TASK_BASE}/${taskId}`, body);
+  const formData = new FormData();
+  formData.append('title', body.title);
+  formData.append('deadline', body.deadline);
+  formData.append('type', body.type);
+  if (body.status) formData.append('status', body.status);
+  formData.append('folderId', String(body.folderId));
+  formData.append('subTasks', JSON.stringify(body.subTasks ?? []));
+  formData.append('references', JSON.stringify(body.references ?? []));
+
+  if (body.fileNames) {
+    const fileNames = Array.isArray(body.fileNames)
+      ? body.fileNames.join(',')
+      : body.fileNames;
+    if (fileNames) formData.append('fileNames', fileNames);
+  }
+
+  if (body.files?.length) {
+    body.files.forEach((file) => {
+      formData.append('files', file);
+    });
+  }
+
+  await axiosInstance.patch(`${TASK_BASE}/${taskId}`, formData, {
+    headers: { 'Content-Type': undefined } as unknown as Record<string, string>,
+  });
 };
 
 // 과제 삭제 api 호출 (DELETE /task/{taskId})
