@@ -34,7 +34,7 @@ export async function updateMeetingLog(
     return one as MeetingLogItemResponse;
   // data 없이 응답 본문에 회의록 객체가 직접 있는 경우 (id → log_id)
   if (raw && typeof raw === 'object' && ('log_id' in raw || 'id' in raw)) {
-    const r = raw as MeetingLogItemResponse & { id?: number };
+    const r = raw as unknown as MeetingLogItemResponse & { id?: number };
     return {
       log_id: r.log_id ?? r.id!,
       date: r.date ?? '',
