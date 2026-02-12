@@ -9,6 +9,8 @@ export const useUpdateTask = (taskId: number) => {
     mutationFn: (body: UpdateTaskRequest) => updateTask(taskId, body),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['taskDetail', taskId] });
+      queryClient.invalidateQueries({ queryKey: ['taskList'], exact: false });
+      queryClient.invalidateQueries({ queryKey: ['completedTaskList'] });
     },
   });
 };
