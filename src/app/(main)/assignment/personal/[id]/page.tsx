@@ -31,7 +31,7 @@ export default function PersonalPage() {
           completionRate={data.progressRate}
           tasks={data.tasks}
         />
-        <PersonalRightContainer items={data.items} />
+        <PersonalRightContainer taskId={data.taskId} items={data.items} />
       </div>
     </div>
   );
