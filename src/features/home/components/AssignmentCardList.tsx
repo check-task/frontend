@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import {
   DndContext,
   closestCenter,
@@ -44,10 +45,12 @@ const SortableAssignmentCard = ({
   assignment,
   index,
   disabled,
+  onClick,
 }: {
   assignment: Assignment;
   index: number;
   disabled?: boolean;
+  onClick: () => void;
 }) => {
   const {
     attributes,
@@ -66,7 +69,13 @@ const SortableAssignmentCard = ({
   };
 
   return (
-    <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
+    <div
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      {...listeners}
+      onClick={onClick}
+    >
       <AssignmentCard
         index={index}
         folderName={assignment.folderName}
@@ -84,6 +93,7 @@ export const AssignmentCardList = ({
   assignments,
   isDragDisabled = false,
 }: AssignmentCardListProps) => {
+  const router = useRouter();
   const updatePriorities = useUpdateTaskPriorities();
   // 드래그 시 즉각적인 UI 반영을 위한 로컬 상태
   const [items, setItems] = useState(assignments);
@@ -93,8 +103,10 @@ export const AssignmentCardList = ({
   }, [assignments]);
 
   const sensors = useSensors(
-    // 마우스/터치 감지
-    useSensor(PointerSensor),
+    // 마우스/터치 감지 (distance: 5로 클릭과 드래그 구분)
+    useSensor(PointerSensor, {
+      activationConstraint: { distance: 5 },
+    }),
     // 접근성을 위한 키보드 감지
     // Tab으로 카드 선택 후 Space/Enter로 드래그 시작
     // 방향키로 위치로 이동 후 Space/Enter로 드롭
@@ -102,6 +114,11 @@ export const AssignmentCardList = ({
       coordinateGetter: sortableKeyboardCoordinates,
     }),
   );
+
+  const handleCardClick = (assignment: Assignment) => {
+    const type = assignment.assignmentType === '팀' ? 'team' : 'personal';
+    router.push(`/assignment/${type}/${assignment.id}`);
+  };
 
   // 드래그 완료 시 카드 순서 재정렬 + 우선순위 API 호출
   const handleDragEnd = (event: DragEndEvent) => {
@@ -141,6 +158,7 @@ export const AssignmentCardList = ({
               assignment={assignment}
               index={index}
               disabled={isDragDisabled}
+              onClick={() => handleCardClick(assignment)}
             />
           ))}
         </Container>

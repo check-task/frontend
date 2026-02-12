@@ -37,7 +37,7 @@ export const FolderModalContent = ({
     .filter((f) => f.id !== folderId)
     .map((f) => f.color);
 
-  const [name, setName] = useState('');
+  const [name, setName] = useState<string>(mode === 'edit' ? initialName : '');
   // 추가는 초기 선택 없음, 수정은 기존 색상 선택
   const [selectedColor, setSelectedColor] = useState<FolderColor | null>(
     mode === 'add' ? null : (initialColor ?? null),
