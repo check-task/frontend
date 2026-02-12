@@ -26,17 +26,17 @@ export const sub = defineSemanticTokens.colors({
   },
 
   '05': {
-    '100': { value: { base: '#081221', _dark: '#F7F9FD' } },
+    '100': { value: { base: '#081221', _dark: '#B5BAC4' } },
     '60': {
       value: {
         base: 'rgba(8, 18, 33, 0.6)',
-        _dark: 'rgba(247, 249, 253, 0.6)',
+        _dark: 'rgba(181, 186, 196, 0.6)',
       },
     },
     '40': {
       value: {
         base: 'rgba(8, 18, 33, 0.4)',
-        _dark: 'rgba(247, 249, 253, 0.4)',
+        _dark: 'rgba(181, 186, 196, 0.4)',
       },
     },
   },
