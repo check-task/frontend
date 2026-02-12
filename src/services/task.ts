@@ -9,6 +9,7 @@ import {
   GetTaskListParams,
   GetTaskListResponse,
   JoinTaskResponse,
+  DeleteTaskResponse,
   UpdateTaskPrioritiesRequest,
   SubTaskListItem,
   Task,
@@ -63,8 +64,7 @@ export const getTaskDetail = async (taskId: number): Promise<TaskDetail> => {
         url: string;
       }) => ({
         ...c,
-        communicationId:
-          c.communicationId ?? c.communication_id ?? c.id,
+        communicationId: c.communicationId ?? c.communication_id ?? c.id,
       }),
     );
   }
@@ -72,11 +72,13 @@ export const getTaskDetail = async (taskId: number): Promise<TaskDetail> => {
   // references: API는 id, fileUrl 사용 → referenceId, file_url로 통일
   if (data.references?.length) {
     data.references = data.references.map(
-      (r: TaskReference & {
-        id?: number;
-        reference_id?: number;
-        fileUrl?: string | null;
-      }) => ({
+      (
+        r: TaskReference & {
+          id?: number;
+          reference_id?: number;
+          fileUrl?: string | null;
+        },
+      ) => ({
         referenceId: r.referenceId ?? r.reference_id ?? r.id,
         name: r.name,
         url: r.url ?? null,
@@ -90,18 +92,19 @@ export const getTaskDetail = async (taskId: number): Promise<TaskDetail> => {
     data.subTasks ?? (data as { sub_tasks?: unknown[] }).sub_tasks;
   if (rawSubTasks?.length) {
     data.subTasks = rawSubTasks.map(
-      (st: TaskDetailSubTask & {
-        sub_task_id?: number;
-        assignee_id?: number | null;
-        assignee_name?: string;
-        assignee_profile_image?: string | null;
-      }) => {
+      (
+        st: TaskDetailSubTask & {
+          sub_task_id?: number;
+          assignee_id?: number | null;
+          assignee_name?: string;
+          assignee_profile_image?: string | null;
+        },
+      ) => {
         const rawAssigneeId = st.assigneeId ?? st.assignee_id;
         return {
           ...st,
           subTaskId: st.subTaskId ?? st.sub_task_id ?? 0,
-          assigneeId:
-            rawAssigneeId != null ? rawAssigneeId : undefined,
+          assigneeId: rawAssigneeId != null ? rawAssigneeId : undefined,
           assigneeName:
             st.assigneeName ?? st.assignee_name ?? st.assigneeName ?? '',
           assigneeProfileImage:
@@ -140,10 +143,13 @@ export const updateTask = async (
   await axiosInstance.patch(`${TASK_BASE}/${taskId}`, body);
 };
 
+// 과제 삭제 api 호출 (DELETE /task/{taskId})
+export const deleteTask = async (taskId: number): Promise<void> => {
+  await axiosInstance.delete<DeleteTaskResponse>(`${TASK_BASE}/${taskId}`);
+};
+
 // 과제 생성 api 호출 (201 응답 시 data.taskId 반환, 응답 형태 다양하게 처리)
-export const createTask = async (
-  body: CreateTaskRequest,
-): Promise<number> => {
+export const createTask = async (body: CreateTaskRequest): Promise<number> => {
   const res = await axiosInstance.post<CreateTaskResponse>(TASK_BASE, body);
   const bodyData = res.data?.data;
   const taskId =
@@ -193,7 +199,15 @@ export const createSubTask = async (
     `${TASK_BASE}/${taskId}/subTask`,
     body,
   );
-  return res.data?.data ?? { subTaskId: 0, title: '', deadline: '', status: 'PENDING', assigneeName: '' };
+  return (
+    res.data?.data ?? {
+      subTaskId: 0,
+      title: '',
+      deadline: '',
+      status: 'PENDING',
+      assigneeName: '',
+    }
+  );
 };
 
 // 팀원 초대 링크 생성 api 호출 (POST /task/{taskId}/invitation)
@@ -224,9 +238,7 @@ type TaskMemberRaw = TaskMember & {
   profile_image?: string | null;
 };
 
-export const getTaskMembers = async (
-  taskId: number,
-): Promise<TaskMember[]> => {
+export const getTaskMembers = async (taskId: number): Promise<TaskMember[]> => {
   const res = await axiosInstance.get<{
     data: { members?: TaskMemberRaw[] };
   }>(`${TASK_BASE}/${taskId}/members`);
