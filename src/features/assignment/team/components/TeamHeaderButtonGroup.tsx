@@ -39,7 +39,8 @@ export const TeamHeaderButton = ({ taskId }: TeamHeaderButtonProps) => {
       >
         팀원관리
       </Button>
-      <Link href='/assignment/modify'>
+      {/* 과제 수정에서 해당 과제를 조회하기 위해 taskId 전달 */}
+      <Link href={`/assignment/modify?taskId=${taskId}`}>
         <Button
           variant='strokeBlue'
           size={isSidebarCollapsed ? 'small' : 'tiny'}

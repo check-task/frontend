@@ -13,17 +13,19 @@ export interface ReferenceItem {
 }
 
 interface PersonalRightContainerProps {
+  taskId: number;
   items: ReferenceItem[];
 }
 
 // 페이지 기준 오른쪽 영역 (과제 수정버튼+자료 모음집)
 export const PersonalRightContainer = ({
+  taskId,
   items,
 }: PersonalRightContainerProps) => {
   return (
     <div className={containerStyle}>
-      {/* 추후 링크로 과제 수정 페이지 연결 */}
-      <Link href='/assignment/modify'>
+      {/* 과제 수정에서 해당 과제를 조회하기 위해 taskId 전달 */}
+      <Link href={`/assignment/modify?taskId=${taskId}`}>
         <Button variant='strokeBlue' size='small'>
           과제수정
         </Button>
