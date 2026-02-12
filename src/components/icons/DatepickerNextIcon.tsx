@@ -2,7 +2,6 @@ import { cva } from 'styled-system/css';
 
 const iconStyle = cva({
   base: {
-    stroke: 'gray.900',
     strokeLinecap: 'round',
   },
   variants: {
@@ -10,23 +9,29 @@ const iconStyle = cva({
       md: { width: '1.5rem', height: '1.5rem' }, // 기존 datePicker용
       lg: { width: '2.25rem', height: '2.25rem', strokeWidth: '1.5' }, // 추가 MonthPicker용
     },
+    stroke: {
+      default: { stroke: 'gray.900' },
+      login: { stroke: 'gray.400' },
+    },
   },
   defaultVariants: {
     size: 'md',
+    stroke: 'default',
   },
 });
 
-interface IconSizeProps {
+interface IconProps {
   size?: 'md' | 'lg';
+  stroke?: 'default' | 'login';
 }
 
-export const DatepickerNextIcon = ({ size = 'md' }: IconSizeProps) => {
+export const DatepickerNextIcon = ({ size = 'md', stroke }: IconProps) => {
   return (
     <svg
       xmlns='http://www.w3.org/2000/svg'
       viewBox='0 0 24 24'
       fill='none'
-      className={iconStyle({ size })}
+      className={iconStyle({ size, stroke })}
     >
       <path d='M10 6L15.2929 11.2929C15.6834 11.6834 15.6834 12.3166 15.2929 12.7071L10 18' />
     </svg>
