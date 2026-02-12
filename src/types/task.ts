@@ -168,6 +168,13 @@ export interface GetTaskDetailResponse {
   data: TaskDetail;
 }
 
+// 과제 삭제 응답
+export interface DeleteTaskResponse {
+  resultType: 'SUCCESS' | 'FAIL';
+  message: string;
+  data: null;
+}
+
 // ============================
 // 과제 생성 타입 정의
 // ============================
