@@ -127,7 +127,9 @@ export const TeamEtc = ({
   };
 
   const getMeetingLogCardTitle = (item: TaskMeetingLog, index: number) =>
-    toMMDD(item.date) ? `${toMMDD(item.date)} 회의록` : `${index + 1}주차 회의록`;
+    toMMDD(item.date)
+      ? `${toMMDD(item.date)} 회의록`
+      : `${index + 1}주차 회의록`;
 
   const handleDeleteMeetingLog = (item: TaskMeetingLog, index: number) => {
     openModal({
@@ -207,7 +209,11 @@ export const TeamEtc = ({
               </div>
               {item.url ? (
                 <a
-                  href={item.url.startsWith('http') ? item.url : `https://${item.url}`}
+                  href={
+                    item.url.startsWith('http')
+                      ? item.url
+                      : `https://${item.url}`
+                  }
                   target='_blank'
                   rel='noopener noreferrer'
                   className={cardContentStyle}
@@ -243,9 +249,14 @@ export const TeamEtc = ({
             >
               <div className={communicationHeaderStyle}>
                 <p className={cardTitleStyle}>
-                  {toMMDD(item.date) ? `${toMMDD(item.date)} 회의록` : `${index + 1}주차 회의록`}
+                  {toMMDD(item.date)
+                    ? `${toMMDD(item.date)} 회의록`
+                    : `${index + 1}주차 회의록`}
                 </p>
-                <div className={meetingLogIconGroupStyle} data-meeting-log-icons>
+                <div
+                  className={meetingLogIconGroupStyle}
+                  data-meeting-log-icons
+                >
                   <button
                     type='button'
                     className={communicationIconButtonStyle}
@@ -353,11 +364,7 @@ export const TeamEtc = ({
       </div>
 
       <MinutesModal
-        key={
-          minutesModalOpen
-            ? (editingMeetingLog?.logId ?? 'new')
-            : 'closed'
-        }
+        key={minutesModalOpen ? (editingMeetingLog?.logId ?? 'new') : 'closed'}
         open={minutesModalOpen}
         onClose={() => {
           setMinutesModalOpen(false);
@@ -420,8 +427,11 @@ const meetingLogIconGroupStyle = css({
 const meetingLogCardStyle = css({
   display: 'flex',
   flexDirection: 'column',
-  gap: '1.25rem',
-  p: '1rem',
+  // 간격 수정했습니다- 예원
+  gap: '0.25rem',
+  px: '1rem',
+  py: '1.25rem',
+  // 여기까지
   bg: 'blue.50',
   borderRadius: '0.5rem',
   width: '100%',
@@ -453,8 +463,11 @@ const referenceIconGroupStyle = css({
 const communicationCardStyle = css({
   display: 'flex',
   flexDirection: 'column',
-  gap: '1.25rem',
-  p: '1rem',
+  // 간격 수정했습니다- 예원
+  gap: '0.25rem',
+  px: '1rem',
+  py: '1.25rem',
+  // 여기까지
   bg: 'blue.50',
   borderRadius: '0.5rem',
   width: '100%',
@@ -469,8 +482,11 @@ const communicationCardStyle = css({
 const referenceCardStyle = css({
   display: 'flex',
   flexDirection: 'column',
-  gap: '1.25rem',
-  p: '1rem',
+  // 간격 수정했습니다- 예원
+  gap: '0.25rem',
+  px: '1rem',
+  py: '1.25rem',
+  // 여기까지
   bg: 'blue.50',
   borderRadius: '0.5rem',
   width: '100%',
