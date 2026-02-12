@@ -70,36 +70,40 @@ export const TeamCommunicationModal = ({
   return (
     <div className={containerStyle}>
       <div className={inputContainerStyle}>
-        {inputGroups.map((group, index) => (
-          <div key={group.id}>
-            {index > 0 && <Divider mt='1.25rem' mb='1.25rem' />}
-            <div className={inputGroupStyle}>
-              <div className={inputWrapperStyle}>
-                <label className={labelStyle}>커뮤니케이션명</label>
-                <Input
-                  size='modal'
-                  placeholder='커뮤니케이션명을 입력하세요.'
-                  value={group.name}
-                  onChange={(e) =>
-                    handleInputChange(group.id, 'name', e.target.value)
-                  }
-                />
-              </div>
-              <div className={inputWrapperStyle}>
-                <label className={labelStyle}>URL경로</label>
-                <Input
-                  size='modal'
-                  placeholder='URL을 붙여넣으세요.'
-                  value={group.url}
-                  onChange={(e) =>
-                    handleInputChange(group.id, 'url', e.target.value)
-                  }
-                />
+        <div className={scrollableListStyle}>
+          {inputGroups.map((group, index) => (
+            <div key={group.id}>
+              {index > 0 && <Divider mt='1.25rem' mb='1.25rem' />}
+              <div className={inputGroupStyle}>
+                <div className={inputWrapperStyle}>
+                  <label className={labelStyle}>커뮤니케이션명</label>
+                  <Input
+                    size='modal'
+                    placeholder='커뮤니케이션명을 입력하세요.'
+                    value={group.name}
+                    onChange={(e) =>
+                      handleInputChange(group.id, 'name', e.target.value)
+                    }
+                  />
+                </div>
+                <div className={inputWrapperStyle}>
+                  <label className={labelStyle}>URL경로</label>
+                  <Input
+                    size='modal'
+                    placeholder='URL을 붙여넣으세요.'
+                    value={group.url}
+                    onChange={(e) =>
+                      handleInputChange(group.id, 'url', e.target.value)
+                    }
+                  />
+                </div>
               </div>
             </div>
-          </div>
-        ))}
-        <AddURLDataButton toggleType={0} onClick={handleAddInput} />
+          ))}
+        </div>
+        <div className={css({ mt: '1rem', mb: '1.25rem' })}>
+          <AddURLDataButton toggleType={0} onClick={handleAddInput} />
+        </div>
       </div>
 
       <Button variant='fillBlue' size='xlarge' onClick={handleSave}>
@@ -120,9 +124,16 @@ const containerStyle = css({
 const inputContainerStyle = css({
   display: 'flex',
   flexDirection: 'column',
-  gap: '1rem',
   width: '100%',
-  pb: '1rem',
+});
+
+// 입력 목록만 스크롤 — 3개 이상일 때 스크롤 (자료 모달과 동일)
+const scrollableListStyle = css({
+  display: 'flex',
+  flexDirection: 'column',
+  width: '100%',
+  maxHeight: '26rem',
+  overflowY: 'auto',
 });
 
 const inputGroupStyle = css({

@@ -14,6 +14,9 @@ export interface GetTaskListParams {
   sort?: TaskSort;
 }
 
+// 과제(상세) 진행 상태 (API 응답과 동일)
+export type TaskStatus = 'PROGRESS' | 'COMPLETED';
+
 // 과제 기본 정보
 // 세부 과제 정보에 상속됨 그래서 folderId, folderTitle optional 처리
 export interface Task {
@@ -23,6 +26,7 @@ export interface Task {
   foldercolor?: string;
   title: string;
   type: TaskType; // PERSONAL | TEAM
+  status?: TaskStatus; // 과제 상세 조회 시 반환 (PROGRESS | COMPLETED)
   deadline: string; // YYYY-MM-DD
   dDay: string; // D-3 형태
   progressRate: number; // 0 ~ 100
@@ -59,7 +63,7 @@ export interface TaskDetailSubTaskComment {
   commentId: number;
   content: string;
   writer: string;
-  profileImage: string;
+  profileImage: string | null;
   createdAt: string;
 }
 
@@ -73,9 +77,9 @@ export interface TaskDetailSubTask {
   commentCount: number;
   comments?: TaskDetailSubTaskComment[];
   /** 담당자 사용자 ID (과제 수정 API용) */
-  assigneeId?: number;
+  assigneeId?: number | null;
   assigneeName: string;
-  assigneeProfileImage?: string;
+  assigneeProfileImage?: string | null;
 }
 
 // 자료 모음집 참조 항목 (과제 상세·자료 생성 응답)
@@ -325,6 +329,27 @@ export interface UpdateSubTaskAssigneeResponse {
   data: {
     sub_task_id: number;
     assignee_id: number;
+  };
+}
+
+// ============================
+// 단일 세부 과제 추가 타입 정의
+// ============================
+export interface CreateSubTaskRequest {
+  title: string;
+  deadline: string; // YYYY-MM-DD
+  isAlarm: boolean;
+}
+
+export interface CreateSubTaskResponse {
+  resultType: 'SUCCESS' | 'FAIL';
+  message: string;
+  data: {
+    subTaskId: number;
+    title: string;
+    deadline: string;
+    status: string;
+    assigneeName: string;
   };
 }
 

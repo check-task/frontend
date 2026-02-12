@@ -40,7 +40,16 @@ export const CommentEditDropdown = ({
             댓글 수정
           </div>
           <div className={dividerStyle} />
-          <div className={dropdownItemStyle} onClick={handleDeleteComment}>
+          <div
+            className={dropdownItemStyle}
+            onMouseDown={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              handleDeleteComment();
+            }}
+            role="button"
+            tabIndex={0}
+          >
             댓글 삭제
           </div>
         </div>

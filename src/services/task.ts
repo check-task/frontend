@@ -1,5 +1,7 @@
 import {
   CompletedTask,
+  CreateSubTaskRequest,
+  CreateSubTaskResponse,
   CreateTaskRequest,
   CreateTaskResponse,
   GetCompletedTaskListResponse,
@@ -180,4 +182,71 @@ export const updateTaskDeadline = async (
   deadline: string,
 ): Promise<void> => {
   await axiosInstance.patch(`/task/${taskId}`, { deadline });
+};
+
+// 단일 세부 과제 추가 api 호출 (POST /task/{taskId}/subTask)
+export const createSubTask = async (
+  taskId: number,
+  body: CreateSubTaskRequest,
+): Promise<CreateSubTaskResponse['data']> => {
+  const res = await axiosInstance.post<CreateSubTaskResponse>(
+    `${TASK_BASE}/${taskId}/subTask`,
+    body,
+  );
+  return res.data?.data ?? { subTaskId: 0, title: '', deadline: '', status: 'PENDING', assigneeName: '' };
+};
+
+// 팀원 초대 링크 생성 api 호출 (POST /task/{taskId}/invitation)
+export interface CreateInvitationResponse {
+  invite_code: string;
+  invite_expired: string;
+}
+
+export const createInvitationLink = async (
+  taskId: number,
+): Promise<CreateInvitationResponse> => {
+  const res = await axiosInstance.post<{
+    data: CreateInvitationResponse;
+  }>(`${TASK_BASE}/${taskId}/invitation`);
+  return res.data?.data ?? { invite_code: '', invite_expired: '' };
+};
+
+// 팀원 목록 (역할: 0 = Member, 1 = Owner, 만든 사람은 Owner)
+export interface TaskMember {
+  memberId: number;
+  name: string;
+  profileImage?: string | null;
+  role: 0 | 1; // 0: Member, 1: Owner
+}
+
+type TaskMemberRaw = TaskMember & {
+  member_id?: number;
+  profile_image?: string | null;
+};
+
+export const getTaskMembers = async (
+  taskId: number,
+): Promise<TaskMember[]> => {
+  const res = await axiosInstance.get<{
+    data: { members?: TaskMemberRaw[] };
+  }>(`${TASK_BASE}/${taskId}/members`);
+  const raw = res.data?.data?.members;
+  if (!Array.isArray(raw)) return [];
+  return raw.map((m) => ({
+    memberId: m.memberId ?? m.member_id ?? 0,
+    name: m.name ?? (m as { nickname?: string }).nickname ?? '',
+    profileImage: m.profileImage ?? m.profile_image ?? null,
+    role: m.role === 1 ? 1 : 0,
+  }));
+};
+
+// 팀원 역할 수정 (PATCH /task/{taskId}/member/{memberId})
+export const updateMemberRole = async (
+  taskId: number,
+  memberId: number,
+  role: 0 | 1,
+): Promise<void> => {
+  await axiosInstance.patch(`${TASK_BASE}/${taskId}/member/${memberId}`, {
+    role,
+  });
 };
