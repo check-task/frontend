@@ -13,11 +13,13 @@ export interface ReferenceItem {
 }
 
 interface PersonalRightContainerProps {
+  taskId: number;
   items: ReferenceItem[];
 }
 
 // 페이지 기준 오른쪽 영역 (과제 수정버튼+자료 모음집)
 export const PersonalRightContainer = ({
+  taskId,
   items,
 }: PersonalRightContainerProps) => {
   return (
@@ -28,7 +30,7 @@ export const PersonalRightContainer = ({
           과제수정
         </Button>
       </Link>
-      <PersonalEtc items={items} />
+      <PersonalEtc taskId={taskId} items={items} />
     </div>
   );
 };

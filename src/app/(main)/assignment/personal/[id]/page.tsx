@@ -11,7 +11,6 @@ export default function PersonalPage() {
   const taskId = Number(params?.id);
   // 개인 과제 상세 커스텀 훅 호출
   const { data, isLoading } = usePersonalTaskDetail(taskId);
-  console.log('개인 과제 상세 데이터:', data);
 
   if (isLoading || !data) {
     return (
@@ -27,11 +26,13 @@ export default function PersonalPage() {
         <PersonalLeftContainer
           taskId={data.taskId}
           title={data.title}
+          deadline={data.deadline}
           daysLeft={data.dDay}
           completionRate={data.progressRate}
+          folderColorHex={data.folderColorHex}
           tasks={data.tasks}
         />
-        <PersonalRightContainer items={data.items} />
+        <PersonalRightContainer taskId={data.taskId} items={data.items} />
       </div>
     </div>
   );
