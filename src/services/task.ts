@@ -181,7 +181,7 @@ export const updateTaskDeadline = async (
   taskId: number,
   deadline: string,
 ): Promise<void> => {
-  await axiosInstance.patch(`/task/${taskId}`, { deadline });
+  await axiosInstance.patch(`/task/${taskId}/deadline`, { deadline });
 };
 
 // 단일 세부 과제 추가 api 호출 (POST /task/{taskId}/subTask)

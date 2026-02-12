@@ -12,6 +12,7 @@ export interface GetTaskListParams {
   type?: TaskType;
   folderId?: number;
   sort?: TaskSort;
+  status?: string;
 }
 
 // 과제(상세) 진행 상태 (API 응답과 동일)

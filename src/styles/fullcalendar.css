@@ -137,6 +137,12 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  font-weight: 700;
+}
+
+/* 세부과제 이벤트 텍스트*/
+.fc .fc-subtask-event .fc-event-title {
+  font-weight: 400;
 }
 
 /* 이벤트 컨테이너 */
