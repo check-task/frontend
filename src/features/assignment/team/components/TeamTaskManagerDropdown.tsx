@@ -99,8 +99,8 @@ const dropdownItemStyle = css({
   background: 'transparent',
   cursor: 'pointer',
   textAlign: 'left',
-  borderBottom: '1px solid',
-  borderColor: 'gray.100',
+  borderBottom: '0.0625rem solid',
+  borderBottomColor: 'gray.100',
   '&:last-child': {
     borderBottom: 'none',
   },

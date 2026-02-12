@@ -23,6 +23,7 @@ import { useCreateSubTaskComment } from './hooks/useCreateSubTaskComment';
 import { useUpdateComment } from './hooks/useUpdateComment';
 import { useDeleteComment } from './hooks/useDeleteComment';
 import { useUpdateSubTaskAlarm } from '@/features/assignment/personal/components/hooks/useUpdateSubTaskAlarm';
+import { useTaskMembers } from '@/hooks/queries/useTaskMembers';
 import { useMyInfo } from '@/hooks/queries/useMyInfo';
 import { AddTaskButton } from './AddTaskButton';
 
@@ -64,6 +65,19 @@ const TeamTaskList = ({
   const { mutateAsync: updateComment } = useUpdateComment(taskId);
   const { mutate: deleteComment } = useDeleteComment(taskId);
   const { data: myInfo } = useMyInfo();
+  const { data: taskMembers = [] } = useTaskMembers(taskId);
+  const currentUserId = myInfo?.user?.id;
+  const myNickname = myInfo?.user?.nickname ?? '';
+  const teamMembersForDropdown = taskMembers
+    .filter(
+      (m) =>
+        m.memberId !== currentUserId && m.name !== myNickname,
+    )
+    .map((m) => ({
+      id: m.memberId,
+      nickname: m.name,
+      profileImage: m.profileImage ?? undefined,
+    }));
 
   const handleSelectAssignee = (subTaskId: number, assigneeId: number) => {
     updateAssignee({ subTaskId, assigneeId });
@@ -292,7 +306,7 @@ const TeamTaskList = ({
                     <TeamTaskManager
                       manager={task.assigneeName}
                       profileImage={task.assigneeProfileImage ?? undefined}
-                      members={[]}
+                      members={teamMembersForDropdown}
                       onSelectMember={(_, assigneeId) => {
                         if (assigneeId != null)
                           handleSelectAssignee(task.subTaskId, assigneeId);
