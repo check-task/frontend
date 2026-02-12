@@ -49,8 +49,9 @@ const Container = {
       height: '5.3125rem',
       paddingX: '7.5rem',
       paddingY: '1.25rem',
-      borderTop: '1px solid',
-      borderColor: 'gray.200',
+      position: 'relative',
+      zIndex: 1,
+      boxShadow: '0 -1px 4px 0 rgba(0, 0, 0, 0.08)',
     }),
   }),
   BottomRight: styled('div', {
