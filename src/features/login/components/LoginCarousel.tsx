@@ -34,7 +34,6 @@ const SLIDES = [
 
 export const LoginCarousel = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
-  const slide = SLIDES[currentSlide];
 
   const handlePrev = () => {
     setCurrentSlide((prev) => (prev === 0 ? SLIDES.length - 1 : prev - 1));
@@ -48,24 +47,41 @@ export const LoginCarousel = () => {
     <Container.Main>
       {/* 좌측 패널 - 이미지 영역 */}
       <Container.LeftPanel>
-        <Image
-          src={slide.image}
-          alt={`슬라이드 ${slide.index}`}
-          fill
-          style={{ objectFit: 'contain', padding: '60px' }}
-          priority
-        />
+        {SLIDES.map((s, i) => (
+          <Container.ImageLayer
+            key={s.index}
+            style={{ opacity: currentSlide === i ? 1 : 0 }}
+          >
+            <Image
+              src={s.image}
+              alt={`슬라이드 ${s.index}`}
+              fill
+              style={{ objectFit: 'contain', padding: '60px' }}
+              priority={i === 0}
+            />
+          </Container.ImageLayer>
+        ))}
       </Container.LeftPanel>
 
       {/* 우측 컨텐츠 - 텍스트 + 네비게이션 */}
       <Container.RightContent>
-        <Container.SlideInfo>
-          <Text.SlideIndex>{slide.index}</Text.SlideIndex>
-          <Container.SlideText>
-            <Text.SlideTitle>{slide.title}</Text.SlideTitle>
-            <Text.SlideDescription>{slide.description}</Text.SlideDescription>
-          </Container.SlideText>
-        </Container.SlideInfo>
+        <Container.TextArea>
+          {SLIDES.map((s, i) => (
+            <Container.TextLayer
+              key={s.index}
+              style={{
+                opacity: currentSlide === i ? 1 : 0,
+                position: i === 0 ? 'relative' : 'absolute',
+              }}
+            >
+              <Text.SlideIndex>{s.index}</Text.SlideIndex>
+              <Container.SlideText>
+                <Text.SlideTitle>{s.title}</Text.SlideTitle>
+                <Text.SlideDescription>{s.description}</Text.SlideDescription>
+              </Container.SlideText>
+            </Container.TextLayer>
+          ))}
+        </Container.TextArea>
 
         {/* 좌우 화살표 */}
         <Container.NavButtons>
@@ -120,6 +136,13 @@ const Container = {
       bg: 'blue.50',
     },
   }),
+  ImageLayer: styled('div', {
+    base: {
+      position: 'absolute',
+      inset: 0,
+      transition: 'opacity 500ms ease-out',
+    },
+  }),
   RightContent: styled('div', {
     base: stack.raw({
       flex: 1,
@@ -128,9 +151,18 @@ const Container = {
       gap: '2.25rem',
     }),
   }),
-  SlideInfo: styled('div', {
+  TextArea: styled('div', {
+    base: {
+      position: 'relative',
+      minHeight: '8rem',
+    },
+  }),
+  TextLayer: styled('div', {
     base: stack.raw({
+      position: 'absolute',
+      inset: 0,
       gap: '0.25rem',
+      transition: 'opacity 500ms ease-out',
     }),
   }),
   SlideText: styled('div', {
