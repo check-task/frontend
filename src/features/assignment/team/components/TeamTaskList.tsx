@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Checkbox } from '@/components/Checkbox';
 import { css, cva } from 'styled-system/css';
 import { ClockToggle } from '../../components/ClockToggle';
@@ -23,8 +23,10 @@ import { useCreateSubTaskComment } from './hooks/useCreateSubTaskComment';
 import { useUpdateComment } from './hooks/useUpdateComment';
 import { useDeleteComment } from './hooks/useDeleteComment';
 import { useUpdateSubTaskAlarm } from '@/features/assignment/personal/components/hooks/useUpdateSubTaskAlarm';
+import { useTaskMembers } from '@/hooks/queries/useTaskMembers';
 import { useMyInfo } from '@/hooks/queries/useMyInfo';
 import { AddTaskButton } from './AddTaskButton';
+import { getSocket, COMMENT_SEND_EVENTS, COMMENT_EVENTS } from '@/lib/socket';
 
 const getCommentId = (
   c: TaskDetailSubTaskComment & { comment_id?: number; id?: number },
@@ -47,9 +49,7 @@ const TeamTaskList = ({
   const [commentInputs, setCommentInputs] = useState<{ [key: number]: string }>(
     {},
   );
-  const [pendingComments, setPendingComments] = useState<
-    Record<number, TaskDetailSubTaskComment[]>
-  >({});
+
   const [editingCommentId, setEditingCommentId] = useState<number | null>(null);
   const [editingContent, setEditingContent] = useState('');
   const [deletedCommentIds, setDeletedCommentIds] = useState<Set<number>>(
@@ -64,6 +64,41 @@ const TeamTaskList = ({
   const { mutateAsync: updateComment } = useUpdateComment(taskId);
   const { mutate: deleteComment } = useDeleteComment(taskId);
   const { data: myInfo } = useMyInfo();
+  const { data: taskMembers = [] } = useTaskMembers(taskId);
+  const currentUserId = myInfo?.user?.id;
+  const myNickname = myInfo?.user?.nickname ?? '';
+  const teamMembersForDropdown = taskMembers
+    .filter((m) => m.memberId !== currentUserId && m.name !== myNickname)
+    .map((m) => ({
+      id: m.memberId,
+      nickname: m.name,
+      profileImage: m.profileImage ?? undefined,
+    }));
+
+  // 소켓 comment:created/updated/deleted 수신 시 pending 초기화 + taskDetail refetch
+  const clearPendingAndRefetch = useCallback(() => {
+    setDeletedCommentIds(new Set());
+    queryClient.invalidateQueries({ queryKey: ['taskDetail', taskId] });
+    queryClient.refetchQueries({
+      queryKey: ['taskDetail', taskId],
+      type: 'active',
+    });
+  }, [queryClient, taskId]);
+
+  useEffect(() => {
+    const socket = getSocket();
+    if (!socket) return;
+
+    socket.on(COMMENT_EVENTS.CREATED, clearPendingAndRefetch);
+    socket.on(COMMENT_EVENTS.UPDATED, clearPendingAndRefetch);
+    socket.on(COMMENT_EVENTS.DELETED, clearPendingAndRefetch);
+
+    return () => {
+      socket.off(COMMENT_EVENTS.CREATED, clearPendingAndRefetch);
+      socket.off(COMMENT_EVENTS.UPDATED, clearPendingAndRefetch);
+      socket.off(COMMENT_EVENTS.DELETED, clearPendingAndRefetch);
+    };
+  }, [clearPendingAndRefetch]);
 
   const handleSelectAssignee = (subTaskId: number, assigneeId: number) => {
     updateAssignee({ subTaskId, assigneeId });
@@ -101,20 +136,13 @@ const TeamTaskList = ({
 
   const getDisplayComments = (
     task: TaskDetailSubTask,
-  ): TaskDetailSubTaskComment[] => {
-    const fromApi = (task.comments ?? []).filter(
+  ): TaskDetailSubTaskComment[] =>
+    (task.comments ?? []).filter(
       (c) =>
         !deletedCommentIds.has(
           getCommentId(c as TaskDetailSubTaskComment & { comment_id?: number }),
         ),
     );
-    const pending = pendingComments[task.subTaskId] ?? [];
-    const fromApiContents = new Set(fromApi.map((c) => c.content));
-    return [
-      ...fromApi,
-      ...pending.filter((p) => !fromApiContents.has(p.content)),
-    ];
-  };
 
   const handleStatusChange = (subTaskId: number, isChecked: boolean) => {
     const nextStatus: SubTaskStatus = isChecked ? 'COMPLETED' : 'PROGRESS';
@@ -149,13 +177,25 @@ const TeamTaskList = ({
     setEditingContent(content);
   };
 
-  const handleSubmitEditComment = (commentId: number) => {
+  const handleSubmitEditComment = (commentId: number, subTaskId: number) => {
     const content = editingContent.trim();
     if (commentId < 0 || !content) return;
-    updateComment({ commentId, content }).then(() => {
+    const socket = getSocket();
+    if (socket?.connected) {
+      socket.emit(COMMENT_SEND_EVENTS.UPDATE, {
+        taskId,
+        subTaskId,
+        commentId,
+        content,
+      });
       setEditingCommentId(null);
       setEditingContent('');
-    });
+    } else {
+      updateComment({ commentId, content }).then(() => {
+        setEditingCommentId(null);
+        setEditingContent('');
+      });
+    }
   };
 
   const handleDeleteComment = (
@@ -184,23 +224,44 @@ const TeamTaskList = ({
           ),
         };
       });
-      deleteComment(commentId, {
-        onError: () => {
-          setDeletedCommentIds((prev) => {
-            const next = new Set(prev);
-            next.delete(commentId);
-            return next;
-          });
-          queryClient.invalidateQueries({ queryKey: ['taskDetail', taskId] });
-        },
-      });
+      const socket = getSocket();
+      if (socket?.connected) {
+        socket.emit(COMMENT_SEND_EVENTS.DELETE, {
+          taskId,
+          subTaskId,
+          commentId,
+        });
+      } else {
+        deleteComment(commentId, {
+          onError: () => {
+            setDeletedCommentIds((prev) => {
+              const next = new Set(prev);
+              next.delete(commentId);
+              return next;
+            });
+            queryClient.invalidateQueries({ queryKey: ['taskDetail', taskId] });
+          },
+        });
+      }
     } else {
-      setPendingComments((prev) => ({
-        ...prev,
-        [subTaskId]: (prev[subTaskId] ?? []).filter(
-          (c) => c.commentId !== comment.commentId,
-        ),
-      }));
+      // 낙관적 댓글(commentId < 0)은 캐시에서 직접 제거
+      queryClient.setQueryData<TaskDetail>(['taskDetail', taskId], (old) => {
+        if (!old?.subTasks) return old;
+        return {
+          ...old,
+          subTasks: old.subTasks.map((st) =>
+            st.subTaskId !== subTaskId
+              ? st
+              : {
+                  ...st,
+                  comments: (st.comments ?? []).filter(
+                    (c) => c.commentId !== comment.commentId,
+                  ),
+                  commentCount: Math.max((st.commentCount ?? 1) - 1, 0),
+                },
+          ),
+        };
+      });
     }
   };
 
@@ -209,25 +270,49 @@ const TeamTaskList = ({
     const userId = myInfo?.user.id;
     if (!content || !userId || !myInfo) return;
 
-    createComment(
-      { subTaskId, userId, content },
-      {
-        onSuccess: () => {
-          setCommentInputs((prev) => ({ ...prev, [subTaskId]: '' }));
-          const newComment: TaskDetailSubTaskComment = {
-            commentId: -1,
-            content,
-            writer: myInfo.user.nickname ?? '',
-            profileImage: myInfo.user.profileImage ?? '',
-            createdAt: '방금',
-          };
-          setPendingComments((prev) => ({
-            ...prev,
-            [subTaskId]: [...(prev[subTaskId] ?? []), newComment],
-          }));
-        },
-      },
-    );
+    // 입력창 즉시 비우기
+    setCommentInputs((prev) => ({ ...prev, [subTaskId]: '' }));
+
+    // React Query 캐시에 직접 댓글 추가 → 즉시 UI 반영
+    queryClient.setQueryData<TaskDetail>(['taskDetail', taskId], (old) => {
+      if (!old?.subTasks) return old;
+      return {
+        ...old,
+        subTasks: old.subTasks.map((st) =>
+          st.subTaskId !== subTaskId
+            ? st
+            : {
+                ...st,
+                comments: [
+                  ...(st.comments ?? []),
+                  {
+                    commentId: -Date.now(),
+                    content,
+                    writer: myInfo.user.nickname ?? '',
+                    profileImage: myInfo.user.profileImage ?? '',
+                    createdAt: new Date().toISOString(),
+                  },
+                ],
+                commentCount: (st.commentCount ?? 0) + 1,
+              },
+        ),
+      };
+    });
+
+    // 소켓 또는 HTTP로 서버에 전송
+    const socket = getSocket();
+    if (socket?.connected) {
+      socket.emit(COMMENT_SEND_EVENTS.CREATE, {
+        taskId,
+        subTaskId,
+        content,
+      });
+    } else {
+      createComment({ subTaskId, userId, content });
+    }
+
+    // 서버 데이터와 동기화 (백그라운드)
+    queryClient.invalidateQueries({ queryKey: ['taskDetail', taskId] });
   };
 
   return (
@@ -279,7 +364,7 @@ const TeamTaskList = ({
                       <CommentButton
                         isOpen={commentOpen}
                         onClick={() => handleCommentToggle(task.subTaskId)}
-                        commentCount={task.commentCount}
+                        commentCount={comments.length}
                       />
                     </div>
                   </div>
@@ -292,7 +377,7 @@ const TeamTaskList = ({
                     <TeamTaskManager
                       manager={task.assigneeName}
                       profileImage={task.assigneeProfileImage ?? undefined}
-                      members={[]}
+                      members={teamMembersForDropdown}
                       onSelectMember={(_, assigneeId) => {
                         if (assigneeId != null)
                           handleSelectAssignee(task.subTaskId, assigneeId);
@@ -373,7 +458,10 @@ const TeamTaskList = ({
                                     onKeyDown={(e) => {
                                       if (e.key === 'Enter') {
                                         e.preventDefault();
-                                        handleSubmitEditComment(id);
+                                        handleSubmitEditComment(
+                                          id,
+                                          task.subTaskId,
+                                        );
                                       }
                                       if (e.key === 'Escape') {
                                         setEditingCommentId(null);

@@ -249,40 +249,94 @@ export const createInvitationLink = async (
   return res.data?.data ?? { invite_code: '', invite_expired: '' };
 };
 
-// 팀원 목록 (역할: 0 = Member, 1 = Owner, 만든 사람은 Owner)
+// 팀원 목록 (역할: 0 = Owner, 1 = Member)
+// PATCH 경로용 ID: patchMemberId(있으면 우선) → memberId. GET에서 taskMemberId 등 별도 id 오면 사용
 export interface TaskMember {
   memberId: number;
+  /** PATCH /task/:taskId/members/:id 경로에 쓸 ID. GET에서 오면 사용, 없으면 memberId 사용 */
+  patchMemberId?: number;
+  userId?: number; // 현재 사용자 일치·Owner 판별용
   name: string;
   profileImage?: string | null;
-  role: 0 | 1; // 0: Member, 1: Owner
+  role: 0 | 1; // 0: Owner, 1: Member
 }
 
-type TaskMemberRaw = TaskMember & {
-  member_id?: number;
-  profile_image?: string | null;
+/** 팀원 목록 조회 API 응답 한 건 (GET /task/{taskId}/members) */
+export interface TaskMemberRawItem {
+  id: number;
+  /** PATCH 경로용. 백엔드가 task_member.id 등 별도 id를 주면 여기 넣어서 404 방지 (camelCase) */
+  taskMemberId?: number;
+  /** PATCH 경로용. 백엔드가 snake_case로 보낼 수 있음 */
+  task_member_id?: number;
+  profileImage?: string | null;
+  nickname: string;
+  role: string; // "owner" | "member"
+}
+
+/** 조회(문자열/숫자) · 수정(숫자) 타입 차이 흡수 — 앱 내부는 항상 0 | 1 */
+const normalizeRole = (role: 0 | 1 | string | undefined): 0 | 1 => {
+  if (role === 0 || role === '0') return 0;
+  if (typeof role === 'string') {
+    const lower = role.toLowerCase();
+    if (lower === 'owner' || lower === 'admin' || lower === '관리자') return 0;
+  }
+  return 1;
+};
+
+/** "3:1" 등 복합 문자열이 오면 앞의 숫자만 반환 (경로/비교용 ID) */
+const toSingleId = (v: number | string | null | undefined): number => {
+  if (v == null) return 0;
+  const s = String(v).trim();
+  if (s.includes(':')) return Number(s.split(':')[0]) || 0;
+  const n = Number(s);
+  return Number.isInteger(n) ? n : 0;
 };
 
 export const getTaskMembers = async (taskId: number): Promise<TaskMember[]> => {
-  const res = await axiosInstance.get<{
-    data: { members?: TaskMemberRaw[] };
-  }>(`${TASK_BASE}/${taskId}/members`);
+  const res = await axiosInstance.get<GetTaskMembersResponse>(
+    `${TASK_BASE}/${taskId}/members`,
+  );
   const raw = res.data?.data?.members;
   if (!Array.isArray(raw)) return [];
-  return raw.map((m) => ({
-    memberId: m.memberId ?? m.member_id ?? 0,
-    name: m.name ?? (m as { nickname?: string }).nickname ?? '',
-    profileImage: m.profileImage ?? m.profile_image ?? null,
-    role: m.role === 1 ? 1 : 0,
-  }));
+  return raw.map((m) => {
+    const id = toSingleId(m.id);
+    // PATCH path는 task_member PK 필요. GET에 taskMemberId 또는 task_member_id 없으면 user id로 보내져 404 발생
+    const rawPatchId = m.taskMemberId ?? m.task_member_id;
+    const patchId = rawPatchId != null ? toSingleId(rawPatchId) : id;
+    return {
+      memberId: id,
+      patchMemberId: patchId,
+      userId: id,
+      name: m.nickname ?? '',
+      profileImage: m.profileImage ?? null,
+      role: normalizeRole(m.role),
+    };
+  });
 };
 
-// 팀원 역할 수정 (PATCH /task/{taskId}/member/{memberId})
+/** 팀원 목록 조회 API 응답 (GET /task/{taskId}/members) */
+export interface GetTaskMembersResponse {
+  resultType: string;
+  message: string;
+  data: {
+    members: TaskMemberRawItem[];
+    count: number;
+  };
+}
+
+// 팀원 역할 수정 (PATCH /task/{taskId}/member/{userId})
 export const updateMemberRole = async (
   taskId: number,
-  memberId: number,
+  userId: number | string,
   role: 0 | 1,
 ): Promise<void> => {
-  await axiosInstance.patch(`${TASK_BASE}/${taskId}/member/${memberId}`, {
+  const id = toSingleId(userId);
+  if (id <= 0) {
+    throw new Error('유효한 사용자 ID가 필요합니다.');
+  }
+  await axiosInstance.patch(`${TASK_BASE}/${taskId}/member/${id}`, {
+    taskId,
+    userId: id,
     role,
   });
 };
