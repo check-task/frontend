@@ -24,7 +24,7 @@ const getSocketBaseUrl = (): string => {
 };
 
 /**
- * Socket.io namespace. 백엔드는 기본 namespace(/)만 사용하고 room(team:${taskId})으로 구분하므로
+ * Socket.io namespace. 백엔드는 기본 namespace(/)만 사용하고 room(`task:${taskId}`)으로 구분하므로
  * 기본값은 빈 문자열(기본 "/" 연결). 다른 서버 규격이면 .env에 NEXT_PUBLIC_WS_NAMESPACE 지정.
  */
 const getSocketNamespace = (): string => {
@@ -105,15 +105,33 @@ export function disconnectSocket(): void {
   }
 }
 
-/** 팀 세부 페이지 방 입장 (서버에서 socket.join(`team:${taskId}`) 처리, 인자: taskId) */
+/** 팀 세부 페이지 방 입장 (서버에서 socket.join(`task:${taskId}`) 처리, 인자: taskId) */
 export const JOIN_TASK_ROOM = 'join:team';
 /** 팀 세부 페이지 방 이탈 (인자: taskId) */
 export const LEAVE_TASK_ROOM = 'leave:team';
 
+/** 클라이언트 → 서버: 과제 수정 요청 */
+export const TASK_UPDATE_SEND_EVENT = 'task:update';
+/** 클라이언트 → 서버: 세부 TASK(체크/날짜/담당자) 변경 후 방 갱신 요청, payload: { taskId } */
+export const TASK_REQUEST_REFRESH_EVENT = 'task:request_refresh';
 /** 서버 → 클라이언트: 과제 전체 갱신 시 */
 export const TASK_UPDATED_EVENT = 'task:updated';
 /** 백엔드 socket.util emitTeamUpdate 가 보내는 이벤트 (수신 시 동일하게 taskDetail 무효화) */
 export const TEAM_UPDATE_EVENT = 'team:update';
+
+/** 과제 수정 소켓 페이로드 (task:update) */
+export interface TaskUpdatePayload {
+  taskId: number;
+  title: string;
+  deadline: string;
+  folderId: number;
+  subTasks: {
+    title: string;
+    status: string;
+    endDate: string;
+  }[];
+  references: { name: string; url: string }[];
+}
 
 /** 댓글: 클라이언트 → 서버 (명령) */
 export const COMMENT_SEND_EVENTS = {

@@ -17,13 +17,19 @@ const refetchTaskDetail = (
   queryClient: ReturnType<typeof useQueryClient>,
   taskId: number,
 ) => {
-  if (isDev) console.log('[Socket] 이벤트 수신 → taskDetail 재요청, taskId:', taskId);
+  if (isDev) {
+    console.log('[Socket] 이벤트 수신 → taskDetail 재요청, taskId:', taskId);
+  }
   queryClient.invalidateQueries({ queryKey: ['taskDetail', taskId] });
-  queryClient.refetchQueries({ queryKey: ['taskDetail', taskId] });
+  queryClient
+    .refetchQueries({ queryKey: ['taskDetail', taskId], type: 'active' })
+    .then(() => {
+      if (isDev) console.log('[Socket] taskDetail 재요청 완료, taskId:', taskId);
+    });
 };
 
 /**
- * 팀 과제 상세 페이지에서 join:team(taskId)로 해당 팀 방(team:{taskId})에 입장하고,
+ * 팀 과제 상세 페이지에서 join:team(taskId)로 해당 팀 방(`task:{taskId}`)에 입장하고,
  * task:updated, team:update, comment:created|updated|deleted 수신 시 taskDetail 쿼리 무효화 후 즉시 refetch 해 전체 UI를 갱신합니다.
  * (브라우저/탭 두 개로 테스트 시, 두 번째 창도 같은 방에 들어가 있으면 이벤트를 받아 자동 반영됩니다.)
  */

@@ -2,6 +2,7 @@
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { updateSubTaskDeadline } from '@/services/subtask';
+import { getSocket, TASK_REQUEST_REFRESH_EVENT } from '@/lib/socket';
 
 interface UpdateSubTaskDeadlineInput {
   subTaskId: number;
@@ -17,6 +18,13 @@ export const useUpdateTeamSubTaskDeadline = (taskId: number) => {
       updateSubTaskDeadline(subTaskId, { endDate }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['taskDetail', taskId] });
+      const socket = getSocket();
+      if (socket?.connected) {
+        socket.emit(TASK_REQUEST_REFRESH_EVENT, { taskId });
+        if (typeof process !== 'undefined' && process.env.NODE_ENV === 'development') {
+          console.log('[Socket] task:request_refresh 전송, taskId:', taskId);
+        }
+      }
     },
   });
 };

@@ -6,12 +6,12 @@ export const useUpdateMemberRole = (taskId: number) => {
 
   return useMutation({
     mutationFn: ({
-      memberId,
+      userId,
       role,
     }: {
-      memberId: number;
+      userId: number;
       role: 0 | 1;
-    }) => updateMemberRole(taskId, memberId, role),
+    }) => updateMemberRole(taskId, userId, role),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['taskMembers', taskId] });
     },

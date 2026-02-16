@@ -5,23 +5,40 @@ export type MemberRole = 'Owner' | 'Member';
 
 interface TeamMemberManageModalItemProps {
   memberId: number;
+  /** PATCH 경로에 쓸 ID (GET에서 taskMemberId 등으로 오면 전달) */
+  patchMemberId?: number;
+  userId?: number | null;
   name: string;
   profileImage?: string | null;
   role: MemberRole;
-  /** Owner만 true — 역할 드롭다운 표시 및 변경 가능 */
+  /** 본인 행이면 true — "(you)" 표시, 드롭다운 비표시 */
+  isCurrentUser?: boolean;
+  /** Owner만 true — 다른 사람 역할을 드롭다운으로 변경 가능 */
   canChangeRole: boolean;
-  onRoleChange?: (memberId: number, role: MemberRole) => void;
+  onRoleChange?: (
+    memberId: number,
+    patchMemberId: number | undefined,
+    userId: number | undefined,
+    newRole: MemberRole,
+    currentRole: MemberRole,
+  ) => void;
   onDeleteMember?: () => void;
 }
 
 export const TeamMemberManageModalItem = ({
   memberId,
+  patchMemberId,
+  userId,
   name,
   profileImage,
   role,
+  isCurrentUser = false,
   canChangeRole,
   onRoleChange,
 }: TeamMemberManageModalItemProps) => {
+  const roleLabel = isCurrentUser ? `${role}(you)` : role;
+  const showDropdown = !isCurrentUser && canChangeRole;
+
   return (
     <div className={modalContentItemStyle}>
       <div className={modalContentItemTitleStyle}>
@@ -47,15 +64,17 @@ export const TeamMemberManageModalItem = ({
       </div>
 
       <div className={modalContentItemMemberStyle}>
-        {canChangeRole ? (
+        {showDropdown ? (
           <TeamMemberDropdown
             role={role}
-            onRoleChange={(newRole) => onRoleChange?.(memberId, newRole)}
+            onRoleChange={(newRole) =>
+              onRoleChange?.(memberId, patchMemberId, userId ?? undefined, newRole, role)
+            }
             disabled={false}
           />
         ) : (
           <p className={css({ textStyle: 'body3.r', color: 'gray.900' })}>
-            {role}
+            {roleLabel}
           </p>
         )}
       </div>
