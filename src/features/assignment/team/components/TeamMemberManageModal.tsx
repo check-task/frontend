@@ -18,11 +18,14 @@ interface TeamMemberManageModalProps {
 }
 
 const roleFromApi = (role: 0 | 1): MemberRole =>
-  role === 1 ? 'Owner' : 'Member';
+  role === 0 ? 'Owner' : 'Member';
 
 const getRoleUpdateErrorMessage = (err: unknown): string => {
   const ax = err as {
-    response?: { data?: { reason?: string; message?: string }; status?: number };
+    response?: {
+      data?: { reason?: string; message?: string };
+      status?: number;
+    };
   };
   if (ax.response?.data?.reason) return ax.response.data.reason;
   if (ax.response?.data?.message) return ax.response.data.message;
@@ -48,7 +51,7 @@ export const TeamMemberManageModal = ({
   // API가 user_id를 주면 숫자 비교(문자열 응답 대비 Number() 사용), 없으면 닉네임으로 현재 사용자 행 보완
   const isCurrentUserOwner = members.some(
     (m) =>
-      m.role === 1 &&
+      m.role === 0 &&
       (Number(m.userId) === Number(currentUserId) ||
         (m.userId == null && myNickname != null && m.name === myNickname)),
   );
@@ -81,15 +84,13 @@ export const TeamMemberManageModal = ({
     // API는 path/body 모두 userId 사용 (GET 팀원 목록의 id가 user id)
     const id = userId ?? memberId;
     if (id == null || id === 0) {
-      setRoleError(
-        '팀원 정보에 사용자 ID가 없어 역할을 수정할 수 없습니다.',
-      );
+      setRoleError('팀원 정보에 사용자 ID가 없어 역할을 수정할 수 없습니다.');
       return;
     }
     updateRole(
       {
         userId: id,
-        role: newRole === 'Owner' ? 1 : 0,
+        role: newRole === 'Owner' ? 0 : 1,
       },
       {
         onError: (err) => setRoleError(getRoleUpdateErrorMessage(err)),

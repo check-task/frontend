@@ -249,7 +249,7 @@ export const createInvitationLink = async (
   return res.data?.data ?? { invite_code: '', invite_expired: '' };
 };
 
-// 팀원 목록 (역할: 0 = Member, 1 = Owner)
+// 팀원 목록 (역할: 0 = Owner, 1 = Member)
 // PATCH 경로용 ID: patchMemberId(있으면 우선) → memberId. GET에서 taskMemberId 등 별도 id 오면 사용
 export interface TaskMember {
   memberId: number;
@@ -258,7 +258,7 @@ export interface TaskMember {
   userId?: number; // 현재 사용자 일치·Owner 판별용
   name: string;
   profileImage?: string | null;
-  role: 0 | 1; // 0: Member, 1: Owner
+  role: 0 | 1; // 0: Owner, 1: Member
 }
 
 /** 팀원 목록 조회 API 응답 한 건 (GET /task/{taskId}/members) */
@@ -275,9 +275,12 @@ export interface TaskMemberRawItem {
 
 /** 조회(문자열/숫자) · 수정(숫자) 타입 차이 흡수 — 앱 내부는 항상 0 | 1 */
 const normalizeRole = (role: 0 | 1 | string | undefined): 0 | 1 => {
-  if (role === 1) return 1;
-  if (typeof role === 'string' && role.toLowerCase() === 'owner') return 1;
-  return 0;
+  if (role === 0 || role === '0') return 0;
+  if (typeof role === 'string') {
+    const lower = role.toLowerCase();
+    if (lower === 'owner' || lower === 'admin' || lower === '관리자') return 0;
+  }
+  return 1;
 };
 
 /** "3:1" 등 복합 문자열이 오면 앞의 숫자만 반환 (경로/비교용 ID) */
@@ -299,8 +302,7 @@ export const getTaskMembers = async (taskId: number): Promise<TaskMember[]> => {
     const id = toSingleId(m.id);
     // PATCH path는 task_member PK 필요. GET에 taskMemberId 또는 task_member_id 없으면 user id로 보내져 404 발생
     const rawPatchId = m.taskMemberId ?? m.task_member_id;
-    const patchId =
-      rawPatchId != null ? toSingleId(rawPatchId) : id;
+    const patchId = rawPatchId != null ? toSingleId(rawPatchId) : id;
     return {
       memberId: id,
       patchMemberId: patchId,
