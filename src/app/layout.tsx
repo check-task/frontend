@@ -2,7 +2,6 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import { cookies } from 'next/headers';
 import './globals.css';
-import { CounterStoreProvider } from '@/providers/counter-store-provider';
 import { ThemeProvider } from '@/providers/theme-provider';
 import { QueryProvider } from '@/providers/query-provider';
 import { parseUICookie } from '@/lib/parse-ui-cookie';
@@ -36,9 +35,7 @@ export default async function RootLayout({
       <head />
       <body className={inter.className}>
         <ThemeProvider>
-          <QueryProvider>
-            <CounterStoreProvider>{children}</CounterStoreProvider>
-          </QueryProvider>
+          <QueryProvider>{children}</QueryProvider>
         </ThemeProvider>
       </body>
     </html>
