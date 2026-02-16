@@ -180,6 +180,31 @@ const TeamTaskList = ({
   const handleSubmitEditComment = (commentId: number, subTaskId: number) => {
     const content = editingContent.trim();
     if (commentId < 0 || !content) return;
+
+    // 낙관적 캐시 업데이트 — 수정 즉시 UI 반영
+    queryClient.setQueryData<TaskDetail>(['taskDetail', taskId], (old) => {
+      if (!old?.subTasks) return old;
+      return {
+        ...old,
+        subTasks: old.subTasks.map((st) =>
+          st.subTaskId !== subTaskId
+            ? st
+            : {
+                ...st,
+                comments: (st.comments ?? []).map((c) => {
+                  const cId = getCommentId(
+                    c as TaskDetailSubTaskComment & { comment_id?: number },
+                  );
+                  return cId === commentId ? { ...c, content } : c;
+                }),
+              },
+        ),
+      };
+    });
+
+    setEditingCommentId(null);
+    setEditingContent('');
+
     const socket = getSocket();
     if (socket?.connected) {
       socket.emit(COMMENT_SEND_EVENTS.UPDATE, {
@@ -188,13 +213,8 @@ const TeamTaskList = ({
         commentId,
         content,
       });
-      setEditingCommentId(null);
-      setEditingContent('');
     } else {
-      updateComment({ commentId, content }).then(() => {
-        setEditingCommentId(null);
-        setEditingContent('');
-      });
+      updateComment({ commentId, content });
     }
   };
 
@@ -482,6 +502,8 @@ const TeamTaskList = ({
                                   const { date, time } = formatCommentCreatedAt(
                                     comment.createdAt,
                                   );
+                                  const isMyComment =
+                                    comment.writer === myNickname;
                                   return (
                                     <div className={commentItemEtcStyle}>
                                       <div
@@ -494,20 +516,22 @@ const TeamTaskList = ({
                                           {time}
                                         </span>
                                       </div>
-                                      <CommentEditDropdown
-                                        onEditComment={() =>
-                                          handleStartEditComment(
-                                            id,
-                                            comment.content,
-                                          )
-                                        }
-                                        onDeleteComment={() =>
-                                          handleDeleteComment(
-                                            comment,
-                                            task.subTaskId,
-                                          )
-                                        }
-                                      />
+                                      {isMyComment && (
+                                        <CommentEditDropdown
+                                          onEditComment={() =>
+                                            handleStartEditComment(
+                                              id,
+                                              comment.content,
+                                            )
+                                          }
+                                          onDeleteComment={() =>
+                                            handleDeleteComment(
+                                              comment,
+                                              task.subTaskId,
+                                            )
+                                          }
+                                        />
+                                      )}
                                     </div>
                                   );
                                 })()}
