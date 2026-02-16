@@ -8,10 +8,10 @@ import {
   LEAVE_TASK_ROOM,
   TASK_UPDATED_EVENT,
   TEAM_UPDATE_EVENT,
-  COMMENT_EVENTS,
 } from '@/lib/socket';
 
-const isDev = typeof process !== 'undefined' && process.env.NODE_ENV === 'development';
+const isDev =
+  typeof process !== 'undefined' && process.env.NODE_ENV === 'development';
 
 const refetchTaskDetail = (
   queryClient: ReturnType<typeof useQueryClient>,
@@ -24,7 +24,8 @@ const refetchTaskDetail = (
   queryClient
     .refetchQueries({ queryKey: ['taskDetail', taskId], type: 'active' })
     .then(() => {
-      if (isDev) console.log('[Socket] taskDetail 재요청 완료, taskId:', taskId);
+      if (isDev)
+        console.log('[Socket] taskDetail 재요청 완료, taskId:', taskId);
     });
 };
 
@@ -55,7 +56,11 @@ export function useTaskRoomSocket(taskId: number) {
 
     if (isDev) {
       socket.onAny((eventName, ...args) => {
-        console.log('[Socket] 수신 이벤트:', eventName, args.length ? args : '');
+        console.log(
+          '[Socket] 수신 이벤트:',
+          eventName,
+          args.length ? args : '',
+        );
       });
     }
 
@@ -63,18 +68,12 @@ export function useTaskRoomSocket(taskId: number) {
 
     socket.on(TASK_UPDATED_EVENT, onRefetch);
     socket.on(TEAM_UPDATE_EVENT, onRefetch);
-    socket.on(COMMENT_EVENTS.CREATED, onRefetch);
-    socket.on(COMMENT_EVENTS.UPDATED, onRefetch);
-    socket.on(COMMENT_EVENTS.DELETED, onRefetch);
 
     return () => {
       if (isDev) socket.offAny();
       socket.off('connect', joinRoom);
       socket.off(TASK_UPDATED_EVENT, onRefetch);
       socket.off(TEAM_UPDATE_EVENT, onRefetch);
-      socket.off(COMMENT_EVENTS.CREATED, onRefetch);
-      socket.off(COMMENT_EVENTS.UPDATED, onRefetch);
-      socket.off(COMMENT_EVENTS.DELETED, onRefetch);
       socket.emit(LEAVE_TASK_ROOM, taskId);
     };
   }, [taskId, queryClient]);
