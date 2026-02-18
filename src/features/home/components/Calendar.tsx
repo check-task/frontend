@@ -189,7 +189,7 @@ export const Calendar = ({
       eventDrop={handleEventDrop}
       eventClick={handleEventClick}
       headerToolbar={false}
-      height='100%'
+      height='auto'
       // 6주 고정
       fixedWeekCount={true}
     />
