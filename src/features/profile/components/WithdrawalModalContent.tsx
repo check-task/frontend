@@ -20,7 +20,7 @@ export const WithdrawalModalContent = () => {
       <Modal.MessageSection>
         <Modal.Title>회원 탈퇴를 진행하시겠습니까?</Modal.Title>
         <Modal.Description>
-          탈퇴 시 계정은 즉시 비활성화되며, 회원 정보는 4일간 보관 후 영구
+          탈퇴 시 계정은 즉시 비활성화되며, 회원 정보는 7일간 보관 후 영구
           삭제됩니다. 보관 기간 내에는 계정 복구가 가능합니다.
         </Modal.Description>
       </Modal.MessageSection>
