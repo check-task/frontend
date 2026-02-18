@@ -63,9 +63,9 @@ export const CreateAssignmentForm = () => {
 
     setSaveError(null);
     try {
-      await createTask(payload);
-      const typeParam = type === 'TEAM' ? 'team' : 'personal';
-      router.push(`/assignment?type=${typeParam}`);
+      const taskId = await createTask(payload);
+      const typePath = type === 'TEAM' ? 'team' : 'personal';
+      router.push(`/assignment/${typePath}/${taskId}`);
     } catch (err: unknown) {
       const ax = err as {
         response?: { data?: { reason?: string; message?: string } };
