@@ -47,7 +47,7 @@ export const CommentEditDropdown = ({
               e.stopPropagation();
               handleDeleteComment();
             }}
-            role="button"
+            role='button'
             tabIndex={0}
           >
             댓글 삭제
@@ -94,6 +94,7 @@ const dropdownItemStyle = css({
   _hover: {
     backgroundColor: 'gray.50',
   },
+  bg: 'bg',
 });
 
 const dividerStyle = css({
