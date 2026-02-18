@@ -20,7 +20,7 @@ export const CommentButton = ({
       onClick={onClick}
     >
       <CommentIcon />
-      <p className={css({ textStyle: 'body2.r', color: 'blue.500' })}>
+      <p className={css({ textStyle: 'body2.r', color: 'blue.300' })}>
         {commentCount}
       </p>
     </button>
