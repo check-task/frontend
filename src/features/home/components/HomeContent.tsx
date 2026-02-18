@@ -83,7 +83,7 @@ const Container = {
   Calendar: styled('div', {
     base: {
       width: '45.9375rem',
-      height: '44rem',
+      minHeight: '44rem',
       border: '0.0625rem solid',
       borderColor: 'gray.200',
       borderRadius: '0.75rem',
