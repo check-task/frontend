@@ -468,34 +468,41 @@ const TeamTaskList = ({
                                       : undefined
                                   }
                                 />
-                                {isEditing ? (
-                                  <Input
-                                    size='basic'
-                                    value={editingContent}
-                                    onChange={(e) =>
-                                      setEditingContent(e.target.value)
-                                    }
-                                    onKeyDown={(e) => {
-                                      if (e.key === 'Enter') {
-                                        e.preventDefault();
-                                        handleSubmitEditComment(
-                                          id,
-                                          task.subTaskId,
-                                        );
-                                      }
-                                      if (e.key === 'Escape') {
-                                        setEditingCommentId(null);
-                                        setEditingContent('');
-                                      }
-                                    }}
-                                    className={commentEditInputStyle}
-                                    autoFocus
-                                  />
-                                ) : (
-                                  <p className={commentItemHeaderCommentStyle}>
-                                    {comment.content}
+                                <div className={commentNameContentWrapperStyle}>
+                                  <p className={commentWriterNameStyle}>
+                                    {comment.writer}
                                   </p>
-                                )}
+                                  {isEditing ? (
+                                    <Input
+                                      size='basic'
+                                      value={editingContent}
+                                      onChange={(e) =>
+                                        setEditingContent(e.target.value)
+                                      }
+                                      onKeyDown={(e) => {
+                                        if (e.key === 'Enter') {
+                                          e.preventDefault();
+                                          handleSubmitEditComment(
+                                            id,
+                                            task.subTaskId,
+                                          );
+                                        }
+                                        if (e.key === 'Escape') {
+                                          setEditingCommentId(null);
+                                          setEditingContent('');
+                                        }
+                                      }}
+                                      className={commentEditInputStyle}
+                                      autoFocus
+                                    />
+                                  ) : (
+                                    <p
+                                      className={commentItemHeaderCommentStyle}
+                                    >
+                                      {comment.content}
+                                    </p>
+                                  )}
+                                </div>
                               </div>
                               {!isEditing &&
                                 (() => {
@@ -743,15 +750,26 @@ const commentItemContainerStyle = css({
 
 const commentItemStyle = css({
   display: 'flex',
-  alignItems: 'center',
+  alignItems: 'flex-end',
   justifyContent: 'space-between',
   width: 'full',
 });
 
 const commentItemHeaderStyle = css({
   display: 'flex',
-  alignItems: 'center',
+  alignItems: 'flex-start',
   gap: '0.5rem',
+});
+
+const commentNameContentWrapperStyle = css({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '0.5rem',
+});
+
+const commentWriterNameStyle = css({
+  textStyle: 'body2.m',
+  color: 'gray.900',
 });
 
 const commentItemHeaderProfileStyle = css({
@@ -765,6 +783,7 @@ const commentItemHeaderProfileStyle = css({
 const commentItemHeaderCommentStyle = css({
   textStyle: 'body3',
   color: 'gray.700',
+  ml: '0.125rem',
 });
 
 const commentEditInputStyle = css({
