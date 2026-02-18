@@ -37,6 +37,11 @@ export const FolderModalContent = ({
     .filter((f) => f.id !== folderId)
     .map((f) => f.color);
 
+  // 현재 사용 중인 폴더 이름 목록
+  const usedNames = (data?.folders ?? [])
+    .filter((f) => f.id !== folderId)
+    .map((f) => f.name);
+
   const [name, setName] = useState<string>(mode === 'edit' ? initialName : '');
   // 추가는 초기 선택 없음, 수정은 기존 색상 선택
   const [selectedColor, setSelectedColor] = useState<FolderColor | null>(
@@ -47,6 +52,16 @@ export const FolderModalContent = ({
 
   const handleSave = () => {
     if (!selectedColor || !name.trim()) return;
+
+    if (name.trim().length > 11) {
+      alert('폴더 이름은 최대 11자까지만 가능합니다.');
+      return;
+    }
+
+    if (usedNames.includes(name.trim())) {
+      alert('이미 사용 중인 폴더 이름입니다.');
+      return;
+    }
 
     if (usedColors.includes(selectedColor)) {
       alert('이미 사용 중인 폴더 색상입니다.');
@@ -78,6 +93,7 @@ export const FolderModalContent = ({
             placeholder={mode === 'edit' ? initialName : '폴더명을 입력하세요'}
             value={name}
             onChange={(e) => setName(e.target.value)}
+            maxLength={11}
           />
         </Modal.FormField>
 

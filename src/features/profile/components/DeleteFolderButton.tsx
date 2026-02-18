@@ -19,6 +19,11 @@ export const DeleteFolderButton = ({
   const openModal = useModalStore((state) => state.openModal);
 
   const handleOpen = () => {
+    if (folderName === '팀') {
+      alert("'팀' 폴더는 삭제할 수 없습니다.");
+      return;
+    }
+
     openModal({
       title: '폴더 삭제',
       content: (
