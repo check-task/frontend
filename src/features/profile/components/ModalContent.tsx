@@ -5,6 +5,7 @@ import { stack, hstack } from 'styled-system/patterns';
 const Container = styled('div', {
   base: stack.raw({
     paddingTop: '1.75rem',
+    maxWidth: '24.125rem',
   }),
   variants: {
     gap: {

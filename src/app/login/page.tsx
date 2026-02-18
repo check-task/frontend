@@ -2,9 +2,17 @@ import { styled } from 'styled-system/jsx';
 import { hstack } from 'styled-system/patterns';
 import { KakaoLoginButton } from '@/features/login/components/KakaoLoginButton';
 import { LoginCarousel } from '@/features/login/components/LoginCarousel';
+import { WithdrawnAlert } from '@/features/login/components/WithdrawnAlert';
 import Image from 'next/image';
 
-export default function LoginPage() {
+interface LoginPageProps {
+  searchParams: Promise<{ status?: string; token?: string }>;
+}
+
+export default async function LoginPage({ searchParams }: LoginPageProps) {
+  const { status, token } = await searchParams;
+  const isWithdrawn = status === 'withdrawn' && !!token;
+
   return (
     <Container.Page>
       {/* 메인 영역 - 캐러셀 */}
@@ -27,6 +35,9 @@ export default function LoginPage() {
           <KakaoLoginButton />
         </Container.BottomRight>
       </Container.BottomBar>
+
+      {/* 탈퇴 계정 복구 모달 */}
+      {isWithdrawn && <WithdrawnAlert token={token} />}
     </Container.Page>
   );
 }
