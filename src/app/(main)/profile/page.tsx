@@ -4,6 +4,7 @@ import { ProfileSection } from '@/features/profile/components/ProfileSection';
 import { ManagementSection } from '@/features/profile/components/ManagementSection';
 import { WithdrawalButton } from '@/features/profile/components/WithdrawalButton';
 import { ProfileFooter } from '@/features/profile/components/ProfileFooter';
+import { PolicyLink } from '@/features/profile/components/PolicyLink';
 
 // 프로필 설정 페이지
 export default function ProfilePage() {
@@ -16,9 +17,9 @@ export default function ProfilePage() {
       <ProfileFooter>
         <WithdrawalButton />
         <Text.FooterLinks>
-          <Text.FooterLink>개인 정보 처리 방침</Text.FooterLink>
+          <PolicyLink type='privacy' />
           <Divider />
-          <Text.FooterLink>사이트 이용 약관</Text.FooterLink>
+          <PolicyLink type='terms' />
           <Divider />
           <Text.FooterCopyright>
             © 2025, CheckTask, All rights reserved.
@@ -46,12 +47,6 @@ const Layout = {
 const Text = {
   FooterLinks: styled('div', {
     base: hstack.raw({ gap: '0.25rem', alignItems: 'center' }),
-  }),
-  FooterLink: styled('span', {
-    base: {
-      textStyle: 'body4.r',
-      color: 'gray.300',
-    },
   }),
   FooterCopyright: styled('span', {
     base: {
