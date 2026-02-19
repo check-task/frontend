@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { styled } from 'styled-system/jsx';
 import { hstack } from 'styled-system/patterns';
 import { FilterChipGroup } from '@/features/home/components/FilterChipGroup';
@@ -28,20 +28,25 @@ export const HomeContent = () => {
     () => [...new Set(assignments.map((a) => a.folderId))],
     [assignments],
   );
-  const [selectedFolderIds, setSelectedFolderIds] =
-    useState<number[]>(allFolderIds);
+  // 유저가 직접 토글한 선택 상태
+  const [selectedFolderIds, setSelectedFolderIds] = useState<number[] | null>(
+    null,
+  );
 
-  // 데이터 로드 후 모든 폴더 기본 선택
-  useEffect(() => {
-    setSelectedFolderIds(allFolderIds);
-  }, [allFolderIds]);
+  // 정렬 변경 시 기존 선택 유지, 초기 로드 시 전체 선택
+  const effectiveSelectedIds = useMemo(() => {
+    if (selectedFolderIds === null) return allFolderIds;
+    const validIds = new Set(allFolderIds);
+    const kept = selectedFolderIds.filter((id) => validIds.has(id));
+    return kept.length > 0 ? kept : allFolderIds;
+  }, [selectedFolderIds, allFolderIds]);
 
   return (
     <>
       {/* 폴더 필터 바 */}
       <FilterChipGroup
         assignments={assignments}
-        selectedIds={selectedFolderIds}
+        selectedIds={effectiveSelectedIds}
         onSelectionChange={setSelectedFolderIds}
       />
 
@@ -52,7 +57,7 @@ export const HomeContent = () => {
           <Calendar
             assignments={assignments}
             subTasks={subTasks}
-            selectedFolderIds={selectedFolderIds}
+            selectedFolderIds={effectiveSelectedIds}
           />
         </Container.Calendar>
 
@@ -78,7 +83,7 @@ const Container = {
   Calendar: styled('div', {
     base: {
       width: '45.9375rem',
-      height: '44rem',
+      minHeight: '44rem',
       border: '0.0625rem solid',
       borderColor: 'gray.200',
       borderRadius: '0.75rem',

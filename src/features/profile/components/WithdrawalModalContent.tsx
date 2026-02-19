@@ -10,23 +10,23 @@ export const WithdrawalModalContent = () => {
   const withdraw = useWithdraw();
 
   const handleConfirm = () => {
-    withdraw.mutate(undefined, {
-      onSuccess: () => closeModal(),
-    });
+    closeModal();
+    withdraw.mutate();
   };
 
   return (
     <Modal.Container gap='medium'>
       {/* 경고 메시지 */}
       <Modal.MessageSection>
-        <Modal.Title>정말 회원 탈퇴를 진행하시겠습니까?</Modal.Title>
+        <Modal.Title>회원 탈퇴를 진행하시겠습니까?</Modal.Title>
         <Modal.Description>
-          탈퇴 시 등록한 정보가 모두 삭제되며 되돌릴 수 없습니다.
+          탈퇴 시 계정은 즉시 비활성화되며, 회원 정보는 7일간 보관 후 영구
+          삭제됩니다. 보관 기간 내에는 계정 복구가 가능합니다.
         </Modal.Description>
       </Modal.MessageSection>
 
       {/* 버튼 */}
-      <Modal.ButtonSection>
+      <Modal.ButtonSection marginTop='medium'>
         <Button variant='fillBlue' size='xlarge' onClick={handleConfirm}>
           예
         </Button>

@@ -53,3 +53,11 @@ export const updateProfile = async (
 export const withdrawAccount = async (): Promise<void> => {
   await axiosInstance.delete('/auth/kakao/unlink');
 };
+
+// 탈퇴 계정 복구 API 호출
+export const restoreAccount = async (
+  token: string,
+): Promise<{ accessToken: string }> => {
+  const res = await axiosInstance.post('/auth/restore', { token });
+  return res.data.data;
+};
