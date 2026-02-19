@@ -340,3 +340,15 @@ export const updateMemberRole = async (
     role,
   });
 };
+
+/** 팀원 추방 (DELETE /task/{taskId}/member/{memberId}) — 팀장만 가능 */
+export const expelTaskMember = async (
+  taskId: number,
+  memberId: number | string,
+): Promise<void> => {
+  const id = toSingleId(memberId);
+  if (id <= 0) {
+    throw new Error('유효한 팀원 ID가 필요합니다.');
+  }
+  await axiosInstance.delete(`${TASK_BASE}/${taskId}/member/${id}`);
+};

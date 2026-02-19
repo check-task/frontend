@@ -9,6 +9,7 @@ import {
 import { Divider } from '@/components/Divider';
 import { Input } from '@/components/TextField';
 import { useCreateInvitationLink } from '@/hooks/mutations/useCreateInvitationLink';
+import { useExpelTaskMember } from '@/hooks/mutations/useExpelTaskMember';
 import { useTaskMembers } from '@/hooks/queries/useTaskMembers';
 import { useUpdateMemberRole } from '@/hooks/mutations/useUpdateMemberRole';
 import { useMyInfo } from '@/hooks/queries/useMyInfo';
@@ -23,15 +24,30 @@ const roleFromApi = (role: 0 | 1): MemberRole =>
 const getRoleUpdateErrorMessage = (err: unknown): string => {
   const ax = err as {
     response?: {
-      data?: { reason?: string; message?: string };
+      data?: { reason?: string; message?: string; error?: string };
       status?: number;
     };
   };
   if (ax.response?.data?.reason) return ax.response.data.reason;
   if (ax.response?.data?.message) return ax.response.data.message;
+  if (ax.response?.data?.error) return ax.response.data.error;
   if (ax.response?.status === 403) return '역할 수정 권한이 없습니다.';
   if (ax.response?.status === 404) return '해당 멤버를 찾을 수 없습니다.';
   return '역할 수정에 실패했습니다.';
+};
+
+const getExpelErrorMessage = (err: unknown): string => {
+  const ax = err as {
+    response?: {
+      data?: { error?: string; message?: string };
+      status?: number;
+    };
+  };
+  if (ax.response?.data?.error) return ax.response.data.error;
+  if (ax.response?.data?.message) return ax.response.data.message;
+  if (ax.response?.status === 403) return '권한이 없습니다. 팀장만 추방할 수 있습니다.';
+  if (ax.response?.status === 404) return '멤버를 찾을 수 없습니다.';
+  return '팀원 추방에 실패했습니다.';
 };
 
 export const TeamMemberManageModal = ({
@@ -44,6 +60,7 @@ export const TeamMemberManageModal = ({
   const { mutateAsync: createInvitation, isPending } =
     useCreateInvitationLink(taskId);
   const { mutate: updateRole } = useUpdateMemberRole(taskId);
+  const { mutate: expelMember } = useExpelTaskMember(taskId);
 
   const members = membersData ?? [];
   const currentUserId = myInfo?.user?.id;
@@ -98,6 +115,17 @@ export const TeamMemberManageModal = ({
     );
   };
 
+  const handleExpelMember = (memberId: number) => {
+    setRoleError(null);
+    if (memberId == null || memberId === 0) {
+      setRoleError('팀원 정보에 사용자 ID가 없어 추방할 수 없습니다.');
+      return;
+    }
+    expelMember(memberId, {
+      onError: (err) => setRoleError(getExpelErrorMessage(err)),
+    });
+  };
+
   return (
     <div className={modalContentStyle}>
       <div className={modalContentItemStyle}>
@@ -123,6 +151,7 @@ export const TeamMemberManageModal = ({
               isCurrentUser={isCurrentUser(member)}
               canChangeRole={isCurrentUserOwner}
               onRoleChange={handleRoleChange}
+              onExpelMember={() => handleExpelMember(member.memberId)}
             />
           ))
         )}

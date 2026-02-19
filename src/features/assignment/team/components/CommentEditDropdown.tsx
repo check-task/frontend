@@ -61,6 +61,7 @@ export const CommentEditDropdown = ({
 const dropdownWrapperStyle = css({
   position: 'relative',
   display: 'inline-block',
+  bg: 'bg',
 });
 
 const dropdownButtonStyle = css({
