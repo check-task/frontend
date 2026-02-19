@@ -8,7 +8,8 @@ import { CheckboxHeader } from './CheckboxHeader';
 import { AddAssignmentContent } from './AddAssignmentContent';
 import { AddAssignmentTask, type SubTaskInput } from './AddAssignmentTask';
 import { AddAssignmentData, type DataItem } from './AddAssignmentData';
-import { css } from 'styled-system/css';
+import { css, cva } from 'styled-system/css';
+import { useUIStore } from '@/stores/ui-store';
 import { useMyInfo } from '@/hooks/queries/useMyInfo';
 import { useCreateTask } from '@/hooks/mutations/useCreateTask';
 import type { TaskType } from '@/types/task';
@@ -19,6 +20,7 @@ export const CreateAssignmentForm = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const taskIdParam = searchParams.get('taskId');
+  const isSidebarCollapsed = useUIStore((state) => state.isSidebarCollapsed);
   const { data: myInfo } = useMyInfo();
   const { mutateAsync: createTask, isPending } = useCreateTask();
 
@@ -63,9 +65,9 @@ export const CreateAssignmentForm = () => {
 
     setSaveError(null);
     try {
-      await createTask(payload);
-      const typeParam = type === 'TEAM' ? 'team' : 'personal';
-      router.push(`/assignment?type=${typeParam}`);
+      const taskId = await createTask(payload);
+      const typePath = type === 'TEAM' ? 'team' : 'personal';
+      router.push(`/assignment/${typePath}/${taskId}`);
     } catch (err: unknown) {
       const ax = err as {
         response?: { data?: { reason?: string; message?: string } };
@@ -81,7 +83,7 @@ export const CreateAssignmentForm = () => {
   };
 
   return (
-    <div className={containerStyle}>
+    <div className={containerStyle({ collapsed: isSidebarCollapsed })}>
       <div className={headerStyle}>
         <h1 className={css({ textStyle: 'h3', color: 'gray.900' })}>
           과제 등록
@@ -144,14 +146,23 @@ export const CreateAssignmentForm = () => {
   );
 };
 
-const containerStyle = css({
-  display: 'flex',
-  flexDirection: 'column',
-  w: '100%',
-  maxW: '49.625rem',
-  mt: '2.5rem',
-  minHeight: 'calc(100vh - 5.25rem - 2.5rem)',
-  pb: '14.5rem',
+const containerStyle = cva({
+  base: {
+    display: 'flex',
+    flexDirection: 'column',
+    mt: '2.5rem',
+    minHeight: 'calc(100vh - 5.25rem - 2.5rem)',
+    pb: '14.5rem',
+    transition: 'width 0.3s ease',
+  },
+  variants: {
+    collapsed: {
+      // 사이드바 접힘
+      true: { w: '49.625rem' },
+      // 사이드바 열림
+      false: { w: '36.875rem' },
+    },
+  },
 });
 
 const headerStyle = css({
@@ -169,8 +180,7 @@ const taskDataWrapperStyle = css({
 
 const buttonWrapperStyle = css({
   display: 'flex',
-  justifyContent: 'space-between',
+  gap: '1.25rem',
   mt: '6.125rem',
-  w: '100%',
-  maxW: '49.625rem',
+  w: 'full',
 });

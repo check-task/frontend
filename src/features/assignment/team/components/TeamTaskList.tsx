@@ -180,6 +180,31 @@ const TeamTaskList = ({
   const handleSubmitEditComment = (commentId: number, subTaskId: number) => {
     const content = editingContent.trim();
     if (commentId < 0 || !content) return;
+
+    // 낙관적 캐시 업데이트 — 수정 즉시 UI 반영
+    queryClient.setQueryData<TaskDetail>(['taskDetail', taskId], (old) => {
+      if (!old?.subTasks) return old;
+      return {
+        ...old,
+        subTasks: old.subTasks.map((st) =>
+          st.subTaskId !== subTaskId
+            ? st
+            : {
+                ...st,
+                comments: (st.comments ?? []).map((c) => {
+                  const cId = getCommentId(
+                    c as TaskDetailSubTaskComment & { comment_id?: number },
+                  );
+                  return cId === commentId ? { ...c, content } : c;
+                }),
+              },
+        ),
+      };
+    });
+
+    setEditingCommentId(null);
+    setEditingContent('');
+
     const socket = getSocket();
     if (socket?.connected) {
       socket.emit(COMMENT_SEND_EVENTS.UPDATE, {
@@ -188,13 +213,8 @@ const TeamTaskList = ({
         commentId,
         content,
       });
-      setEditingCommentId(null);
-      setEditingContent('');
     } else {
-      updateComment({ commentId, content }).then(() => {
-        setEditingCommentId(null);
-        setEditingContent('');
-      });
+      updateComment({ commentId, content });
     }
   };
 
@@ -448,40 +468,49 @@ const TeamTaskList = ({
                                       : undefined
                                   }
                                 />
-                                {isEditing ? (
-                                  <Input
-                                    size='basic'
-                                    value={editingContent}
-                                    onChange={(e) =>
-                                      setEditingContent(e.target.value)
-                                    }
-                                    onKeyDown={(e) => {
-                                      if (e.key === 'Enter') {
-                                        e.preventDefault();
-                                        handleSubmitEditComment(
-                                          id,
-                                          task.subTaskId,
-                                        );
-                                      }
-                                      if (e.key === 'Escape') {
-                                        setEditingCommentId(null);
-                                        setEditingContent('');
-                                      }
-                                    }}
-                                    className={commentEditInputStyle}
-                                    autoFocus
-                                  />
-                                ) : (
-                                  <p className={commentItemHeaderCommentStyle}>
-                                    {comment.content}
+                                <div className={commentNameContentWrapperStyle}>
+                                  <p className={commentWriterNameStyle}>
+                                    {comment.writer}
                                   </p>
-                                )}
+                                  {isEditing ? (
+                                    <Input
+                                      size='basic'
+                                      value={editingContent}
+                                      onChange={(e) =>
+                                        setEditingContent(e.target.value)
+                                      }
+                                      onKeyDown={(e) => {
+                                        if (e.key === 'Enter') {
+                                          e.preventDefault();
+                                          handleSubmitEditComment(
+                                            id,
+                                            task.subTaskId,
+                                          );
+                                        }
+                                        if (e.key === 'Escape') {
+                                          setEditingCommentId(null);
+                                          setEditingContent('');
+                                        }
+                                      }}
+                                      className={commentEditInputStyle}
+                                      autoFocus
+                                    />
+                                  ) : (
+                                    <p
+                                      className={commentItemHeaderCommentStyle}
+                                    >
+                                      {comment.content}
+                                    </p>
+                                  )}
+                                </div>
                               </div>
                               {!isEditing &&
                                 (() => {
                                   const { date, time } = formatCommentCreatedAt(
                                     comment.createdAt,
                                   );
+                                  const isMyComment =
+                                    comment.writer === myNickname;
                                   return (
                                     <div className={commentItemEtcStyle}>
                                       <div
@@ -494,20 +523,22 @@ const TeamTaskList = ({
                                           {time}
                                         </span>
                                       </div>
-                                      <CommentEditDropdown
-                                        onEditComment={() =>
-                                          handleStartEditComment(
-                                            id,
-                                            comment.content,
-                                          )
-                                        }
-                                        onDeleteComment={() =>
-                                          handleDeleteComment(
-                                            comment,
-                                            task.subTaskId,
-                                          )
-                                        }
-                                      />
+                                      {isMyComment && (
+                                        <CommentEditDropdown
+                                          onEditComment={() =>
+                                            handleStartEditComment(
+                                              id,
+                                              comment.content,
+                                            )
+                                          }
+                                          onDeleteComment={() =>
+                                            handleDeleteComment(
+                                              comment,
+                                              task.subTaskId,
+                                            )
+                                          }
+                                        />
+                                      )}
                                     </div>
                                   );
                                 })()}
@@ -719,15 +750,26 @@ const commentItemContainerStyle = css({
 
 const commentItemStyle = css({
   display: 'flex',
-  alignItems: 'center',
+  alignItems: 'flex-end',
   justifyContent: 'space-between',
   width: 'full',
 });
 
 const commentItemHeaderStyle = css({
   display: 'flex',
-  alignItems: 'center',
+  alignItems: 'flex-start',
   gap: '0.5rem',
+});
+
+const commentNameContentWrapperStyle = css({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '0.5rem',
+});
+
+const commentWriterNameStyle = css({
+  textStyle: 'body2.m',
+  color: 'gray.900',
 });
 
 const commentItemHeaderProfileStyle = css({
@@ -741,6 +783,7 @@ const commentItemHeaderProfileStyle = css({
 const commentItemHeaderCommentStyle = css({
   textStyle: 'body3',
   color: 'gray.700',
+  ml: '0.125rem',
 });
 
 const commentEditInputStyle = css({

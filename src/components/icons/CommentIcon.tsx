@@ -2,7 +2,7 @@ import { css } from 'styled-system/css';
 
 export const CommentIcon = () => {
   const iconStyle = css({
-    fill: 'blue.500',
+    fill: 'blue.300',
   });
 
   return (
