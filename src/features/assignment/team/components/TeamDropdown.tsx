@@ -7,6 +7,8 @@ type RoleType = 'Owner' | 'Member';
 interface TeamMemberDropdownPropsBase {
   onSetLeader?: () => void;
   onDeleteMember?: () => void;
+  /** 팀원 추방 (역할 모드에서 '팀원 삭제' 클릭 시 호출, 미제공 시 기존 onRoleChange('Member')) */
+  onExpelMember?: () => void;
 }
 
 interface TeamMemberDropdownPropsRole {
@@ -26,6 +28,7 @@ interface CommentDropdownProps {
 export const TeamMemberDropdown = ({
   onSetLeader,
   onDeleteMember,
+  onExpelMember,
   role,
   onRoleChange,
   disabled = false,
@@ -53,11 +56,16 @@ export const TeamMemberDropdown = ({
     setIsOpen(false);
   };
 
+  const handleExpelMember = () => {
+    onExpelMember?.();
+    setIsOpen(false);
+  };
+
   if (isRoleMode) {
     return (
       <div className={dropdownWrapperStyle}>
         <button
-          type="button"
+          type='button'
           className={cx(dropdownButtonStyle, roleDropdownButtonStyle)}
           onClick={handleToggle}
           disabled={disabled}
@@ -73,19 +81,21 @@ export const TeamMemberDropdown = ({
             <div
               className={dropdownItemStyle}
               onClick={() => handleRoleSelect('Owner')}
-              role="option"
+              role='option'
               aria-selected={role === 'Owner'}
             >
-              Owner
+              팀장 설정
             </div>
             <div className={dividerStyle} />
             <div
               className={dropdownItemStyle}
-              onClick={() => handleRoleSelect('Member')}
-              role="option"
+              onClick={() =>
+                onExpelMember ? handleExpelMember() : handleRoleSelect('Member')
+              }
+              role='option'
               aria-selected={role === 'Member'}
             >
-              Member
+              팀원 삭제
             </div>
           </div>
         )}
@@ -207,6 +217,7 @@ const dropdownItemStyle = css({
   _hover: {
     backgroundColor: 'gray.50',
   },
+  bg: 'bg',
 });
 
 const dividerStyle = css({

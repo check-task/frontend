@@ -23,6 +23,7 @@ interface TeamMemberManageModalItemProps {
     currentRole: MemberRole,
   ) => void;
   onDeleteMember?: () => void;
+  onExpelMember?: () => void;
 }
 
 export const TeamMemberManageModalItem = ({
@@ -35,6 +36,7 @@ export const TeamMemberManageModalItem = ({
   isCurrentUser = false,
   canChangeRole,
   onRoleChange,
+  onExpelMember,
 }: TeamMemberManageModalItemProps) => {
   const roleLabel = isCurrentUser ? `${role}(you)` : role;
   const showDropdown = !isCurrentUser && canChangeRole;
@@ -68,8 +70,15 @@ export const TeamMemberManageModalItem = ({
           <TeamMemberDropdown
             role={role}
             onRoleChange={(newRole) =>
-              onRoleChange?.(memberId, patchMemberId, userId ?? undefined, newRole, role)
+              onRoleChange?.(
+                memberId,
+                patchMemberId,
+                userId ?? undefined,
+                newRole,
+                role,
+              )
             }
+            onExpelMember={onExpelMember}
             disabled={false}
           />
         ) : (

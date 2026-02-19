@@ -9,17 +9,25 @@ import TeamTaskList from '@/features/assignment/team/components/TeamTaskList';
 import { css } from 'styled-system/css';
 import { useTeamTaskDetail } from '@/features/assignment/team/components/hooks/useTeamTaskDetail';
 import { useTaskRoomSocket } from '@/features/assignment/team/hooks/useTaskRoomSocket';
+import { useUIStore } from '@/stores/ui-store';
+
+const TEAM_PAGE_WIDTH_EXPANDED = '70.125rem';
+const TEAM_PAGE_WIDTH_COLLAPSED = '75rem';
 
 export default function TeamAssignmentDetailPage() {
   const params = useParams();
   const taskId = Number(params?.id);
+  const isSidebarCollapsed = useUIStore((state) => state.isSidebarCollapsed);
+  const containerWidth = isSidebarCollapsed
+    ? TEAM_PAGE_WIDTH_COLLAPSED
+    : TEAM_PAGE_WIDTH_EXPANDED;
   const { data, isLoading, isError, error } = useTeamTaskDetail(taskId);
 
   useTaskRoomSocket(taskId);
 
   if (isLoading || !data) {
     return (
-      <div className={containerStyle}>
+      <div className={containerStyle} style={{ width: containerWidth }}>
         <div
           className={css({
             py: '3rem',
@@ -38,7 +46,7 @@ export default function TeamAssignmentDetailPage() {
       (error as { response?: { data?: { reason?: string } } })?.response?.data
         ?.reason ?? '과제를 찾을 수 없습니다.';
     return (
-      <div className={containerStyle}>
+      <div className={containerStyle} style={{ width: containerWidth }}>
         <div
           className={css({
             py: '3rem',
@@ -53,7 +61,7 @@ export default function TeamAssignmentDetailPage() {
   }
 
   return (
-    <div className={containerStyle}>
+    <div className={containerStyle} style={{ width: containerWidth }}>
       <div className={headerContainerStyle}>
         <TeamHeader
           title={data.title}
@@ -90,11 +98,9 @@ export default function TeamAssignmentDetailPage() {
 const containerStyle = css({
   display: 'flex',
   flexDirection: 'column',
-  width: '75rem',
-  maxWidth: '75rem',
-  minWidth: '70.125rem',
   pt: '2.5rem',
   pb: '3.75rem',
+  transition: 'width 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
 });
 
 const headerContainerStyle = css({
