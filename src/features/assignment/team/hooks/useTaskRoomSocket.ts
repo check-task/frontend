@@ -6,8 +6,7 @@ import {
   getSocket,
   JOIN_TASK_ROOM,
   LEAVE_TASK_ROOM,
-  TASK_UPDATED_EVENT,
-  TEAM_UPDATE_EVENT,
+  TASK_ROOM_UPDATE_EVENTS,
 } from '@/lib/socket';
 
 const isDev =
@@ -22,7 +21,7 @@ const refetchTaskDetail = (
   }
   queryClient.invalidateQueries({ queryKey: ['taskDetail', taskId] });
   queryClient
-    .refetchQueries({ queryKey: ['taskDetail', taskId], type: 'active' })
+    .refetchQueries({ queryKey: ['taskDetail', taskId] })
     .then(() => {
       if (isDev)
         console.log('[Socket] taskDetail 재요청 완료, taskId:', taskId);
@@ -30,7 +29,7 @@ const refetchTaskDetail = (
 };
 
 /**
- * 팀 과제 상세 페이지에서 join:team(taskId)로 해당 팀 방(`task:{taskId}`)에 입장하고,
+ * 팀 과제 상세 페이지에서 joinTaskRoom(taskId)로 해당 팀 방(`task:{taskId}`)에 입장하고,
  * task:updated, team:update, comment:created|updated|deleted 수신 시 taskDetail 쿼리 무효화 후 즉시 refetch 해 전체 UI를 갱신합니다.
  * (브라우저/탭 두 개로 테스트 시, 두 번째 창도 같은 방에 들어가 있으면 이벤트를 받아 자동 반영됩니다.)
  */
@@ -38,14 +37,14 @@ export function useTaskRoomSocket(taskId: number) {
   const queryClient = useQueryClient();
 
   useEffect(() => {
-    if (taskId <= 0) return;
+    if (!Number.isFinite(taskId) || taskId <= 0) return;
 
     const socket = getSocket();
     if (!socket) return;
 
     const joinRoom = () => {
       socket.emit(JOIN_TASK_ROOM, taskId);
-      if (isDev) console.log('[Socket] join:team 전송, taskId:', taskId);
+      if (isDev) console.log('[Socket] joinTaskRoom 전송, taskId:', taskId);
     };
 
     if (socket.connected) {
@@ -66,14 +65,25 @@ export function useTaskRoomSocket(taskId: number) {
 
     const onRefetch = () => refetchTaskDetail(queryClient, taskId);
 
-    socket.on(TASK_UPDATED_EVENT, onRefetch);
-    socket.on(TEAM_UPDATE_EVENT, onRefetch);
+    const handleRoomUpdate = (event: string) => {
+      if (isDev) console.log('[Socket] 수신 → refetch:', event);
+      onRefetch();
+    };
+
+    const boundHandlers = new Map<string, () => void>();
+    TASK_ROOM_UPDATE_EVENTS.forEach((event) => {
+      const handler = () => handleRoomUpdate(event);
+      boundHandlers.set(event, handler);
+      socket.on(event, handler);
+    });
 
     return () => {
       if (isDev) socket.offAny();
       socket.off('connect', joinRoom);
-      socket.off(TASK_UPDATED_EVENT, onRefetch);
-      socket.off(TEAM_UPDATE_EVENT, onRefetch);
+      TASK_ROOM_UPDATE_EVENTS.forEach((event) => {
+        const handler = boundHandlers.get(event);
+        if (handler) socket.off(event, handler);
+      });
       socket.emit(LEAVE_TASK_ROOM, taskId);
     };
   }, [taskId, queryClient]);
