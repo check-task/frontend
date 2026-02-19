@@ -14,7 +14,12 @@ import { useMyInfo } from '@/hooks/queries/useMyInfo';
 import { useCreateTask } from '@/hooks/mutations/useCreateTask';
 import type { TaskType } from '@/types/task';
 
-const formatDate = (d: Date) => d.toISOString().slice(0, 10);
+const formatDate = (d: Date) => {
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  return `${yyyy}-${mm}-${dd}`;
+};
 
 export const CreateAssignmentForm = () => {
   const router = useRouter();
