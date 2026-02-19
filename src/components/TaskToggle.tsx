@@ -75,11 +75,13 @@ export const containerStyle = cva({
       true: {
         w: '49.625rem',
         gap: '0.125rem',
+        transition: 'width 0.3s ease-in-out, gap 0.3s ease-in-out',
       },
       // 사이드바 열여 있음
       false: {
         w: '43.25rem',
         gap: '0.5rem',
+        transition: 'width 0.3s ease-in-out, gap 0.3s ease-in-out',
       },
     },
   },
