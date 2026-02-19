@@ -70,7 +70,10 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
 
         {/* 체크마크 UI */}
         <div className={checkboxControl({ variant })}>
-          <CheckMark variant={variant} />
+          <CheckMark
+            className={css({ w: '0.83331rem', h: '0.83331rem' })}
+            variant={variant}
+          />
         </div>
       </label>
     );

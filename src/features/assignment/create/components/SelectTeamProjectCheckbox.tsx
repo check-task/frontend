@@ -49,13 +49,16 @@ export const SelectTeamProjectCheckbox = forwardRef<
   return (
     <label>
       <input
-        type="checkbox"
+        type='checkbox'
         className={cx('peer', hiddenInputStyle)}
         ref={ref}
         {...props}
       />
       <div className={checkboxControl()}>
-        <CheckMark variant="black" />
+        <CheckMark
+          className={css({ w: '0.83331rem', h: '0.83331rem' })}
+          variant='black'
+        />
       </div>
     </label>
   );

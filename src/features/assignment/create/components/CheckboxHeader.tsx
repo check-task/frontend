@@ -16,11 +16,9 @@ export const CheckboxHeader = ({
 }: CheckboxHeaderProps) => {
   const [internalTeam, setInternalTeam] = useState(false);
   const isTeamProject =
-    onTeamProjectChange != null ? controlledTeam ?? false : internalTeam;
+    onTeamProjectChange != null ? (controlledTeam ?? false) : internalTeam;
   const setTeam =
-    onTeamProjectChange != null
-      ? onTeamProjectChange
-      : setInternalTeam;
+    onTeamProjectChange != null ? onTeamProjectChange : setInternalTeam;
 
   return (
     <div className={checkboxWrapperStyle}>
@@ -33,7 +31,8 @@ export const CheckboxHeader = ({
       </div>
       {isTeamProject && (
         <div className={checkboxContainerStyle}>
-          <Checkbox />
+          {/* 체크박스 변경 */}
+          <SelectTeamProjectCheckbox />
           <p>웬투밋 추가</p>
         </div>
       )}
