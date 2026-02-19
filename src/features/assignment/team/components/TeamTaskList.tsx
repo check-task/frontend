@@ -772,14 +772,14 @@ const commentNameContentWrapperStyle = css({
 });
 
 const commentWriterNameStyle = css({
-  textStyle: 'body2.m',
-  color: 'gray.900',
+  textStyle: 'body3.m',
+  color: 'gray.700',
 });
 
 const commentItemHeaderProfileStyle = css({
   display: 'flex',
-  w: '1.5rem',
-  h: '1.5rem',
+  w: '1.25rem',
+  h: '1.25rem',
   borderRadius: '100%',
   bg: 'blue.100',
 });
