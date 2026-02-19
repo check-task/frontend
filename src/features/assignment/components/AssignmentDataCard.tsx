@@ -78,7 +78,7 @@ const iconGroupStyle = css({
   gap: '0.5rem',
   flexShrink: 0,
   opacity: 0,
-  transition: 'opacity 0.2s ease',
+  transition: 'opacity 0.4s ease',
 
   // 카드 호버시 아이콘 나타나도록
   _groupHover: {
