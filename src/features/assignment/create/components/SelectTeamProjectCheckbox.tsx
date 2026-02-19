@@ -16,12 +16,11 @@ const checkboxControl = cva({
     alignItems: 'center',
     justifyContent: 'center',
     cursor: 'pointer',
-    transition: 'border-color 0.2s',
 
     '& svg': {
       opacity: 0,
       transform: 'scale(0.5)',
-      transition: 'all 0.1s ease-in-out',
+      transition: 'opacity 0.2s ease-in-out, transform 0.2s ease-in-out',
     },
 
     _peerChecked: {

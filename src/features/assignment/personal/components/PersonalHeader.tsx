@@ -54,7 +54,7 @@ export const PersonalHeader = ({
             textStyle: 'h4',
             flexShrink: 0,
             whiteSpace: 'nowrap',
-            marginTop: '0.3rem',
+            marginTop: '0.4rem',
             ...(useHex ? {} : { color: colorMap[folderColor] }),
           })}
           style={useHex ? { color: folderColorHex } : undefined}

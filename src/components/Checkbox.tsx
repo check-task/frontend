@@ -13,13 +13,12 @@ const checkboxControl = cva({
     alignItems: 'center',
     justifyContent: 'center',
     cursor: 'pointer',
-    transition: 'border-color 0.2s', // 테두리 색상 변경 시 부드럽게
 
     // 아이콘의 기본 상태 정의
     '& svg': {
       opacity: 0,
       transform: 'scale(0.5)',
-      transition: 'all 0.1s ease-in-out', // 나타나는 모션
+      transition: 'opacity 0.2s ease-in-out, transform 0.2s ease-in-out', // 체크 시에만 애니메이션
     },
 
     //  체크되었을 때 스타일

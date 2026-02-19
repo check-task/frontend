@@ -285,18 +285,12 @@ export const ModifyAssignmentForm = () => {
 
       {/* 취소, 저장 */}
       <div className={buttonWrapperStyle}>
-        <Button
-          variant='fillGray'
-          size={isSidebarCollapsed ? 'xlarge' : 'medium'}
-          className={buttonSizeTransitionStyle}
-          onClick={handleCancel}
-        >
+        <Button variant='fillGray' size='xlarge' onClick={handleCancel}>
           취소
         </Button>
         <Button
           variant='fillBlue'
-          size={isSidebarCollapsed ? 'xlarge' : 'medium'}
-          className={buttonSizeTransitionStyle}
+          size='xlarge'
           disabled={!isFormValid || isPending}
           onClick={handleSave}
         >
@@ -316,7 +310,7 @@ const containerStyle = cva({
     mt: '2.5rem',
     minHeight: 'calc(100vh - 5.25rem - 2.5rem)',
     pb: '14.5rem',
-    transition: 'max-width 0.3s ease',
+    transition: 'width 0.3s ease',
   },
   variants: {
     collapsed: {
@@ -355,8 +349,5 @@ const buttonWrapperStyle = css({
   display: 'flex',
   gap: '1.25rem',
   mt: '3.75rem',
-});
-
-const buttonSizeTransitionStyle = css({
-  transition: 'width 0.3s ease, padding 0.3s ease',
+  w: 'full',
 });
