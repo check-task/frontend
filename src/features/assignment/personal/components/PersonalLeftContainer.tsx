@@ -4,6 +4,7 @@ import { css, cva } from 'styled-system/css';
 import { useUIStore } from '@/stores/ui-store';
 import { PersonalHeader } from './PersonalHeader';
 import { PersonalTaskList, type PersonalTaskItem } from './PersonalTaskList';
+import { useRef, useEffect } from 'react';
 
 interface PersonalLeftContainerProps {
   // 헤더 정보
@@ -15,6 +16,8 @@ interface PersonalLeftContainerProps {
   taskId: number;
   // task 목록
   tasks: PersonalTaskItem[];
+  // 헤더 높이 콜백
+  onHeaderHeightChange?: (height: number) => void;
 }
 
 // 페이지 기준 왼쪽 영역 (헤더+ task 목록)
@@ -26,18 +29,29 @@ export const PersonalLeftContainer = ({
   folderColorHex,
   taskId,
   tasks,
+  onHeaderHeightChange,
 }: PersonalLeftContainerProps) => {
   const isSidebarCollapsed = useUIStore((state) => state.isSidebarCollapsed);
+  const headerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (headerRef.current && onHeaderHeightChange) {
+      const height = headerRef.current.offsetHeight;
+      onHeaderHeightChange(height);
+    }
+  }, [title, completionRate, onHeaderHeightChange]);
 
   return (
     <div className={containerStyle({ collapsed: isSidebarCollapsed })}>
       <div className={contentWrapperStyle}>
-        <PersonalHeader
-          completionRate={completionRate}
-          title={title}
-          daysLeft={daysLeft}
-          folderColorHex={folderColorHex}
-        />
+        <div ref={headerRef} style={{ width: '100%' }}>
+          <PersonalHeader
+            completionRate={completionRate}
+            title={title}
+            daysLeft={daysLeft}
+            folderColorHex={folderColorHex}
+          />
+        </div>
         <div className={taskContainerStyle}>
           <h2 className={css({ textStyle: 'h4', color: 'gray.900' })}>
             TASK 목록

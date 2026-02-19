@@ -5,12 +5,15 @@ import { useParams } from 'next/navigation';
 import { PersonalLeftContainer } from '@/features/assignment/personal/components/PersonalLeftContainer';
 import { PersonalRightContainer } from '@/features/assignment/personal/components/PersonalRightContainer';
 import { usePersonalTaskDetail } from '@/features/assignment/personal/components/hooks/usePersonalTaskDetail';
+import { useState } from 'react';
 
 export default function PersonalPage() {
   const params = useParams();
   const taskId = Number(params?.id);
   // 개인 과제 상세 커스텀 훅 호출
   const { data, isLoading } = usePersonalTaskDetail(taskId);
+  // 헤더 높이 상태
+  const [headerHeight, setHeaderHeight] = useState(0);
 
   if (isLoading || !data) {
     return (
@@ -31,8 +34,13 @@ export default function PersonalPage() {
           completionRate={data.progressRate}
           folderColorHex={data.folderColorHex}
           tasks={data.tasks}
+          onHeaderHeightChange={setHeaderHeight}
         />
-        <PersonalRightContainer taskId={data.taskId} items={data.items} />
+        <PersonalRightContainer
+          taskId={data.taskId}
+          items={data.items}
+          headerHeight={headerHeight}
+        />
       </div>
     </div>
   );

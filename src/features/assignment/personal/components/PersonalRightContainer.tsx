@@ -15,12 +15,14 @@ export interface ReferenceItem {
 interface PersonalRightContainerProps {
   taskId: number;
   items: ReferenceItem[];
+  headerHeight?: number;
 }
 
 // 페이지 기준 오른쪽 영역 (과제 수정버튼+자료 모음집)
 export const PersonalRightContainer = ({
   taskId,
   items,
+  headerHeight = 0,
 }: PersonalRightContainerProps) => {
   return (
     <div className={containerStyle}>
@@ -30,7 +32,13 @@ export const PersonalRightContainer = ({
           과제수정
         </Button>
       </Link>
-      <PersonalEtc taskId={taskId} items={items} />
+      <div
+        style={{
+          marginTop: headerHeight ? `calc(${headerHeight}px - 0.8rem)` : '0',
+        }}
+      >
+        <PersonalEtc taskId={taskId} items={items} />
+      </div>
     </div>
   );
 };
@@ -39,6 +47,5 @@ const containerStyle = css({
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'flex-end',
-  gap: '7.15rem', // 직접 왼쪽이랑 정렬되도록 넣음...
   w: '100%',
 });
