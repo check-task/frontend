@@ -768,7 +768,8 @@ const commentItemHeaderStyle = css({
 const commentNameContentWrapperStyle = css({
   display: 'flex',
   flexDirection: 'column',
-  gap: '0.5rem',
+  gap: '0.25rem',
+  transform: 'translateY(-0.0625rem)',
 });
 
 const commentWriterNameStyle = css({
