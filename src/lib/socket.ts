@@ -24,6 +24,16 @@ const getSocketBaseUrl = (): string => {
 };
 
 /**
+ * Socket.IO 엔드포인트 경로.
+ * 기본값은 루트 '/socket.io'. 백엔드가 다른 경로에 두면 .env에 NEXT_PUBLIC_WS_PATH 지정 (예: /api/v1/socket.io).
+ */
+const getSocketPath = (): string => {
+  const envPath = process.env.NEXT_PUBLIC_WS_PATH;
+  if (envPath && typeof envPath === 'string') return envPath;
+  return '/socket.io';
+};
+
+/**
  * Socket.io namespace. 백엔드는 기본 namespace(/)만 사용하고 room(`task:${taskId}`)으로 구분하므로
  * 기본값은 빈 문자열(기본 "/" 연결). 다른 서버 규격이면 .env에 NEXT_PUBLIC_WS_NAMESPACE 지정.
  */
@@ -49,7 +59,7 @@ const shouldUseBearerPrefix = (): boolean =>
 /**
  * 팀 과제 실시간 동기화용 Socket.io 클라이언트 싱글톤
  * - 연결 시 auth에 JWT 전달 (재연결 시에도 최신 토큰 사용)
- * - 방 참여: join:team(taskId)
+ * - 방 참여: joinTaskRoom(taskId)
  */
 export function getSocket(): Socket | null {
   if (typeof window === 'undefined') return null;
@@ -60,10 +70,12 @@ export function getSocket(): Socket | null {
   const url = namespace ? `${baseUrl}${namespace}` : baseUrl;
 
   if (!socket) {
+    const socketPath = getSocketPath();
     socket = io(url, {
-      path: '/socket.io',
-      transports: ['websocket'],
-      withCredentials: true,
+      path: socketPath,
+      transports: ['polling', 'websocket'],
+      // 소켓 인증은 auth 콜백(JWT)만 사용. 백엔드는 origin 구체 지정 + credentials: true 유지해도 됨.
+      withCredentials: false,
       autoConnect: true,
       auth: (cb) => {
         const token = getAccessToken();
@@ -74,7 +86,7 @@ export function getSocket(): Socket | null {
       },
     });
     if (typeof process !== 'undefined' && process.env.NODE_ENV === 'development') {
-      console.log('[Socket] 연결 시도:', url, namespace ? `(namespace: ${namespace})` : '(기본 namespace /)');
+      console.log('[Socket] 연결 시도:', url, 'path:', socketPath, namespace ? `(namespace: ${namespace})` : '(기본 namespace /)');
       socket.on('connect', () => console.log('[Socket] 연결됨, id:', socket?.id));
       socket.on('connect_error', (err) => {
         console.error('[Socket] 연결 실패:', err.message);
@@ -105,10 +117,10 @@ export function disconnectSocket(): void {
   }
 }
 
-/** 팀 세부 페이지 방 입장 (서버에서 socket.join(`task:${taskId}`) 처리, 인자: taskId) */
-export const JOIN_TASK_ROOM = 'join:team';
-/** 팀 세부 페이지 방 이탈 (인자: taskId) */
-export const LEAVE_TASK_ROOM = 'leave:team';
+/** 팀 세부 페이지 방 입장 (백엔드 taskEvents.JOIN_TASK, 인자: taskId) */
+export const JOIN_TASK_ROOM = 'joinTaskRoom';
+/** 팀 세부 페이지 방 이탈 (백엔드 taskEvents.LEAVE_TASK, 인자: taskId) */
+export const LEAVE_TASK_ROOM = 'leaveTaskRoom';
 
 /** 클라이언트 → 서버: 과제 수정 요청 */
 export const TASK_UPDATE_SEND_EVENT = 'task:update';
@@ -118,6 +130,32 @@ export const TASK_REQUEST_REFRESH_EVENT = 'task:request_refresh';
 export const TASK_UPDATED_EVENT = 'task:updated';
 /** 백엔드 socket.util emitTeamUpdate 가 보내는 이벤트 (수신 시 동일하게 taskDetail 무효화) */
 export const TEAM_UPDATE_EVENT = 'team:update';
+
+/**
+ * 백엔드가 task 방에 브로드캐스트하는 모든 갱신 이벤트.
+ * 이 중 하나라도 수신하면 taskDetail refetch로 실시간 반영.
+ */
+export const TASK_ROOM_UPDATE_EVENTS = [
+  TASK_UPDATED_EVENT,
+  TEAM_UPDATE_EVENT,
+  'subtaskStatusUpdated',
+  'deadlineUpdated',
+  'subtaskAssigneeUpdated',
+  'member:updated',
+  'subtask:created',
+  'reference:created',
+  'reference:updated',
+  'reference:deleted',
+  'comment:created',
+  'comment:updated',
+  'comment:deleted',
+  'communication:created',
+  'communication:updated',
+  'communication:deleted',
+  'log:created',
+  'log:updated',
+  'log:deleted',
+] as const;
 
 /** 과제 수정 소켓 페이로드 (task:update) */
 export interface TaskUpdatePayload {
