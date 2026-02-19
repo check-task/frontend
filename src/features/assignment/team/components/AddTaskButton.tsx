@@ -35,6 +35,7 @@ export const AddTaskButton = ({ taskId, maxDate }: AddTaskButtonProps) => {
   const [deadline, setDeadline] = useState<Date>(() =>
     getDefaultDeadline(maxDate),
   );
+  const isAlarm = true;
   const [saveError, setSaveError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const { mutate: createSubTask, isPending } = useCreateSubTask(taskId);
@@ -63,7 +64,7 @@ export const AddTaskButton = ({ taskId, maxDate }: AddTaskButtonProps) => {
       {
         title,
         deadline: toYYYYMMDD(deadline),
-        isAlarm: false,
+        isAlarm,
       },
       {
         onSuccess: closeAndClear,
