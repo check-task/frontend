@@ -66,8 +66,9 @@ const cardStyle = css({
 // 파일명 + 아이콘
 const headerStyle = css({
   display: 'flex',
-  alignItems: 'center',
+  alignItems: 'flex-start',
   justifyContent: 'space-between',
+  gap: '0.5rem',
 });
 
 // 아이콘 묶음
@@ -93,6 +94,8 @@ const iconGroupStyle = css({
 const cardTitleStyle = css({
   textStyle: 'body2.r',
   color: 'gray.900',
+  wordBreak: 'break-word',
+  flex: 1,
 });
 
 // 파일 URL

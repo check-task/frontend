@@ -114,7 +114,26 @@ export const ModifyAssignmentForm = () => {
 
   const handleSave = async () => {
     if (!isFormValid || dueDate == null || selectedFolderId == null) return;
+
+    const activeTasks = tasks.length > 0 ? tasks : (initialTasks ?? []);
     const type: TaskType = isTeamProject ? 'TEAM' : 'PERSONAL';
+
+    // 타입과 폴더 일치 검증
+    const selectedFolder = folders.find((f) => f.id === selectedFolderId);
+    const isTeamFolder = selectedFolder?.name === '팀';
+
+    if (
+      (type === 'TEAM' && !isTeamFolder) ||
+      (type === 'PERSONAL' && isTeamFolder)
+    ) {
+      alert(
+        type === 'TEAM'
+          ? '팀 과제는 팀 폴더에만 저장할 수 있습니다.'
+          : '개인 과제는 개인 폴더에만 저장할 수 있습니다.',
+      );
+      return;
+    }
+
     const mergeReferences = (
       items: Array<{ name: string; url: string }>,
     ): Array<{ name: string; url: string }> => {
@@ -140,21 +159,27 @@ export const ModifyAssignmentForm = () => {
       (item) => item.type === 1 && item.id < 0 && item.file,
     );
 
+    // 개인 과제의 경우 assigneeId는 현재 사용자로 설정
+    const currentUserId = myInfo?.user?.id ?? 0;
+
+    const subTasksData = activeTasks
+      .filter((task) => task.title.trim() !== '')
+      .map((task) => ({
+        title: task.title.trim(),
+        endDate: task.dueDate ?? '',
+        status: ensureStatus(task.status),
+        isAlarm: task.isAlarm ?? false,
+        assigneeId:
+          type === 'PERSONAL' ? currentUserId : (task.assigneeId ?? 0),
+      }));
+
     const payload: UpdateTaskRequest = {
       title: assignmentName.trim(),
       deadline: toYYYYMMDD(dueDate),
       type,
       status: ensureStatus(data?.status),
       folderId: selectedFolderId,
-      subTasks: tasks
-        .filter((task) => task.title.trim() !== '')
-        .map((task) => ({
-          title: task.title.trim(),
-          endDate: task.dueDate ?? '',
-          status: ensureStatus(task.status),
-          isAlarm: task.isAlarm ?? false,
-          assigneeId: task.assigneeId ?? 0,
-        })),
+      subTasks: subTasksData,
       references,
       fileNames: newFileItems.map((item) => item.name),
       files: newFileItems
@@ -162,9 +187,23 @@ export const ModifyAssignmentForm = () => {
         .filter((file): file is File => Boolean(file)),
     };
 
-    await updateTask(payload);
-    const detailType = type === 'TEAM' ? 'team' : 'personal';
-    router.push(`/assignment/${detailType}/${taskId}`);
+    try {
+      await updateTask(payload);
+      const detailType = type === 'TEAM' ? 'team' : 'personal';
+      router.push(`/assignment/${detailType}/${taskId}`);
+    } catch (error: unknown) {
+      console.error('[과제 수정 실패]', error);
+      const ax = error as {
+        response?: { data?: { reason?: string; message?: string } };
+        message?: string;
+      };
+      const message =
+        ax.response?.data?.reason ??
+        ax.response?.data?.message ??
+        (typeof ax.message === 'string' ? ax.message : null) ??
+        '과제 수정에 실패했습니다.';
+      alert(message);
+    }
   };
 
   // 과제 삭제 모달 핸들러

@@ -55,6 +55,9 @@ const TeamTaskList = ({
   const [deletedCommentIds, setDeletedCommentIds] = useState<Set<number>>(
     () => new Set(),
   );
+  const [alarmStateMap, setAlarmStateMap] = useState<Record<number, boolean>>(
+    {},
+  );
   const queryClient = useQueryClient();
   const { mutate: mutateStatus } = useUpdateTeamSubTaskStatus(taskId);
   const { mutate: mutateDeadline } = useUpdateTeamSubTaskDeadline(taskId);
@@ -161,6 +164,12 @@ const TeamTaskList = ({
 
   const handleDeadlineChange = (subTaskId: number, date: Date) => {
     mutateDeadline({ subTaskId, endDate: toYYYYMMDD(date) });
+  };
+
+  // 알림 설정 변경 핸들러
+  const handleAlarmToggle = (subTaskId: number) => (next: boolean) => {
+    setAlarmStateMap((prev) => ({ ...prev, [subTaskId]: next }));
+    updateSubTaskAlarm({ subTaskId, isAlarm: next });
   };
 
   const handleCommentToggle = (taskId: number) => {
@@ -373,13 +382,8 @@ const TeamTaskList = ({
                       />
                       <ClockToggle
                         muted={isCompleted}
-                        isOn={task.isAlarm}
-                        onToggle={(next) =>
-                          updateSubTaskAlarm({
-                            subTaskId: task.subTaskId,
-                            isAlarm: next,
-                          })
-                        }
+                        isOn={alarmStateMap[task.subTaskId] ?? task.isAlarm}
+                        onToggle={handleAlarmToggle(task.subTaskId)}
                       />
                       <CommentButton
                         isOpen={commentOpen}

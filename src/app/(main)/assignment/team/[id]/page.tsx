@@ -2,7 +2,7 @@
 
 import { useParams } from 'next/navigation';
 import { Divider } from '@/components/Divider';
-import { PersonalHeader } from '@/features/assignment/personal/components/PersonalHeader';
+import { TeamHeader } from '@/features/assignment/team/components/TeamHeader';
 import { TeamHeaderButton } from '@/features/assignment/team/components/TeamHeaderButtonGroup';
 import { TeamEtc } from '@/features/assignment/team/components/TeamEtc';
 import TeamTaskList from '@/features/assignment/team/components/TeamTaskList';
@@ -55,7 +55,7 @@ export default function TeamAssignmentDetailPage() {
   return (
     <div className={containerStyle}>
       <div className={headerContainerStyle}>
-        <PersonalHeader
+        <TeamHeader
           title={data.title}
           daysLeft={data.dDay}
           completionRate={data.progressRate}

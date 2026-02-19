@@ -70,37 +70,37 @@ export const TeamCommunicationModal = ({
   return (
     <div className={containerStyle}>
       <div className={inputContainerStyle}>
-        <div className={scrollableListStyle}>
-          {inputGroups.map((group, index) => (
-            <div key={group.id}>
-              {index > 0 && <Divider mt='1.25rem' mb='1.25rem' />}
-              <div className={inputGroupStyle}>
-                <div className={inputWrapperStyle}>
-                  <label className={labelStyle}>커뮤니케이션명</label>
-                  <Input
-                    size='modal'
-                    placeholder='커뮤니케이션명을 입력하세요.'
-                    value={group.name}
-                    onChange={(e) =>
-                      handleInputChange(group.id, 'name', e.target.value)
-                    }
-                  />
-                </div>
-                <div className={inputWrapperStyle}>
-                  <label className={labelStyle}>URL경로</label>
-                  <Input
-                    size='modal'
-                    placeholder='URL을 붙여넣으세요.'
-                    value={group.url}
-                    onChange={(e) =>
-                      handleInputChange(group.id, 'url', e.target.value)
-                    }
-                  />
-                </div>
+        {/* <div className={scrollableListStyle}> */}
+        {inputGroups.map((group, index) => (
+          <div key={group.id}>
+            {index > 0 && <Divider mt='1.25rem' mb='1.25rem' />}
+            <div className={inputGroupStyle}>
+              <div className={inputWrapperStyle}>
+                <label className={labelStyle}>커뮤니케이션명</label>
+                <Input
+                  size='modal'
+                  placeholder='커뮤니케이션명을 입력하세요.'
+                  value={group.name}
+                  onChange={(e) =>
+                    handleInputChange(group.id, 'name', e.target.value)
+                  }
+                />
+              </div>
+              <div className={inputWrapperStyle}>
+                <label className={labelStyle}>URL경로</label>
+                <Input
+                  size='modal'
+                  placeholder='URL을 붙여넣으세요.'
+                  value={group.url}
+                  onChange={(e) =>
+                    handleInputChange(group.id, 'url', e.target.value)
+                  }
+                />
               </div>
             </div>
-          ))}
-        </div>
+          </div>
+        ))}
+        {/* </div> */}
         <div className={css({ mt: '1rem', mb: '1.25rem' })}>
           <AddURLDataButton toggleType={0} onClick={handleAddInput} />
         </div>
@@ -121,20 +121,40 @@ const containerStyle = css({
   pt: '1.75rem',
 });
 
+// 커뮤니케이션 추가 모달에 스크롤 스타일 적용
 const inputContainerStyle = css({
   display: 'flex',
   flexDirection: 'column',
-  width: '100%',
+  width: 'calc(100% + 1.25rem)',
+  maxH: '32rem',
+  overflowY: 'auto',
+  pr: '1rem',
+  scrollbarGutter: 'stable',
+  boxSizing: 'border-box',
+
+  // 스크롤바 스타일 초기화 및 스타일 설정
+  '&::-webkit-scrollbar': {
+    width: '0.25rem',
+  },
+  '&::-webkit-scrollbar-button': {
+    width: 0,
+    height: 0,
+    display: 'none !important',
+  },
+  '&::-webkit-scrollbar-thumb': {
+    background: 'gray.200',
+    borderRadius: '6.25rem',
+  },
 });
 
 // 입력 목록만 스크롤 — 3개 이상일 때 스크롤 (자료 모달과 동일)
-const scrollableListStyle = css({
-  display: 'flex',
-  flexDirection: 'column',
-  width: '100%',
-  maxHeight: '26rem',
-  overflowY: 'auto',
-});
+// const scrollableListStyle = css({
+//   display: 'flex',
+//   flexDirection: 'column',
+//   width: '100%',
+//   maxHeight: '26rem',
+//   overflowY: 'auto',
+// });
 
 const inputGroupStyle = css({
   display: 'flex',

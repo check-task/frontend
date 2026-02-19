@@ -36,18 +36,25 @@ export const PersonalHeader = ({
                 width: '2.5rem',
                 height: '2.5rem',
                 borderRadius: '50%',
+                flexShrink: 0,
+                marginTop: '0.2rem',
               })}
               style={{ backgroundColor: folderColorHex }}
             />
           ) : (
-            <FolderClassification color={folderColor} />
+            <div className={css({ flexShrink: 0, marginTop: '0.25rem' })}>
+              <FolderClassification color={folderColor} />
+            </div>
           )}
-          <p className={css({ textStyle: 'h2', color: 'gray.900' })}>{title}</p>
+          <p className={titleTextStyle}>{title}</p>
         </div>
 
         <p
           className={css({
             textStyle: 'h4',
+            flexShrink: 0,
+            whiteSpace: 'nowrap',
+            marginTop: '0.3rem',
             ...(useHex ? {} : { color: colorMap[folderColor] }),
           })}
           style={useHex ? { color: folderColorHex } : undefined}
@@ -74,21 +81,32 @@ const containerStyle = css({
   gap: '1.88rem', // 제목과 완료율 사이 간격(아니면 1.75)
   justifyContent: 'space-between',
   transition: 'all 0.3s ease-in-out',
-  w: '43.25rem',
+  w: '100%',
 });
 
 // 폴더 색상 + 제목 + 디데이
 const titleStyle = css({
   display: 'flex',
   justifyContent: 'space-between',
-  alignItems: 'center',
+  alignItems: 'flex-start',
+  gap: '1rem',
 });
 
 // 폴더 색상+ 제목
 const titleContentStyle = css({
   display: 'flex',
   gap: '0.75rem',
-  alignItems: 'center',
+  alignItems: 'flex-start',
+  flex: 1,
+  minWidth: 0,
+});
+
+// 제목 텍스트
+const titleTextStyle = css({
+  textStyle: 'h2',
+  color: 'gray.900',
+  wordBreak: 'break-word',
+  flex: 1,
 });
 
 const completionRateStyle = css({
