@@ -10,6 +10,7 @@ import { AddAssignmentDataModal } from '@/features/assignment/components/AddAssi
 import { CommunicationEditIcon } from '@/components/icons/CommunicationEditIcon';
 import { CommunicationDeleteIcon } from '@/components/icons/CommunicationDeleteIcon';
 import { useDeleteCommunication } from '@/hooks/mutations/useDeleteCommunication';
+import { useDeleteMeetingLog } from '@/hooks/mutations/useDeleteMeetingLog';
 import { MinutesModal } from './MinutesModal';
 import { ReferenceEditModal } from './ReferenceEditModal';
 import { useDeleteReferenceData } from '@/hooks/mutations/useDeleteReferenceData';
@@ -41,6 +42,7 @@ export const TeamEtc = ({
       : '';
   const { mutate: deleteCommunication } = useDeleteCommunication(taskId);
   const { mutate: deleteReference } = useDeleteReferenceData(taskId);
+  const { mutate: deleteMeetingLog } = useDeleteMeetingLog(taskId);
   const [minutesModalOpen, setMinutesModalOpen] = useState(false);
   const [editingMeetingLog, setEditingMeetingLog] =
     useState<TaskMeetingLog | null>(null);
@@ -139,8 +141,8 @@ export const TeamEtc = ({
         <ConfirmDeleteAssignmentDataModal
           highlightText={getMeetingLogCardTitle(item, index)}
           onConfirm={() => {
+            deleteMeetingLog(item.logId);
             closeModal();
-            // TODO: 회의록 삭제 API 연동
           }}
           onCancel={closeModal}
         />

@@ -104,7 +104,7 @@ const TeamTaskList = ({
   }, [clearPendingAndRefetch]);
 
   const handleSelectAssignee = (subTaskId: number, assigneeId: number) => {
-    updateAssignee({ subTaskId, assigneeId });
+    updateAssignee({ taskId, subTaskId, assigneeId });
   };
 
   // createdAt을 yy.mm.dd, hh:mm 으로 분리 (각각 0.25rem 간격용)
@@ -150,6 +150,7 @@ const TeamTaskList = ({
   const handleStatusChange = (subTaskId: number, isChecked: boolean) => {
     const nextStatus: SubTaskStatus = isChecked ? 'COMPLETED' : 'PROGRESS';
     mutateStatus({
+      taskId,
       subTaskId,
       status: nextStatus === 'COMPLETED' ? 'COMPLETE' : 'PROGRESS',
     });
@@ -163,7 +164,7 @@ const TeamTaskList = ({
   };
 
   const handleDeadlineChange = (subTaskId: number, date: Date) => {
-    mutateDeadline({ subTaskId, endDate: toYYYYMMDD(date) });
+    mutateDeadline({ taskId, subTaskId, endDate: toYYYYMMDD(date) });
   };
 
   // 알림 설정 변경 핸들러

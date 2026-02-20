@@ -1,27 +1,27 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { deleteReferenceData } from '@/lib/reference';
-import { getSocket, REFERENCE_SEND_EVENTS } from '@/lib/socket';
+import { deleteMeetingLog } from '@/lib/meeting-log';
+import { getSocket, LOG_SEND_EVENTS } from '@/lib/socket';
 
-/** 자료 삭제 (백엔드 reference:delete 소켓 또는 REST) */
-export const useDeleteReferenceData = (taskId: number) => {
+/** 회의록 삭제 (백엔드 log:delete 소켓 또는 REST) */
+export const useDeleteMeetingLog = (taskId: number) => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (referenceId: number) => {
+    mutationFn: async (logId: number) => {
       const socket = getSocket();
       if (socket?.connected) {
         return new Promise<void>((resolve, reject) => {
           socket.emit(
-            REFERENCE_SEND_EVENTS.DELETE,
-            { taskId, referenceId },
+            LOG_SEND_EVENTS.DELETE,
+            { taskId, logId },
             (res: { success?: boolean; reason?: string }) => {
               if (res?.success) resolve();
-              else reject(new Error(res?.reason ?? '자료 삭제에 실패했습니다.'));
+              else reject(new Error(res?.reason ?? '회의록 삭제에 실패했습니다.'));
             },
           );
         });
       }
-      await deleteReferenceData(taskId, referenceId);
+      await deleteMeetingLog(taskId, logId);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['taskDetail', taskId] });
