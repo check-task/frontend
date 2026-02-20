@@ -52,3 +52,10 @@ export async function updateMeetingLog(
     discussion: payload.discussion ?? '',
   };
 }
+
+export async function deleteMeetingLog(
+  taskId: number,
+  logId: number,
+): Promise<void> {
+  await axiosInstance.delete(`/reference/log/${taskId}/${logId}`);
+}

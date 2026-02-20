@@ -102,7 +102,7 @@ export const AddAssignmentDataModal = ({
     });
 
     if (taskId != null) {
-      // taskId 있으면 자료 생성 API 순차 호출 후 응답 목록으로 onSave
+      // taskId 있으면 자료 생성 API 순차 호출 후 응답 목록으로 onSave (소켓 사용 시 빈 배열 반환)
       let lastData: ReferenceDataItem[] = [];
       for (const group of validGroups) {
         const type = selectedType === 0 ? 'url' : 'file';
@@ -110,7 +110,8 @@ export const AddAssignmentDataModal = ({
           type === 'url'
             ? { name: group.name, url: group.path }
             : { name: group.name, file: group.file };
-        lastData = await createReference({ type, payload });
+        const result = await createReference({ type, payload });
+        lastData = Array.isArray(result) ? result : [];
       }
       onSave?.(lastData.map(refItemToDataItem));
     } else {

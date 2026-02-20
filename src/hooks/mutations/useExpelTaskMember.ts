@@ -7,6 +7,7 @@ export const useExpelTaskMember = (taskId: number) => {
   return useMutation({
     mutationFn: (memberId: number) => expelTaskMember(taskId, memberId),
     onSuccess: async () => {
+      queryClient.invalidateQueries({ queryKey: ['taskDetail', taskId] });
       await queryClient.invalidateQueries({
         queryKey: ['taskMembers', taskId],
         refetchType: 'active',

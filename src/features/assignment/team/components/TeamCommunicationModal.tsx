@@ -57,8 +57,9 @@ export const TeamCommunicationModal = ({
         name: group.name.trim(),
         url: group.url.trim(),
       });
-      latest = data.map((item) => ({
-        id: item.communication_id,
+      const list = Array.isArray(data) ? data : [];
+      latest = list.map((item: { communication_id?: number; name: string; url: string }) => ({
+        id: item.communication_id ?? 0,
         name: item.name,
         url: item.url,
       }));

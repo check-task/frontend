@@ -122,12 +122,40 @@ export const JOIN_TASK_ROOM = 'joinTaskRoom';
 /** 팀 세부 페이지 방 이탈 (백엔드 taskEvents.LEAVE_TASK, 인자: taskId) */
 export const LEAVE_TASK_ROOM = 'leaveTaskRoom';
 
-/** 클라이언트 → 서버: 과제 수정 요청 */
+/** 클라이언트 → 서버: 과제 수정 (백엔드 taskEvents.UPDATE_TASK) */
 export const TASK_UPDATE_SEND_EVENT = 'task:update';
-/** 클라이언트 → 서버: 세부 TASK(체크/날짜/담당자) 변경 후 방 갱신 요청, payload: { taskId } */
-export const TASK_REQUEST_REFRESH_EVENT = 'task:request_refresh';
 /** 서버 → 클라이언트: 과제 전체 갱신 시 */
 export const TASK_UPDATED_EVENT = 'task:updated';
+
+/** 클라이언트 → 서버: 세부과제 상태 (백엔드 taskEvents.UPDATE_SUBTASK) payload: { taskId, subTaskId, status } */
+export const SOCKET_UPDATE_SUBTASK = 'updateSubtaskStatus';
+/** 클라이언트 → 서버: 세부과제 마감일 (백엔드 taskEvents.UPDATE_DEADLINE) payload: { taskId, subTaskId, endDate } */
+export const SOCKET_UPDATE_DEADLINE = 'updateDeadline';
+/** 클라이언트 → 서버: 세부과제 담당자 (백엔드 taskEvents.SET_ASSIGNEE) payload: { taskId, subTaskId, assigneeId } */
+export const SOCKET_SET_ASSIGNEE = 'setSubTaskAssignee';
+/** 클라이언트 → 서버: 단일 세부과제 생성 (백엔드 taskEvents.CREATE_SUBTASK) payload: { taskId, title?, deadline?, isAlarm? } */
+export const SOCKET_CREATE_SUBTASK = 'subtask:create';
+/** 클라이언트 → 서버: 멤버 역할 변경 (백엔드 taskEvents.UPDATE_MEMBER) payload: { taskId, userId, role: 0|1 } */
+export const SOCKET_UPDATE_MEMBER = 'member:update';
+
+/** 자료: 클라이언트 → 서버 (백엔드 referenceEvents) */
+export const REFERENCE_SEND_EVENTS = {
+  CREATE: 'reference:create',
+  UPDATE: 'reference:update',
+  DELETE: 'reference:delete',
+} as const;
+/** 커뮤니케이션: 클라이언트 → 서버 (백엔드 communicationEvents) */
+export const COMMUNICATION_SEND_EVENTS = {
+  CREATE: 'communication:create',
+  UPDATE: 'communication:update',
+  DELETE: 'communication:delete',
+} as const;
+/** 회의록: 클라이언트 → 서버 (백엔드 logEvents) */
+export const LOG_SEND_EVENTS = {
+  CREATE: 'log:create',
+  UPDATE: 'log:update',
+  DELETE: 'log:delete',
+} as const;
 /** 백엔드 socket.util emitTeamUpdate 가 보내는 이벤트 (수신 시 동일하게 taskDetail 무효화) */
 export const TEAM_UPDATE_EVENT = 'team:update';
 
@@ -200,4 +228,60 @@ export interface CommentDeletePayload {
   taskId: number;
   subTaskId: number;
   commentId: number;
+}
+
+/** 자료 생성 (reference:create) - type 'url' 시 item.url, 'file' 시 item.file_url */
+export interface ReferenceCreatePayload {
+  taskId: number;
+  type: 'url' | 'file';
+  item: { name: string; url?: string; file_url?: string };
+}
+export interface ReferenceUpdatePayload {
+  taskId: number;
+  referenceId: number;
+  name?: string;
+  url?: string;
+  file_url?: string;
+}
+export interface ReferenceDeletePayload {
+  taskId: number;
+  referenceId: number;
+}
+
+/** 커뮤니케이션 (communication:create/update) */
+export interface CommunicationCreatePayload {
+  taskId: number;
+  name: string;
+  url: string;
+}
+export interface CommunicationUpdatePayload {
+  taskId: number;
+  communicationId: number;
+  name: string;
+  url: string;
+}
+export interface CommunicationDeletePayload {
+  taskId: number;
+  communicationId: number;
+}
+
+/** 회의록 (log:create/update/delete) */
+export interface LogCreatePayload {
+  taskId: number;
+  date: string;
+  agenda?: string | null;
+  conclusion?: string | null;
+  discussion?: string | null;
+}
+export interface LogUpdatePayload {
+  taskId: number;
+  logId: number;
+  date: string;
+  agenda?: string | null;
+  conclusion?: string | null;
+  discussion?: string | null;
+}
+export interface LogDeletePayload {
+  taskId: number;
+  logId: number;
 }

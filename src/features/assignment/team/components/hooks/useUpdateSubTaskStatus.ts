@@ -1,32 +1,42 @@
 'use client';
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { updateSubTaskStatus } from '@/services/subtask';
 import type { UpdateSubTaskStatusRequestStatus } from '@/types/task';
-import { getSocket, TASK_REQUEST_REFRESH_EVENT } from '@/lib/socket';
+import { getSocket, SOCKET_UPDATE_SUBTASK } from '@/lib/socket';
 
 interface UpdateSubTaskStatusInput {
+  taskId: number;
   subTaskId: number;
   status: UpdateSubTaskStatusRequestStatus;
 }
 
-// 팀 과제 세부 TASK 완료 상태 변경 훅 (personal과 동일 로직)
+/** 팀 과제 세부 TASK 완료 상태 변경 (백엔드 updateSubtaskStatus 소켓) */
 export const useUpdateTeamSubTaskStatus = (taskId: number) => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ subTaskId, status }: UpdateSubTaskStatusInput) =>
-      updateSubTaskStatus(subTaskId, { status }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['taskDetail', taskId] });
-      const socket = getSocket();
-      if (socket?.connected) {
-        socket.emit(TASK_REQUEST_REFRESH_EVENT, { taskId });
-        if (typeof process !== 'undefined' && process.env.NODE_ENV === 'development') {
-          console.log('[Socket] task:request_refresh 전송, taskId:', taskId);
+    mutationFn: ({
+      taskId,
+      subTaskId,
+      status,
+    }: UpdateSubTaskStatusInput): Promise<void> =>
+      new Promise((resolve, reject) => {
+        const socket = getSocket();
+        if (!socket?.connected) {
+          reject(new Error('소켓이 연결되지 않았습니다.'));
+          return;
         }
-      }
+        socket.emit(
+          SOCKET_UPDATE_SUBTASK,
+          { taskId, subTaskId, status: status.toUpperCase() },
+          (res: { success?: boolean; error?: string }) => {
+            if (res?.success) resolve();
+            else reject(new Error(res?.error ?? '상태 업데이트에 실패했습니다.'));
+          },
+        );
+      }),
+    onSuccess: (_, { taskId: tid }) => {
+      queryClient.invalidateQueries({ queryKey: ['taskDetail', tid] });
     },
   });
 };
-
