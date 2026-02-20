@@ -51,7 +51,7 @@ export const PersonalTaskList = ({
   const handleStatusChange = (subTaskId: number, isChecked: boolean) => {
     mutateStatus({
       subTaskId,
-      status: isChecked ? 'COMPLETE' : 'PROGRESS', // 스웨거 요청에 맞게
+      status: isChecked ? 'COMPLETED' : 'PROGRESS',
     });
   };
 

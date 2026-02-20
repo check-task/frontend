@@ -310,8 +310,8 @@ export interface UpdateTaskPrioritiesRequest {
 // 세부 TASK 완료 상태 변경 타입 정의
 // ============================
 // 상태 변경 요청시 사용되는 타입
-// SubTaskStatus 이걸 사용하지 못한 건 상태 값이 달라서 입니다.
-export type UpdateSubTaskStatusRequestStatus = 'PROGRESS' | 'COMPLETE';
+/** 백엔드 SubTaskStatus enum과 동일: PROGRESS | COMPLETED */
+export type UpdateSubTaskStatusRequestStatus = 'PROGRESS' | 'COMPLETED';
 
 export interface UpdateSubTaskStatusRequest {
   status: UpdateSubTaskStatusRequestStatus;

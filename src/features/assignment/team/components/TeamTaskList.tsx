@@ -13,7 +13,7 @@ import type {
   TaskDetail,
   TaskDetailSubTask,
   TaskDetailSubTaskComment,
-  SubTaskStatus,
+  UpdateSubTaskStatusRequestStatus,
 } from '@/types/task';
 import { useQueryClient } from '@tanstack/react-query';
 import { useUpdateTeamSubTaskStatus } from './hooks/useUpdateSubTaskStatus';
@@ -148,11 +148,11 @@ const TeamTaskList = ({
     );
 
   const handleStatusChange = (subTaskId: number, isChecked: boolean) => {
-    const nextStatus: SubTaskStatus = isChecked ? 'COMPLETED' : 'PROGRESS';
+    const status: UpdateSubTaskStatusRequestStatus = isChecked ? 'COMPLETED' : 'PROGRESS';
     mutateStatus({
       taskId,
       subTaskId,
-      status: nextStatus === 'COMPLETED' ? 'COMPLETE' : 'PROGRESS',
+      status,
     });
   };
 
