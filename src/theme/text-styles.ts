@@ -4,34 +4,34 @@ export const textStyles = defineTextStyles({
   // HEADING
   h1: {
     value: {
-      fontSize: '2.25rem',
+      fontSize: '2rem',
       fontWeight: '500',
-      lineHeight: '1.5',
-      letterSpacing: '-0.015em',
+      lineHeight: '1.4',
+      letterSpacing: '-0.01em',
     },
   },
   h2: {
     value: {
-      fontSize: '2rem',
+      fontSize: '1.75rem',
       fontWeight: '500',
-      lineHeight: '1.5',
-      letterSpacing: '-0.015em',
+      lineHeight: '1.4',
+      letterSpacing: '-0.01em',
     },
   },
   h3: {
     value: {
-      fontSize: '1.75rem',
+      fontSize: '1.5rem',
       fontWeight: '500',
-      lineHeight: '1.5',
-      letterSpacing: '-0.015em',
+      lineHeight: '1.4',
+      letterSpacing: '-0.01em',
     },
   },
   h4: {
     value: {
-      fontSize: '1.5rem',
+      fontSize: '1.25rem',
       fontWeight: '500',
-      lineHeight: '1.5',
-      letterSpacing: '-0.015em',
+      lineHeight: '1.4',
+      letterSpacing: '-0.01em',
     },
   },
 
@@ -39,7 +39,7 @@ export const textStyles = defineTextStyles({
   body1: {
     m: {
       value: {
-        fontSize: '1.25rem',
+        fontSize: '1.125rem',
         fontWeight: '500',
         lineHeight: '1.5',
         letterSpacing: '-0.02em',
@@ -47,7 +47,7 @@ export const textStyles = defineTextStyles({
     },
     r: {
       value: {
-        fontSize: '1.25rem',
+        fontSize: '1.125rem',
         fontWeight: '400',
         lineHeight: '1.5',
         letterSpacing: '-0.02em',
@@ -57,17 +57,17 @@ export const textStyles = defineTextStyles({
   body2: {
     m: {
       value: {
-        fontSize: '1.125rem',
+        fontSize: '1rem',
         fontWeight: '500',
-        lineHeight: '1.45',
+        lineHeight: '1.5',
         letterSpacing: '-0.02em',
       },
     },
     r: {
       value: {
-        fontSize: '1.125rem',
+        fontSize: '1rem',
         fontWeight: '400',
-        lineHeight: '1.45',
+        lineHeight: '1.5',
         letterSpacing: '-0.02em',
       },
     },
@@ -75,7 +75,7 @@ export const textStyles = defineTextStyles({
   body3: {
     m: {
       value: {
-        fontSize: '1rem',
+        fontSize: '0.875rem',
         fontWeight: '500',
         lineHeight: '1.4',
         letterSpacing: '-0.02em',
@@ -83,7 +83,7 @@ export const textStyles = defineTextStyles({
     },
     r: {
       value: {
-        fontSize: '1rem',
+        fontSize: '0.875rem',
         fontWeight: '400',
         lineHeight: '1.4',
         letterSpacing: '-0.02em',
@@ -93,7 +93,7 @@ export const textStyles = defineTextStyles({
   body4: {
     m: {
       value: {
-        fontSize: '0.875rem',
+        fontSize: '0.8125rem',
         fontWeight: '500',
         lineHeight: '1.4',
         letterSpacing: '-0.02em',
@@ -101,7 +101,7 @@ export const textStyles = defineTextStyles({
     },
     r: {
       value: {
-        fontSize: '0.875rem',
+        fontSize: '0.8125rem',
         fontWeight: '400',
         lineHeight: '1.4',
         letterSpacing: '-0.02em',
@@ -112,9 +112,9 @@ export const textStyles = defineTextStyles({
   // ETC
   btn: {
     value: {
-      fontSize: '1.125rem',
+      fontSize: '1rem',
       fontWeight: '600',
-      lineHeight: '1.36',
+      lineHeight: '1.4',
       letterSpacing: '-0.01em',
     },
   },
@@ -124,6 +124,14 @@ export const textStyles = defineTextStyles({
       fontWeight: '600',
       lineHeight: '1.4',
       letterSpacing: '-0.02em',
+    },
+  },
+  caption: {
+    value: {
+      fontSize: '0.6875rem',
+      fontWeight: '500',
+      lineHeight: '1.4',
+      letterSpacing: '-0.01em',
     },
   },
 });
