@@ -29,13 +29,13 @@ export const CheckboxHeader = ({
         />
         <p>팀프로젝트</p>
       </div>
-      {isTeamProject && (
-        <div className={checkboxContainerStyle}>
-          {/* 체크박스 변경 */}
-          <SelectTeamProjectCheckbox />
+      {/* {isTeamProject && (
+        <div className={checkboxContainerStyle}> */}
+      {/* 체크박스 변경 */}
+      {/* <SelectTeamProjectCheckbox />
           <p>웬투밋 추가</p>
         </div>
-      )}
+      )} */}
     </div>
   );
 };
