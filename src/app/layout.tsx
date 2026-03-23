@@ -5,6 +5,7 @@ import './globals.css';
 import { ThemeProvider } from '@/providers/theme-provider';
 import { QueryProvider } from '@/providers/query-provider';
 import { parseUICookie } from '@/lib/parse-ui-cookie';
+import { GoogleAnalytics } from '@next/third-parties/google';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -33,6 +34,7 @@ export default async function RootLayout({
       data-sidebar-collapsed={String(initialUIState.isSidebarCollapsed)}
     >
       <head />
+      <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID!} />
       <body className={inter.className}>
         <ThemeProvider>
           <QueryProvider>{children}</QueryProvider>
