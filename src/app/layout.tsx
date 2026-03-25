@@ -12,8 +12,16 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://checktask.kro.kr'),
   title: 'CHECKTASK',
   description: '대학생을 위한 경량 과제 관리 서비스',
+  openGraph: {
+    url: 'https://checktask.kro.kr',
+    type: 'website',
+  },
+  verification: {
+    google: 'W6LMixy2ulbtgwVR4UxJ_ZvWj2nG0UPq-_jzL79ay3g',
+  },
 };
 
 export default async function RootLayout({
