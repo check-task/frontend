@@ -90,7 +90,9 @@ export const Calendar = ({
       id: `sub-${st.subTaskId}`,
       title: st.title,
       start: st.dueDate,
-      backgroundColor: FOLDER_COLOR_MAP[st.folderColor],
+      backgroundColor: 'transparent',
+      borderColor: FOLDER_COLOR_MAP[st.folderColor],
+      textColor: FOLDER_COLOR_MAP[st.folderColor],
       classNames: ['fc-subtask-event'],
     }));
 

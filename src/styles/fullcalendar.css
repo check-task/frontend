@@ -119,9 +119,10 @@
 .fc .fc-daygrid-event {
   border-radius: 0.125rem;
   padding: 0.125rem 0.25rem;
+  font-size: 0.6875rem;
   font-weight: 500;
-  font-size: 0.75rem;
   line-height: 1.4;
+  letter-spacing: -0.01em;
   border: none;
   cursor: pointer;
   height: 1.25rem;
@@ -136,12 +137,18 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-weight: 700;
+}
+
+/* 세부과제 이벤트 스타일 */
+.fc .fc-subtask-event {
+  background-color: transparent !important;
+  border-width: 0.0625rem !important;
+  border-style: solid !important;
 }
 
 /* 세부과제 이벤트 텍스트*/
 .fc .fc-subtask-event .fc-event-title {
-  font-weight: 400;
+  color: inherit !important;
 }
 
 /* 이벤트 컨테이너 */
