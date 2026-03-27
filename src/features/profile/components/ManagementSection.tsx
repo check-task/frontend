@@ -105,7 +105,7 @@ export const ManagementSection = () => {
 // 레이아웃
 const Layout = {
   Section: styled('section', {
-    base: stack.raw({ gap: '0.75rem' }),
+    base: stack.raw({ gap: '0.75rem', marginTop: '0.75rem' }),
   }),
 };
 
@@ -163,7 +163,7 @@ const Folder = {
     }),
   }),
   Color: styled('div', {
-    base: { width: '1.25rem', height: '1.25rem', borderRadius: '50%' },
+    base: { width: '1.75rem', height: '1.75rem', borderRadius: '50%' },
     variants: {
       color: {
         red: { bg: 'sub.01.100' },

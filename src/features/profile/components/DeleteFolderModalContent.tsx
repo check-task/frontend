@@ -85,8 +85,8 @@ const FolderName = styled('span', {
 
 const FolderDot = styled('span', {
   base: {
-    width: '1rem',
-    height: '1rem',
+    width: '1.5rem',
+    height: '1.5rem',
     borderRadius: '50%',
     display: 'inline-block',
   },
