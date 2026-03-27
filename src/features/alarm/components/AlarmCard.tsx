@@ -82,8 +82,8 @@ const cardContainer = cva({
 // 종 아이콘, 닫기 아이콘(버튼으로 변형)
 const iconWrapper = cva({
   base: {
-    width: '2.25rem',
-    height: '2.25rem',
+    width: '2rem',
+    height: '2rem',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',

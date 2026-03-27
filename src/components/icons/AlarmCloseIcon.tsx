@@ -10,13 +10,13 @@ export const AlarmCloseIcon = () => {
   return (
     <svg
       xmlns='http://www.w3.org/2000/svg'
-      width='36'
-      height='36'
-      viewBox='0 0 36 36'
+      width='32'
+      height='32'
+      viewBox='0 0 32 32'
       fill='none'
     >
-      <path d='M27 9L9 27' className={pathStyle} />
-      <path d='M9 9L27 27' className={pathStyle} />
+      <path d='M24 8L8 24' className={pathStyle} />
+      <path d='M8 8L24 24' className={pathStyle} />
     </svg>
   );
 };
