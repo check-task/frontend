@@ -22,6 +22,6 @@ export default function CompletedPage() {
 // ======== 스타일 정의 ========
 const titleStyle = css({
   textStyle: 'h3',
-  mb: '0.75rem',
+  mb: '1.25rem',
   color: 'gray.900',
 });
