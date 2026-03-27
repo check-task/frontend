@@ -25,7 +25,9 @@ export const AssignmentCard = ({
   const displayDate =
     dateType === 'dday' && typeof dueDate === 'number'
       ? `D-${dueDate}`
-      : String(dueDate).replace(/-/g, '.');
+      : dateType === 'date'
+        ? String(dueDate).replace(/-/g, '.')
+        : String(dueDate);
 
   return (
     <button className={cx(cardContainerStyle, className)} {...props}>
