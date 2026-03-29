@@ -126,15 +126,30 @@ export const Calendar = ({
     router.push(`/assignment/${type}/${taskId}`);
   };
 
-  // 세부과제를 과제 마감일 이후로 드롭 못하도록 제한
+  // 드롭 허용 여부 검증
+  // - 과제: 세부과제 마감일 중 가장 늦은 날짜보다 이전으로 이동 불가
+  // - 세부과제: 상위 과제 마감일 이후로 이동 불가
   const handleEventAllow = (
     dropInfo: { startStr: string },
     draggedEvent: { id: string } | null,
   ) => {
     if (!draggedEvent) return false;
     const eventId = draggedEvent.id;
-    if (!eventId.startsWith('sub-')) return true;
+    if (!eventId.startsWith('sub-')) {
+      // 과제 이동: 세부과제가 없으면 자유롭게 이동 가능
+      const taskId = Number(eventId);
+      const childSubs = subItems.filter((s) => s.taskId === taskId);
+      if (childSubs.length === 0) return true;
+      // 세부과제 중 가장 늦은 마감일 이전으로는 이동 불가
+      const latestSubDate = childSubs
+        .map((s) => s.dueDate)
+        .filter(Boolean)
+        .sort()
+        .at(-1)!;
+      return dropInfo.startStr >= latestSubDate;
+    }
 
+    // 세부과제 이동: 상위 과제 마감일 이후로는 이동 불가
     const subTaskId = Number(eventId.replace('sub-', ''));
     const sub = subItems.find((s) => s.subTaskId === subTaskId);
     if (!sub) return false;
