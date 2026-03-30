@@ -5,6 +5,7 @@ import { AssignmentButton } from './AssignmentButton';
 import { SidebarLogoButton } from './SidebarLogoButton';
 import { CompletedAssignmentButton } from './CompletedAssignmentButton';
 import { MyInfoButton } from './MyInfoButton';
+import { NoticeButton } from './NoticeButton';
 import { ModeSwitchToggle } from './ModeSwitchToggle';
 import { LogoutButton } from './LogoutButton';
 import { css, cva } from 'styled-system/css';
@@ -27,6 +28,7 @@ export const Sidebar = ({ initialCollapsed, initialTheme }: SidebarProps) => {
   const [isCollapsed, setIsCollapsed] = useState(initialCollapsed);
   const [isHydrated, setIsHydrated] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isAssignmentOpen, setIsAssignmentOpen] = useState(false);
   const [dropdownTop, setDropdownTop] = useState(0);
   const assignmentRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -138,12 +140,18 @@ export const Sidebar = ({ initialCollapsed, initialTheme }: SidebarProps) => {
         <div ref={assignmentRef} className={assignmentBlockStyle}>
           <AssignmentButton
             collapsed={isSidebarCollapsed}
+            isOpen={isAssignmentOpen}
             onClick={isSidebarCollapsed ? handleAssignmentClick : undefined}
+            onToggle={() => setIsAssignmentOpen((prev) => !prev)}
           />
-          <SidebarHooks collapsed={isSidebarCollapsed} />
+          <SidebarHooks
+            collapsed={isSidebarCollapsed}
+            isOpen={isAssignmentOpen}
+          />
         </div>
         <CompletedAssignmentButton collapsed={isSidebarCollapsed} />
         <MyInfoButton collapsed={isSidebarCollapsed} />
+        <NoticeButton collapsed={isSidebarCollapsed} />
         <ModeSwitchToggle collapsed={isSidebarCollapsed} />
       </div>
 
