@@ -22,7 +22,6 @@ const footerStyle = cva({
   base: hstack.raw({
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: '0.75rem',
     transition: 'width 0.3s ease',
   }),
   variants: {

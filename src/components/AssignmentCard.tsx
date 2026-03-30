@@ -1,5 +1,5 @@
 import { styled } from 'styled-system/jsx';
-import { hstack, stack } from 'styled-system/patterns';
+import { center, hstack, stack } from 'styled-system/patterns';
 import { cva, css, cx } from 'styled-system/css';
 import { FolderColor } from '@/types/folder';
 
@@ -25,7 +25,9 @@ export const AssignmentCard = ({
   const displayDate =
     dateType === 'dday' && typeof dueDate === 'number'
       ? `D-${dueDate}`
-      : String(dueDate);
+      : dateType === 'date'
+        ? String(dueDate).replace(/-/g, '.')
+        : String(dueDate);
 
   return (
     <button className={cx(cardContainerStyle, className)} {...props}>
@@ -110,7 +112,7 @@ const cardContainerStyle = css(
 const AssignmentCardStyle = {
   InfoSection: styled('div', {
     base: stack.raw({
-      gap: '0.5rem',
+      justifyContent: 'space-between',
       alignItems: 'flex-start',
       height: '3.75rem',
     }),

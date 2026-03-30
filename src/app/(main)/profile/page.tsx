@@ -34,7 +34,7 @@ export default function ProfilePage() {
 const Layout = {
   Container: styled('div', {
     base: stack.raw({
-      gap: '1.75rem',
+      gap: '2.25rem',
       width: '62.25rem',
       marginX: 'auto',
       marginTop: '3.25rem',

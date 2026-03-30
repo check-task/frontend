@@ -21,11 +21,8 @@ const Button = styled('button', {
 
 const ButtonText = styled('span', {
   base: {
+    textStyle: 'btn',
     color: 'rgba(0, 0, 0, 0.85)',
-    fontSize: '0.9375rem',
-    fontStyle: 'normal',
-    fontWeight: '600',
-    lineHeight: '150%',
   },
 });
 
