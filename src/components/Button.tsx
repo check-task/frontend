@@ -7,7 +7,6 @@ const button = cva({
     justifyContent: 'center',
     borderRadius: '0.5rem',
     cursor: 'pointer',
-    transition: 'all 0.3s ease-out',
     textStyle: 'btn',
     _disabled: {
       bg: 'gray.200',
@@ -21,19 +20,19 @@ const button = cva({
       fillBlue: {
         bg: 'primary',
         color: 'primary-button-text',
-        _hover: { bg: '#1D6BDD' },
+        _hover: { bg: '#1D6BDD', transition: 'background-color 0.3s ease-out' },
       },
       fillGray: {
         bg: 'gray.100',
         color: 'gray.600',
-        _hover: { bg: '#E0E2E6' },
+        _hover: { bg: '#E0E2E6', transition: 'background-color 0.3s ease-out' },
       },
       strokeBlue: {
         bg: 'transparent',
         border: '0.0625rem solid',
         borderColor: 'blue.500',
         color: 'blue.500',
-        _hover: { bg: 'blue.50' },
+        _hover: { bg: 'blue.50', transition: 'background-color 0.3s ease-out' },
       },
     },
     size: {
