@@ -82,10 +82,10 @@ const itemStyle = css({
   display: 'flex',
   flexDirection: 'column',
   gap: '1rem',
-  px: '1.5rem',
+  px: '1rem',
   py: '2.5rem',
   borderBottom: '0.0625rem solid',
-  borderColor: 'gray.200',
+  borderBottomColor: 'gray.200',
 });
 
 const itemTitleStyle = css({
@@ -101,11 +101,11 @@ const bulletListStyle = css({
 });
 
 const descriptionStyle = css({
-  textStyle: 'body4.r',
+  textStyle: 'body3.r',
   color: 'gray.600',
 });
 
 const dateStyle = css({
-  textStyle: 'caption',
+  textStyle: 'body4.m',
   color: 'gray.400',
 });
