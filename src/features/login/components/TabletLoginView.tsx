@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { styled } from 'styled-system/jsx';
 import { center, hstack, stack } from 'styled-system/patterns';
 import Image from 'next/image';
+import { DoubleChevronDownIcon } from '@/components/icons/DoubleChevronDownIcon';
 import { PREVIEW_SLIDES } from '@/constants/previewSlides';
 import { DatepickerPrevIcon } from '@/components/icons/DatepickerPrevIcon';
 import { DatepickerNextIcon } from '@/components/icons/DatepickerNextIcon';
@@ -48,15 +49,7 @@ export const TabletLoginView = () => {
         <Text.IntroTitle>모바일 화면 준비 중이에요!</Text.IntroTitle>
         <Container.PreviewLink onClick={handleNext}>
           <Text.PreviewText>채택 서비스 미리보기</Text.PreviewText>
-          <svg width='24' height='24' viewBox='0 0 24 24' fill='none'>
-            <path
-              d='M5 12H19M19 12L13 6M19 12L13 18'
-              stroke='#D3D6D9'
-              strokeWidth='1.5'
-              strokeLinecap='round'
-              strokeLinejoin='round'
-            />
-          </svg>
+          <DoubleChevronDownIcon style={{ transform: 'rotate(-90deg)' }} />
         </Container.PreviewLink>
       </Container.IntroSlide>
 

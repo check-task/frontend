@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import { css } from 'styled-system/css';
+import { DoubleChevronDownIcon } from '@/components/icons/DoubleChevronDownIcon';
 import { PREVIEW_SLIDES } from '@/constants/previewSlides';
 
 export const MobileLoginView = () => {
@@ -15,15 +16,7 @@ export const MobileLoginView = () => {
         <p className={introTitleStyle}>모바일 화면 준비 중이에요!</p>
         <div className={previewLinkStyle}>
           <span className={previewTextStyle}>채택 서비스 미리보기</span>
-          <svg width='24' height='24' viewBox='0 0 24 24' fill='none'>
-            <path
-              d='M12 5L12 19M12 19L6 13M12 19L18 13'
-              stroke='#D3D6D9'
-              strokeWidth='1.5'
-              strokeLinecap='round'
-              strokeLinejoin='round'
-            />
-          </svg>
+          <DoubleChevronDownIcon />
         </div>
       </section>
 
@@ -47,10 +40,14 @@ export const MobileLoginView = () => {
               priority={i === 0}
             />
           </div>
-          {i === PREVIEW_SLIDES.length - 1 && (
+          {i === PREVIEW_SLIDES.length - 1 ? (
             <div className={footerStyle}>
               <p className={footerTextStyle}>대학생을 위한 경량 과제 관리 서비스 채택</p>
               <Image src='/login-logo.svg' alt='채택 로고' width={156} height={28.8} />
+            </div>
+          ) : (
+            <div className={scrollHintStyle}>
+              <DoubleChevronDownIcon />
             </div>
           )}
         </section>
@@ -142,6 +139,14 @@ const slideImageAreaStyle = css({
   height: '21.125rem',
   mt: '1rem',
   flexShrink: 0,
+});
+
+const scrollHintStyle = css({
+  position: 'absolute',
+  bottom: '2.5rem',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
 });
 
 const footerStyle = css({
