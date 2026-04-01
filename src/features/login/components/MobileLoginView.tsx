@@ -1,23 +1,41 @@
 'use client';
 
+import { useRef } from 'react';
 import Image from 'next/image';
 import { css } from 'styled-system/css';
 import { DoubleChevronDownIcon } from '@/components/icons/DoubleChevronDownIcon';
 import { PREVIEW_SLIDES } from '@/constants/previewSlides';
 
 export const MobileLoginView = () => {
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const scrollToNext = (currentIndex: number) => {
+    const container = containerRef.current;
+    if (!container) return;
+    const sections = container.querySelectorAll('section');
+    const next = sections[currentIndex + 1];
+    if (next) next.scrollIntoView({ behavior: 'smooth' });
+  };
+
   return (
-    <div className={containerStyle}>
+    <div ref={containerRef} className={containerStyle}>
       {/* 섹션 1 — 인트로 */}
       <section className={introSectionStyle}>
-        <div className={logoWrapperStyle}>
-          <Image src='/login-logo.svg' alt='채택 로고' width={260} height={48} />
+        <div className={introCenterStyle}>
+          <div className={logoWrapperStyle}>
+            <Image
+              src='/login-logo.svg'
+              alt='채택 로고'
+              width={260}
+              height={48}
+            />
+          </div>
+          <p className={introTitleStyle}>모바일 화면 준비 중이에요!</p>
         </div>
-        <p className={introTitleStyle}>모바일 화면 준비 중이에요!</p>
-        <div className={previewLinkStyle}>
+        <button className={scrollHintStyle} onClick={() => scrollToNext(0)}>
           <span className={previewTextStyle}>채택 서비스 미리보기</span>
           <DoubleChevronDownIcon />
-        </div>
+        </button>
       </section>
 
       {/* 섹션 2–4 — 서비스 미리보기 */}
@@ -42,13 +60,23 @@ export const MobileLoginView = () => {
           </div>
           {i === PREVIEW_SLIDES.length - 1 ? (
             <div className={footerStyle}>
-              <p className={footerTextStyle}>대학생을 위한 경량 과제 관리 서비스 채택</p>
-              <Image src='/login-logo.svg' alt='채택 로고' width={156} height={28.8} />
+              <p className={footerTextStyle}>
+                대학생을 위한 경량 과제 관리 서비스 채택
+              </p>
+              <Image
+                src='/login-logo.svg'
+                alt='채택 로고'
+                width={156}
+                height={28.8}
+              />
             </div>
           ) : (
-            <div className={scrollHintStyle}>
+            <button
+              className={scrollHintStyle}
+              onClick={() => scrollToNext(i + 1)}
+            >
               <DoubleChevronDownIcon />
-            </div>
+            </button>
           )}
         </section>
       ))}
@@ -68,10 +96,16 @@ const introSectionStyle = css({
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
-  justifyContent: 'center',
-  gap: '1.5rem',
   background: 'linear-gradient(180deg, #081221 33.688%, #317ae4 201.94%)',
   overflow: 'hidden',
+});
+
+const introCenterStyle = css({
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  gap: '2.5rem',
+  margin: 'auto',
 });
 
 const logoWrapperStyle = css({
@@ -82,13 +116,6 @@ const introTitleStyle = css({
   textStyle: 'h4',
   color: 'blue.200',
   textAlign: 'center',
-});
-
-const previewLinkStyle = css({
-  display: 'flex',
-  alignItems: 'center',
-  gap: '0.25rem',
-  mt: '6rem',
 });
 
 const previewTextStyle = css({
@@ -122,15 +149,14 @@ const slideTextAreaStyle = css({
 
 const slideTitleStyle = css({
   textStyle: 'h4',
-  color: 'white',
+  color: 'gray.0',
 });
 
 const slideDescStyle = css({
   textStyle: 'body3.r',
-  color: 'white',
+  color: 'gray.0',
   display: 'flex',
   flexDirection: 'column',
-  gap: '0',
 });
 
 const slideImageAreaStyle = css({
@@ -142,16 +168,21 @@ const slideImageAreaStyle = css({
 });
 
 const scrollHintStyle = css({
-  position: 'absolute',
-  bottom: '2.5rem',
+  mt: 'auto',
+  mb: '7.5rem',
   display: 'flex',
+  flexDirection: 'column',
   alignItems: 'center',
-  justifyContent: 'center',
+  gap: '1rem',
+  background: 'none',
+  border: 'none',
+  cursor: 'pointer',
+  padding: 0,
 });
 
 const footerStyle = css({
-  position: 'absolute',
-  bottom: '2.5rem',
+  mt: 'auto',
+  mb: '2.5rem',
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
