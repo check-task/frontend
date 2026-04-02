@@ -11,45 +11,86 @@ import { DatepickerNextIcon } from '@/components/icons/DatepickerNextIcon';
 
 const TOTAL = PREVIEW_SLIDES.length + 1; // 인트로 슬라이드 + 미리보기 3개
 
+const TABLET_TITLES = [
+  '명도차이로 확인하는\n과제 마감 우선순위',
+  '한 눈에 확인하는\n과제 진척도',
+  '세부 과제별로\n팀원들과 소통하기',
+];
+
+const PREVIEW_START = 1;
+const PREVIEW_END = TOTAL - 1;
+
 export const TabletLoginView = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const startTimer = useCallback(() => {
+  const startPreviewTimer = useCallback(() => {
     if (timerRef.current) clearInterval(timerRef.current);
     timerRef.current = setInterval(() => {
-      setCurrentSlide((prev) => (prev === TOTAL - 1 ? 0 : prev + 1));
+      setCurrentSlide((prev) =>
+        prev >= PREVIEW_END ? PREVIEW_START : prev + 1,
+      );
     }, 4000);
   }, []);
 
   useEffect(() => {
-    startTimer();
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
-  }, [startTimer]);
+  }, []);
+
+  const handleEnterPreview = () => {
+    setCurrentSlide(PREVIEW_START);
+    startPreviewTimer();
+  };
 
   const handlePrev = () => {
-    setCurrentSlide((prev) => (prev === 0 ? TOTAL - 1 : prev - 1));
-    startTimer();
+    setCurrentSlide((prev) => (prev <= PREVIEW_START ? PREVIEW_END : prev - 1));
+    startPreviewTimer();
   };
 
   const handleNext = () => {
-    setCurrentSlide((prev) => (prev === TOTAL - 1 ? 0 : prev + 1));
-    startTimer();
+    setCurrentSlide((prev) => (prev >= PREVIEW_END ? PREVIEW_START : prev + 1));
+    startPreviewTimer();
   };
 
   return (
-    <Container.Main>
+    <Container.Main
+      style={{
+        background:
+          currentSlide === 0
+            ? 'linear-gradient(180deg, #081221 33.688%, #317ae4 201.94%)'
+            : 'radial-gradient(ellipse at center, #325279 0%, #1f3858 50%, #0c1e37 100%)',
+      }}
+    >
       {/* 슬라이드 0: 인트로 */}
       <Container.IntroSlide style={{ opacity: currentSlide === 0 ? 1 : 0 }}>
         <Container.LogoWrapper>
-          <Image src='/login-logo.svg' alt='채택 로고' width={416} height={76.8} />
+          <Image
+            src='/login-logo.svg'
+            alt='채택 로고'
+            width={320}
+            height={59}
+          />
         </Container.LogoWrapper>
         <Text.IntroTitle>모바일 화면 준비 중이에요!</Text.IntroTitle>
-        <Container.PreviewLink onClick={handleNext}>
+        <Container.PreviewLink>
           <Text.PreviewText>채택 서비스 미리보기</Text.PreviewText>
-          <DoubleChevronDownIcon style={{ transform: 'rotate(-90deg)' }} />
+          <button
+            onClick={handleEnterPreview}
+            style={{
+              background: 'none',
+              border: 'none',
+              padding: 0,
+              cursor: 'pointer',
+              display: 'flex',
+            }}
+          >
+            <DoubleChevronDownIcon
+              size='md'
+              style={{ transform: 'rotate(-90deg)' }}
+            />
+          </button>
         </Container.PreviewLink>
       </Container.IntroSlide>
 
@@ -57,7 +98,10 @@ export const TabletLoginView = () => {
       {PREVIEW_SLIDES.map((slide, i) => (
         <Container.PreviewSlide
           key={i}
-          style={{ opacity: currentSlide === i + 1 ? 1 : 0 }}
+          style={{
+            opacity: currentSlide === i + 1 ? 1 : 0,
+            pointerEvents: currentSlide === i + 1 ? 'auto' : 'none',
+          }}
         >
           {/* 좌: 앱 목업 이미지 */}
           <Container.ImagePanel>
@@ -65,7 +109,11 @@ export const TabletLoginView = () => {
               src={slide.image}
               alt={slide.title}
               fill
-              style={{ objectFit: 'contain', padding: '60px' }}
+              style={{
+                objectFit: 'contain',
+                padding: '30px',
+                paddingRight: '0px',
+              }}
               priority={i === 0}
             />
           </Container.ImagePanel>
@@ -73,7 +121,7 @@ export const TabletLoginView = () => {
           {/* 우: 텍스트 + 네비게이션 */}
           <Container.TextPanel>
             <Container.SlideText>
-              <Text.SlideTitle>{slide.title}</Text.SlideTitle>
+              <Text.SlideTitle>{TABLET_TITLES[i]}</Text.SlideTitle>
               <Container.SlideDesc>
                 {slide.description.map((line, j) => (
                   <Text.SlideDescription key={j}>{line}</Text.SlideDescription>
@@ -140,16 +188,16 @@ const Container = {
   }),
   LogoWrapper: styled('div', {
     base: {
+      mt: '2rem',
       mb: '1.5rem',
     },
   }),
-  PreviewLink: styled('button', {
+  PreviewLink: styled('div', {
     base: {
       display: 'flex',
       alignItems: 'center',
       gap: '0.5rem',
-      mt: '4rem',
-      cursor: 'pointer',
+      mt: '13rem',
       background: 'none',
       border: 'none',
       padding: 0,
@@ -177,8 +225,8 @@ const Container = {
     base: stack.raw({
       flex: 1,
       justifyContent: 'center',
-      paddingLeft: '3.5rem',
-      gap: '2.25rem',
+      paddingLeft: '2.5rem',
+      gap: '2rem',
     }),
   }),
   SlideText: styled('div', {
@@ -202,26 +250,26 @@ const Container = {
 const Text = {
   IntroTitle: styled('p', {
     base: {
-      textStyle: 'h1',
+      textStyle: 'h2',
       color: 'blue.200',
     },
   }),
   PreviewText: styled('span', {
     base: {
-      textStyle: 'h3',
+      textStyle: 'h4',
       color: 'gray.200',
     },
   }),
   SlideTitle: styled('h2', {
     base: {
-      textStyle: 'h1',
+      textStyle: 'h2',
       color: 'white',
       whiteSpace: 'pre-line',
     },
   }),
   SlideDescription: styled('p', {
     base: {
-      textStyle: 'body1.r',
+      textStyle: 'body2.r',
       color: 'white',
     },
   }),
