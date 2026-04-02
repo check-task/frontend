@@ -1,7 +1,10 @@
+import { css } from 'styled-system/css';
 import { styled } from 'styled-system/jsx';
 import { hstack } from 'styled-system/patterns';
 import { KakaoLoginButton } from '@/features/login/components/KakaoLoginButton';
 import { LoginCarousel } from '@/features/login/components/LoginCarousel';
+import { MobileLoginView } from '@/features/login/components/MobileLoginView';
+import { TabletLoginView } from '@/features/login/components/TabletLoginView';
 import { WithdrawnAlert } from '@/features/login/components/WithdrawnAlert';
 import Image from 'next/image';
 
@@ -14,31 +17,44 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
   const isWithdrawn = status === 'withdrawn' && !!token;
 
   return (
-    <Container.Page>
-      {/* 메인 영역 - 캐러셀 */}
-      <LoginCarousel />
+    <>
+      {/* 모바일 전용 (< 768px) */}
+      <div className={css({ display: 'block', md: { display: 'none' } })}>
+        <MobileLoginView />
+      </div>
 
-      {/* 하단 바 */}
-      <Container.BottomBar>
-        <Image
-          src='/login-logo.svg'
-          alt='채택 로고'
-          width={140}
-          height={25.85}
-        />
-        <Container.BottomRight>
-          <Text.KakaoGuide>
-            아이디와 비밀번호 입력하기 귀찮으시죠?
-            <br />
-            1초 회원가입으로 입력없이 간편하게 로그인 하세요.
-          </Text.KakaoGuide>
-          <KakaoLoginButton />
-        </Container.BottomRight>
-      </Container.BottomBar>
+      {/* 태블릿 전용 (768px – 1024px) */}
+      <div className={css({ display: 'none', md: { display: 'block' }, lg: { display: 'none' } })}>
+        <TabletLoginView />
+      </div>
 
-      {/* 탈퇴 계정 복구 모달 */}
-      {isWithdrawn && <WithdrawnAlert token={token} />}
-    </Container.Page>
+      {/* 데스크톱 전용 (≥ 1024px) */}
+      <Container.Page className={css({ display: 'none', lg: { display: 'flex' } })}>
+        {/* 메인 영역 - 캐러셀 */}
+        <LoginCarousel />
+
+        {/* 하단 바 */}
+        <Container.BottomBar>
+          <Image
+            src='/login-logo.svg'
+            alt='채택 로고'
+            width={140}
+            height={25.85}
+          />
+          <Container.BottomRight>
+            <Text.KakaoGuide>
+              아이디와 비밀번호 입력하기 귀찮으시죠?
+              <br />
+              1초 회원가입으로 입력없이 간편하게 로그인 하세요.
+            </Text.KakaoGuide>
+            <KakaoLoginButton />
+          </Container.BottomRight>
+        </Container.BottomBar>
+
+        {/* 탈퇴 계정 복구 모달 */}
+        {isWithdrawn && <WithdrawnAlert token={token} />}
+      </Container.Page>
+    </>
   );
 }
 
