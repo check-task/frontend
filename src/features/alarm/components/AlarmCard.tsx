@@ -3,7 +3,7 @@
 import { css, cva } from 'styled-system/css';
 import { flex } from 'styled-system/patterns';
 import { AlarmIcon } from '@/components/icons/AlarmIcon';
-import { AlarmCloseIcon } from '@/components/icons/AlarmCloseIcon';
+import { CloseIcon } from '@/components/icons/CloseIcon';
 import type { AlarmListItem } from '@/types/alarm';
 
 type AlarmCardProps = AlarmListItem & {
@@ -44,7 +44,7 @@ export const AlarmCard = ({
         className={iconWrapper({ type: 'button' })}
         aria-label='알림 삭제'
       >
-        <AlarmCloseIcon />
+        <CloseIcon size='2rem' color='gray.600' strokeWidth={1.33333} />
       </button>
     </div>
   );
