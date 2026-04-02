@@ -1,16 +1,22 @@
+import { css, cx } from 'styled-system/css';
+
 interface PlusIconProps {
+  size?: number | string;
+  color?: string;
   className?: string;
 }
 
-export const PlusIcon = ({ className }: PlusIconProps) => {
+export const PlusIcon = ({ size = '1.25rem', color = 'currentColor', className }: PlusIconProps) => {
+  const iconClassName = cx(css({ color }), className);
+
   return (
     <svg
-      className={className}
       xmlns='http://www.w3.org/2000/svg'
-      width='20'
-      height='20'
+      width={size}
+      height={size}
       viewBox='0 0 20 20'
       fill='none'
+      className={iconClassName}
     >
       <path
         d='M3.3335 10H16.6668'

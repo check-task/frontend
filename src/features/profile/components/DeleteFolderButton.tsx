@@ -39,7 +39,7 @@ export const DeleteFolderButton = ({
 
   return (
     <button onClick={handleOpen} style={{ cursor: 'pointer' }}>
-      <CloseIcon />
+      <CloseIcon color='gray.700' />
     </button>
   );
 };

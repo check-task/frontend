@@ -6,8 +6,8 @@ import { center, hstack, stack } from 'styled-system/patterns';
 import Image from 'next/image';
 import { DoubleChevronDownIcon } from '@/components/icons/DoubleChevronDownIcon';
 import { PREVIEW_SLIDES } from '@/constants/previewSlides';
-import { DatepickerPrevIcon } from '@/components/icons/DatepickerPrevIcon';
-import { DatepickerNextIcon } from '@/components/icons/DatepickerNextIcon';
+import { LeftIcon } from '@/components/icons/LeftIcon';
+import { RightIcon } from '@/components/icons/RightIcon';
 
 const TOTAL = PREVIEW_SLIDES.length + 1; // 인트로 슬라이드 + 미리보기 3개
 
@@ -130,10 +130,10 @@ export const TabletLoginView = () => {
             </Container.SlideText>
             <Container.NavButtons>
               <NavButton onClick={handlePrev} aria-label='이전 슬라이드'>
-                <DatepickerPrevIcon stroke='login' />
+                <LeftIcon stroke='tablet' />
               </NavButton>
               <NavButton onClick={handleNext} aria-label='다음 슬라이드'>
-                <DatepickerNextIcon stroke='login' />
+                <RightIcon stroke='tablet' />
               </NavButton>
             </Container.NavButtons>
           </Container.TextPanel>

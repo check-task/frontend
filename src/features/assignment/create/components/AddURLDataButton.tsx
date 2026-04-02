@@ -1,4 +1,4 @@
-import { AddURLDataPlusIcon } from '@/components/icons/AddURLDataPlusIcon';
+import { PlusIcon } from '@/components/icons/PlusIcon';
 import { css } from 'styled-system/css';
 
 interface AddURLDataButtonProps {
@@ -14,7 +14,7 @@ export const AddURLDataButton = ({
 
   return (
     <button className={buttonStyle} onClick={onClick}>
-      <AddURLDataPlusIcon />
+      <PlusIcon />
       <span>{label}</span>
     </button>
   );

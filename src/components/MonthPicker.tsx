@@ -4,8 +4,8 @@ import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import { css } from 'styled-system/css';
 import { token } from 'styled-system/tokens';
-import { DatepickerNextIcon } from '@/components/icons/DatepickerNextIcon';
-import { DatepickerPrevIcon } from '@/components/icons/DatepickerPrevIcon';
+import { RightIcon } from '@/components/icons/RightIcon';
+import { LeftIcon } from '@/components/icons/LeftIcon';
 import { useCalendarStore } from '@/stores/calendar-store';
 
 interface MonthPickerProps {
@@ -44,8 +44,8 @@ export default function MonthPicker({ onClose }: MonthPickerProps) {
         minDetail='year'
         activeStartDate={new Date(viewingYear, 0, 1)}
         onActiveStartDateChange={handleActiveStartDateChange}
-        nextLabel={<DatepickerNextIcon size='lg' />}
-        prevLabel={<DatepickerPrevIcon size='lg' />}
+        nextLabel={<RightIcon size='lg' />}
+        prevLabel={<LeftIcon size='lg' />}
         next2Label={null}
         prev2Label={null}
         formatMonthYear={(locale, date) => `${date.getFullYear()}년`}

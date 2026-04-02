@@ -4,8 +4,8 @@ import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import { css } from 'styled-system/css';
 import { flex } from 'styled-system/patterns';
-import { DatepickerNextIcon } from '../icons/DatepickerNextIcon';
-import { DatepickerPrevIcon } from '../icons/DatepickerPrevIcon';
+import { RightIcon } from '../icons/RightIcon';
+import { LeftIcon } from '../icons/LeftIcon';
 import { useState } from 'react';
 import { Button } from '../Button';
 
@@ -44,8 +44,8 @@ export default function CalendarModal({
         maxDate={maxDate}
         maxDetail='month' // 달 뷰로 고정
         minDetail='month'
-        nextLabel={<DatepickerNextIcon />}
-        prevLabel={<DatepickerPrevIcon />}
+        nextLabel={<RightIcon />}
+        prevLabel={<LeftIcon />}
         next2Label={null}
         prev2Label={null}
         formatShortWeekday={(locale, date) =>
