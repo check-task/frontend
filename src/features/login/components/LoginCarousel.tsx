@@ -4,8 +4,8 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { styled } from 'styled-system/jsx';
 import { center, hstack, stack } from 'styled-system/patterns';
 import Image from 'next/image';
-import { DatepickerPrevIcon } from '@/components/icons/DatepickerPrevIcon';
-import { DatepickerNextIcon } from '@/components/icons/DatepickerNextIcon';
+import { LeftIcon } from '@/components/icons/LeftIcon';
+import { RightIcon } from '@/components/icons/RightIcon';
 
 // 슬라이드 데이터
 const SLIDES = [
@@ -103,10 +103,10 @@ export const LoginCarousel = () => {
         {/* 좌우 화살표 */}
         <Container.NavButtons>
           <NavButton onClick={handlePrev} aria-label='이전 슬라이드'>
-            <DatepickerPrevIcon stroke='login' />
+            <LeftIcon stroke='login' />
           </NavButton>
           <NavButton onClick={handleNext} aria-label='다음 슬라이드'>
-            <DatepickerNextIcon stroke='login' />
+            <RightIcon stroke='login' />
           </NavButton>
         </Container.NavButtons>
       </Container.RightContent>

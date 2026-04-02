@@ -12,6 +12,7 @@ const iconStyle = cva({
     stroke: {
       default: { stroke: 'gray.900' },
       login: { stroke: 'gray.400' },
+      tablet: { stroke: 'gray.200' },
     },
   },
   defaultVariants: {
@@ -22,18 +23,18 @@ const iconStyle = cva({
 
 interface IconProps {
   size?: 'md' | 'lg';
-  stroke?: 'default' | 'login';
+  stroke?: 'default' | 'login' | 'tablet';
 }
 
-export const DatepickerPrevIcon = ({ size = 'md', stroke }: IconProps) => {
+export const RightIcon = ({ size = 'md', stroke }: IconProps) => {
   return (
     <svg
       xmlns='http://www.w3.org/2000/svg'
-      className={iconStyle({ size, stroke })}
       viewBox='0 0 24 24'
       fill='none'
+      className={iconStyle({ size, stroke })}
     >
-      <path d='M14 6L8.70711 11.2929C8.31658 11.6834 8.31658 12.3166 8.70711 12.7071L14 18' />
+      <path d='M10 6L15.2929 11.2929C15.6834 11.6834 15.6834 12.3166 15.2929 12.7071L10 18' />
     </svg>
   );
 };
