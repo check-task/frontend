@@ -60,7 +60,7 @@ export const TabletLoginView = () => {
         background:
           currentSlide === 0
             ? 'linear-gradient(180deg, #081221 33.688%, #317ae4 201.94%)'
-            : 'radial-gradient(ellipse at center, #325279 0%, #1f3858 50%, #0c1e37 100%)',
+            : 'radial-gradient(ellipse at center, #14315b 0%, #0e223e 50%, #081221 100%)',
       }}
     >
       {/* 슬라이드 0: 인트로 */}
@@ -211,7 +211,7 @@ const Container = {
       alignItems: 'stretch',
       transition: 'opacity 500ms ease-out',
       background:
-        'radial-gradient(ellipse at center, #325279 0%, #1f3858 50%, #0c1e37 100%)',
+        'radial-gradient(ellipse at center, #14315b 0%, #0e223e 50%, #081221 100%)',
     }),
   }),
   ImagePanel: styled('div', {

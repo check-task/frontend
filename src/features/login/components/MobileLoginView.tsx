@@ -132,7 +132,7 @@ const previewSectionStyle = css({
   justifyContent: 'flex-start',
   position: 'relative',
   background:
-    'radial-gradient(ellipse at center, #325279 0%, #1f3858 50%, #0c1e37 100%)',
+    'radial-gradient(ellipse at center, #14315b 0%, #0e223e 50%, #081221 100%)',
   overflow: 'hidden',
 });
 
