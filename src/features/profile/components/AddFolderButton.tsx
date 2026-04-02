@@ -2,7 +2,7 @@
 
 import { useModalStore } from '@/stores/modal-store';
 import { FolderModalContent } from './FolderModalContent';
-import { AddIcon } from '@/components/icons/AddIcon';
+import { PlusIcon } from '@/components/icons/PlusIcon';
 
 export const AddFolderButton = () => {
   const openModal = useModalStore((state) => state.openModal);
@@ -17,7 +17,7 @@ export const AddFolderButton = () => {
 
   return (
     <button onClick={handleOpen} style={{ cursor: 'pointer' }}>
-      <AddIcon />
+      <PlusIcon size='1.75rem' color='gray.900' />
     </button>
   );
 };
