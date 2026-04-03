@@ -49,6 +49,7 @@ export const PersonalLeftContainer = ({
             completionRate={completionRate}
             title={title}
             daysLeft={daysLeft}
+            deadline={deadline}
             folderColorHex={folderColorHex}
           />
         </div>
