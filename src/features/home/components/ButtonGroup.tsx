@@ -1,10 +1,10 @@
 'use client';
 
+import Link from 'next/link';
+import { css } from 'styled-system/css';
+import { hstack } from 'styled-system/patterns';
 import { Button } from '@/components/Button';
 import { useModalStore } from '@/stores/modal-store';
-import Link from 'next/link';
-import { styled } from 'styled-system/jsx';
-import { hstack } from 'styled-system/patterns';
 import { JoinAssignmentModalContent } from './JoinAssignmentModalContent';
 
 export const ButtonGroup = () => {
@@ -17,8 +17,9 @@ export const ButtonGroup = () => {
       headerType: 'withClose',
     });
   };
+
   return (
-    <Container>
+    <div className={containerStyle}>
       <Button variant='strokeBlue' size='small' onClick={handleOpen}>
         과제참여
       </Button>
@@ -27,12 +28,12 @@ export const ButtonGroup = () => {
           과제등록
         </Button>
       </Link>
-    </Container>
+    </div>
   );
 };
 
-const Container = styled('div', {
-  base: hstack.raw({
+const containerStyle = css(
+  hstack.raw({
     gap: '1.25rem',
   }),
-});
+);

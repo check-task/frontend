@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { styled } from 'styled-system/jsx';
+import { css } from 'styled-system/css';
 import { hstack } from 'styled-system/patterns';
 import { FilterChipGroup } from '@/features/home/components/FilterChipGroup';
 import { Calendar } from '@/features/home/components/Calendar';
@@ -51,15 +51,15 @@ export const HomeContent = () => {
       />
 
       {/* 캘린더 + 과제목록 */}
-      <Container.Main>
+      <div className={mainStyle}>
         {/* 캘린더 */}
-        <Container.Calendar>
+        <div className={calendarStyle}>
           <Calendar
             assignments={assignments}
             subTasks={subTasks}
             selectedFolderIds={effectiveSelectedIds}
           />
-        </Container.Calendar>
+        </div>
 
         {/* 과제목록 (마감 지나지 않은 과제만) */}
         <AssignmentSection
@@ -67,27 +67,24 @@ export const HomeContent = () => {
           sortType={sortType}
           onSortChange={setSortType}
         />
-      </Container.Main>
+      </div>
     </>
   );
 };
 
-const Container = {
-  Main: styled('div', {
-    base: hstack.raw({
-      gap: '1.5rem',
-      alignItems: 'flex-start',
-      width: '100%',
-    }),
+const mainStyle = css(
+  hstack.raw({
+    gap: '1.5rem',
+    alignItems: 'flex-start',
+    width: '100%',
   }),
-  Calendar: styled('div', {
-    base: {
-      width: '45.9375rem',
-      minHeight: '44rem',
-      border: '0.0625rem solid',
-      borderColor: 'gray.200',
-      borderRadius: '0.75rem',
-      boxShadow: '-1px 1px 4px 0 rgba(0, 0, 0, 0.08)',
-    },
-  }),
-};
+);
+
+const calendarStyle = css({
+  width: '45.9375rem',
+  minHeight: '44rem',
+  border: '0.0625rem solid',
+  borderColor: 'gray.200',
+  borderRadius: '0.75rem',
+  boxShadow: '-1px 1px 4px 0 rgba(0, 0, 0, 0.08)',
+});
