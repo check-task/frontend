@@ -1,6 +1,6 @@
 'use client';
 
-import { styled } from 'styled-system/jsx';
+import { css, cva } from 'styled-system/css';
 import { hstack, stack } from 'styled-system/patterns';
 import { Card } from '@/features/profile/components/Card';
 import { NotificationSetting } from '@/features/profile/components/NotificationSetting';
@@ -40,48 +40,48 @@ export const ManagementSection = () => {
   const { user, folders } = data;
 
   return (
-    <Layout.Section>
-      <Text.Title>과제 관리</Text.Title>
+    <section className={layoutSectionStyle}>
+      <h1 className={titleStyle}>과제 관리</h1>
 
       <Card type='management'>
         {/* 알림 설정 */}
         <NotificationSetting>
-          <Text.SectionTitle>알림 설정</Text.SectionTitle>
-          <Setting.Content>
-            <Setting.Row>
-              <Text.SettingLabel>최종 마감 알림</Text.SettingLabel>
+          <h3 className={sectionTitleStyle}>알림 설정</h3>
+          <div className={settingContentStyle}>
+            <div className={settingRowStyle}>
+              <span className={settingLabelStyle}>최종 마감 알림</span>
               <AlarmTimeSelect
                 defaultValue={user.deadlineAlarm}
                 onChange={(hours) => handleAlarmChange('deadlineAlarm', hours)}
               />
-            </Setting.Row>
-            <Setting.Row>
-              <Text.SettingLabel>TASK별 알림</Text.SettingLabel>
+            </div>
+            <div className={settingRowStyle}>
+              <span className={settingLabelStyle}>TASK별 알림</span>
               <AlarmTimeSelect
                 defaultValue={user.taskAlarm}
                 onChange={(hours) => handleAlarmChange('taskAlarm', hours)}
               />
-            </Setting.Row>
-          </Setting.Content>
+            </div>
+          </div>
         </NotificationSetting>
 
         {/* 구분선 */}
-        <Divider />
+        <div className={dividerStyle} />
 
         {/* 폴더 설정 */}
         <FolderSetting>
-          <Folder.Header>
-            <Text.SectionTitle>폴더 설정</Text.SectionTitle>
+          <div className={folderHeaderStyle}>
+            <h3 className={sectionTitleStyle}>폴더 설정</h3>
             <AddFolderButton />
-          </Folder.Header>
-          <Folder.List>
+          </div>
+          <div className={folderListStyle}>
             {folders.map((folder) => (
-              <Folder.Item key={folder.id}>
-                <Folder.Info>
-                  <Folder.Color color={folder.color} />
-                  <Folder.Name>{folder.name}</Folder.Name>
-                </Folder.Info>
-                <Folder.Actions>
+              <div key={folder.id} className={folderItemStyle}>
+                <div className={folderInfoStyle}>
+                  <div className={folderColorStyle({ color: folder.color })} />
+                  <span className={folderNameStyle}>{folder.name}</span>
+                </div>
+                <div className={folderActionsStyle}>
                   <EditFolderButton
                     folderId={folder.id}
                     folderName={folder.name}
@@ -92,102 +92,119 @@ export const ManagementSection = () => {
                     folderName={folder.name}
                     folderColor={folder.color}
                   />
-                </Folder.Actions>
-              </Folder.Item>
+                </div>
+              </div>
             ))}
-          </Folder.List>
+          </div>
         </FolderSetting>
       </Card>
-    </Layout.Section>
+    </section>
   );
 };
 
 // 레이아웃
-const Layout = {
-  Section: styled('section', {
-    base: stack.raw({ gap: '0.75rem', marginTop: '0.75rem' }),
+const layoutSectionStyle = css(
+  stack.raw({
+    gap: '0.75rem',
+    marginTop: '0.75rem',
   }),
-};
+);
 
 // 텍스트 스타일
-const Text = {
-  Title: styled('h1', {
-    base: { textStyle: 'h3', color: 'gray.900' },
-  }),
-  SectionTitle: styled('h3', {
-    base: { textStyle: 'h4', color: 'gray.900' },
-  }),
-  SettingLabel: styled('span', {
-    base: { textStyle: 'body1.r', color: 'gray.400' },
-  }),
-};
+const titleStyle = css({
+  textStyle: 'h3',
+  color: 'gray.900',
+});
+
+const sectionTitleStyle = css({
+  textStyle: 'h4',
+  color: 'gray.900',
+});
+
+const settingLabelStyle = css({
+  textStyle: 'body1.r',
+  color: 'gray.400',
+});
 
 // 설정 섹션 스타일
-const Setting = {
-  Row: styled('div', {
-    base: hstack.raw({
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      width: '100%',
-      height: '3rem',
-    }),
+const settingRowStyle = css(
+  hstack.raw({
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    width: '100%',
+    height: '3rem',
   }),
-  Content: styled('div', {
-    base: stack.raw({ gap: '0.5rem' }),
+);
+
+const settingContentStyle = css(
+  stack.raw({
+    gap: '0.5rem',
   }),
-};
+);
 
 // 폴더 스타일
-const Folder = {
-  Header: styled('div', {
-    base: hstack.raw({
-      justifyContent: 'space-between',
-      alignItems: 'center',
-    }),
+const folderHeaderStyle = css(
+  hstack.raw({
+    justifyContent: 'space-between',
+    alignItems: 'center',
   }),
-  List: styled('div', {
-    base: stack.raw({ gap: '0.5rem' }),
+);
+
+const folderListStyle = css(
+  stack.raw({
+    gap: '0.5rem',
   }),
-  Item: styled('div', {
-    base: hstack.raw({
-      gap: '0.75rem',
-      alignItems: 'center',
-      height: '3rem',
-    }),
+);
+
+const folderItemStyle = css(
+  hstack.raw({
+    gap: '0.75rem',
+    alignItems: 'center',
+    height: '3rem',
   }),
-  Info: styled('div', {
-    base: hstack.raw({
-      gap: '0.75rem',
-      alignItems: 'center',
-      flex: 1,
-    }),
+);
+
+const folderInfoStyle = css(
+  hstack.raw({
+    gap: '0.75rem',
+    alignItems: 'center',
+    flex: 1,
   }),
-  Color: styled('div', {
-    base: { width: '1.75rem', height: '1.75rem', borderRadius: '50%' },
-    variants: {
-      color: {
-        red: { bg: 'sub.01.100' },
-        yellow: { bg: 'sub.02.100' },
-        green: { bg: 'sub.03.100' },
-        purple: { bg: 'sub.04.100' },
-        black: { bg: 'sub.05.100' },
-      },
+);
+
+const folderColorStyle = cva({
+  base: {
+    width: '1.75rem',
+    height: '1.75rem',
+    borderRadius: '50%',
+  },
+  variants: {
+    color: {
+      red: { bg: 'sub.01.100' },
+      yellow: { bg: 'sub.02.100' },
+      green: { bg: 'sub.03.100' },
+      purple: { bg: 'sub.04.100' },
+      black: { bg: 'sub.05.100' },
     },
+  },
+});
+
+const folderNameStyle = css({
+  textStyle: 'body1.m',
+  color: 'gray.700',
+  flex: 1,
+});
+
+const folderActionsStyle = css(
+  hstack.raw({
+    gap: '0.75rem',
   }),
-  Name: styled('span', {
-    base: { textStyle: 'body1.m', color: 'gray.700', flex: 1 },
-  }),
-  Actions: styled('div', {
-    base: hstack.raw({ gap: '0.75rem' }),
-  }),
-};
+);
 
 // 구분선
-const Divider = styled('div', {
-  base: {
-    width: '1px',
-    height: '17.25rem',
-    bg: 'gray.200',
-    alignSelf: 'center',
-  },
+const dividerStyle = css({
+  width: '1px',
+  height: '17.25rem',
+  bg: 'gray.200',
+  alignSelf: 'center',
 });

@@ -1,6 +1,6 @@
 'use client';
 
-import { styled } from 'styled-system/jsx';
+import { css, cva } from 'styled-system/css';
 import { hstack } from 'styled-system/patterns';
 import { Button } from '@/components/Button';
 import { useModalStore } from '@/stores/modal-store';
@@ -35,10 +35,12 @@ export const DeleteFolderModalContent = ({
         <Modal.MessageSection>
           <Modal.TitleInline>
             폴더명
-            <FolderBadge>
-              <FolderDot color={folderColor} />
-              <FolderName color={folderColor}>{folderName}</FolderName>
-            </FolderBadge>
+            <span className={folderBadgeStyle}>
+              <span className={folderDotStyle({ color: folderColor })} />
+              <span className={folderNameStyle({ color: folderColor })}>
+                {folderName}
+              </span>
+            </span>
             을(를) 삭제하시겠습니까?
           </Modal.TitleInline>
           <Modal.Description>
@@ -60,15 +62,15 @@ export const DeleteFolderModalContent = ({
   );
 };
 
-const FolderBadge = styled('span', {
-  base: hstack.raw({
+const folderBadgeStyle = css(
+  hstack.raw({
     gap: '0.25rem',
     display: 'inline-flex',
     alignItems: 'center',
   }),
-});
+);
 
-const FolderName = styled('span', {
+const folderNameStyle = cva({
   base: {
     textStyle: 'body1.m',
   },
@@ -83,7 +85,7 @@ const FolderName = styled('span', {
   },
 });
 
-const FolderDot = styled('span', {
+const folderDotStyle = cva({
   base: {
     width: '1.5rem',
     height: '1.5rem',

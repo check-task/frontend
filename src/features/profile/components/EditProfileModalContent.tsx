@@ -1,7 +1,6 @@
 'use client';
 
 import { useRef, useState } from 'react';
-import { styled } from 'styled-system/jsx';
 import { css } from 'styled-system/css';
 import { Button } from '@/components/Button';
 import { Input } from '@/components/TextField';
@@ -60,17 +59,21 @@ export const EditProfileModalContent = ({
     <>
       <Modal.Container gap='large'>
         {/* 프로필 이미지 */}
-        <ImageSection>
-          <ImageWrapper onClick={handleImageClick}>
+        <div className={imageSectionStyle}>
+          <div className={imageWrapperStyle} onClick={handleImageClick}>
             {imagePreview ? (
-              <ProfileImageActual src={imagePreview} alt={nickname} />
+              <img
+                className={profileImageActualStyle}
+                src={imagePreview}
+                alt={nickname}
+              />
             ) : (
-              <ProfileImage />
+              <div className={profileImageStyle} />
             )}
-            <ImageOverlay>
+            <div className={imageOverlayStyle}>
               <CameraIcon />
-            </ImageOverlay>
-          </ImageWrapper>
+            </div>
+          </div>
           <input
             ref={fileInputRef}
             type='file'
@@ -78,7 +81,7 @@ export const EditProfileModalContent = ({
             onChange={handleImageChange}
             style={{ display: 'none' }}
           />
-        </ImageSection>
+        </div>
 
         {/* 입력 필드들 */}
         <Modal.FormField gap='small'>
@@ -134,56 +137,46 @@ export const EditProfileModalContent = ({
   );
 };
 
-const ImageSection = styled('div', {
-  base: {
-    display: 'flex',
-    justifyContent: 'center',
-    width: '100%',
-  },
+const imageSectionStyle = css({
+  display: 'flex',
+  justifyContent: 'center',
+  width: '100%',
 });
 
-const ImageWrapper = styled('div', {
-  base: {
-    position: 'relative',
-    cursor: 'pointer',
-  },
+const imageWrapperStyle = css({
+  position: 'relative',
+  cursor: 'pointer',
 });
 
-const ProfileImage = styled('div', {
-  base: {
-    width: '7.5rem',
-    height: '7.5rem',
-    borderRadius: '50%',
-    bg: 'blue.100',
-  },
+const profileImageStyle = css({
+  width: '7.5rem',
+  height: '7.5rem',
+  borderRadius: '50%',
+  bg: 'blue.100',
 });
 
-const ProfileImageActual = styled('img', {
-  base: {
-    width: '7.5rem',
-    height: '7.5rem',
-    borderRadius: '50%',
-    objectFit: 'cover',
-  },
+const profileImageActualStyle = css({
+  width: '7.5rem',
+  height: '7.5rem',
+  borderRadius: '50%',
+  objectFit: 'cover',
 });
 
-const ImageOverlay = styled('div', {
-  base: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    width: '7.5rem',
-    height: '7.5rem',
-    borderRadius: '50%',
-    background:
-      'linear-gradient(0deg, rgba(0, 0, 0, 0.60) 0%, rgba(0, 0, 0, 0.60) 100%), var(--colors-blue-100)',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    opacity: 0,
-    transition: 'opacity 0.2s ease',
-    _hover: {
-      opacity: 1,
-    },
+const imageOverlayStyle = css({
+  position: 'absolute',
+  top: 0,
+  left: 0,
+  width: '7.5rem',
+  height: '7.5rem',
+  borderRadius: '50%',
+  background:
+    'linear-gradient(0deg, rgba(0, 0, 0, 0.60) 0%, rgba(0, 0, 0, 0.60) 100%), var(--colors-blue-100)',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  opacity: 0,
+  transition: 'opacity 0.2s ease',
+  _hover: {
+    opacity: 1,
   },
 });
