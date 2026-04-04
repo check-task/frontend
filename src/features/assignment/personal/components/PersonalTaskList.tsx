@@ -68,24 +68,14 @@ export const PersonalTaskList = ({
       ) : (
         <div className={PersonalTaskListStyle}>
           {tasks.map((task) => {
-            const isLongTitle = task.title.length >= 23;
             // 완료 여부를 UI에서 사용하기 위함
-            // 리스트 한줄을 기준으로 처리하려 했는데 아이콘 부분이 처리가 안되어서  개별 요소로 보냄
             const isCompleted = task.status === 'COMPLETED';
 
             return (
               <div key={task.id} className={PersonalTaskItemContainerStyle}>
                 {/* 왼쪽: 체크박스 + 제목 */}
-                <div
-                  className={PersonalTaskItemLeftStyle({
-                    align: isLongTitle ? 'top' : 'center',
-                  })}
-                >
-                  <div
-                    className={checkboxWrapperStyle({
-                      align: isLongTitle ? 'top' : 'center',
-                    })}
-                  >
+                <div className={PersonalTaskItemLeftStyle}>
+                  <div className={checkboxWrapperStyle}>
                     <Checkbox
                       checked={isCompleted}
                       variant='black'
@@ -100,11 +90,7 @@ export const PersonalTaskList = ({
                 </div>
 
                 {/* 오른쪽: 달력 + 시계토글 */}
-                <div
-                  className={teamTaskItemRightStyle({
-                    align: isLongTitle ? 'top' : 'center',
-                  })}
-                >
+                <div className={teamTaskItemRightStyle}>
                   <div className={rightContentWrapperStyle}>
                     <DatePicker
                       value={task.deadline}
@@ -162,35 +148,18 @@ const PersonalTaskItemContainerStyle = css({
 });
 
 // 각 리스트에서 왼쪽 (체크박스+ 과제명)
-const PersonalTaskItemLeftStyle = cva({
-  base: {
-    display: 'flex',
+const PersonalTaskItemLeftStyle = css({
+  display: 'flex',
     gap: '0.75rem', // 체크박스랑 task 제목 간격
-    flex: 1, // 오른쪽 영역에 마진을 줄거라서 남은 부분 차지
-    maxWidth: '27rem', // 줄 바꿈이 되기 직전 너비를 주면 됩니다
-  },
-
-  variants: {
-    align: {
-      center: {
-        alignItems: 'center',
-      },
-      top: {
-        alignItems: 'flex-start',
-      },
-    },
-  },
-
-  defaultVariants: {
-    align: 'center',
-  },
+    flex: 1, 
+    alignItems: 'center',
 });
 
 const taskTextStyle = cva({
   base: {
     textStyle: 'body1.m',
     color: 'gray.900',
-    wordBreak: 'break-word', // 상자 크기 넘어가면 자동으로 줄 바꿈
+    wordBreak: 'break-word', 
   },
   variants: {
     completed: {
@@ -198,7 +167,8 @@ const taskTextStyle = cva({
         textStyle: 'body1.r',
         color: 'gray.400',
         textDecoration: 'line-through',
-        textDecorationThickness: '0.09rem', // 임의로 넣음
+        textDecorationThickness: '1px',
+        textDecorationSkipInk: 'none',
       },
       false: { color: 'gray.900' },
     },
@@ -209,55 +179,20 @@ const taskTextStyle = cva({
 });
 
 // 체크 박스
-const checkboxWrapperStyle = cva({
-  base: {
-    display: 'flex',
-  },
-
-  variants: {
-    align: {
-      center: {
-        marginTop: '-0.1rem',
-      },
-      top: {
-        marginTop: '0.35rem',
-      },
-    },
-  },
-
-  defaultVariants: {
-    align: 'center',
-  },
+const checkboxWrapperStyle = css({
+  display: 'flex',
+  marginTop: '-0.1rem',
 });
 
 // 각 리스트에서 오른쪽 영역
-const teamTaskItemRightStyle = cva({
-  base: {
-    display: 'flex',
-    ml: '0.75rem',
-  },
-
-  variants: {
-    align: {
-      center: {
-        alignItems: 'center',
-      },
-      top: {
-        alignItems: 'flex-start',
-      },
-    },
-  },
-
-  defaultVariants: {
-    align: 'center',
-  },
+const teamTaskItemRightStyle = css({
+  display: 'flex',
+  alignItems: 'center',
 });
 
 // 달력 왼쪽 시계 오른쪽으로 가도록
 const rightContentWrapperStyle = css({
   display: 'flex',
   alignItems: 'center',
-  justifyContent: 'space-between',
-  gap: '2.25rem',
-  width: '12rem', // 직접 계산
+  gap: '1.5rem', 
 });
