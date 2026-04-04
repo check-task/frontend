@@ -51,7 +51,7 @@ export const PersonalTaskList = ({
   const handleStatusChange = (subTaskId: number, isChecked: boolean) => {
     mutateStatus({
       subTaskId,
-      status: isChecked ? 'COMPLETED' : 'PROGRESS',
+      status: isChecked ? 'COMPLETED' : 'PENDING',
     });
   };
 
