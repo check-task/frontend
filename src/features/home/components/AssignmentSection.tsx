@@ -1,6 +1,6 @@
 'use client';
 
-import { styled } from 'styled-system/jsx';
+import { css, cva } from 'styled-system/css';
 import { hstack, stack } from 'styled-system/patterns';
 import { SortTabs, SortType } from './SortTabs';
 import { AssignmentCardList, Assignment } from './AssignmentCardList';
@@ -20,36 +20,43 @@ export const AssignmentSection = ({
   const isSidebarCollapsed = useUIStore((state) => state.isSidebarCollapsed);
 
   return (
-    <Container css={{ width: isSidebarCollapsed ? '27.375rem' : '22.75rem' }}>
-      <Header>
-        <Title>과제목록</Title>
+    <div className={containerStyle({ collapsed: isSidebarCollapsed })}>
+      <div className={headerStyle}>
+        <h4 className={titleStyle}>과제목록</h4>
         <SortTabs activeTab={sortType} onTabChange={onSortChange} />
-      </Header>
+      </div>
       <AssignmentCardList
         assignments={assignments}
-        isDragDisabled={sortType !== 'priority'} // 우선순위 탭이 아닌 경우 드래그앤드롭 비활성화
+        isDragDisabled={sortType !== 'priority'}
       />
-    </Container>
+    </div>
   );
 };
 
-const Container = styled('div', {
+const containerStyle = cva({
   base: stack.raw({
     gap: '1.25rem',
     transition: 'width 0.3s ease',
   }),
+  variants: {
+    collapsed: {
+      true: { width: '27.375rem' },
+      false: { width: '22.75rem' },
+    },
+  },
+  defaultVariants: {
+    collapsed: false,
+  },
 });
 
-const Header = styled('div', {
-  base: hstack.raw({
+const headerStyle = css(
+  hstack.raw({
     justifyContent: 'space-between',
     alignItems: 'center',
   }),
-});
+);
 
-const Title = styled('h4', {
-  base: {
-    textStyle: 'h4',
-    color: 'gray.900',
-  },
+const titleStyle = css({
+  textStyle: 'h4',
+  color: 'gray.900',
 });

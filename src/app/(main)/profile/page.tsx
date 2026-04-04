@@ -1,4 +1,4 @@
-import { styled } from '../../../../styled-system/jsx';
+import { css } from '../../../../styled-system/css';
 import { hstack, stack } from '../../../../styled-system/patterns';
 import { ProfileSection } from '@/features/profile/components/ProfileSection';
 import { ManagementSection } from '@/features/profile/components/ManagementSection';
@@ -9,59 +9,52 @@ import { PolicyLink } from '@/features/profile/components/PolicyLink';
 // 프로필 설정 페이지
 export default function ProfilePage() {
   return (
-    <Layout.Container>
+    <div className={containerStyle}>
       <ProfileSection />
       <ManagementSection />
 
       {/* 푸터 */}
       <ProfileFooter>
         <WithdrawalButton />
-        <Text.FooterLinks>
+        <div className={footerLinksStyle}>
           <PolicyLink type='privacy' />
-          <Divider />
+          <div className={dividerStyle} />
           <PolicyLink type='terms' />
-          <Divider />
-          <Text.FooterCopyright>
+          <div className={dividerStyle} />
+          <span className={footerCopyrightStyle}>
             © 2025, CheckTask, All rights reserved.
-          </Text.FooterCopyright>
-        </Text.FooterLinks>
+          </span>
+        </div>
       </ProfileFooter>
-    </Layout.Container>
+    </div>
   );
 }
 
 // 레이아웃 관련 스타일
-const Layout = {
-  Container: styled('div', {
-    base: stack.raw({
-      gap: '2.25rem',
-      width: '62.25rem',
-      marginX: 'auto',
-      marginTop: '3.25rem',
-      marginBottom: '3.75rem',
-    }),
+const containerStyle = css(
+  stack.raw({
+    gap: '2.25rem',
+    width: '62.25rem',
+    marginX: 'auto',
+    marginTop: '3.25rem',
+    marginBottom: '3.75rem',
   }),
-};
+);
 
 // 텍스트 스타일
-const Text = {
-  FooterLinks: styled('div', {
-    base: hstack.raw({ gap: '0.25rem', alignItems: 'center' }),
-  }),
-  FooterCopyright: styled('span', {
-    base: {
-      textStyle: 'body4.r',
-      color: 'gray.300',
-    },
-  }),
-};
+const footerLinksStyle = css(
+  hstack.raw({ gap: '0.25rem', alignItems: 'center' }),
+);
+
+const footerCopyrightStyle = css({
+  textStyle: 'body4.r',
+  color: 'gray.300',
+});
 
 // 구분선
-const Divider = styled('div', {
-  base: {
-    width: '1px',
-    height: '1rem',
-    bg: 'gray.300',
-    alignSelf: 'center',
-  },
+const dividerStyle = css({
+  width: '1px',
+  height: '1rem',
+  bg: 'gray.300',
+  alignSelf: 'center',
 });

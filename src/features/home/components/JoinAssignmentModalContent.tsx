@@ -1,10 +1,10 @@
 import { useState } from 'react';
+import { css } from 'styled-system/css';
+import { stack } from 'styled-system/patterns';
 import { Button } from '@/components/Button';
 import { Input } from '@/components/TextField';
 import { useModalStore } from '@/stores/modal-store';
 import { useJoinTask } from '@/hooks/mutations/useJoinTask';
-import { styled } from 'styled-system/jsx';
-import { stack } from 'styled-system/patterns';
 
 export const JoinAssignmentModalContent = () => {
   const closeModal = useModalStore((state) => state.closeModal);
@@ -18,9 +18,9 @@ export const JoinAssignmentModalContent = () => {
   };
 
   return (
-    <Container>
-      <FormField>
-        <Label>초대코드</Label>
+    <div className={containerStyle}>
+      <div className={formFieldStyle}>
+        <label className={labelStyle}>초대코드</label>
         <Input
           size='modal'
           type='text'
@@ -28,7 +28,7 @@ export const JoinAssignmentModalContent = () => {
           value={inviteCode}
           onChange={(e) => setInviteCode(e.target.value)}
         />
-      </FormField>
+      </div>
 
       <Button
         variant='fillBlue'
@@ -38,26 +38,24 @@ export const JoinAssignmentModalContent = () => {
       >
         팀과제 참여
       </Button>
-    </Container>
+    </div>
   );
 };
 
-const Container = styled('div', {
-  base: stack.raw({
+const containerStyle = css(
+  stack.raw({
     paddingTop: '1.75rem',
     gap: '2.5rem',
   }),
-});
+);
 
-const FormField = styled('div', {
-  base: stack.raw({
+const formFieldStyle = css(
+  stack.raw({
     gap: '0.75rem',
   }),
-});
+);
 
-const Label = styled('label', {
-  base: {
-    textStyle: 'body3.m',
-    color: 'gray.800',
-  },
+const labelStyle = css({
+  textStyle: 'body3.m',
+  color: 'gray.800',
 });

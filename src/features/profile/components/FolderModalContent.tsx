@@ -1,9 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { styled } from 'styled-system/jsx';
+import { css, cva } from 'styled-system/css';
 import { hstack } from 'styled-system/patterns';
-import { css } from 'styled-system/css';
 import { Button } from '@/components/Button';
 import { Input } from '@/components/TextField';
 import { useModalStore } from '@/stores/modal-store';
@@ -100,18 +99,18 @@ export const FolderModalContent = ({
         {/* 폴더색 */}
         <Modal.FormField gap='medium'>
           <Modal.Label>폴더색</Modal.Label>
-          <ColorSection>
+          <div className={colorSectionStyle}>
             {FOLDER_COLORS.map((color) => (
-              <ColorButton
+              <button
                 key={color}
                 type='button'
-                color={color}
+                className={colorButtonStyle({ color })}
                 onClick={() => setSelectedColor(color)}
               >
                 {selectedColor === color && <FolderCheckMark />}
-              </ColorButton>
+              </button>
             ))}
-          </ColorSection>
+          </div>
         </Modal.FormField>
       </Modal.Container>
 
@@ -129,13 +128,13 @@ export const FolderModalContent = ({
   );
 };
 
-const ColorSection = styled('div', {
-  base: hstack.raw({
+const colorSectionStyle = css(
+  hstack.raw({
     gap: '0.75rem',
   }),
-});
+);
 
-const ColorButton = styled('button', {
+const colorButtonStyle = cva({
   base: {
     width: '2.5rem',
     height: '2.5rem',

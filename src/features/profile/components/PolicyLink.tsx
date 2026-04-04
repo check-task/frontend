@@ -1,6 +1,6 @@
 'use client';
 
-import { styled } from 'styled-system/jsx';
+import { css } from 'styled-system/css';
 import { useModalStore } from '@/stores/modal-store';
 import { PrivacyPolicyContent } from './PrivacyPolicyContent';
 import { TermsOfServiceContent } from './TermsOfServiceContent';
@@ -36,16 +36,18 @@ export const PolicyLink = ({ type }: PolicyLinkProps) => {
     });
   };
 
-  return <LinkButton onClick={handleClick}>{LABEL[type]}</LinkButton>;
+  return (
+    <button className={linkButtonStyle} onClick={handleClick}>
+      {LABEL[type]}
+    </button>
+  );
 };
 
-const LinkButton = styled('button', {
-  base: {
-    textStyle: 'body4.r',
-    color: 'gray.300',
-    cursor: 'pointer',
-    background: 'none',
-    border: 'none',
-    padding: 0,
-  },
+const linkButtonStyle = css({
+  textStyle: 'body4.r',
+  color: 'gray.300',
+  cursor: 'pointer',
+  background: 'none',
+  border: 'none',
+  padding: 0,
 });

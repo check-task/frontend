@@ -1,5 +1,4 @@
-import { styled } from 'styled-system/jsx';
-import { center, hstack, stack } from 'styled-system/patterns';
+import { hstack, stack } from 'styled-system/patterns';
 import { cva, css, cx } from 'styled-system/css';
 import { FolderColor } from '@/types/folder';
 
@@ -31,17 +30,13 @@ export const AssignmentCard = ({
 
   return (
     <button className={cx(cardContainerStyle, className)} {...props}>
-      <AssignmentCardStyle.InfoSection>
-        <AssignmentCardStyle.FolderSection>
+      <div className={infoSectionStyle}>
+        <div className={folderSectionStyle}>
           <div className={folderIconStyle({ color: folderColor })} />
-          <AssignmentCardStyle.FolderName>
-            {folderName}
-          </AssignmentCardStyle.FolderName>
-        </AssignmentCardStyle.FolderSection>
-        <AssignmentCardStyle.AssignmentName>
-          {assignmentName}
-        </AssignmentCardStyle.AssignmentName>
-      </AssignmentCardStyle.InfoSection>
+          <p className={folderNameStyle}>{folderName}</p>
+        </div>
+        <p className={assignmentNameStyle}>{assignmentName}</p>
+      </div>
       <span className={dateStyle({ color: folderColor, type: dateType })}>
         {displayDate}
       </span>
@@ -109,21 +104,24 @@ const cardContainerStyle = css(
   }),
 );
 
-const AssignmentCardStyle = {
-  InfoSection: styled('div', {
-    base: stack.raw({
-      justifyContent: 'space-between',
-      alignItems: 'flex-start',
-      height: '3.75rem',
-    }),
+const infoSectionStyle = css(
+  stack.raw({
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    height: '3.75rem',
   }),
-  FolderSection: styled('div', {
-    base: hstack.raw({ gap: '0.25rem', alignItems: 'center' }),
-  }),
-  FolderName: styled('p', {
-    base: { textStyle: 'body3.r', color: 'gray.600' },
-  }),
-  AssignmentName: styled('p', {
-    base: { textStyle: 'body1.m', color: 'gray.900' },
-  }),
-};
+);
+
+const folderSectionStyle = css(
+  hstack.raw({ gap: '0.25rem', alignItems: 'center' }),
+);
+
+const folderNameStyle = css({
+  textStyle: 'body3.r',
+  color: 'gray.600',
+});
+
+const assignmentNameStyle = css({
+  textStyle: 'body1.m',
+  color: 'gray.900',
+});

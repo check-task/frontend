@@ -1,4 +1,4 @@
-import { styled } from 'styled-system/jsx';
+import { css } from 'styled-system/css';
 import { hstack, stack } from 'styled-system/patterns';
 import { DateSelectorWithPicker } from '@/features/home/components/DateSelectorWithPicker';
 import { ButtonGroup } from '@/features/home/components/ButtonGroup';
@@ -6,32 +6,31 @@ import { HomeContent } from '@/features/home/components/HomeContent';
 
 export default function Home() {
   return (
-    <Container.Page>
+    <div className={pageStyle}>
       {/* 년/월 선택 + 버튼 */}
-      <Container.Header>
+      <div className={headerStyle}>
         <DateSelectorWithPicker />
         <ButtonGroup />
-      </Container.Header>
+      </div>
 
       {/* 폴더 필터 + 캘린더 + 과제목록 */}
       <HomeContent />
-    </Container.Page>
+    </div>
   );
 }
 
-const Container = {
-  Page: styled('div', {
-    base: stack.raw({
-      gap: '1.5rem',
-      marginTop: '2rem',
-      marginBottom: '3.75rem',
-    }),
+const pageStyle = css(
+  stack.raw({
+    gap: '1.5rem',
+    marginTop: '2rem',
+    marginBottom: '3.75rem',
   }),
-  Header: styled('div', {
-    base: hstack.raw({
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      width: '100%',
-    }),
+);
+
+const headerStyle = css(
+  hstack.raw({
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    width: '100%',
   }),
-};
+);

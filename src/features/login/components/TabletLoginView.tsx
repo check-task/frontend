@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { styled } from 'styled-system/jsx';
+import { css } from 'styled-system/css';
 import { center, hstack, stack } from 'styled-system/patterns';
 import Image from 'next/image';
 import { DoubleChevronDownIcon } from '@/components/icons/DoubleChevronDownIcon';
@@ -55,7 +55,8 @@ export const TabletLoginView = () => {
   };
 
   return (
-    <Container.Main
+    <div
+      className={mainStyle}
       style={{
         background:
           currentSlide === 0
@@ -64,18 +65,21 @@ export const TabletLoginView = () => {
       }}
     >
       {/* 슬라이드 0: 인트로 */}
-      <Container.IntroSlide style={{ opacity: currentSlide === 0 ? 1 : 0 }}>
-        <Container.LogoWrapper>
+      <div
+        className={introSlideStyle}
+        style={{ opacity: currentSlide === 0 ? 1 : 0 }}
+      >
+        <div className={logoWrapperStyle}>
           <Image
             src='/login-logo.svg'
             alt='채택 로고'
             width={320}
             height={59}
           />
-        </Container.LogoWrapper>
-        <Text.IntroTitle>모바일 화면 준비 중이에요!</Text.IntroTitle>
-        <Container.PreviewLink>
-          <Text.PreviewText>채택 서비스 미리보기</Text.PreviewText>
+        </div>
+        <p className={introTitleStyle}>모바일 화면 준비 중이에요!</p>
+        <div className={previewLinkStyle}>
+          <span className={previewTextStyle}>채택 서비스 미리보기</span>
           <button
             onClick={handleEnterPreview}
             style={{
@@ -91,20 +95,21 @@ export const TabletLoginView = () => {
               style={{ transform: 'rotate(-90deg)' }}
             />
           </button>
-        </Container.PreviewLink>
-      </Container.IntroSlide>
+        </div>
+      </div>
 
       {/* 슬라이드 1–3: 서비스 미리보기 */}
       {PREVIEW_SLIDES.map((slide, i) => (
-        <Container.PreviewSlide
+        <div
           key={i}
+          className={previewSlideStyle}
           style={{
             opacity: currentSlide === i + 1 ? 1 : 0,
             pointerEvents: currentSlide === i + 1 ? 'auto' : 'none',
           }}
         >
           {/* 좌: 앱 목업 이미지 */}
-          <Container.ImagePanel>
+          <div className={imagePanelStyle}>
             <Image
               src={slide.image}
               alt={slide.title}
@@ -116,36 +121,46 @@ export const TabletLoginView = () => {
               }}
               priority={i === 0}
             />
-          </Container.ImagePanel>
+          </div>
 
           {/* 우: 텍스트 + 네비게이션 */}
-          <Container.TextPanel>
-            <Container.SlideText>
-              <Text.SlideTitle>{TABLET_TITLES[i]}</Text.SlideTitle>
-              <Container.SlideDesc>
+          <div className={textPanelStyle}>
+            <div className={slideTextStyle}>
+              <h2 className={slideTitleStyle}>{TABLET_TITLES[i]}</h2>
+              <div className={slideDescStyle}>
                 {slide.description.map((line, j) => (
-                  <Text.SlideDescription key={j}>{line}</Text.SlideDescription>
+                  <p key={j} className={slideDescriptionStyle}>
+                    {line}
+                  </p>
                 ))}
-              </Container.SlideDesc>
-            </Container.SlideText>
-            <Container.NavButtons>
-              <NavButton onClick={handlePrev} aria-label='이전 슬라이드'>
+              </div>
+            </div>
+            <div className={navButtonsStyle}>
+              <button
+                className={navButtonStyle}
+                onClick={handlePrev}
+                aria-label='이전 슬라이드'
+              >
                 <LeftIcon stroke='tablet' />
-              </NavButton>
-              <NavButton onClick={handleNext} aria-label='다음 슬라이드'>
+              </button>
+              <button
+                className={navButtonStyle}
+                onClick={handleNext}
+                aria-label='다음 슬라이드'
+              >
                 <RightIcon stroke='tablet' />
-              </NavButton>
-            </Container.NavButtons>
-          </Container.TextPanel>
-        </Container.PreviewSlide>
+              </button>
+            </div>
+          </div>
+        </div>
       ))}
-    </Container.Main>
+    </div>
   );
 };
 
 // 네비게이션 버튼
-const NavButton = styled('button', {
-  base: center.raw({
+const navButtonStyle = css(
+  center.raw({
     width: '2.5rem',
     height: '2.5rem',
     borderRadius: '50%',
@@ -164,113 +179,105 @@ const NavButton = styled('button', {
       },
     },
   }),
-});
+);
 
 // Container 관련 스타일
-const Container = {
-  Main: styled('div', {
-    base: {
-      position: 'relative',
-      width: '100%',
-      height: '100dvh',
-      overflow: 'hidden',
-    },
+const mainStyle = css({
+  position: 'relative',
+  width: '100%',
+  height: '100dvh',
+  overflow: 'hidden',
+});
+
+const introSlideStyle = css(
+  stack.raw({
+    position: 'absolute',
+    inset: 0,
+    alignItems: 'center',
+    justifyContent: 'center',
+    transition: 'opacity 500ms ease-out',
+    background: 'linear-gradient(180deg, #081221 33.688%, #317ae4 201.94%)',
   }),
-  IntroSlide: styled('div', {
-    base: stack.raw({
-      position: 'absolute',
-      inset: 0,
-      alignItems: 'center',
-      justifyContent: 'center',
-      transition: 'opacity 500ms ease-out',
-      background: 'linear-gradient(180deg, #081221 33.688%, #317ae4 201.94%)',
-    }),
+);
+
+const logoWrapperStyle = css({
+  mt: '2rem',
+  mb: '1.5rem',
+});
+
+const previewLinkStyle = css({
+  display: 'flex',
+  alignItems: 'center',
+  gap: '0.5rem',
+  mt: '13rem',
+  background: 'none',
+  border: 'none',
+  padding: 0,
+});
+
+const previewSlideStyle = css(
+  hstack.raw({
+    position: 'absolute',
+    inset: 0,
+    gap: 0,
+    alignItems: 'stretch',
+    transition: 'opacity 500ms ease-out',
+    background:
+      'radial-gradient(ellipse at center, #14315b 0%, #0e223e 50%, #081221 100%)',
   }),
-  LogoWrapper: styled('div', {
-    base: {
-      mt: '2rem',
-      mb: '1.5rem',
-    },
+);
+
+const imagePanelStyle = css({
+  position: 'relative',
+  width: '50%',
+  flexShrink: 0,
+});
+
+const textPanelStyle = css(
+  stack.raw({
+    flex: 1,
+    justifyContent: 'center',
+    paddingLeft: '2.5rem',
+    gap: '2rem',
   }),
-  PreviewLink: styled('div', {
-    base: {
-      display: 'flex',
-      alignItems: 'center',
-      gap: '0.5rem',
-      mt: '13rem',
-      background: 'none',
-      border: 'none',
-      padding: 0,
-    },
+);
+
+const slideTextStyle = css(
+  stack.raw({
+    gap: '0.75rem',
   }),
-  PreviewSlide: styled('div', {
-    base: hstack.raw({
-      position: 'absolute',
-      inset: 0,
-      gap: 0,
-      alignItems: 'stretch',
-      transition: 'opacity 500ms ease-out',
-      background:
-        'radial-gradient(ellipse at center, #14315b 0%, #0e223e 50%, #081221 100%)',
-    }),
+);
+
+const slideDescStyle = css(
+  stack.raw({
+    gap: 0,
   }),
-  ImagePanel: styled('div', {
-    base: {
-      position: 'relative',
-      width: '50%',
-      flexShrink: 0,
-    },
+);
+
+const navButtonsStyle = css(
+  hstack.raw({
+    gap: '1.25rem',
   }),
-  TextPanel: styled('div', {
-    base: stack.raw({
-      flex: 1,
-      justifyContent: 'center',
-      paddingLeft: '2.5rem',
-      gap: '2rem',
-    }),
-  }),
-  SlideText: styled('div', {
-    base: stack.raw({
-      gap: '0.75rem',
-    }),
-  }),
-  SlideDesc: styled('div', {
-    base: stack.raw({
-      gap: 0,
-    }),
-  }),
-  NavButtons: styled('div', {
-    base: hstack.raw({
-      gap: '1.25rem',
-    }),
-  }),
-};
+);
 
 // 텍스트 스타일
-const Text = {
-  IntroTitle: styled('p', {
-    base: {
-      textStyle: 'h2',
-      color: 'blue.200',
-    },
-  }),
-  PreviewText: styled('span', {
-    base: {
-      textStyle: 'h4',
-      color: 'gray.200',
-    },
-  }),
-  SlideTitle: styled('h2', {
-    base: {
-      textStyle: 'h2',
-      color: 'white',
-      whiteSpace: 'pre-line',
-    },
-  }),
-  SlideDescription: styled('p', {
-    base: {
-      textStyle: 'body2.r',
-      color: 'white',
-    },
-  }),
-};
+const introTitleStyle = css({
+  textStyle: 'h2',
+  color: 'blue.200',
+});
+
+const previewTextStyle = css({
+  textStyle: 'h4',
+  color: 'gray.200',
+});
+
+const slideTitleStyle = css({
+  textStyle: 'h2',
+  color: 'white',
+  whiteSpace: 'pre-line',
+});
+
+const slideDescriptionStyle = css({
+  textStyle: 'body2.r',
+  color: 'white',
+});

@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { styled } from 'styled-system/jsx';
 import { css } from 'styled-system/css';
 import { hstack } from 'styled-system/patterns';
 import { MonthPickerIcon } from '@/components/icons/MonthPickerIcon';
@@ -26,55 +25,48 @@ export const DateSelectorWithPicker = () => {
   const pickerRef = useClickOutside<HTMLDivElement>(() => setIsOpen(false));
 
   return (
-    <Container ref={pickerRef}>
-      <DateSelector onClick={togglePicker}>
-        <DateTitle>
+    <div ref={pickerRef} className={containerStyle}>
+      <button className={dateSelectorStyle} onClick={togglePicker}>
+        <h1 className={dateTitleStyle}>
           {currentYear}년 {currentMonth}월
-        </DateTitle>
+        </h1>
         <div className={iconWrapperStyle(isOpen)}>
           <MonthPickerIcon />
         </div>
-        {/* <MonthPickerIcon /> */}
-      </DateSelector>
+      </button>
       {isOpen && (
-        <PickerWrapper>
+        <div className={pickerWrapperStyle}>
           <MonthPicker onClose={closePicker} />
-        </PickerWrapper>
+        </div>
       )}
-    </Container>
+    </div>
   );
 };
 
-const Container = styled('div', {
-  base: {
-    position: 'relative',
-  },
+const containerStyle = css({
+  position: 'relative',
 });
 
-const DateSelector = styled('button', {
-  base: hstack.raw({
+const dateSelectorStyle = css(
+  hstack.raw({
     gap: '0.25rem',
     alignItems: 'center',
     cursor: 'pointer',
     background: 'transparent',
     border: 'none',
   }),
+);
+
+const dateTitleStyle = css({
+  textStyle: 'h1',
+  color: 'gray.900',
 });
 
-const DateTitle = styled('h1', {
-  base: {
-    textStyle: 'h1',
-    color: 'gray.900',
-  },
-});
-
-const PickerWrapper = styled('div', {
-  base: {
-    position: 'absolute',
-    top: 'calc(100% + 0.5rem)',
-    left: 0,
-    zIndex: 'dropdown',
-  },
+const pickerWrapperStyle = css({
+  position: 'absolute',
+  top: 'calc(100% + 0.5rem)',
+  left: 0,
+  zIndex: 'dropdown',
 });
 
 // 작성해주신 토글 위아래 전환 코드 부분만 뜯어옴

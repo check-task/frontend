@@ -20,7 +20,7 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { styled } from 'styled-system/jsx';
+import { css } from 'styled-system/css';
 import { stack } from 'styled-system/patterns';
 import { AssignmentCard } from './AssignmentCard';
 import { useUpdateTaskPriorities } from '@/hooks/mutations/useUpdateTaskPriorities';
@@ -153,7 +153,7 @@ export const AssignmentCardList = ({
         items={items.map((a) => a.id)}
         strategy={verticalListSortingStrategy}
       >
-        <Container>
+        <div className={containerStyle}>
           {items.map((assignment, index) => (
             <SortableAssignmentCard
               key={assignment.id}
@@ -163,14 +163,14 @@ export const AssignmentCardList = ({
               onClick={() => handleCardClick(assignment)}
             />
           ))}
-        </Container>
+        </div>
       </SortableContext>
     </DndContext>
   );
 };
 
-const Container = styled('div', {
-  base: stack.raw({
+const containerStyle = css(
+  stack.raw({
     gap: '0.75rem',
   }),
-});
+);

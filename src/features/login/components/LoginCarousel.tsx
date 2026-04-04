@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { styled } from 'styled-system/jsx';
+import { css } from 'styled-system/css';
 import { center, hstack, stack } from 'styled-system/patterns';
 import Image from 'next/image';
 import { LeftIcon } from '@/components/icons/LeftIcon';
@@ -61,12 +61,13 @@ export const LoginCarousel = () => {
   };
 
   return (
-    <Container.Main>
-      {/* 좌측 패널 - 이미지 영역 */}
-      <Container.LeftPanel>
+    <div className={mainStyle}>
+      {/* 좌측 패널 */}
+      <div className={leftPanelStyle}>
         {SLIDES.map((s, i) => (
-          <Container.ImageLayer
+          <div
             key={s.index}
+            className={imageLayerStyle}
             style={{ opacity: currentSlide === i ? 1 : 0 }}
           >
             <Image
@@ -76,47 +77,56 @@ export const LoginCarousel = () => {
               style={{ objectFit: 'contain', padding: '60px' }}
               priority={i === 0}
             />
-          </Container.ImageLayer>
+          </div>
         ))}
-      </Container.LeftPanel>
+      </div>
 
-      {/* 우측 컨텐츠 - 텍스트 + 네비게이션 */}
-      <Container.RightContent>
-        <Container.TextArea>
+      {/* 우측 패널 */}
+      <div className={rightContentStyle}>
+        <div className={textAreaStyle}>
           {SLIDES.map((s, i) => (
-            <Container.TextLayer
+            <div
               key={s.index}
+              className={textLayerStyle}
               style={{
                 opacity: currentSlide === i ? 1 : 0,
                 position: i === 0 ? 'relative' : 'absolute',
               }}
             >
-              <Text.SlideIndex>{s.index}</Text.SlideIndex>
-              <Container.SlideText>
-                <Text.SlideTitle>{s.title}</Text.SlideTitle>
-                <Text.SlideDescription>{s.description}</Text.SlideDescription>
-              </Container.SlideText>
-            </Container.TextLayer>
+              <span className={slideIndexStyle}>{s.index}</span>
+              <div className={slideTextStyle}>
+                <h1 className={slideTitleStyle}>{s.title}</h1>
+                <p className={slideDescriptionStyle}>{s.description}</p>
+              </div>
+            </div>
           ))}
-        </Container.TextArea>
+        </div>
 
         {/* 좌우 화살표 */}
-        <Container.NavButtons>
-          <NavButton onClick={handlePrev} aria-label='이전 슬라이드'>
+        <div className={navButtonsStyle}>
+          <button
+            className={navButtonStyle}
+            onClick={handlePrev}
+            aria-label='이전 슬라이드'
+          >
             <LeftIcon stroke='login' />
-          </NavButton>
-          <NavButton onClick={handleNext} aria-label='다음 슬라이드'>
+          </button>
+          <button
+            className={navButtonStyle}
+            onClick={handleNext}
+            aria-label='다음 슬라이드'
+          >
             <RightIcon stroke='login' />
-          </NavButton>
-        </Container.NavButtons>
-      </Container.RightContent>
-    </Container.Main>
+          </button>
+        </div>
+      </div>
+    </div>
   );
 };
 
 // 네비게이션 버튼
-const NavButton = styled('button', {
-  base: center.raw({
+const navButtonStyle = css(
+  center.raw({
     width: '2.5rem',
     height: '2.5rem',
     borderRadius: '50%',
@@ -135,85 +145,76 @@ const NavButton = styled('button', {
       },
     },
   }),
+);
+
+const mainStyle = css(
+  hstack.raw({
+    flex: 1,
+    gap: 0,
+    alignItems: 'stretch',
+  }),
+);
+
+const leftPanelStyle = css({
+  position: 'relative',
+  width: '55.56%', // 800/1440
+  bg: 'blue.50',
 });
 
-// Container 관련 스타일
-const Container = {
-  Main: styled('div', {
-    base: hstack.raw({
-      flex: 1,
-      gap: 0,
-      alignItems: 'stretch',
-    }),
-  }),
-  LeftPanel: styled('div', {
-    base: {
-      position: 'relative',
-      width: '55.56%', // 800/1440
-      bg: 'blue.50',
-    },
-  }),
-  ImageLayer: styled('div', {
-    base: {
-      position: 'absolute',
-      inset: 0,
-      transition: 'opacity 500ms ease-out',
-    },
-  }),
-  RightContent: styled('div', {
-    base: stack.raw({
-      flex: 1,
-      justifyContent: 'center',
-      paddingLeft: '5rem',
-      gap: '2.25rem',
-    }),
-  }),
-  TextArea: styled('div', {
-    base: {
-      position: 'relative',
-      minHeight: '8rem',
-    },
-  }),
-  TextLayer: styled('div', {
-    base: stack.raw({
-      position: 'absolute',
-      inset: 0,
-      gap: '0.25rem',
-      transition: 'opacity 500ms ease-out',
-    }),
-  }),
-  SlideText: styled('div', {
-    base: stack.raw({
-      gap: '0.75rem',
-    }),
-  }),
-  NavButtons: styled('div', {
-    base: hstack.raw({
-      gap: '1.25rem',
-    }),
-  }),
-};
+const imageLayerStyle = css({
+  position: 'absolute',
+  inset: 0,
+  transition: 'opacity 500ms ease-out',
+});
 
-// 텍스트 스타일
-const Text = {
-  SlideIndex: styled('span', {
-    base: {
-      fontStyle: 'body1.r',
-      color: 'gray.900',
-    },
+const rightContentStyle = css(
+  stack.raw({
+    flex: 1,
+    justifyContent: 'center',
+    paddingLeft: '5rem',
+    gap: '2.25rem',
   }),
-  SlideTitle: styled('h1', {
-    base: {
-      textStyle: 'h1',
-      color: 'gray.900',
-      whiteSpace: 'pre-line',
-    },
+);
+
+const textAreaStyle = css({
+  position: 'relative',
+  minHeight: '8rem',
+});
+
+const textLayerStyle = css(
+  stack.raw({
+    position: 'absolute',
+    inset: 0,
+    gap: '0.25rem',
+    transition: 'opacity 500ms ease-out',
   }),
-  SlideDescription: styled('p', {
-    base: {
-      textStyle: 'body1.r',
-      color: 'gray.900',
-      whiteSpace: 'pre-line',
-    },
+);
+
+const slideTextStyle = css(
+  stack.raw({
+    gap: '0.75rem',
   }),
-};
+);
+
+const navButtonsStyle = css(
+  hstack.raw({
+    gap: '1.25rem',
+  }),
+);
+
+const slideIndexStyle = css({
+  fontStyle: 'body1.r',
+  color: 'gray.900',
+});
+
+const slideTitleStyle = css({
+  textStyle: 'h1',
+  color: 'gray.900',
+  whiteSpace: 'pre-line',
+});
+
+const slideDescriptionStyle = css({
+  textStyle: 'body1.r',
+  color: 'gray.900',
+  whiteSpace: 'pre-line',
+});
