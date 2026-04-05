@@ -123,7 +123,7 @@ export const PersonalLeftContainer = ({
                   className={pencilButtonStyle}
                   aria-label='세부 task 수정'
                 >
-                  <PencilIcon size={28} />
+                  <PencilIcon size={24} />
                 </button>
               )}
             </div>

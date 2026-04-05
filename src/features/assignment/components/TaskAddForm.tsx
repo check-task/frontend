@@ -129,7 +129,7 @@ const inputRowStyle = css({
 const datePickerWrapperStyle = css({
   display: 'flex',
   alignItems: 'center',
-  w: '11rem',
+  w: '10.5rem',
   ml:'1.5rem',
 });
 
