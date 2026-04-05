@@ -65,7 +65,7 @@ export const PersonalEtc = ({ taskId, items }: PersonalEtcProps) => {
       headerType: 'none',
       content: (
         <ConfirmDeleteAssignmentDataModal
-          highlightText='자료명(파일명.확장자 or URL 경로)'
+          highlightText={item.name}
           onConfirm={() => {
             deleteReference(item.id);
             closeModal();
