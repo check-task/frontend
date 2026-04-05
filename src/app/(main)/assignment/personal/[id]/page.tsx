@@ -12,8 +12,8 @@ export default function PersonalPage() {
   const taskId = Number(params?.id);
   // 개인 과제 상세 커스텀 훅 호출
   const { data, isLoading } = usePersonalTaskDetail(taskId);
-  // 헤더 높이 상태
-  const [headerHeight, setHeaderHeight] = useState(0);
+  // 수정 모드 상태 (오른쪽 영역도 비활성화하기 위해 page 레벨에서 관리)
+  const [isEditMode, setIsEditMode] = useState(false);
 
   if (isLoading || !data) {
     return (
@@ -34,12 +34,13 @@ export default function PersonalPage() {
           completionRate={data.progressRate}
           folderColorHex={data.folderColorHex}
           tasks={data.tasks}
-          onHeaderHeightChange={setHeaderHeight}
+          isEditMode={isEditMode}
+          onEditModeChange={setIsEditMode}
         />
         <PersonalRightContainer
           taskId={data.taskId}
           items={data.items}
-          headerHeight={headerHeight}
+          isEditMode={isEditMode}
         />
       </div>
     </div>

@@ -148,7 +148,7 @@ const TeamTaskList = ({
     );
 
   const handleStatusChange = (subTaskId: number, isChecked: boolean) => {
-    const status: UpdateSubTaskStatusRequestStatus = isChecked ? 'COMPLETED' : 'PROGRESS';
+    const status: UpdateSubTaskStatusRequestStatus = isChecked ? 'COMPLETED' : 'PENDING';
     mutateStatus({
       taskId,
       subTaskId,

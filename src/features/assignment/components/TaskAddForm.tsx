@@ -1,11 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import { css, cva } from 'styled-system/css';
+import { css } from 'styled-system/css';
+import { useUIStore } from '@/stores/ui-store';
 import { PlusIcon } from '@/components/icons/PlusIcon';
 import { Input } from '@/components/TextField';
-import { CheckMark } from '@/components/icons/CheckMark';
-import { CloseIcon } from '@/components/icons/CloseIcon';
+import { FormActionButtons } from '@/features/assignment/components/FormActionButtons';
 import DatePicker from '@/components/DatePicker';
 import { useCreateSubTask } from '@/hooks/mutations/useCreateSubTask';
 
@@ -18,6 +18,7 @@ interface TaskAddFormProps {
 const formatDate = (date: Date) => date.toLocaleDateString('en-CA');
 
 export const TaskAddForm = ({ taskId, maxDate }: TaskAddFormProps) => {
+  const isSidebarCollapsed = useUIStore((state) => state.isSidebarCollapsed);
   const [isAdding, setIsAdding] = useState(false);
   const [taskName, setTaskName] = useState('');
 
@@ -59,51 +60,35 @@ export const TaskAddForm = ({ taskId, maxDate }: TaskAddFormProps) => {
     <div className={taskAddWrapperStyle}>
       {!isAdding ? (
         <button className={taskAddButtonStyle} onClick={handleAddTask}>
-          <PlusIcon className={iconStyle} />
+          <PlusIcon size='1.25rem' color='gray.500' />
           <p className={taskAddButtonTextStyle}>세부과제 추가</p>
         </button>
       ) : (
         <div className={inputFormContainerStyle}>
           <div className={inputRowStyle}>
-            <Input
-              size='basic'
-              className={css({ flex: 1 })}
-              placeholder='TASK명을 입력하세요.'
-              value={taskName}
-              onChange={(e) => setTaskName(e.target.value)}
-              autoFocus
-            />
-            <DatePicker
-              value={selectedDate}
-              onChange={setSelectedDate}
-              maxDate={maxDate}
-            />
+            <div className={css({ flex: '1' })}>
+              <Input
+                size='basic'
+                className={css({ w: '100%' })}
+                placeholder='TASK명을 입력하세요.'
+                value={taskName}
+                onChange={(e) => setTaskName(e.target.value)}
+                autoFocus
+              />
+            </div>
+            <div className={datePickerWrapperStyle}>
+              <DatePicker
+                value={selectedDate}
+                onChange={setSelectedDate}
+                maxDate={maxDate}
+              />
+            </div>
           </div>
-          <div className={buttonGroupStyle}>
-            <button
-              className={buttonStyle({ type: 'save' })}
-              onClick={handleSaveTask}
-              disabled={isPending}
-            >
-              <div>
-                <CheckMark
-                  variant='blue'
-                  className={css({ width: '0.75rem', height: '0.75rem' })}
-                />
-              </div>
-              저장
-            </button>
-            <button
-              className={buttonStyle({ type: 'cancel' })}
-              onClick={handleCancelTask}
-              disabled={isPending}
-            >
-              <div>
-                <CloseIcon size={20} strokeWidth={1} color='gray.600' />
-              </div>
-              취소
-            </button>
-          </div>
+          <FormActionButtons
+            onSave={handleSaveTask}
+            onCancel={handleCancelTask}
+            isPending={isPending}
+          />
         </div>
       )}
     </div>
@@ -120,17 +105,10 @@ const taskAddButtonStyle = css({
   alignItems: 'center',
   gap: '0.25rem',
   cursor: 'pointer',
-  pr: '0.5rem',
 });
 
 const taskAddButtonTextStyle = css({
   textStyle: 'body3.r',
-  color: 'gray.500',
-});
-
-const iconStyle = css({
-  w: '1.25rem',
-  h: '1.25rem',
   color: 'gray.500',
 });
 
@@ -145,35 +123,14 @@ const inputRowStyle = css({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
-  gap: '1rem',
 });
 
-const buttonGroupStyle = css({
+
+const datePickerWrapperStyle = css({
   display: 'flex',
-  gap: '0.75rem',
+  alignItems: 'center',
+  w: '10.5rem',
+  ml:'1.5rem',
 });
 
-const buttonStyle = cva({
-  base: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '0.25rem',
-    padding: '0.5rem 1rem 0.5rem 0.7rem',
-    borderRadius: '2.5rem',
-    textStyle: 'body3.m',
-    cursor: 'pointer',
-    border: '1px solid',
-  },
-  variants: {
-    type: {
-      save: {
-        borderColor: 'blue.500',
-        color: 'blue.500',
-      },
-      cancel: {
-        borderColor: 'gray.100',
-        color: 'gray.600',
-      },
-    },
-  },
-});
+

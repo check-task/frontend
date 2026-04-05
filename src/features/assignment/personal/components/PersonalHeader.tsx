@@ -1,63 +1,66 @@
 'use client';
 
-import { FolderClassification } from '@/features/assignment/components/FolderClassification';
 import { CompletionProgressBar } from '@/features/assignment/components/CompletionProgressBar';
+import { PencilIcon } from '@/components/icons/PencilIcon';
+import { AssignmentEditModalContent, hexToFolderColor } from '@/components/AssignmentEditModal';
+import { useModalStore } from '@/stores/modal-store';
 import { css } from 'styled-system/css';
-import {
-  colorMap,
-  type FolderColor,
-} from '@/features/assignment/components/FolderClassification';
 
 interface HeaderProps {
   completionRate: number;
-  /** 폴더 색상 토큰 (01~05). folderColorHex 없을 때 사용 */
-  folderColor?: FolderColor;
-  /** 폴더 색상 HEX (상세 조회 API foldercolor). 있으면 이걸로 표시 */
   folderColorHex?: string;
   title: string;
   daysLeft: string;
+  // 마감일 - 모달 표시
+  deadline?: string;
 }
 
 export const PersonalHeader = ({
   completionRate,
-  folderColor = '01',
   folderColorHex,
   title,
   daysLeft,
+  deadline,
 }: HeaderProps) => {
-  const useHex = !!folderColorHex;
+  const { openModal } = useModalStore();
+  const folderColorToken = hexToFolderColor(folderColorHex) ?? '01';
+
+  const handleEditClick = () => {
+    openModal({
+      title: '과제 수정',
+      content: (
+        <AssignmentEditModalContent
+          initialTitle={title}
+          initialColor={folderColorToken}
+          initialDueDate={deadline}
+        />
+      ),
+      headerType: 'withClose',
+    });
+  };
+
   return (
     <div className={containerStyle}>
       <div className={titleStyle}>
         <div className={titleContentStyle}>
-          {useHex ? (
-            <div
-              className={css({
-                width: '2.5rem',
-                height: '2.5rem',
-                borderRadius: '50%',
-                flexShrink: 0,
-                marginTop: '0.2rem',
-              })}
-              style={{ backgroundColor: folderColorHex }}
-            />
-          ) : (
-            <div className={css({ flexShrink: 0, marginTop: '0.25rem' })}>
-              <FolderClassification color={folderColor} />
-            </div>
-          )}
+          <div
+            className={css({
+              width: '2.5rem',
+              height: '2.5rem',
+              borderRadius: '50%',
+              flexShrink: 0,
+            })}
+            style={{ backgroundColor: folderColorHex }}
+          />
           <p className={titleTextStyle}>{title}</p>
+          <button onClick={handleEditClick} style={{ cursor: 'pointer' }}>
+            <PencilIcon />
+          </button>
         </div>
 
         <p
-          className={css({
-            textStyle: 'h4',
-            flexShrink: 0,
-            whiteSpace: 'nowrap',
-            marginTop: '0.4rem',
-            ...(useHex ? {} : { color: colorMap[folderColor] }),
-          })}
-          style={useHex ? { color: folderColorHex } : undefined}
+          className={daysLeftStyle}
+          style={{ color: folderColorHex }}
         >
           {daysLeft}
         </p>
@@ -78,8 +81,7 @@ export const PersonalHeader = ({
 const containerStyle = css({
   display: 'flex',
   flexDirection: 'column',
-  gap: '1.88rem', // 제목과 완료율 사이 간격(아니면 1.75)
-  justifyContent: 'space-between',
+  gap: '1.75rem', 
   transition: 'all 0.3s ease-in-out',
   w: '100%',
 });
@@ -88,7 +90,7 @@ const containerStyle = css({
 const titleStyle = css({
   display: 'flex',
   justifyContent: 'space-between',
-  alignItems: 'flex-start',
+  alignItems: 'center',
   gap: '1rem',
 });
 
@@ -96,7 +98,7 @@ const titleStyle = css({
 const titleContentStyle = css({
   display: 'flex',
   gap: '0.75rem',
-  alignItems: 'flex-start',
+  alignItems: 'center',
   flex: 1,
   minWidth: 0,
 });
@@ -106,7 +108,13 @@ const titleTextStyle = css({
   textStyle: 'h2',
   color: 'gray.900',
   wordBreak: 'break-word',
-  flex: 1,
+  minWidth: 0,
+});
+
+const daysLeftStyle = css({
+  textStyle: 'h4',
+  flexShrink: 0,
+  whiteSpace: 'nowrap',
 });
 
 const completionRateStyle = css({

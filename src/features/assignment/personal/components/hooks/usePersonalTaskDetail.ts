@@ -26,8 +26,9 @@ const mapToPersonalView = (data: TaskDetail): PersonalTaskDetailView => {
     path: ref.url ?? ref.file_url ?? '',
   }));
 
-  // Task목록에 사용되는 데이터 형태에 맞게 매핑
-  const tasks: PersonalTaskItem[] = data.subTasks.map((task) => ({
+  const tasks: PersonalTaskItem[] = [...data.subTasks]
+    .sort((a, b) => a.subTaskId - b.subTaskId)
+    .map((task) => ({
     id: task.subTaskId,
     title: task.title,
     deadline: task.deadline,

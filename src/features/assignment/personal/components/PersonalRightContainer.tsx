@@ -1,9 +1,7 @@
 'use client';
 
-import { Button } from '@/components/Button';
 import { css } from 'styled-system/css';
 import { PersonalEtc } from './PersonalEtc';
-import Link from 'next/link';
 
 export interface ReferenceItem {
   id: number;
@@ -15,28 +13,21 @@ export interface ReferenceItem {
 interface PersonalRightContainerProps {
   taskId: number;
   items: ReferenceItem[];
-  headerHeight?: number;
+  isEditMode?: boolean;
 }
 
 // 페이지 기준 오른쪽 영역 (과제 수정버튼+자료 모음집)
 export const PersonalRightContainer = ({
   taskId,
   items,
-  headerHeight = 0,
+  isEditMode = false,
 }: PersonalRightContainerProps) => {
   return (
-    <div className={containerStyle}>
-      {/* 과제 수정에서 해당 과제를 조회하기 위해 taskId 전달 */}
-      <Link href={`/assignment/modify?taskId=${taskId}`}>
-        <Button variant='strokeBlue' size='small'>
-          과제수정
-        </Button>
-      </Link>
-      <div
-        style={{
-          marginTop: headerHeight ? `calc(${headerHeight}px - 0.8rem)` : '0',
-        }}
-      >
+    <div
+      className={containerStyle}
+      style={isEditMode ? { opacity: 0.4, pointerEvents: 'none' } : undefined}
+    >
+      <div style={{ marginTop: '9.6rem' }}>
         <PersonalEtc taskId={taskId} items={items} />
       </div>
     </div>
