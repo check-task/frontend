@@ -6,6 +6,8 @@ import { PersonalHeader } from './PersonalHeader';
 import { PersonalTaskList, type PersonalTaskItem } from './PersonalTaskList';
 import { PencilIcon } from '@/components/icons/PencilIcon';
 import { FormActionButtons } from '@/features/assignment/components/FormActionButtons';
+import { useModalStore } from '@/stores/modal-store';
+import { DeleteAllTaskConfirmModal } from '@/features/assignment/components/DeleteAllTaskConfirmModal';
 import { useState } from 'react';
 
 interface PersonalLeftContainerProps {
@@ -36,6 +38,7 @@ export const PersonalLeftContainer = ({
   onEditModeChange,
 }: PersonalLeftContainerProps) => {
   const isSidebarCollapsed = useUIStore((state) => state.isSidebarCollapsed);
+  const { openModal, closeModal } = useModalStore();
 
   // 수정 모드 로컬 상태 (편집 중 데이터)
   const [editedTitles, setEditedTitles] = useState<Record<number, string>>({});
@@ -58,9 +61,23 @@ export const PersonalLeftContainer = ({
     exitEditMode();
   };
 
-  const handleDeleteAll = () => {
+  const confirmDeleteAll = () => {
     // TODO: API 연동 (전체 삭제)
     exitEditMode();
+    closeModal();
+  };
+
+  const handleDeleteAll = () => {
+    openModal({
+      title: '세부 과제 삭제',
+      headerType: 'none',
+      content: (
+        <DeleteAllTaskConfirmModal
+          onConfirm={confirmDeleteAll}
+          onCancel={closeModal}
+        />
+      ),
+    });
   };
 
   const handleTitleChange = (id: number, title: string) => {
