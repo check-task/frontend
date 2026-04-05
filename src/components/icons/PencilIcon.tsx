@@ -1,6 +1,6 @@
 import { css } from 'styled-system/css';
 
-export const PencilIcon = () => {
+export const PencilIcon = ({ size = 28 }: { size?: number }) => {
   const iconStyle = css({
     stroke: 'gray.700',
     strokeWidth: '1.16667',
@@ -10,8 +10,8 @@ export const PencilIcon = () => {
   return (
     <svg
       xmlns='http://www.w3.org/2000/svg'
-      width='28'
-      height='28'
+      width={size}
+      height={size}
       viewBox='0 0 28 28'
       fill='none'
     >
