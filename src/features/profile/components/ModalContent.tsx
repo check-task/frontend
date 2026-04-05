@@ -1,8 +1,9 @@
-import { styled } from 'styled-system/jsx';
-import { stack, hstack } from 'styled-system/patterns';
+import type { ComponentPropsWithoutRef } from 'react';
+import { css, cva, cx } from 'styled-system/css';
+import { hstack, stack } from 'styled-system/patterns';
 
 // 모달 컨테이너
-const Container = styled('div', {
+const containerStyle = cva({
   base: stack.raw({
     paddingTop: '1.75rem',
     maxWidth: '24.125rem',
@@ -20,40 +21,36 @@ const Container = styled('div', {
 });
 
 // 메시지 섹션
-const MessageSection = styled('div', {
-  base: stack.raw({
+const messageSectionStyle = css(
+  stack.raw({
     gap: '0.5rem',
   }),
-});
+);
 
 // 제목 텍스트
-const Title = styled('p', {
-  base: {
-    textStyle: 'body2.m',
-    color: 'gray.800',
-  },
+const titleStyle = css({
+  textStyle: 'body2.m',
+  color: 'gray.800',
 });
 
 // 제목 (인라인 요소 포함용)
-const TitleInline = styled('p', {
-  base: hstack.raw({
+const titleInlineStyle = css(
+  hstack.raw({
     gap: '0.5rem',
     flexWrap: 'wrap',
     textStyle: 'body2.m',
     color: 'gray.800',
   }),
-});
+);
 
 // 설명 텍스트
-const Description = styled('p', {
-  base: {
-    textStyle: 'body3.m',
-    color: 'gray.600',
-  },
+const descriptionStyle = css({
+  textStyle: 'body3.m',
+  color: 'gray.600',
 });
 
 // 버튼 섹션
-const ButtonSection = styled('div', {
+const buttonSectionStyle = cva({
   base: stack.raw({
     gap: '1rem',
   }),
@@ -71,7 +68,7 @@ const ButtonSection = styled('div', {
 });
 
 // 폼 필드
-const FormField = styled('div', {
+const formFieldStyle = cva({
   base: stack.raw({}),
   variants: {
     gap: {
@@ -85,14 +82,71 @@ const FormField = styled('div', {
 });
 
 // 라벨
-const Label = styled('label', {
-  base: {
-    textStyle: 'body3.m',
-    color: 'gray.800',
-  },
+const labelStyle = css({
+  textStyle: 'body3.m',
+  color: 'gray.800',
 });
 
-// Modal 네임스페이스로 export
+type ContainerProps = ComponentPropsWithoutRef<'div'> & {
+  gap?: 'small' | 'medium' | 'large';
+};
+
+const Container = ({ className, gap, ...props }: ContainerProps) => (
+  <div className={cx(containerStyle({ gap }), className)} {...props} />
+);
+
+const MessageSection = ({
+  className,
+  ...props
+}: ComponentPropsWithoutRef<'div'>) => (
+  <div className={cx(messageSectionStyle, className)} {...props} />
+);
+
+const Title = ({ className, ...props }: ComponentPropsWithoutRef<'p'>) => (
+  <p className={cx(titleStyle, className)} {...props} />
+);
+
+const TitleInline = ({
+  className,
+  ...props
+}: ComponentPropsWithoutRef<'p'>) => (
+  <p className={cx(titleInlineStyle, className)} {...props} />
+);
+
+const Description = ({
+  className,
+  ...props
+}: ComponentPropsWithoutRef<'p'>) => (
+  <p className={cx(descriptionStyle, className)} {...props} />
+);
+
+type ButtonSectionProps = ComponentPropsWithoutRef<'div'> & {
+  marginTop?: 'none' | 'small' | 'medium' | 'large';
+};
+
+const ButtonSection = ({
+  className,
+  marginTop,
+  ...props
+}: ButtonSectionProps) => (
+  <div
+    className={cx(buttonSectionStyle({ marginTop }), className)}
+    {...props}
+  />
+);
+
+type FormFieldProps = ComponentPropsWithoutRef<'div'> & {
+  gap?: 'small' | 'medium';
+};
+
+const FormField = ({ className, gap, ...props }: FormFieldProps) => (
+  <div className={cx(formFieldStyle({ gap }), className)} {...props} />
+);
+
+const Label = ({ className, ...props }: ComponentPropsWithoutRef<'label'>) => (
+  <label className={cx(labelStyle, className)} {...props} />
+);
+
 export const Modal = {
   Container,
   MessageSection,

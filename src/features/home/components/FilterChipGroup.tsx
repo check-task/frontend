@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
-import { styled } from 'styled-system/jsx';
+import { cva, css } from 'styled-system/css';
 import { hstack } from 'styled-system/patterns';
 import { FolderColor } from '@/types/folder';
 
@@ -43,121 +43,115 @@ export const FilterChipGroup = ({
   };
 
   return (
-    <Container>
+    <div className={containerStyle}>
       {folders.map((folder) => (
-        <FilterChip
+        <div
           key={folder.folderId}
-          color={folder.folderColor}
-          active={selectedIds.includes(folder.folderId)}
+          className={chipWrapperStyle({
+            color: folder.folderColor,
+            active: selectedIds.includes(folder.folderId),
+          })}
           onClick={() => toggleFolder(folder.folderId)}
         >
-          {folder.folderName}
-        </FilterChip>
+          <div
+            className={chipDotStyle({
+              active: selectedIds.includes(folder.folderId),
+            })}
+          />
+          <span
+            className={chipTextStyle({
+              active: selectedIds.includes(folder.folderId),
+            })}
+          >
+            {folder.folderName}
+          </span>
+        </div>
       ))}
-    </Container>
+    </div>
   );
 };
 
-interface FilterChipProps {
-  children: React.ReactNode;
-  color: FolderColor;
-  active?: boolean;
-  onClick?: () => void;
-}
-
-const FilterChip = ({
-  children,
-  color,
-  active = false,
-  onClick,
-}: FilterChipProps) => (
-  <Chip.Wrapper active={active} color={color} onClick={onClick}>
-    <Chip.Dot active={active} />
-    <Chip.Text active={active}>{children}</Chip.Text>
-  </Chip.Wrapper>
-);
-
-const Container = styled('div', {
-  base: hstack.raw({
+const containerStyle = css(
+  hstack.raw({
     gap: '0.25rem',
     flexWrap: 'wrap',
   }),
+);
+
+const chipWrapperStyle = cva({
+  base: hstack.raw({
+    gap: '0.5rem',
+    padding: '0.5rem 0.75rem',
+    borderRadius: '6.25rem',
+    border: '1px solid',
+    cursor: 'pointer',
+    maxWidth: '8.9875rem', // 캘린더 넓이 기준으로 5개 들어갈 수 있게
+  }),
+  variants: {
+    color: {
+      red: {
+        '--chip-color-100': 'token(colors.sub.01.100)',
+        '--chip-color-40': 'token(colors.sub.01.40)',
+      },
+      yellow: {
+        '--chip-color-100': 'token(colors.sub.02.100)',
+        '--chip-color-40': 'token(colors.sub.02.40)',
+      },
+      green: {
+        '--chip-color-100': 'token(colors.sub.03.100)',
+        '--chip-color-40': 'token(colors.sub.03.40)',
+      },
+      purple: {
+        '--chip-color-100': 'token(colors.sub.04.100)',
+        '--chip-color-40': 'token(colors.sub.04.40)',
+      },
+      black: {
+        '--chip-color-100': 'token(colors.sub.05.100)',
+        '--chip-color-40': 'token(colors.sub.05.40)',
+      },
+    },
+    active: {
+      true: { borderColor: 'var(--chip-color-100)' },
+      false: { borderColor: 'var(--chip-color-40)' },
+    },
+  },
+  defaultVariants: {
+    active: false,
+  },
 });
 
-const Chip = {
-  Wrapper: styled('div', {
-    base: hstack.raw({
-      gap: '0.5rem',
-      padding: '0.5rem 0.75rem',
-      borderRadius: '6.25rem',
-      border: '1px solid',
-      cursor: 'pointer',
-      maxWidth: '8.9875rem', // 캘린더 넓이 기준으로 5개 들어갈 수 있게
-    }),
-    variants: {
-      color: {
-        red: {
-          '--chip-color-100': 'token(colors.sub.01.100)',
-          '--chip-color-40': 'token(colors.sub.01.40)',
-        },
-        yellow: {
-          '--chip-color-100': 'token(colors.sub.02.100)',
-          '--chip-color-40': 'token(colors.sub.02.40)',
-        },
-        green: {
-          '--chip-color-100': 'token(colors.sub.03.100)',
-          '--chip-color-40': 'token(colors.sub.03.40)',
-        },
-        purple: {
-          '--chip-color-100': 'token(colors.sub.04.100)',
-          '--chip-color-40': 'token(colors.sub.04.40)',
-        },
-        black: {
-          '--chip-color-100': 'token(colors.sub.05.100)',
-          '--chip-color-40': 'token(colors.sub.05.40)',
-        },
-      },
-      active: {
-        true: { borderColor: 'var(--chip-color-100)' },
-        false: { borderColor: 'var(--chip-color-40)' },
-      },
+const chipDotStyle = cva({
+  base: {
+    width: '1rem',
+    height: '1rem',
+    borderRadius: '50%',
+    flexShrink: 0,
+  },
+  variants: {
+    active: {
+      true: { bg: 'var(--chip-color-100)' },
+      false: { bg: 'var(--chip-color-40)' },
     },
-    defaultVariants: {
-      active: false,
+  },
+  defaultVariants: {
+    active: false,
+  },
+});
+
+const chipTextStyle = cva({
+  base: {
+    textStyle: 'body4.m',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+  },
+  variants: {
+    active: {
+      true: { color: 'gray.900' },
+      false: { color: 'gray.400' },
     },
-  }),
-  Dot: styled('div', {
-    base: {
-      width: '1rem',
-      height: '1rem',
-      borderRadius: '50%',
-      flexShrink: 0,
-    },
-    variants: {
-      active: {
-        true: { bg: 'var(--chip-color-100)' },
-        false: { bg: 'var(--chip-color-40)' },
-      },
-    },
-    defaultVariants: {
-      active: false,
-    },
-  }),
-  Text: styled('span', {
-    base: {
-      textStyle: 'body4.m',
-      overflow: 'hidden',
-      textOverflow: 'ellipsis',
-      whiteSpace: 'nowrap',
-    },
-    variants: {
-      active: {
-        true: { color: 'gray.900' },
-        false: { color: 'gray.400' },
-      },
-    },
-    defaultVariants: {
-      active: false,
-    },
-  }),
-};
+  },
+  defaultVariants: {
+    active: false,
+  },
+});

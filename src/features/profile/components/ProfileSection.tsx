@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import { styled } from 'styled-system/jsx';
+import { css } from 'styled-system/css';
 import { hstack, stack } from 'styled-system/patterns';
 import { Card } from '@/features/profile/components/Card';
 import { EditProfileButton } from '@/features/profile/components/EditProfileButton';
@@ -26,110 +26,132 @@ export const ProfileSection = () => {
   const { user } = data;
 
   return (
-    <Layout.Section>
-      <Text.Title>프로필 설정</Text.Title>
+    <section className={layoutSectionStyle}>
+      <h1 className={titleStyle}>프로필 설정</h1>
 
       <Card type='profile'>
-        <Profile.ImageSection>
+        <div className={profileImageSectionStyle}>
           {user.profileImage ? (
-            <Profile.ImageActual src={user.profileImage} alt={user.nickname} />
+            <img
+              className={profileImageActualStyle}
+              src={user.profileImage}
+              alt={user.nickname}
+            />
           ) : (
-            <Profile.ImageDefault />
+            <div className={profileImageDefaultStyle} />
           )}
-          <Profile.Name>{user.nickname}</Profile.Name>
-        </Profile.ImageSection>
+          <p className={profileNameStyle}>{user.nickname}</p>
+        </div>
 
-        <Divider />
+        <div className={dividerStyle} />
 
-        <Profile.InfoSection>
-          <Profile.BasicInfo>
-            <Text.SectionTitle>기본정보</Text.SectionTitle>
-            <Profile.InfoContent>
+        <div className={profileInfoSectionStyle}>
+          <div className={profileBasicInfoStyle}>
+            <h3 className={sectionTitleStyle}>기본정보</h3>
+            <div className={profileInfoContentStyle}>
               {[
                 { label: '연락처', value: user.phoneNum },
                 { label: '이메일', value: user.email },
               ].map((info) => (
-                <Profile.InfoRow key={info.label}>
-                  <Text.Label>{info.label}</Text.Label>
-                  <Text.Value>{info.value}</Text.Value>
-                </Profile.InfoRow>
+                <div key={info.label} className={profileInfoRowStyle}>
+                  <span className={labelStyle}>{info.label}</span>
+                  <span className={valueStyle}>{info.value}</span>
+                </div>
               ))}
-            </Profile.InfoContent>
-          </Profile.BasicInfo>
+            </div>
+          </div>
           <EditProfileButton user={user} />
-        </Profile.InfoSection>
+        </div>
       </Card>
-    </Layout.Section>
+    </section>
   );
 };
 
 // 레이아웃
-const Layout = {
-  Section: styled('section', {
-    base: stack.raw({ gap: '0.75rem' }),
+const layoutSectionStyle = css(
+  stack.raw({
+    gap: '0.75rem',
   }),
-};
+);
 
 // 텍스트 스타일
-const Text = {
-  Title: styled('h1', {
-    base: { textStyle: 'h3', color: 'gray.900' },
-  }),
-  SectionTitle: styled('h3', {
-    base: { textStyle: 'h4', color: 'gray.900' },
-  }),
-  Label: styled('span', {
-    base: { textStyle: 'body1.r', color: 'gray.400', width: '3.4375rem' },
-  }),
-  Value: styled('span', {
-    base: { textStyle: 'body1.m', color: 'gray.700' },
-  }),
-};
+const titleStyle = css({
+  textStyle: 'h3',
+  color: 'gray.900',
+});
+
+const sectionTitleStyle = css({
+  textStyle: 'h4',
+  color: 'gray.900',
+});
+
+const labelStyle = css({
+  textStyle: 'body1.r',
+  color: 'gray.400',
+  width: '3.4375rem',
+});
+
+const valueStyle = css({
+  textStyle: 'body1.m',
+  color: 'gray.700',
+});
 
 // 프로필 섹션 스타일
-const Profile = {
-  ImageSection: styled('div', {
-    base: stack.raw({ gap: '1.5rem', alignItems: 'center' }),
+const profileImageSectionStyle = css(
+  stack.raw({
+    gap: '1.5rem',
+    alignItems: 'center',
   }),
-  ImageDefault: styled('div', {
-    base: {
-      width: '10rem',
-      height: '10rem',
-      borderRadius: '50%',
-      bg: 'blue.100',
-    },
+);
+
+const profileImageDefaultStyle = css({
+  width: '10rem',
+  height: '10rem',
+  borderRadius: '50%',
+  bg: 'blue.100',
+});
+
+const profileImageActualStyle = css({
+  width: '10rem',
+  height: '10rem',
+  borderRadius: '50%',
+  objectFit: 'cover',
+});
+
+const profileNameStyle = css({
+  textStyle: 'body1.m',
+  color: 'gray.900',
+});
+
+const profileInfoSectionStyle = css(
+  stack.raw({
+    gap: '2.5rem',
+    flex: 1,
   }),
-  ImageActual: styled('img', {
-    base: {
-      width: '10rem',
-      height: '10rem',
-      borderRadius: '50%',
-      objectFit: 'cover',
-    },
+);
+
+const profileBasicInfoStyle = css(
+  stack.raw({
+    gap: '1.75rem',
   }),
-  Name: styled('p', {
-    base: { textStyle: 'body1.m', color: 'gray.900' },
+);
+
+const profileInfoContentStyle = css(
+  stack.raw({
+    gap: '1.5rem',
   }),
-  InfoSection: styled('div', {
-    base: stack.raw({ gap: '2.5rem', flex: 1 }),
+);
+
+const profileInfoRowStyle = css(
+  hstack.raw({
+    gap: '1.5rem',
   }),
-  BasicInfo: styled('div', {
-    base: stack.raw({ gap: '1.75rem' }),
-  }),
-  InfoContent: styled('div', {
-    base: stack.raw({ gap: '1.5rem' }),
-  }),
-  InfoRow: styled('div', {
-    base: hstack.raw({ gap: '1.5rem' }),
-  }),
-};
+);
 
 // 구분선
-const Divider = styled('div', {
-  base: {
-    width: '1px',
-    height: '13.625rem',
-    bg: 'gray.200',
-    alignSelf: 'center',
-  },
+const dividerStyle = css({
+  width: '1px',
+  height: '13.625rem',
+  bg: 'gray.200',
+  alignSelf: 'center',
 });

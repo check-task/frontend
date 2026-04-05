@@ -1,6 +1,6 @@
 'use client';
 
-import { styled } from 'styled-system/jsx';
+import { css } from 'styled-system/css';
 import { useModalStore } from '@/stores/modal-store';
 import { WithdrawalModalContent } from './WithdrawalModalContent';
 
@@ -16,36 +16,30 @@ export const WithdrawalButton = () => {
   };
 
   return (
-    <UnderlineLink onClick={handleOpen}>
-      <LinkText>회원탈퇴</LinkText>
-      <Underline />
-    </UnderlineLink>
+    <button className={underlineLinkStyle} onClick={handleOpen}>
+      <span className={linkTextStyle}>회원탈퇴</span>
+      <span className={underlineStyle} />
+    </button>
   );
 };
 
-const UnderlineLink = styled('button', {
-  base: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '0.25rem',
-    textStyle: 'body4.m',
-    color: 'gray.500',
-    cursor: 'pointer',
-    alignSelf: 'flex-start',
-  },
+const underlineLinkStyle = css({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '0.25rem',
+  textStyle: 'body4.m',
+  color: 'gray.500',
+  cursor: 'pointer',
+  alignSelf: 'flex-start',
 });
 
-const LinkText = styled('span', {
-  base: {
-    textStyle: 'body4.m',
-    color: 'gray.400',
-  },
+const linkTextStyle = css({
+  textStyle: 'body4.m',
+  color: 'gray.400',
 });
 
-const Underline = styled('span', {
-  base: {
-    width: '100%',
-    height: '0.0625rem',
-    bg: 'gray.400',
-  },
+const underlineStyle = css({
+  width: '100%',
+  height: '0.0625rem',
+  bg: 'gray.400',
 });
