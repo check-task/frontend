@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Checkbox } from '@/components/Checkbox';
+import { Input } from '@/components/TextField';
 import { css, cva } from 'styled-system/css';
 import { ClockToggle } from '../../components/ClockToggle';
 import DatePicker from '@/components/DatePicker';
@@ -8,19 +9,24 @@ import { useUpdateSubTaskStatus } from './hooks/useUpdateSubTaskStatus';
 import { useUpdateSubTaskAlarm } from './hooks/useUpdateSubTaskAlarm';
 import { SubTaskStatus } from '@/types/task';
 import { TaskAddForm } from '@/features/assignment/components/TaskAddForm';
+import { CloseIcon } from '@/components/icons/CloseIcon';
 
 export interface PersonalTaskItem {
   id: number;
   title: string;
   deadline: string;
   isAlarm: boolean;
-  status: SubTaskStatus; // 'PROGRESS' | 'COMPLETED' 상태 추가
+  status: SubTaskStatus;
 }
 
 interface PersonalTaskListProps {
   taskId: number;
   tasks: PersonalTaskItem[];
   maxDate?: string | Date;
+  isEditMode?: boolean;
+  editedTitles?: Record<number, string>;
+  onTitleChange?: (id: number, title: string) => void;
+  onDeleteTask?: (id: number) => void;
 }
 
 // Api형태에 맞게 Date형태를 YYYY-MM-DD 문자열로 변환
@@ -31,6 +37,10 @@ export const PersonalTaskList = ({
   taskId,
   tasks,
   maxDate,
+  isEditMode = false,
+  editedTitles = {},
+  onTitleChange,
+  onDeleteTask,
 }: PersonalTaskListProps) => {
   // 세부 task 마감일 변경 훅 호출
   const { mutate: mutateDeadline } = useUpdateSubTaskDeadline(taskId);
@@ -68,50 +78,87 @@ export const PersonalTaskList = ({
       ) : (
         <div className={PersonalTaskListStyle}>
           {tasks.map((task) => {
-            // 완료 여부를 UI에서 사용하기 위함
             const isCompleted = task.status === 'COMPLETED';
 
             return (
               <div key={task.id} className={PersonalTaskItemContainerStyle}>
-                {/* 왼쪽: 체크박스 + 제목 */}
+                {/* 왼쪽: [일반] 체크박스 + 제목 / [수정] Input */}
                 <div className={PersonalTaskItemLeftStyle}>
-                  <div className={checkboxWrapperStyle}>
-                    <Checkbox
-                      checked={isCompleted}
-                      variant='black'
-                      onChange={(event) =>
-                        handleStatusChange(task.id, event.target.checked)
-                      }
+                  {isEditMode ? (
+                    <Input
+                      size='basic'
+                      width='100%'
+                      value={editedTitles[task.id] ?? task.title}
+                      onChange={(e) => onTitleChange?.(task.id, e.target.value)}
+                      className={css({ flex: 1 })}
                     />
-                  </div>
-                  <p className={taskTextStyle({ completed: isCompleted })}>
-                    {task.title}
-                  </p>
+                  ) : (
+                    <>
+                      <div className={checkboxWrapperStyle}>
+                        <Checkbox
+                          checked={isCompleted}
+                          variant='black'
+                          onChange={(event) =>
+                            handleStatusChange(task.id, event.target.checked)
+                          }
+                        />
+                      </div>
+                      <p className={taskTextStyle({ completed: isCompleted })}>
+                        {task.title}
+                      </p>
+                    </>
+                  )}
                 </div>
 
-                {/* 오른쪽: 달력 + 시계토글 */}
-                <div className={teamTaskItemRightStyle}>
-                  <div className={rightContentWrapperStyle}>
+                {/* 오른쪽: 달력 + 시계토글 (+ 수정모드: 삭제 아이콘) */}
+                <div className={css({ display: 'flex', alignItems: 'center', flexShrink: 0, ...(isEditMode && { ml: '1.25rem' }) })}>
+                  <div
+                    className={css({
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: isEditMode ? '0.5rem' : '1rem',
+                      ...(isEditMode && { opacity: 0.4, pointerEvents: 'none' }),
+                    })}
+                  >
                     <DatePicker
                       value={task.deadline}
                       onChange={handleDeadlineChange(task.id)}
                       muted={isCompleted}
                       maxDate={maxDate}
                     />
-                    {/* 시계 아이콘은 꺼짐으로 시작됨  */}
                     <ClockToggle
                       muted={isCompleted}
                       isOn={alarmStateMap[task.id] ?? task.isAlarm}
                       onToggle={handleAlarmToggle(task.id)}
                     />
                   </div>
+                  {/* 수정 모드에서만 삭제 버튼 렌더 */}
+                  {isEditMode && (
+                    <button
+                      type='button'
+                      onClick={() => onDeleteTask?.(task.id)}
+                      className={css({
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        cursor: 'pointer',
+                        border: 'none',
+                        padding: 0,
+                        bg: 'transparent',
+                        ml: '0.75rem',
+                        flexShrink: 0,
+                      })}
+                    >
+                      <CloseIcon size={28} strokeWidth={1} color='gray.900' />
+                    </button>
+                  )}
                 </div>
               </div>
             );
           })}
         </div>
       )}
-      <TaskAddForm taskId={taskId} maxDate={maxDate} />
+      {!isEditMode && <TaskAddForm taskId={taskId} maxDate={maxDate} />}
     </div>
   );
 };
@@ -132,7 +179,7 @@ const PersonalTaskListContainerStyle = css({
 const PersonalTaskListStyle = css({
   display: 'flex',
   flexDirection: 'column',
-  gap: '1.75rem', // 각 리스트 사이 간격
+  gap: '1.75rem',
 });
 
 // 리스트 비어 있을 때 문구 스타일
@@ -144,22 +191,24 @@ const emptyStateStyle = css({
 // 각 리스트를 왼쪽 오른쪽으로 구분
 const PersonalTaskItemContainerStyle = css({
   display: 'flex',
+  alignItems: 'center',
   justifyContent: 'space-between',
 });
 
-// 각 리스트에서 왼쪽 (체크박스+ 과제명)
+// 각 리스트에서 왼쪽 (체크박스+제목 or Input)
 const PersonalTaskItemLeftStyle = css({
   display: 'flex',
-    gap: '0.75rem', // 체크박스랑 task 제목 간격
-    flex: 1, 
-    alignItems: 'center',
+  gap: '0.75rem',
+  flex: 1,
+  alignItems: 'center',
 });
 
 const taskTextStyle = cva({
   base: {
     textStyle: 'body1.m',
     color: 'gray.900',
-    wordBreak: 'break-word', 
+    wordBreak: 'break-word',
+    flex: 1,
   },
   variants: {
     completed: {
@@ -182,17 +231,12 @@ const taskTextStyle = cva({
 const checkboxWrapperStyle = css({
   display: 'flex',
   marginTop: '-0.1rem',
+  flexShrink: 1,
 });
 
 // 각 리스트에서 오른쪽 영역
 const teamTaskItemRightStyle = css({
   display: 'flex',
   alignItems: 'center',
-});
-
-// 달력 왼쪽 시계 오른쪽으로 가도록
-const rightContentWrapperStyle = css({
-  display: 'flex',
-  alignItems: 'center',
-  gap: '1.5rem', 
+  flexShrink: 1,
 });

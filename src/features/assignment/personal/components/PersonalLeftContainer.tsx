@@ -4,7 +4,9 @@ import { css, cva } from 'styled-system/css';
 import { useUIStore } from '@/stores/ui-store';
 import { PersonalHeader } from './PersonalHeader';
 import { PersonalTaskList, type PersonalTaskItem } from './PersonalTaskList';
-import { useRef, useEffect } from 'react';
+import { PencilIcon } from '@/components/icons/PencilIcon';
+import { FormActionButtons } from '@/features/assignment/components/FormActionButtons';
+import { useState } from 'react';
 
 interface PersonalLeftContainerProps {
   // 헤더 정보
@@ -16,8 +18,9 @@ interface PersonalLeftContainerProps {
   taskId: number;
   // task 목록
   tasks: PersonalTaskItem[];
-  // 헤더 높이 콜백
-  onHeaderHeightChange?: (height: number) => void;
+  // 수정 모드 (page 레벨에서 관리)
+  isEditMode?: boolean;
+  onEditModeChange?: (value: boolean) => void;
 }
 
 // 페이지 기준 왼쪽 영역 (헤더+ task 목록)
@@ -29,22 +32,56 @@ export const PersonalLeftContainer = ({
   folderColorHex,
   taskId,
   tasks,
-  onHeaderHeightChange,
+  isEditMode = false,
+  onEditModeChange,
 }: PersonalLeftContainerProps) => {
   const isSidebarCollapsed = useUIStore((state) => state.isSidebarCollapsed);
-  const headerRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    if (headerRef.current && onHeaderHeightChange) {
-      const height = headerRef.current.offsetHeight;
-      onHeaderHeightChange(height);
-    }
-  }, [title, completionRate, onHeaderHeightChange]);
+  // 수정 모드 로컬 상태 (편집 중 데이터)
+  const [editedTitles, setEditedTitles] = useState<Record<number, string>>({});
+  const [deletedTaskIds, setDeletedTaskIds] = useState<Set<number>>(new Set());
+
+  const enterEditMode = () => {
+    onEditModeChange?.(true);
+    setEditedTitles({});
+    setDeletedTaskIds(new Set());
+  };
+
+  const exitEditMode = () => {
+    onEditModeChange?.(false);
+    setEditedTitles({});
+    setDeletedTaskIds(new Set());
+  };
+
+  const handleSave = () => {
+    // TODO: API 연동 (editedTitles로 변경된 제목 저장, deletedTaskIds로 삭제 처리)
+    exitEditMode();
+  };
+
+  const handleDeleteAll = () => {
+    // TODO: API 연동 (전체 삭제)
+    exitEditMode();
+  };
+
+  const handleTitleChange = (id: number, title: string) => {
+    setEditedTitles((prev) => ({ ...prev, [id]: title }));
+  };
+
+  const handleDeleteTask = (id: number) => {
+    setDeletedTaskIds((prev) => new Set(prev).add(id));
+  };
+
+  const visibleTasks = tasks.filter((t) => !deletedTaskIds.has(t.id));
 
   return (
     <div className={containerStyle({ collapsed: isSidebarCollapsed })}>
       <div className={contentWrapperStyle}>
-        <div ref={headerRef} style={{ width: '100%' }}>
+        <div
+          style={{
+            width: '100%',
+            ...(isEditMode && { opacity: 0.4, pointerEvents: 'none' }),
+          }}
+        >
           <PersonalHeader
             completionRate={completionRate}
             title={title}
@@ -53,11 +90,44 @@ export const PersonalLeftContainer = ({
             folderColorHex={folderColorHex}
           />
         </div>
+
+        {/* task 목록 영역 */}
         <div className={taskContainerStyle}>
-          <h2 className={css({ textStyle: 'h4', color: 'gray.900' })}>
-            TASK 목록
-          </h2>
-          <PersonalTaskList taskId={taskId} tasks={tasks} maxDate={deadline} />
+          {/* 제목 + 연필 아이콘 / 편집 버튼 바 */}
+          <div className={taskHeaderStyle({ editMode: isEditMode })}>
+            <div className={css({ display: 'flex', alignItems: 'center', gap: '0.5rem' })}>
+              <h2 className={css({ textStyle: 'h4', color: 'gray.900' })}>
+                세부 TASK
+              </h2>
+              {!isEditMode && (
+                <button
+                  type='button'
+                  onClick={enterEditMode}
+                  className={pencilButtonStyle}
+                  aria-label='세부 task 수정'
+                >
+                  <PencilIcon size={28} />
+                </button>
+              )}
+            </div>
+            <div className={css({ visibility: isEditMode ? 'visible' : 'hidden' })}>
+              <FormActionButtons
+                onSave={handleSave}
+                onCancel={exitEditMode}
+                onDeleteAll={handleDeleteAll}
+              />
+            </div>
+          </div>
+
+          <PersonalTaskList
+            taskId={taskId}
+            tasks={visibleTasks}
+            maxDate={deadline}
+            isEditMode={isEditMode}
+            editedTitles={editedTitles}
+            onTitleChange={handleTitleChange}
+            onDeleteTask={handleDeleteTask}
+          />
         </div>
       </div>
     </div>
@@ -93,12 +163,39 @@ const contentWrapperStyle = css({
   flexDirection: 'column',
   width: '100%',
   alignItems: 'flex-start',
-  gap: '2.38rem', // 헤더와 task목록 사이의 간격
+  gap: '2.38rem',
 });
 
 const taskContainerStyle = css({
   display: 'flex',
   flexDirection: 'column',
-  gap: '1.25rem', // task목록 제목과 리스트 사이 간격
+  gap: '1.25rem',
   width: '100%',
+});
+
+// 세부 TASK 제목 + 연필/버튼 row
+const taskHeaderStyle = cva({
+  base: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '100%',
+  },
+  variants: {
+    editMode: {
+      true: {},
+      false: {},
+    },
+  },
+});
+
+const pencilButtonStyle = css({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  bg: 'transparent',
+  border: 'none',
+  cursor: 'pointer',
+  padding: 0,
+  flexShrink: 0,
 });
