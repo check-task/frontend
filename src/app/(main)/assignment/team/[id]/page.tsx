@@ -80,7 +80,6 @@ export default function TeamAssignmentDetailPage() {
               daysLeft={data.dDay}
               completionRate={data.progressRate}
               folderColorHex={data.foldercolor}
-              showEditButton={false}
             />
           </div>
           <TeamHeaderButton taskId={data.taskId} />

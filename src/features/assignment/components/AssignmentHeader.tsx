@@ -13,8 +13,6 @@ interface AssignmentHeaderProps {
   daysLeft: string;
   /** 마감일 - 수정 모달에서 사용 */
   deadline?: string;
-  /** 연필 아이콘(수정 버튼) 표시 여부. 기본값: true */
-  showEditButton?: boolean;
 }
 
 export const AssignmentHeader = ({
@@ -23,7 +21,6 @@ export const AssignmentHeader = ({
   title,
   daysLeft,
   deadline,
-  showEditButton = true,
 }: AssignmentHeaderProps) => {
   const { openModal } = useModalStore();
   const folderColorToken = hexToFolderColor(folderColorHex) ?? '01';
@@ -56,11 +53,9 @@ export const AssignmentHeader = ({
             style={{ backgroundColor: folderColorHex }}
           />
           <p className={titleTextStyle}>{title}</p>
-          {showEditButton && (
-            <button onClick={handleEditClick} style={{ cursor: 'pointer' }}>
-              <PencilIcon />
-            </button>
-          )}
+          <button onClick={handleEditClick} style={{ cursor: 'pointer' }}>
+            <PencilIcon />
+          </button>
         </div>
 
         <p className={daysLeftStyle} style={{ color: folderColorHex }}>
