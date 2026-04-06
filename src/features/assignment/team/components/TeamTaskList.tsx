@@ -396,9 +396,9 @@ const TeamTaskList = ({
                     </div>
                   </div>
                   <div
-                    className={managerContainerStyle({ checked: isCompleted })}
+                    className={managerContainerStyle}
                   >
-                    <p className={managerLabelStyle({ checked: isCompleted })}>
+                    <p className={managerLabelStyle}>
                       담당:
                     </p>
                     <TeamTaskManager
@@ -652,46 +652,15 @@ const taskComponentsStyle = css({
   gap: '1.25rem',
 });
 
-const managerContainerStyle = cva({
-  base: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '0.5rem',
-    transition: 'opacity 0.2s ease',
-  },
-  variants: {
-    checked: {
-      true: {
-        opacity: 0.4,
-      },
-      false: {
-        opacity: 1,
-      },
-    },
-  },
-  defaultVariants: {
-    checked: false,
-  },
+const managerContainerStyle = css({
+  display: 'flex',
+  alignItems: 'center',
+  gap: '0.5rem',
 });
 
-const managerLabelStyle = cva({
-  base: {
-    textStyle: 'body3',
-    transition: 'color 0.2s ease',
-  },
-  variants: {
-    checked: {
-      true: {
-        color: 'gray.400',
-      },
-      false: {
-        color: 'gray.600',
-      },
-    },
-  },
-  defaultVariants: {
-    checked: false,
-  },
+const managerLabelStyle = css({
+  textStyle: 'body3.r',
+  color: 'gray.600',
 });
 
 const commentSectionStyle = css({
@@ -774,7 +743,7 @@ const commentItemHeaderProfileStyle = css({
 });
 
 const commentItemHeaderCommentStyle = css({
-  textStyle: 'body3',
+  textStyle: 'body3.r',
   color: 'gray.700',
   ml: '0.125rem',
 });
