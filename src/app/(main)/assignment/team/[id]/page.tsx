@@ -1,11 +1,14 @@
 'use client';
 
+import { useState } from 'react';
 import { useParams } from 'next/navigation';
 import { Divider } from '@/components/Divider';
 import { AssignmentHeader } from '@/features/assignment/components/AssignmentHeader';
 import { TeamHeaderButton } from '@/features/assignment/team/components/TeamHeaderButtonGroup';
 import { TeamEtc } from '@/features/assignment/team/components/TeamEtc';
 import TeamTaskList from '@/features/assignment/team/components/TeamTaskList';
+import { PencilIcon } from '@/components/icons/PencilIcon';
+import { FormActionButtons } from '@/features/assignment/components/FormActionButtons';
 import { css } from 'styled-system/css';
 import { useTeamTaskDetail } from '@/features/assignment/team/components/hooks/useTeamTaskDetail';
 import { useTaskRoomSocket } from '@/features/assignment/team/hooks/useTaskRoomSocket';
@@ -23,6 +26,20 @@ export default function TeamAssignmentDetailPage() {
   const headerWidth = isSidebarCollapsed ? HEADER_WIDTH_COLLAPSED : HEADER_WIDTH_EXPANDED;
   const contentWidth = isSidebarCollapsed ? CONTENT_WIDTH_COLLAPSED : CONTENT_WIDTH_EXPANDED;
   const { data, isLoading, isError, error } = useTeamTaskDetail(taskId);
+  const [isEditMode, setIsEditMode] = useState(false);
+
+  const enterEditMode = () => setIsEditMode(true);
+  const exitEditMode = () => setIsEditMode(false);
+
+  const handleSave = () => {
+    // TODO: API 연동
+    exitEditMode();
+  };
+
+  const handleDeleteAll = () => {
+    // TODO: API 연동 (전체 삭제)
+    exitEditMode();
+  };
 
   useTaskRoomSocket(taskId);
 
@@ -86,9 +103,30 @@ export default function TeamAssignmentDetailPage() {
         </div>
 
         <div className={taskContainerStyle}>
-          <h2 className={css({ textStyle: 'h4', color: 'gray.900' })}>
-            TASK 목록
-          </h2>
+          <div className={taskHeaderStyle}>
+            <div className={css({ display: 'flex', alignItems: 'center', gap: '0.5rem' })}>
+              <h2 className={css({ textStyle: 'h4', color: 'gray.900' })}>
+                세부 TASK
+              </h2>
+              {!isEditMode && (
+                <button
+                  type='button'
+                  onClick={enterEditMode}
+                  className={css({cursor: 'pointer'})}
+                  aria-label='세부 task 수정'
+                >
+                  <PencilIcon size={24} />
+                </button>
+              )}
+            </div>
+            <div className={css({ visibility: isEditMode ? 'visible' : 'hidden' })}>
+              <FormActionButtons
+                onSave={handleSave}
+                onCancel={exitEditMode}
+                onDeleteAll={handleDeleteAll}
+              />
+            </div>
+          </div>
           <TeamTaskList
             taskId={data.taskId}
             subTasks={data.subTasks}
@@ -137,3 +175,11 @@ const taskContainerStyle = css({
   gap: '1.25rem',
   width: '100%',
 });
+
+const taskHeaderStyle = css({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  width: '100%',
+});
+
