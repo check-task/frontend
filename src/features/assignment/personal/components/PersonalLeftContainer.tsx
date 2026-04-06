@@ -2,7 +2,7 @@
 
 import { css, cva } from 'styled-system/css';
 import { useUIStore } from '@/stores/ui-store';
-import { PersonalHeader } from './PersonalHeader';
+import { AssignmentHeader } from '@/features/assignment/components/AssignmentHeader';
 import { PersonalTaskList, type PersonalTaskItem } from './PersonalTaskList';
 import { PencilIcon } from '@/components/icons/PencilIcon';
 import { FormActionButtons } from '@/features/assignment/components/FormActionButtons';
@@ -99,7 +99,7 @@ export const PersonalLeftContainer = ({
             ...(isEditMode && { opacity: 0.4, pointerEvents: 'none' }),
           }}
         >
-          <PersonalHeader
+          <AssignmentHeader
             completionRate={completionRate}
             title={title}
             daysLeft={daysLeft}
