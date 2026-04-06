@@ -349,8 +349,9 @@ const TeamTaskList = ({
     <div className={teamTaskListContainerStyle}>
       <div className={teamTaskListStyle}>
         {subTasks.length > 0 ? (
-          subTasks.map((task) => {
-            const isCompleted = task.status === 'COMPLETED';
+          subTasks.map((task, index) => {
+            // const isCompleted = task.status === 'COMPLETED';
+            const isCompleted = index === 0 ? true : task.status === 'COMPLETED'; // TODO: 테스트용 - 삭제 필요 index 부분
             const commentOpen = openComments[task.subTaskId] ?? false;
             const comments = getDisplayComments(task);
             return (
@@ -371,7 +372,7 @@ const TeamTaskList = ({
                       </p>
                     </div>
                     <div
-                      className={taskComponentsStyle({ checked: isCompleted })}
+                      className={taskComponentsStyle}
                     >
                       <DatePicker
                         value={task.deadline}
@@ -390,6 +391,7 @@ const TeamTaskList = ({
                         isOpen={commentOpen}
                         onClick={() => handleCommentToggle(task.subTaskId)}
                         commentCount={comments.length}
+                        muted={isCompleted}
                       />
                     </div>
                   </div>
@@ -577,7 +579,8 @@ const teamTaskListContainerStyle = css({
   flexDirection: 'column',
   p: '1.5rem',
   borderRadius: '0.75rem',
-  shadow: '0px 1px 4px 0px #00000029',
+  bg: 'bg',
+  shadow: '0 1px 4px 0 rgba(0, 0, 0, 0.16)',
 });
 
 const teamTaskListStyle = css({
@@ -590,7 +593,7 @@ const teamTaskItemTitleStyle = css({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
-  width: '46.125rem',
+  width: '46.5rem',
 });
 
 const teamTaskItemCheckTitleStyle = css({
@@ -643,26 +646,10 @@ const taskTextStyle = cva({
   },
 });
 
-const taskComponentsStyle = cva({
-  base: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '2rem',
-    transition: 'opacity 0.2s ease',
-  },
-  variants: {
-    checked: {
-      true: {
-        opacity: 0.4,
-      },
-      false: {
-        opacity: 1,
-      },
-    },
-  },
-  defaultVariants: {
-    checked: false,
-  },
+const taskComponentsStyle = css({
+  display: 'flex',
+  alignItems: 'center',
+  gap: '1.25rem',
 });
 
 const managerContainerStyle = cva({
