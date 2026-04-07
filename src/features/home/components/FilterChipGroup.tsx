@@ -109,6 +109,10 @@ const chipWrapperStyle = cva({
         '--chip-color-100': 'token(colors.sub.05.100)',
         '--chip-color-40': 'token(colors.sub.05.40)',
       },
+      null: {
+        '--chip-color-100': 'token(colors.null)',
+        '--chip-color-40': 'token(colors.null)',
+      },
     },
     active: {
       true: { borderColor: 'var(--chip-color-100)' },
