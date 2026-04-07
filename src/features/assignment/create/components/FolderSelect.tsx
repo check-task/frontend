@@ -11,6 +11,7 @@ const FOLDER_COLOR_TOKEN: Record<Folder['color'], string> = {
   green: 'sub.03.100',
   purple: 'sub.04.100',
   black: 'sub.05.100',
+  null: 'null',
 };
 
 interface FolderSelectProps {
@@ -26,7 +27,7 @@ export const FolderSelect = ({
 }: FolderSelectProps) => {
   return (
     <div className={containerStyle}>
-      {folders.map((folder) => {
+      {folders.filter((folder) => folder.name !== '지정안함').map((folder) => {
         const token = FOLDER_COLOR_TOKEN[folder.color];
         const isSelected = selectedFolderId === folder.id;
         return (

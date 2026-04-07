@@ -5,6 +5,7 @@ export const FOLDER_COLORS = [
   'green',
   'purple',
   'black',
+  'null',
 ] as const;
 
 export type FolderColor = (typeof FOLDER_COLORS)[number];
