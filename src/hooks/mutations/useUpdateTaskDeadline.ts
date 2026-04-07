@@ -10,7 +10,8 @@ export const useUpdateTaskDeadline = () => {
       updateTaskDeadline(taskId, deadline),
     onMutate: async ({ taskId, deadline }) => {
       await queryClient.cancelQueries({ queryKey: ['taskList'] });
-      // 모든 sort 변형의 캐시를 즉시 업데이트
+      // 날짜 부분만 캐시에 업데이트 (시간 제거)
+      const dueDateOnly = deadline.split(' ')[0];
       queryClient.setQueriesData<{
         assignments: { id: number; dueDate: string }[];
         subTasks: unknown[];
@@ -19,7 +20,7 @@ export const useUpdateTaskDeadline = () => {
         return {
           ...old,
           assignments: old.assignments.map((a) =>
-            a.id === taskId ? { ...a, dueDate: deadline } : a,
+            a.id === taskId ? { ...a, dueDate: dueDateOnly } : a,
           ),
         };
       });

@@ -44,7 +44,7 @@ export const useHomeTaskList = (sort?: TaskSort) => {
         folderName: task.folderTitle ?? '',
         folderColor: resolveFolderColor(task.foldercolor ?? ''),
         dDay: task.dDay,
-        dueDate: task.deadline.replace(/\./g, '-'), // FullCalendar와 호환을 위해 . -> -로 변경
+        dueDate: task.deadline.replace(/\./g, '-').split(' ')[0], // FullCalendar와 호환을 위해 . -> -로 변경, 시간 제거
         assignmentName: task.title,
         assignmentType: task.type === 'TEAM' ? '팀' : '개인',
         progress: task.progressRate,
