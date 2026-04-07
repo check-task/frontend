@@ -190,7 +190,7 @@ export interface CreateTaskReferenceRequest {
 
 export interface CreateTaskRequest {
   title: string;
-  folderId: number;
+  folderId: number | null;
   deadline: string; // YYYY-MM-DD
   type: TaskType; // PERSONAL | TEAM
   subTasks: CreateTaskSubTaskRequest[];

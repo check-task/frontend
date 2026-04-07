@@ -38,24 +38,21 @@ export const CreateAssignmentForm = () => {
   const [saveError, setSaveError] = useState<string | null>(null);
 
   const folders = myInfo?.folders ?? [];
-  const isFormValid =
-    assignmentName.trim() !== '' &&
-    selectedFolderId != null &&
-    deadline != null;
+  const isFormValid = assignmentName.trim() !== '';
 
   const handleCancel = () => {
     router.push('/assignment');
   };
 
   const handleSave = async () => {
-    if (!isFormValid || deadline == null || selectedFolderId == null) return;
+    if (!isFormValid) return;
 
     const folderId = selectedFolderId;
     const type: TaskType = isTeamProject ? 'TEAM' : 'PERSONAL';
     const payload = {
       title: assignmentName.trim(),
       folderId,
-      deadline: formatDate(deadline),
+      deadline: formatDate(deadline ?? new Date()),
       type,
       subTasks: subTasks
         .filter((t) => t.title.trim() !== '')
