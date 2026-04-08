@@ -1,6 +1,9 @@
 'use client';
 
 import { useRef, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import { css } from 'styled-system/css';
 import { Button } from '@/components/Button';
 import { Input } from '@/components/TextField';
@@ -9,6 +12,20 @@ import { Modal } from '@/features/profile/components/ModalContent';
 import { useUpdateProfile } from '@/hooks/mutations/useUpdateProfile';
 import { useModalStore } from '@/stores/modal-store';
 import type { User } from '@/types/api/user';
+
+const schema = z.object({
+  nickname: z.string().min(1, '닉네임을 입력해주세요'),
+  phone: z
+    .string()
+    .min(1, '연락처를 입력해주세요')
+    .regex(
+      /^01[0-9]-\d{3,4}-\d{4}$/,
+      '올바른 연락처 형식으로 입력해주세요 (예: 010-1234-5678)',
+    ),
+  email: z.email('올바른 이메일 형식으로 입력해주세요'),
+});
+
+type FormValues = z.infer<typeof schema>;
 
 interface EditProfileModalContentProps {
   user: User;
@@ -21,13 +38,24 @@ export const EditProfileModalContent = ({
   const updateProfile = useUpdateProfile();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const [nickname, setNickname] = useState(user.nickname);
-  const [phone, setPhone] = useState(user.phoneNum);
-  const [email, setEmail] = useState(user.email);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(
     user.profileImage || null,
   );
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isValid },
+  } = useForm<FormValues>({
+    resolver: zodResolver(schema),
+    defaultValues: {
+      nickname: user.nickname,
+      phone: user.phoneNum,
+      email: user.email,
+    },
+    mode: 'onChange',
+  });
 
   const handleImageClick = () => {
     fileInputRef.current?.click();
@@ -41,11 +69,11 @@ export const EditProfileModalContent = ({
     }
   };
 
-  const handleSave = () => {
+  const onSubmit = (data: FormValues) => {
     const formData = new FormData();
-    formData.append('nickname', nickname);
-    formData.append('phoneNum', phone);
-    formData.append('email', email);
+    formData.append('nickname', data.nickname);
+    formData.append('phoneNum', data.phone);
+    formData.append('email', data.email);
     if (imageFile) {
       formData.append('image', imageFile);
     }
@@ -65,7 +93,7 @@ export const EditProfileModalContent = ({
               <img
                 className={profileImageActualStyle}
                 src={imagePreview}
-                alt={nickname}
+                alt={user.nickname}
               />
             ) : (
               <div className={profileImageStyle} />
@@ -90,9 +118,11 @@ export const EditProfileModalContent = ({
             size='modal'
             type='text'
             placeholder='송월'
-            value={nickname}
-            onChange={(e) => setNickname(e.target.value)}
+            {...register('nickname')}
           />
+          {errors.nickname && (
+            <p className={errorStyle}>{errors.nickname.message}</p>
+          )}
         </Modal.FormField>
 
         <Modal.FormField gap='small'>
@@ -101,9 +131,9 @@ export const EditProfileModalContent = ({
             size='modal'
             type='tel'
             placeholder='010-1234-5678'
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
+            {...register('phone')}
           />
+          {errors.phone && <p className={errorStyle}>{errors.phone.message}</p>}
         </Modal.FormField>
 
         <Modal.FormField gap='small'>
@@ -112,9 +142,9 @@ export const EditProfileModalContent = ({
             size='modal'
             type='email'
             placeholder='checktask@ct.kr'
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            {...register('email')}
           />
+          {errors.email && <p className={errorStyle}>{errors.email.message}</p>}
         </Modal.FormField>
       </Modal.Container>
 
@@ -122,13 +152,8 @@ export const EditProfileModalContent = ({
       <Button
         variant='fillBlue'
         size='xlarge'
-        onClick={handleSave}
-        disabled={
-          !nickname.trim() ||
-          !phone.trim() ||
-          !email.trim() ||
-          updateProfile.isPending
-        }
+        onClick={handleSubmit(onSubmit)}
+        disabled={!isValid || updateProfile.isPending}
         className={css({ marginTop: '2.125rem' })}
       >
         변경사항 저장
@@ -179,4 +204,9 @@ const imageOverlayStyle = css({
   _hover: {
     opacity: 1,
   },
+});
+
+const errorStyle = css({
+  textStyle: 'body4.r',
+  color: 'sub.01.100',
 });
