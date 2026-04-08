@@ -27,6 +27,8 @@ import { useTaskMembers } from '@/hooks/queries/useTaskMembers';
 import { useMyInfo } from '@/hooks/queries/useMyInfo';
 import { AddTaskButton } from './AddTaskButton';
 import { getSocket, COMMENT_SEND_EVENTS, COMMENT_EVENTS } from '@/lib/socket';
+import { CloseIcon } from '@/components/icons/CloseIcon';
+import { useUIStore } from '@/stores/ui-store';
 
 const getCommentId = (
   c: TaskDetailSubTaskComment & { comment_id?: number; id?: number },
@@ -36,13 +38,22 @@ interface TeamTaskListProps {
   taskId: number;
   subTasks?: TaskDetailSubTask[];
   maxDate?: string | Date;
+  isEditMode?: boolean;
+  editedTitles?: Record<number, string>;
+  onTitleChange?: (subTaskId: number, title: string) => void;
+  onDeleteTask?: (subTaskId: number) => void;
 }
 
 const TeamTaskList = ({
   taskId,
   subTasks = [],
   maxDate,
+  isEditMode = false,
+  editedTitles,
+  onTitleChange,
+  onDeleteTask,
 }: TeamTaskListProps) => {
+  const isSidebarCollapsed = useUIStore((state) => state.isSidebarCollapsed);
   const [openComments, setOpenComments] = useState<{ [key: number]: boolean }>(
     {},
   );
@@ -374,58 +385,115 @@ const TeamTaskList = ({
                 <div
                   className={taskItemContainerStyle({ checked: isCompleted })}
                 >
-                  <div className={teamTaskItemTitleStyle}>
-                    <div className={teamTaskItemCheckTitleStyle}>
-                      <Checkbox
-                        checked={isCompleted}
-                        onChange={(e) =>
-                          handleStatusChange(task.subTaskId, e.target.checked)
-                        }
-                      />
-                      <p className={taskTextStyle({ checked: isCompleted })}>
-                        {task.title}
-                      </p>
-                    </div>
-                    <div
-                      className={taskComponentsStyle}
-                    >
-                      <DatePicker
-                        value={task.deadline}
-                        onChange={(date) =>
-                          handleDeadlineChange(task.subTaskId, date)
-                        }
-                        muted={isCompleted}
-                        maxDate={maxDate}
-                      />
-                      <ClockToggle
-                        muted={isCompleted}
-                        isOn={alarmStateMap[task.subTaskId] ?? task.isAlarm}
-                        onToggle={handleAlarmToggle(task.subTaskId)}
-                      />
-                      <CommentButton
-                        isOpen={commentOpen}
-                        onClick={() => handleCommentToggle(task.subTaskId)}
-                        commentCount={comments.length}
-                        muted={isCompleted}
-                      />
-                    </div>
-                  </div>
-                  <div
-                    className={managerContainerStyle}
-                  >
-                    <p className={managerLabelStyle}>
-                      담당:
-                    </p>
-                    <TeamTaskManager
-                      manager={task.assigneeName}
-                      profileImage={task.assigneeProfileImage ?? undefined}
-                      members={teamMembersForDropdown}
-                      onSelectMember={(_, assigneeId) => {
-                        if (assigneeId != null)
-                          handleSelectAssignee(task.subTaskId, assigneeId);
-                      }}
-                    />
-                  </div>
+                  {isEditMode ? (
+                    <>
+                      <div className={editModeContentStyle}>
+                        <div className={teamTaskItemTitleStyle}>
+                          <div className={taskInnerStyle}>
+                            <Input
+                              size='basic'
+                              width='27.875rem'
+                              value={editedTitles?.[task.subTaskId] ?? task.title}
+                              onChange={(e) => onTitleChange?.(task.subTaskId, e.target.value)}
+                            />
+                            <div className={css({ display: 'flex', alignItems: 'center', gap: '1rem', flexShrink: 0, opacity: 0.4, pointerEvents: 'none' })}>
+                              <DatePicker
+                                value={task.deadline}
+                                onChange={(date) =>
+                                  handleDeadlineChange(task.subTaskId, date)
+                                }
+                                muted={isCompleted}
+                                maxDate={maxDate}
+                              />
+                              <ClockToggle
+                                muted={isCompleted}
+                                isOn={alarmStateMap[task.subTaskId] ?? task.isAlarm}
+                                onToggle={handleAlarmToggle(task.subTaskId)}
+                              />
+                            </div>
+                          </div>
+                          <div className={css({ opacity: 0.4, pointerEvents: 'none' })}>
+                            <CommentButton
+                              isOpen={commentOpen}
+                              onClick={() => handleCommentToggle(task.subTaskId)}
+                              commentCount={comments.length}
+                              muted={isCompleted}
+                            />
+                          </div>
+                        </div>
+                        <div className={css({ display: 'flex', alignItems: 'center', gap: '0.5rem', opacity: 0.4, pointerEvents: 'none' })} style={{ marginRight: isSidebarCollapsed ? '3.5625rem' : '2.9375rem', transition: 'margin-right 0.3s cubic-bezier(0.4, 0, 0.2, 1)' }}>
+                          <p className={managerLabelStyle}>담당:</p>
+                          <TeamTaskManager
+                            manager={task.assigneeName}
+                            profileImage={task.assigneeProfileImage ?? undefined}
+                            members={teamMembersForDropdown}
+                            onSelectMember={(_, assigneeId) => {
+                              if (assigneeId != null)
+                                handleSelectAssignee(task.subTaskId, assigneeId);
+                            }}
+                          />
+                        </div>
+                      </div>
+                      <button
+                        type='button'
+                        onClick={() => onDeleteTask?.(task.subTaskId)}
+                        className={deleteButtonStyle}
+                      >
+                        <CloseIcon size={28} strokeWidth={1} color='gray.900' />
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <div className={teamTaskItemTitleStyle}>
+                        <div className={taskInnerStyle}>
+                          <div className={teamTaskItemCheckTitleStyle}>
+                            <Checkbox
+                              checked={isCompleted}
+                              onChange={(e) =>
+                                handleStatusChange(task.subTaskId, e.target.checked)
+                              }
+                            />
+                            <p className={taskTextStyle({ checked: isCompleted })}>
+                              {task.title}
+                            </p>
+                          </div>
+                          <div className={dateAlarmStyle}>
+                            <DatePicker
+                              value={task.deadline}
+                              onChange={(date) =>
+                                handleDeadlineChange(task.subTaskId, date)
+                              }
+                              muted={isCompleted}
+                              maxDate={maxDate}
+                            />
+                            <ClockToggle
+                              muted={isCompleted}
+                              isOn={alarmStateMap[task.subTaskId] ?? task.isAlarm}
+                              onToggle={handleAlarmToggle(task.subTaskId)}
+                            />
+                          </div>
+                        </div>
+                        <CommentButton
+                          isOpen={commentOpen}
+                          onClick={() => handleCommentToggle(task.subTaskId)}
+                          commentCount={comments.length}
+                          muted={isCompleted}
+                        />
+                      </div>
+                      <div className={managerContainerStyle}>
+                        <p className={managerLabelStyle}>담당:</p>
+                        <TeamTaskManager
+                          manager={task.assigneeName}
+                          profileImage={task.assigneeProfileImage ?? undefined}
+                          members={teamMembersForDropdown}
+                          onSelectMember={(_, assigneeId) => {
+                            if (assigneeId != null)
+                              handleSelectAssignee(task.subTaskId, assigneeId);
+                          }}
+                        />
+                      </div>
+                    </>
+                  )}
                 </div>
                 {commentOpen && (
                   <div className={commentSectionStyle}>
@@ -608,13 +676,22 @@ const teamTaskItemTitleStyle = css({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
+  gap: '1.25rem',
   width: '46.5rem',
+});
+
+const taskInnerStyle = css({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  flex: 1,
 });
 
 const teamTaskItemCheckTitleStyle = css({
   display: 'flex',
   alignItems: 'center',
   gap: '0.75rem',
+  width: '27.875rem',
 });
 
 const taskItemContainerStyle = cva({
@@ -641,18 +718,21 @@ const taskItemContainerStyle = cva({
 
 const taskTextStyle = cva({
   base: {
-    textStyle: 'body1.r',
-    transition: 'all 0.2s ease',
+    wordBreak: 'break-word',
+    flex: 1,
   },
   variants: {
     checked: {
       true: {
+        textStyle: 'body1.r',
         color: 'gray.400',
         textDecoration: 'line-through',
+        textDecorationThickness: '1px',
+        textDecorationSkipInk: 'none',
       },
       false: {
+        textStyle: 'body1.m',
         color: 'gray.900',
-        textDecoration: 'none',
       },
     },
   },
@@ -661,10 +741,29 @@ const taskTextStyle = cva({
   },
 });
 
-const taskComponentsStyle = css({
+const dateAlarmStyle = css({
   display: 'flex',
   alignItems: 'center',
-  gap: '1.25rem',
+  gap: '1rem',
+  flexShrink: 0,
+});
+
+const editModeContentStyle = css({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  flex: 1,
+});
+
+
+const deleteButtonStyle = css({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  width: '1.75rem',
+  height: '1.75rem',
+  flexShrink: 0,
+  cursor: 'pointer',
 });
 
 const managerContainerStyle = css({

@@ -27,12 +27,31 @@ export default function TeamAssignmentDetailPage() {
   const contentWidth = isSidebarCollapsed ? CONTENT_WIDTH_COLLAPSED : CONTENT_WIDTH_EXPANDED;
   const { data, isLoading, isError, error } = useTeamTaskDetail(taskId);
   const [isEditMode, setIsEditMode] = useState(false);
+  const [editedTitles, setEditedTitles] = useState<Record<number, string>>({});
+  const [deletedSubTaskIds, setDeletedSubTaskIds] = useState<Set<number>>(new Set());
 
-  const enterEditMode = () => setIsEditMode(true);
-  const exitEditMode = () => setIsEditMode(false);
+  const enterEditMode = () => {
+    setIsEditMode(true);
+    setEditedTitles({});
+    setDeletedSubTaskIds(new Set());
+  };
+
+  const exitEditMode = () => {
+    setIsEditMode(false);
+    setEditedTitles({});
+    setDeletedSubTaskIds(new Set());
+  };
+
+  const handleTitleChange = (subTaskId: number, title: string) => {
+    setEditedTitles((prev) => ({ ...prev, [subTaskId]: title }));
+  };
+
+  const handleDeleteTask = (subTaskId: number) => {
+    setDeletedSubTaskIds((prev) => new Set(prev).add(subTaskId));
+  };
 
   const handleSave = () => {
-    // TODO: API 연동
+    // TODO: API 연동 (editedTitles, deletedSubTaskIds 사용)
     exitEditMode();
   };
 
@@ -129,8 +148,12 @@ export default function TeamAssignmentDetailPage() {
           </div>
           <TeamTaskList
             taskId={data.taskId}
-            subTasks={data.subTasks}
+            subTasks={data.subTasks.filter((t) => !deletedSubTaskIds.has(t.subTaskId))}
             maxDate={data.deadline}
+            isEditMode={isEditMode}
+            editedTitles={editedTitles}
+            onTitleChange={handleTitleChange}
+            onDeleteTask={handleDeleteTask}
           />
         </div>
 
