@@ -23,7 +23,7 @@ interface AssignmentEditModalContentProps {
 const FOLDER_COLORS: FolderColor[] = ['01', '02', '03', '04', '05'];
 
 /** FolderColor 이름 Assignment 토큰 매핑 */
-const NAME_TO_TOKEN: Record<FolderColorName, FolderColor> = {
+const NAME_TO_TOKEN: Partial<Record<FolderColorName, FolderColor>> = {
   red: '01',
   yellow: '02',
   green: '03',
@@ -49,7 +49,7 @@ export const AssignmentEditModalContent = ({
 
   // 사용자가 실제 생성한 폴더의 색상(중복 제거)
   const userColors: FolderColor[] = myInfo
-    ? [...new Set(myInfo.folders.map((f) => NAME_TO_TOKEN[f.color]))]
+    ? [...new Set(myInfo.folders.map((f) => NAME_TO_TOKEN[f.color]).filter((c): c is FolderColor => c !== undefined))]
     : FOLDER_COLORS;
 
   return (
