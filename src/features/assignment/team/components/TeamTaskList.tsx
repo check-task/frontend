@@ -217,12 +217,13 @@ const TeamTaskList = ({
 
     const socket = getSocket();
     if (socket?.connected) {
-      socket.emit(COMMENT_SEND_EVENTS.UPDATE, {
-        taskId,
-        subTaskId,
-        commentId,
-        content,
-      });
+      socket.emit(
+        COMMENT_SEND_EVENTS.UPDATE,
+        { taskId, subTaskId, commentId, content },
+        (res: { success?: boolean }) => {
+          if (!res?.success) updateComment({ commentId, content });
+        },
+      );
     } else {
       updateComment({ commentId, content });
     }
@@ -256,11 +257,24 @@ const TeamTaskList = ({
       });
       const socket = getSocket();
       if (socket?.connected) {
-        socket.emit(COMMENT_SEND_EVENTS.DELETE, {
-          taskId,
-          subTaskId,
-          commentId,
-        });
+        socket.emit(
+          COMMENT_SEND_EVENTS.DELETE,
+          { taskId, subTaskId, commentId },
+          (res: { success?: boolean }) => {
+            if (!res?.success) {
+              deleteComment(commentId, {
+                onError: () => {
+                  setDeletedCommentIds((prev) => {
+                    const next = new Set(prev);
+                    next.delete(commentId);
+                    return next;
+                  });
+                  queryClient.invalidateQueries({ queryKey: ['taskDetail', taskId] });
+                },
+              });
+            }
+          },
+        );
       } else {
         deleteComment(commentId, {
           onError: () => {
@@ -332,11 +346,13 @@ const TeamTaskList = ({
     // 소켓 또는 HTTP로 서버에 전송
     const socket = getSocket();
     if (socket?.connected) {
-      socket.emit(COMMENT_SEND_EVENTS.CREATE, {
-        taskId,
-        subTaskId,
-        content,
-      });
+      socket.emit(
+        COMMENT_SEND_EVENTS.CREATE,
+        { taskId, subTaskId, content },
+        (res: { success?: boolean }) => {
+          if (!res?.success) createComment({ subTaskId, userId, content });
+        },
+      );
     } else {
       createComment({ subTaskId, userId, content });
     }
@@ -349,9 +365,8 @@ const TeamTaskList = ({
     <div className={teamTaskListContainerStyle}>
       <div className={teamTaskListStyle}>
         {subTasks.length > 0 ? (
-          subTasks.map((task, index) => {
-            // const isCompleted = task.status === 'COMPLETED';
-            const isCompleted = index === 0 ? true : task.status === 'COMPLETED'; // TODO: 테스트용 - 삭제 필요 index 부분
+          subTasks.map((task) => {
+            const isCompleted = task.status === 'COMPLETED';
             const commentOpen = openComments[task.subTaskId] ?? false;
             const comments = getDisplayComments(task);
             return (

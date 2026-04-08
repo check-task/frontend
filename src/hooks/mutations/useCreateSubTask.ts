@@ -11,16 +11,14 @@ export const useCreateSubTask = (taskId: number) => {
     mutationFn: async (body: CreateSubTaskRequest) => {
       const socket = getSocket();
       if (socket?.connected) {
-        return new Promise<unknown>((resolve, reject) => {
+        const socketOk = await new Promise<boolean>((resolve) => {
           socket.emit(
             SOCKET_CREATE_SUBTASK,
             { taskId, ...body },
-            (res: { success?: boolean; reason?: string }) => {
-              if (res?.success) resolve(res);
-              else reject(new Error(res?.reason ?? '세부과제 생성에 실패했습니다.'));
-            },
+            (res: { success?: boolean; reason?: string }) => resolve(!!res?.success),
           );
         });
+        if (socketOk) return;
       }
       return createSubTask(taskId, body);
     },
