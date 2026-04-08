@@ -91,7 +91,7 @@ export const AddTaskButton = ({ taskId, maxDate }: AddTaskButtonProps) => {
           <Input
             ref={inputRef}
             size='basic'
-            width='37.125rem'
+            width='37.875rem'
             placeholder='세부과제명을 입력하세요.'
             value={value}
             onChange={(e) => setValue(e.target.value)}
@@ -164,14 +164,14 @@ const addTaskButtonTextStyle = css({
 const inputWrapperStyle = css({
   display: 'flex',
   justifyContent: 'space-between',
-  alignItems: 'flex-start',
+  alignItems: 'center',
   width: '100%',
 });
 
 const inputContainerStyle = css({
   display: 'flex',
   alignItems: 'center',
-  gap: '1.5rem',
+  gap: '1.2rem',
 });
 
 const buttonGroupStyle = css({
@@ -179,6 +179,7 @@ const buttonGroupStyle = css({
   flexDirection: 'column',
   alignItems: 'flex-end',
   gap: '0.5rem',
+  mr:'3rem',
 });
 
 const errorTextStyle = css({
