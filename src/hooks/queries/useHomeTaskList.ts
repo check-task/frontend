@@ -61,7 +61,7 @@ export const useHomeTaskList = (sort?: TaskSort) => {
         taskId: st.taskId,
         title: st.title,
         status: st.status,
-        dueDate: st.deadline.replace(/\./g, '-'),
+        dueDate: st.deadline.replace(/\./g, '-').split(' ')[0],
         folderColor: taskColorMap.get(st.taskId) ?? 'red',
       }));
 
