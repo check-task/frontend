@@ -13,6 +13,8 @@ import { css } from 'styled-system/css';
 import { useTeamTaskDetail } from '@/features/assignment/team/components/hooks/useTeamTaskDetail';
 import { useTaskRoomSocket } from '@/features/assignment/team/hooks/useTaskRoomSocket';
 import { useUIStore } from '@/stores/ui-store';
+import { useModalStore } from '@/stores/modal-store';
+import { DeleteAllTaskConfirmModal } from '@/features/assignment/components/DeleteAllTaskConfirmModal';
 
 const HEADER_WIDTH_COLLAPSED = '49.5625rem'; // 사이드바 닫힘 (793px)
 const HEADER_WIDTH_EXPANDED = '43.25rem';  // 사이드바 열림 (692px)
@@ -23,6 +25,7 @@ export default function TeamAssignmentDetailPage() {
   const params = useParams();
   const taskId = Number(params?.id);
   const isSidebarCollapsed = useUIStore((state) => state.isSidebarCollapsed);
+  const { openModal, closeModal } = useModalStore();
   const headerWidth = isSidebarCollapsed ? HEADER_WIDTH_COLLAPSED : HEADER_WIDTH_EXPANDED;
   const contentWidth = isSidebarCollapsed ? CONTENT_WIDTH_COLLAPSED : CONTENT_WIDTH_EXPANDED;
   const { data, isLoading, isError, error } = useTeamTaskDetail(taskId);
@@ -56,8 +59,20 @@ export default function TeamAssignmentDetailPage() {
   };
 
   const handleDeleteAll = () => {
-    // TODO: API 연동 (전체 삭제)
-    exitEditMode();
+    openModal({
+      title: '세부 과제 삭제',
+      headerType: 'none',
+      content: (
+        <DeleteAllTaskConfirmModal
+          onConfirm={() => {
+            // TODO: API 연동 (전체 삭제)
+            exitEditMode();
+            closeModal();
+          }}
+          onCancel={closeModal}
+        />
+      ),
+    });
   };
 
   useTaskRoomSocket(taskId);
