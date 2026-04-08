@@ -103,7 +103,10 @@ export default function TeamAssignmentDetailPage() {
         style={{ width: contentWidth, transition: 'width 0.3s cubic-bezier(0.4, 0, 0.2, 1)' }}
         className={innerContainerStyle}
       >
-        <div className={headerContainerStyle}>
+        <div
+          className={headerContainerStyle}
+          style={isEditMode ? { opacity: 0.4, pointerEvents: 'none' } : undefined}
+        >
           <div
             style={{
               width: headerWidth,
@@ -157,14 +160,15 @@ export default function TeamAssignmentDetailPage() {
           />
         </div>
 
-        <Divider className={css({ mt: '3.75rem', mb: '3.75rem' })} />
-
-        <TeamEtc
-          taskId={data.taskId}
-          references={data.references}
-          communications={data.communications}
-          meetingLogs={data.meetingLogs}
-        />
+        <div style={isEditMode ? { opacity: 0.4, pointerEvents: 'none', width: '100%' } : undefined}>
+          <Divider className={css({ mt: '3.75rem', mb: '3.75rem' })} />
+          <TeamEtc
+            taskId={data.taskId}
+            references={data.references}
+            communications={data.communications}
+            meetingLogs={data.meetingLogs}
+          />
+        </div>
       </div>
     </div>
   );
