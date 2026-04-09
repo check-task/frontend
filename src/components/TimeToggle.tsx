@@ -30,6 +30,7 @@ const trackStyle = cva({
     borderRadius: '6.25rem',
     cursor: 'pointer',
     border: 'none',
+    outline: 'none',
     flexShrink: 0,
   },
   variants: {
