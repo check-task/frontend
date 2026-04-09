@@ -19,12 +19,20 @@ export const DeleteFolderModalContent = ({
   folderName,
   folderColor,
 }: DeleteFolderModalContentProps) => {
-  const closeModal = useModalStore((state) => state.closeModal);
+  const { closeModal } = useModalStore();
   const deleteFolder = useDeleteFolder();
 
   const handleDelete = () => {
     deleteFolder.mutate(folderId, {
       onSuccess: () => closeModal(),
+      onError: (error) => {
+        const code = (error as { response?: { data?: { errorCode?: string } } })
+          ?.response?.data?.errorCode;
+        if (code === 'FOLDER_NOT_EMPTY') {
+          closeModal();
+          alert('폴더 내부에 과제가 존재해서 삭제할 수 없습니다.');
+        }
+      },
     });
   };
 
