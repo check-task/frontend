@@ -44,7 +44,7 @@ export const AddAssignmentContent = ({
 
       <div className={contentItemStyle}>
         <p className={labelTextStyle}>마감일</p>
-        <DatePicker onChange={(d) => onDateChange?.(d)} />
+        <DatePicker onChange={(d) => onDateChange?.(d)} showTimeDisplay={true} />
       </div>
     </div>
   );

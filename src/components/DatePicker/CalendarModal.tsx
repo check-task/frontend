@@ -8,14 +8,19 @@ import { RightIcon } from '../icons/RightIcon';
 import { LeftIcon } from '../icons/LeftIcon';
 import { useState } from 'react';
 import { Button } from '../Button';
+import { TimeToggle } from '../TimeToggle';
 
 interface CalenderModalProps {
   onClose: () => void;
-  onSave: (date: Date) => void;
+  onSave: (date: Date, timeEnabled: boolean) => void;
   // 초기 날짜를 받기 위함
   initialDate: Date;
   // 세부 목록 날짜 선택시 이후 날짜 제한을 위해 추가
   maxDate?: Date;
+  // 시간 추가 토글 초기값
+  initialTimeEnabled?: boolean;
+  // 시간 추가 토글 상태 변경 콜백
+  onTimeToggle?: (enabled: boolean) => void;
 }
 
 export default function CalendarModal({
@@ -23,9 +28,86 @@ export default function CalendarModal({
   onSave,
   initialDate,
   maxDate,
+  initialTimeEnabled = false,
+  onTimeToggle,
 }: CalenderModalProps) {
   // 선택된 날짜
   const [selectedDate, setSelectedDate] = useState<Date | null>(initialDate);
+  // 시간 추가 토글 상태
+  const [timeEnabled, setTimeEnabled] = useState(initialTimeEnabled);
+  // 시간 입력 상태 — 모달을 다시 열 때 저장된 시간 복원
+  const [period, setPeriod] = useState<'오전' | '오후'>(() => {
+    if (!initialTimeEnabled) return '오전';
+    return initialDate.getHours() < 12 ? '오전' : '오후';
+  });
+  const [timeValue, setTimeValue] = useState(() => {
+    if (!initialTimeEnabled) return '00:00';
+    const h = initialDate.getHours() % 12 || 12;
+    const m = initialDate.getMinutes();
+    return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+  });
+
+  const handleTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const raw = e.target.value.replace(/\D/g, '').slice(0, 4);
+    if (raw.length <= 2) {
+      setTimeValue(raw);
+    } else if (raw.length === 3) {
+      // H:MM 형태
+      setTimeValue(`${raw[0]}:${raw.slice(1)}`);
+    } else {
+      // HH:MM 형태
+      setTimeValue(`${raw.slice(0, 2)}:${raw.slice(2)}`);
+    }
+  };
+
+  // 시간 정규화
+  const handleTimeBlur = () => {
+    const raw = timeValue.trim();
+    let h = 0,
+      m = 0;
+
+    if (raw.includes(':')) {
+      const [hPart, mPart] = raw.split(':');
+      h = parseInt(hPart) || 0;
+      m = parseInt(mPart) || 0;
+    } else {
+      // 1~2자리만 입력하고 blur된 경우 (시간만, 분은 00)
+      h = parseInt(raw) || 0;
+      m = 0;
+    }
+
+    h = Math.max(0, h);
+    m = Math.max(0, m);
+
+    // 23시간 범위 초과 또는 분 초과 시 00:00으로 리셋
+    if (h > 23 || m > 59) {
+      setTimeValue('00:00');
+      return;
+    }
+
+    // 24시간 형식 입력 시 자동으로 오전/오후 변환
+    if (h >= 13) {
+      setPeriod('오후');
+      h = h - 12;
+    } else if (h === 12) {
+      setPeriod('오후');
+    } else if (h === 0) {
+      setPeriod('오전');
+      h = 12;
+    }
+
+    setTimeValue(
+      `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`,
+    );
+  };
+
+  const handleTimeToggle = (enabled: boolean) => {
+    setTimeEnabled(enabled);
+    onTimeToggle?.(enabled);
+  };
+
+  const formatKoreanDate = (date: Date) =>
+    `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일`;
 
   const handleDateChange = (value: any) => {
     // 배열 말고 단일 선택만 고려
@@ -54,6 +136,41 @@ export default function CalendarModal({
         showNeighboringMonth={true} // 기본이 true인데 한번 더 명시
         showFixedNumberOfWeeks={true} // 6주를 보여주는 프롭이 있음
       />
+      <div className={timeSection}>
+        <div className={timeToggleRow}>
+          <span className={timeToggleLabel}>시간 추가</span>
+          <TimeToggle checked={timeEnabled} onChange={handleTimeToggle} />
+        </div>
+        {timeEnabled && selectedDate && (
+          <div className={dateTimeRow}>
+            <span className={dateLabel}>{formatKoreanDate(selectedDate)}</span>
+            <div className={timeInputBox}>
+              <button
+                type='button'
+                onClick={() =>
+                  setPeriod((p) => (p === '오전' ? '오후' : '오전'))
+                }
+                className={periodBtn}
+              >
+                {period}
+              </button>
+              <input
+                  className={timeInput}
+                  value={timeValue}
+                  onChange={handleTimeChange}
+                  onBlur={handleTimeBlur}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.currentTarget.blur();
+                    }
+                  }}
+                  placeholder='00:00'
+                  maxLength={5}
+                />
+            </div>
+          </div>
+        )}
+      </div>
       <div className={footer}>
         <Button
           variant='fillGray'
@@ -73,7 +190,20 @@ export default function CalendarModal({
           size='small'
           onClick={() => {
             if (selectedDate) {
-              onSave(selectedDate);
+              if (timeEnabled) {
+                const [hStr, mStr] = timeValue.split(':');
+                const rawHour = parseInt(hStr) || 0;
+                const h =
+                  period === '오후'
+                    ? (rawHour % 12) + 12
+                    : rawHour % 12;
+                const m = parseInt(mStr) || 0;
+                const dateWithTime = new Date(selectedDate);
+                dateWithTime.setHours(h, m, 0, 0);
+                onSave(dateWithTime, true);
+              } else {
+                onSave(selectedDate, false);
+              }
             }
           }}
         >
@@ -263,5 +393,65 @@ const modalWrapper = css({
   },
 });
 
+// 시간 추가 섹션 (토글)
+const timeSection = css({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '0.5rem',
+  mt: '0.75rem',
+});
+
+// 시간 추가 토글 행
+const timeToggleRow = flex({
+  alignItems: 'center',
+  justifyContent: 'space-between',
+});
+
+const timeToggleLabel = css({
+  textStyle: 'body3.m',
+  color: 'gray.900',
+});
+
+// 날짜 + 시간 입력 행
+const dateTimeRow = flex({
+  alignItems: 'center',
+  justifyContent: 'space-between',
+});
+
+const dateLabel = css({
+  textStyle: 'body4.r',
+  color: 'gray.600',
+});
+
+const timeInputBox = flex({
+  alignItems: 'center',
+  gap: '0.5rem',
+  border: '1px solid',
+  borderColor: 'gray.600',
+  borderRadius: '0.25rem',
+  px: '0.5rem',
+  py: '0.25rem',
+});
+
+const periodBtn = css({
+  textStyle: 'body4.r',
+  color: 'gray.600',
+  bg: 'transparent',
+  border: 'none',
+  cursor: 'pointer',
+  p: '0',
+});
+
+const timeInput = css({
+  textStyle: 'body4.r',
+  color: 'gray.600',
+  bg: 'transparent',
+  border: 'none',
+  outline: 'none',
+  textAlign: 'left',
+  width: '2.5rem',
+  p: '0',
+});
+
 // 하단 버튼 레이아웃
-const footer = flex({ gap: '1.25rem', mt: '1.25rem' });
+const footer = flex({ gap: '1.25rem', mt: '1rem' });
