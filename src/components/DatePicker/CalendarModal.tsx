@@ -79,11 +79,23 @@ export default function CalendarModal({
     h = Math.max(0, h);
     m = Math.max(0, m);
 
-    // 12시간 범위 초과 또는 분 초과 시 00:00으로 리셋
-    if (h > 12 || m > 59) {
+    // 23시간 범위 초과 또는 분 초과 시 00:00으로 리셋
+    if (h > 23 || m > 59) {
       setTimeValue('00:00');
       return;
     }
+
+    // 24시간 형식 입력 시 자동으로 오전/오후 변환
+    if (h >= 13) {
+      setPeriod('오후');
+      h = h - 12;
+    } else if (h === 12) {
+      setPeriod('오후');
+    } else if (h === 0) {
+      setPeriod('오전');
+      h = 12;
+    }
+
     setTimeValue(
       `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`,
     );
