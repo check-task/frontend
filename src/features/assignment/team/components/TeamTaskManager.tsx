@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { css } from 'styled-system/css';
+import { css, cva } from 'styled-system/css';
 import { useClickOutside } from '@/hooks/useClickOutside';
 import { useMyInfo } from '@/hooks/queries/useMyInfo';
 import { TeamTaskManagerDropdown } from './TeamTaskManagerDropdown';
@@ -17,7 +17,8 @@ const getDisplayFromProps = (
   const isEmpty =
     value === '' ||
     value === 'none' ||
-    value.toUpperCase() === 'PENDING';
+    value.toUpperCase() === 'PENDING' ||
+    value === '미지정';
   return isEmpty
     ? { name: 'none', profileImage: undefined }
     : { name: manager!, profileImage };
@@ -77,17 +78,13 @@ export const TeamTaskManager = ({
     <div ref={ref} className={wrapperStyle}>
       <button
         type="button"
-        className={
-          isEmpty ? teamTaskManagerEmptyContainerStyle : teamTaskManagerStyle
-        }
+        className={teamTaskManagerStyle({ empty: isEmpty })}
         onClick={() => setIsOpen((prev) => !prev)}
         aria-expanded={isOpen}
         aria-haspopup="listbox"
       >
         <p
-          className={
-            isEmpty ? teamTaskManagerIconEmptyStyle : teamTaskManagerIconStyle
-          }
+          className={teamTaskManagerIconStyle({ empty: isEmpty })}
           style={
             display.profileImage
               ? {
@@ -98,7 +95,7 @@ export const TeamTaskManager = ({
               : undefined
           }
         />
-        <p className={css({ textStyle: 'body2.r', color: 'gray.800' })}>
+        <p className={css({ textStyle: 'body2.r', color: isEmpty ? 'gray.300' : 'gray.800' })}>
           {hasManager ? display.name : 'none'}
         </p>
       </button>
@@ -121,42 +118,39 @@ const wrapperStyle = css({
   display: 'inline-block',
 });
 
-const teamTaskManagerStyle = css({
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  gap: '0.5rem',
-  height: '2.625rem',
-  bg: 'blue.50',
-  borderRadius: '2.5rem',
-  px: '0.75rem',
-  border: 'none',
-  cursor: 'pointer',
+const teamTaskManagerStyle = cva({
+  base: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: '0.375rem',
+    borderRadius: '2.5rem',
+    pl: '0.5rem',
+    pr: '0.75rem',
+    py: '0.5rem',
+    border: 'none',
+    cursor: 'pointer',
+  },
+  variants: {
+    empty: {
+      true: { bg: 'gray.100' },
+      false: { bg: 'blue.50' },
+    },
+  },
+  defaultVariants: { empty: false },
 });
 
-const teamTaskManagerEmptyContainerStyle = css({
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  gap: '0.5rem',
-  height: '2.625rem',
-  bg: 'gray.100',
-  borderRadius: '2.5rem',
-  px: '0.75rem',
-  border: 'none',
-  cursor: 'pointer',
-});
-
-const teamTaskManagerIconStyle = css({
-  width: '1.375rem',
-  height: '1.375rem',
-  borderRadius: 'full',
-  bg: 'blue.200',
-});
-
-const teamTaskManagerIconEmptyStyle = css({
-  width: '1.375rem',
-  height: '1.375rem',
-  borderRadius: 'full',
-  bg: 'gray.200',
+const teamTaskManagerIconStyle = cva({
+  base: {
+    width: '1.375rem',
+    height: '1.375rem',
+    borderRadius: 'full',
+  },
+  variants: {
+    empty: {
+      true: { bg: 'gray.200' },
+      false: { bg: 'blue.200' },
+    },
+  },
+  defaultVariants: { empty: false },
 });

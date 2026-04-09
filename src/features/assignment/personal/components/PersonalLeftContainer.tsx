@@ -2,7 +2,7 @@
 
 import { css, cva } from 'styled-system/css';
 import { useUIStore } from '@/stores/ui-store';
-import { PersonalHeader } from './PersonalHeader';
+import { AssignmentHeader } from '@/features/assignment/components/AssignmentHeader';
 import { PersonalTaskList, type PersonalTaskItem } from './PersonalTaskList';
 import { PencilIcon } from '@/components/icons/PencilIcon';
 import { FormActionButtons } from '@/features/assignment/components/FormActionButtons';
@@ -99,7 +99,7 @@ export const PersonalLeftContainer = ({
             ...(isEditMode && { opacity: 0.4, pointerEvents: 'none' }),
           }}
         >
-          <PersonalHeader
+          <AssignmentHeader
             completionRate={completionRate}
             title={title}
             daysLeft={daysLeft}
@@ -120,7 +120,7 @@ export const PersonalLeftContainer = ({
                 <button
                   type='button'
                   onClick={enterEditMode}
-                  className={pencilButtonStyle}
+                  className={css({cursor: 'pointer'})}
                   aria-label='세부 task 수정'
                 >
                   <PencilIcon size={24} />
@@ -206,13 +206,4 @@ const taskHeaderStyle = cva({
   },
 });
 
-const pencilButtonStyle = css({
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  bg: 'transparent',
-  border: 'none',
-  cursor: 'pointer',
-  padding: 0,
-  flexShrink: 0,
-});
+

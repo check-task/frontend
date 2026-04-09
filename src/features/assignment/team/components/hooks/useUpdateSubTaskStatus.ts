@@ -3,6 +3,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import type { UpdateSubTaskStatusRequestStatus } from '@/types/task';
 import { getSocket, SOCKET_UPDATE_SUBTASK } from '@/lib/socket';
+import { updateSubTaskStatus } from '@/services/subtask';
 
 interface UpdateSubTaskStatusInput {
   taskId: number;
@@ -10,33 +11,31 @@ interface UpdateSubTaskStatusInput {
   status: UpdateSubTaskStatusRequestStatus;
 }
 
-/** 팀 과제 세부 TASK 완료 상태 변경 (백엔드 updateSubtaskStatus 소켓) */
+/** 팀 과제 세부 TASK 완료 상태 변경 (소켓 우선, 미연결 시 REST 폴백) */
 export const useUpdateTeamSubTaskStatus = (taskId: number) => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({
-      taskId,
+    mutationFn: async ({
+      taskId: tid,
       subTaskId,
       status,
-    }: UpdateSubTaskStatusInput): Promise<void> =>
-      new Promise((resolve, reject) => {
-        const socket = getSocket();
-        if (!socket?.connected) {
-          reject(new Error('소켓이 연결되지 않았습니다.'));
-          return;
-        }
-        socket.emit(
-          SOCKET_UPDATE_SUBTASK,
-          { taskId, subTaskId, status: status.toUpperCase() },
-          (res: { success?: boolean; error?: string }) => {
-            if (res?.success) resolve();
-            else reject(new Error(res?.error ?? '상태 업데이트에 실패했습니다.'));
-          },
-        );
-      }),
-    onSuccess: (_, { taskId: tid }) => {
-      queryClient.invalidateQueries({ queryKey: ['taskDetail', tid] });
+    }: UpdateSubTaskStatusInput): Promise<void> => {
+      const socket = getSocket();
+      if (socket?.connected) {
+        const socketOk = await new Promise<boolean>((resolve) => {
+          socket.emit(
+            SOCKET_UPDATE_SUBTASK,
+            { taskId: tid, subTaskId, status: status.toUpperCase() },
+            (res: { success?: boolean; error?: string }) => resolve(!!res?.success),
+          );
+        });
+        if (socketOk) return;
+      }
+      await updateSubTaskStatus(subTaskId, { status });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['taskDetail', taskId] });
     },
   });
 };

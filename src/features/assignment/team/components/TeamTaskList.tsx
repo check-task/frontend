@@ -27,6 +27,7 @@ import { useTaskMembers } from '@/hooks/queries/useTaskMembers';
 import { useMyInfo } from '@/hooks/queries/useMyInfo';
 import { AddTaskButton } from './AddTaskButton';
 import { getSocket, COMMENT_SEND_EVENTS, COMMENT_EVENTS } from '@/lib/socket';
+import { CloseIcon } from '@/components/icons/CloseIcon';
 
 const getCommentId = (
   c: TaskDetailSubTaskComment & { comment_id?: number; id?: number },
@@ -36,12 +37,20 @@ interface TeamTaskListProps {
   taskId: number;
   subTasks?: TaskDetailSubTask[];
   maxDate?: string | Date;
+  isEditMode?: boolean;
+  editedTitles?: Record<number, string>;
+  onTitleChange?: (subTaskId: number, title: string) => void;
+  onDeleteTask?: (subTaskId: number) => void;
 }
 
 const TeamTaskList = ({
   taskId,
   subTasks = [],
   maxDate,
+  isEditMode = false,
+  editedTitles,
+  onTitleChange,
+  onDeleteTask,
 }: TeamTaskListProps) => {
   const [openComments, setOpenComments] = useState<{ [key: number]: boolean }>(
     {},
@@ -217,12 +226,13 @@ const TeamTaskList = ({
 
     const socket = getSocket();
     if (socket?.connected) {
-      socket.emit(COMMENT_SEND_EVENTS.UPDATE, {
-        taskId,
-        subTaskId,
-        commentId,
-        content,
-      });
+      socket.emit(
+        COMMENT_SEND_EVENTS.UPDATE,
+        { taskId, subTaskId, commentId, content },
+        (res: { success?: boolean }) => {
+          if (!res?.success) updateComment({ commentId, content });
+        },
+      );
     } else {
       updateComment({ commentId, content });
     }
@@ -256,11 +266,24 @@ const TeamTaskList = ({
       });
       const socket = getSocket();
       if (socket?.connected) {
-        socket.emit(COMMENT_SEND_EVENTS.DELETE, {
-          taskId,
-          subTaskId,
-          commentId,
-        });
+        socket.emit(
+          COMMENT_SEND_EVENTS.DELETE,
+          { taskId, subTaskId, commentId },
+          (res: { success?: boolean }) => {
+            if (!res?.success) {
+              deleteComment(commentId, {
+                onError: () => {
+                  setDeletedCommentIds((prev) => {
+                    const next = new Set(prev);
+                    next.delete(commentId);
+                    return next;
+                  });
+                  queryClient.invalidateQueries({ queryKey: ['taskDetail', taskId] });
+                },
+              });
+            }
+          },
+        );
       } else {
         deleteComment(commentId, {
           onError: () => {
@@ -332,11 +355,13 @@ const TeamTaskList = ({
     // 소켓 또는 HTTP로 서버에 전송
     const socket = getSocket();
     if (socket?.connected) {
-      socket.emit(COMMENT_SEND_EVENTS.CREATE, {
-        taskId,
-        subTaskId,
-        content,
-      });
+      socket.emit(
+        COMMENT_SEND_EVENTS.CREATE,
+        { taskId, subTaskId, content },
+        (res: { success?: boolean }) => {
+          if (!res?.success) createComment({ subTaskId, userId, content });
+        },
+      );
     } else {
       createComment({ subTaskId, userId, content });
     }
@@ -359,55 +384,80 @@ const TeamTaskList = ({
                   className={taskItemContainerStyle({ checked: isCompleted })}
                 >
                   <div className={teamTaskItemTitleStyle}>
-                    <div className={teamTaskItemCheckTitleStyle}>
-                      <Checkbox
-                        checked={isCompleted}
-                        onChange={(e) =>
-                          handleStatusChange(task.subTaskId, e.target.checked)
-                        }
-                      />
-                      <p className={taskTextStyle({ checked: isCompleted })}>
-                        {task.title}
-                      </p>
+                    <div className={taskInnerStyle}>
+                      {isEditMode ? (
+                        <Input
+                          size='basic'
+                          width='27.875rem'
+                          value={editedTitles?.[task.subTaskId] ?? task.title}
+                          onChange={(e) => onTitleChange?.(task.subTaskId, e.target.value)}
+                        />
+                      ) : (
+                        <div className={teamTaskItemCheckTitleStyle}>
+                          <Checkbox
+                            checked={isCompleted}
+                            onChange={(e) =>
+                              handleStatusChange(task.subTaskId, e.target.checked)
+                            }
+                          />
+                          <p className={taskTextStyle({ checked: isCompleted })}>
+                            {task.title}
+                          </p>
+                        </div>
+                      )}
+                      <div
+                        className={dateAlarmStyle}
+                        style={isEditMode ? { opacity: 0.4, pointerEvents: 'none' } : undefined}
+                      >
+                        <DatePicker
+                          value={task.deadline}
+                          onChange={(date) =>
+                            handleDeadlineChange(task.subTaskId, date)
+                          }
+                          muted={isCompleted}
+                          maxDate={maxDate}
+                        />
+                        <ClockToggle
+                          muted={isCompleted}
+                          isOn={alarmStateMap[task.subTaskId] ?? task.isAlarm}
+                          onToggle={handleAlarmToggle(task.subTaskId)}
+                        />
+                      </div>
                     </div>
-                    <div
-                      className={taskComponentsStyle({ checked: isCompleted })}
-                    >
-                      <DatePicker
-                        value={task.deadline}
-                        onChange={(date) =>
-                          handleDeadlineChange(task.subTaskId, date)
-                        }
-                        muted={isCompleted}
-                        maxDate={maxDate}
-                      />
-                      <ClockToggle
-                        muted={isCompleted}
-                        isOn={alarmStateMap[task.subTaskId] ?? task.isAlarm}
-                        onToggle={handleAlarmToggle(task.subTaskId)}
-                      />
+                    <div style={isEditMode ? { opacity: 0.4, pointerEvents: 'none' } : undefined}>
                       <CommentButton
                         isOpen={commentOpen}
                         onClick={() => handleCommentToggle(task.subTaskId)}
                         commentCount={comments.length}
+                        muted={isCompleted}
                       />
                     </div>
                   </div>
-                  <div
-                    className={managerContainerStyle({ checked: isCompleted })}
-                  >
-                    <p className={managerLabelStyle({ checked: isCompleted })}>
-                      담당:
-                    </p>
-                    <TeamTaskManager
-                      manager={task.assigneeName}
-                      profileImage={task.assigneeProfileImage ?? undefined}
-                      members={teamMembersForDropdown}
-                      onSelectMember={(_, assigneeId) => {
-                        if (assigneeId != null)
-                          handleSelectAssignee(task.subTaskId, assigneeId);
-                      }}
-                    />
+                  <div className={rightSectionStyle({ editMode: isEditMode })}>
+                    <div
+                      className={managerContainerStyle}
+                      style={isEditMode ? { opacity: 0.4, pointerEvents: 'none' } : undefined}
+                    >
+                      <p className={managerLabelStyle}>담당:</p>
+                      <TeamTaskManager
+                        manager={task.assigneeName}
+                        profileImage={task.assigneeProfileImage ?? undefined}
+                        members={teamMembersForDropdown}
+                        onSelectMember={(_, assigneeId) => {
+                          if (assigneeId != null)
+                            handleSelectAssignee(task.subTaskId, assigneeId);
+                        }}
+                      />
+                    </div>
+                    {isEditMode && (
+                      <button
+                        type='button'
+                        onClick={() => onDeleteTask?.(task.subTaskId)}
+                        className={deleteButtonStyle}
+                      >
+                        <CloseIcon size={28} strokeWidth={1} color='gray.900' />
+                      </button>
+                    )}
                   </div>
                 </div>
                 {commentOpen && (
@@ -577,7 +627,8 @@ const teamTaskListContainerStyle = css({
   flexDirection: 'column',
   p: '1.5rem',
   borderRadius: '0.75rem',
-  shadow: '0px 1px 4px 0px #00000029',
+  bg: 'bg',
+  shadow: '0 1px 4px 0 rgba(0, 0, 0, 0.16)',
 });
 
 const teamTaskListStyle = css({
@@ -590,13 +641,22 @@ const teamTaskItemTitleStyle = css({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
-  width: '46.125rem',
+  gap: '1.25rem',
+  width: '46.5rem',
+});
+
+const taskInnerStyle = css({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  flex: 1,
 });
 
 const teamTaskItemCheckTitleStyle = css({
   display: 'flex',
   alignItems: 'center',
   gap: '0.75rem',
+  width: '27.875rem',
 });
 
 const taskItemContainerStyle = cva({
@@ -623,18 +683,21 @@ const taskItemContainerStyle = cva({
 
 const taskTextStyle = cva({
   base: {
-    textStyle: 'body1.r',
-    transition: 'all 0.2s ease',
+    wordBreak: 'break-word',
+    flex: 1,
   },
   variants: {
     checked: {
       true: {
+        textStyle: 'body1.r',
         color: 'gray.400',
         textDecoration: 'line-through',
+        textDecorationThickness: '1px',
+        textDecorationSkipInk: 'none',
       },
       false: {
+        textStyle: 'body1.m',
         color: 'gray.900',
-        textDecoration: 'none',
       },
     },
   },
@@ -643,68 +706,49 @@ const taskTextStyle = cva({
   },
 });
 
-const taskComponentsStyle = cva({
+const dateAlarmStyle = css({
+  display: 'flex',
+  alignItems: 'center',
+  gap: '1rem',
+  flexShrink: 0,
+});
+
+const rightSectionStyle = cva({
   base: {
     display: 'flex',
     alignItems: 'center',
-    gap: '2rem',
-    transition: 'opacity 0.2s ease',
+    flexShrink: 0,
+    width: '13rem',
   },
   variants: {
-    checked: {
-      true: {
-        opacity: 0.4,
-      },
-      false: {
-        opacity: 1,
-      },
+    editMode: {
+      true: { justifyContent: 'space-between' },
+      false: {},
     },
   },
-  defaultVariants: {
-    checked: false,
-  },
+  defaultVariants: { editMode: false },
 });
 
-const managerContainerStyle = cva({
-  base: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '0.5rem',
-    transition: 'opacity 0.2s ease',
-  },
-  variants: {
-    checked: {
-      true: {
-        opacity: 0.4,
-      },
-      false: {
-        opacity: 1,
-      },
-    },
-  },
-  defaultVariants: {
-    checked: false,
-  },
+
+const deleteButtonStyle = css({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  width: '1.75rem',
+  height: '1.75rem',
+  flexShrink: 0,
+  cursor: 'pointer',
 });
 
-const managerLabelStyle = cva({
-  base: {
-    textStyle: 'body3',
-    transition: 'color 0.2s ease',
-  },
-  variants: {
-    checked: {
-      true: {
-        color: 'gray.400',
-      },
-      false: {
-        color: 'gray.600',
-      },
-    },
-  },
-  defaultVariants: {
-    checked: false,
-  },
+const managerContainerStyle = css({
+  display: 'flex',
+  alignItems: 'center',
+  gap: '0.5rem',
+});
+
+const managerLabelStyle = css({
+  textStyle: 'body3.r',
+  color: 'gray.600',
 });
 
 const commentSectionStyle = css({
@@ -787,7 +831,7 @@ const commentItemHeaderProfileStyle = css({
 });
 
 const commentItemHeaderCommentStyle = css({
-  textStyle: 'body3',
+  textStyle: 'body3.r',
   color: 'gray.700',
   ml: '0.125rem',
 });

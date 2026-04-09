@@ -6,22 +6,22 @@ import { AssignmentEditModalContent, hexToFolderColor } from '@/components/Assig
 import { useModalStore } from '@/stores/modal-store';
 import { css } from 'styled-system/css';
 
-interface HeaderProps {
+interface AssignmentHeaderProps {
   completionRate: number;
   folderColorHex?: string;
   title: string;
   daysLeft: string;
-  // 마감일 - 모달 표시
+  /** 마감일 - 수정 모달에서 사용 */
   deadline?: string;
 }
 
-export const PersonalHeader = ({
+export const AssignmentHeader = ({
   completionRate,
   folderColorHex,
   title,
   daysLeft,
   deadline,
-}: HeaderProps) => {
+}: AssignmentHeaderProps) => {
   const { openModal } = useModalStore();
   const folderColorToken = hexToFolderColor(folderColorHex) ?? '01';
 
@@ -58,10 +58,7 @@ export const PersonalHeader = ({
           </button>
         </div>
 
-        <p
-          className={daysLeftStyle}
-          style={{ color: folderColorHex }}
-        >
+        <p className={daysLeftStyle} style={{ color: folderColorHex }}>
           {daysLeft}
         </p>
       </div>
@@ -81,7 +78,7 @@ export const PersonalHeader = ({
 const containerStyle = css({
   display: 'flex',
   flexDirection: 'column',
-  gap: '1.75rem', 
+  gap: '1.75rem',
   transition: 'all 0.3s ease-in-out',
   w: '100%',
 });
@@ -94,7 +91,7 @@ const titleStyle = css({
   gap: '1rem',
 });
 
-// 폴더 색상+ 제목
+// 폴더 색상 + 제목
 const titleContentStyle = css({
   display: 'flex',
   gap: '0.75rem',
@@ -118,10 +115,10 @@ const daysLeftStyle = css({
 });
 
 const completionRateStyle = css({
-  ml: '3.25rem', // 헤더에서 시작 위치가 들어가있음
+  ml: '3.25rem',
   display: 'flex',
   flexDirection: 'column',
-  gap: '0.75rem', // 완료율과 바 사이 간격
+  gap: '0.75rem',
 });
 
 const completionRateContentStyle = css({

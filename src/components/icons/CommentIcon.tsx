@@ -1,8 +1,13 @@
 import { css } from 'styled-system/css';
+import type { SystemStyleObject } from 'styled-system/types';
 
-export const CommentIcon = () => {
+interface CommentIconProps {
+  color?: SystemStyleObject['fill'];
+}
+
+export const CommentIcon = ({ color = 'blue.300' }: CommentIconProps) => {
   const iconStyle = css({
-    fill: 'blue.300',
+    fill: color,
   });
 
   return (
