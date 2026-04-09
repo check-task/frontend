@@ -11,7 +11,7 @@ const FOLDER_COLOR_TOKEN: Record<Folder['color'], string> = {
   green: 'sub.03.100',
   purple: 'sub.04.100',
   black: 'sub.05.100',
-  null: 'null',
+  null: 'sub.null.100',
 };
 
 interface FolderSelectProps {
@@ -27,48 +27,50 @@ export const FolderSelect = ({
 }: FolderSelectProps) => {
   return (
     <div className={containerStyle}>
-      {folders.filter((folder) => folder.name !== '지정안함').map((folder) => {
-        const token = FOLDER_COLOR_TOKEN[folder.color];
-        const isSelected = selectedFolderId === folder.id;
-        return (
-          <label key={folder.id} className={labelStyle}>
-            <input
-              type='radio'
-              name='folder'
-              checked={isSelected}
-              onChange={() => onFolderChange(folder.id)}
-              className={cx('peer', hiddenInputStyle)}
-            />
-            <div
-              className={css({
-                width: '2rem',
-                height: '2rem',
-                borderRadius: '50%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                position: 'relative',
-                bg: token,
-                transition: 'transform 0.2s ease',
-                '& svg': {
-                  opacity: 0,
-                  transform: 'scale(0.5)',
-                  transition: 'all 0.1s ease-in-out',
-                },
-                _peerChecked: {
+      {folders
+        .filter((folder) => folder.name !== '지정안함')
+        .map((folder) => {
+          const token = FOLDER_COLOR_TOKEN[folder.color];
+          const isSelected = selectedFolderId === folder.id;
+          return (
+            <label key={folder.id} className={labelStyle}>
+              <input
+                type='radio'
+                name='folder'
+                checked={isSelected}
+                onChange={() => onFolderChange(folder.id)}
+                className={cx('peer', hiddenInputStyle)}
+              />
+              <div
+                className={css({
+                  width: '2rem',
+                  height: '2rem',
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  position: 'relative',
+                  bg: token,
+                  transition: 'transform 0.2s ease',
                   '& svg': {
-                    opacity: 1,
-                    transform: 'scale(1)',
+                    opacity: 0,
+                    transform: 'scale(0.5)',
+                    transition: 'all 0.1s ease-in-out',
                   },
-                },
-              })}
-              title={folder.name}
-            >
-              <CheckMark variant='white' />
-            </div>
-          </label>
-        );
-      })}
+                  _peerChecked: {
+                    '& svg': {
+                      opacity: 1,
+                      transform: 'scale(1)',
+                    },
+                  },
+                })}
+                title={folder.name}
+              >
+                <CheckMark variant='white' />
+              </div>
+            </label>
+          );
+        })}
     </div>
   );
 };
