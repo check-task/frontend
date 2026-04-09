@@ -100,7 +100,7 @@ export const FolderModalContent = ({
         <Modal.FormField gap='medium'>
           <Modal.Label>폴더색</Modal.Label>
           <div className={colorSectionStyle}>
-            {FOLDER_COLORS.map((color) => (
+            {FOLDER_COLORS.filter((color) => color !== 'null').map((color) => (
               <button
                 key={color}
                 type='button'

@@ -81,18 +81,20 @@ export const ManagementSection = () => {
                   <div className={folderColorStyle({ color: folder.color })} />
                   <span className={folderNameStyle}>{folder.name}</span>
                 </div>
-                <div className={folderActionsStyle}>
-                  <EditFolderButton
-                    folderId={folder.id}
-                    folderName={folder.name}
-                    folderColor={folder.color}
-                  />
-                  <DeleteFolderButton
-                    folderId={folder.id}
-                    folderName={folder.name}
-                    folderColor={folder.color}
-                  />
-                </div>
+                {folder.name !== '지정안함' && (
+                  <div className={folderActionsStyle}>
+                    <EditFolderButton
+                      folderId={folder.id}
+                      folderName={folder.name}
+                      folderColor={folder.color}
+                    />
+                    <DeleteFolderButton
+                      folderId={folder.id}
+                      folderName={folder.name}
+                      folderColor={folder.color}
+                    />
+                  </div>
+                )}
               </div>
             ))}
           </div>
@@ -185,6 +187,7 @@ const folderColorStyle = cva({
       green: { bg: 'sub.03.100' },
       purple: { bg: 'sub.04.100' },
       black: { bg: 'sub.05.100' },
+      null: { bg: 'null' },
     },
   },
 });

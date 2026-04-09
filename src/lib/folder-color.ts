@@ -7,6 +7,7 @@ const HEX_TO_COLOR: Record<string, FolderColor> = {
   '#6EC77B': 'green',
   '#A177E2': 'purple',
   '#081221': 'black',
+  '#818892': 'null',
 };
 
 // FolderColor 이름 → HEX 매핑
@@ -16,6 +17,7 @@ const COLOR_TO_HEX: Record<FolderColor, string> = {
   green: '#6EC77B',
   purple: '#A177E2',
   black: '#081221',
+  null: '#818892',
 };
 
 // HEX 문자열을 FolderColor로 변환
