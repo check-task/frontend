@@ -11,6 +11,7 @@ interface DatePickerProps {
   onChange?: (date: Date) => void;
   maxDate?: string | Date;
   muted?: boolean; // 데이트 피커는 공용이니까 불리언으로 처리
+  showTimeDisplay?: boolean; // 시간 표시 여부 
 }
 
 // 날짜 문자열로 온거 Date 객체로 변환 처리
@@ -25,6 +26,7 @@ export default function DatePicker({
   onChange,
   maxDate,
   muted = false,
+  showTimeDisplay = false,
 }: DatePickerProps) {
   // ======= 상태 정의 =======
   const [isOpen, setIsOpen] = useState(false);
@@ -32,6 +34,8 @@ export default function DatePicker({
   const [confirmedDate, setConfirmedDate] = useState<Date>(
     parseDate(value) ?? new Date(),
   );
+  // 시간 추가 여부
+  const [timeEnabled, setTimeEnabled] = useState(false);
 
   // datepicker 외 화면 클릭하면 닫히도록 처리.
   const pickerRef = useClickOutside<HTMLDivElement>(() => setIsOpen(false));
@@ -45,8 +49,9 @@ export default function DatePicker({
   }, [value]);
 
   // 선택한 날짜 저장
-  const handleSave = (date: Date) => {
+  const handleSave = (date: Date, withTime: boolean) => {
     setConfirmedDate(date);
+    setTimeEnabled(withTime);
     onChange?.(date);
     setIsOpen(false);
   };
@@ -60,6 +65,14 @@ export default function DatePicker({
       })
       .replace(/\s/g, '')
       .slice(0, -1);
+  };
+
+  const formatTime = (date: Date) => {
+    const h = date.getHours();
+    const m = date.getMinutes();
+    const p = h < 12 ? '오전' : '오후';
+    const h12 = h % 12 || 12;
+    return `${p} ${h12}:${String(m).padStart(2, '0')}`;
   };
 
   const parsedMaxDate = parseDate(maxDate);
@@ -90,6 +103,20 @@ export default function DatePicker({
         </button>
       </div>
 
+      {/* 시간 추가 시 구분선 + 시간 텍스트 표시 (showTimeDisplay=true인 페이지에서만) */}
+      {showTimeDisplay && timeEnabled && (
+        <>
+          <span className={separatorStyle} />
+          <button
+            type='button'
+            className={timeTextStyle}
+            onClick={() => setIsOpen(!isOpen)}
+          >
+            {formatTime(confirmedDate)}
+          </button>
+        </>
+      )}
+
       {/* 달력 모달 */}
       {isOpen && (
         <CalendarModal
@@ -97,6 +124,7 @@ export default function DatePicker({
           onSave={handleSave}
           initialDate={confirmedDate}
           maxDate={parsedMaxDate ?? undefined}
+          initialTimeEnabled={timeEnabled}
         />
       )}
     </div>
@@ -120,7 +148,7 @@ const dateTextStyle = cva({
     fontVariantNumeric: 'normal',
     display: 'inline-flex',
     alignItems: 'center',
-    width: '5rem',
+    width: '4.8rem',
     textAlign: 'left',
     backgroundColor: 'transparent',
     border: 'none',
@@ -135,4 +163,27 @@ const dateTextStyle = cva({
   defaultVariants: {
     muted: false,
   },
+});
+
+// 날짜-시간 구분선
+const separatorStyle = css({
+  display: 'inline-block',
+  width: '1px',
+  height: '1.125rem',
+  flexShrink: 0,
+  backgroundColor: 'gray.600',
+});
+
+// 시간 텍스트 스타일
+const timeTextStyle = css({
+  textStyle: 'body1.r',
+  cursor: 'pointer',
+  color: 'gray.600',
+  display: 'inline-flex',
+  alignItems: 'center',
+  backgroundColor: 'transparent',
+  border: 'none',
+  padding: 0,
+  whiteSpace: 'nowrap',
+  fontVariantNumeric: 'normal',
 });

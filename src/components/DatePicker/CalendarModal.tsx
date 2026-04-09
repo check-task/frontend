@@ -12,7 +12,7 @@ import { TimeToggle } from '../TimeToggle';
 
 interface CalenderModalProps {
   onClose: () => void;
-  onSave: (date: Date) => void;
+  onSave: (date: Date, timeEnabled: boolean) => void;
   // 초기 날짜를 받기 위함
   initialDate: Date;
   // 세부 목록 날짜 선택시 이후 날짜 제한을 위해 추가
@@ -35,9 +35,17 @@ export default function CalendarModal({
   const [selectedDate, setSelectedDate] = useState<Date | null>(initialDate);
   // 시간 추가 토글 상태
   const [timeEnabled, setTimeEnabled] = useState(initialTimeEnabled);
-  // 시간 입력 상태
-  const [period, setPeriod] = useState<'오전' | '오후'>('오전');
-  const [timeValue, setTimeValue] = useState('00:00');
+  // 시간 입력 상태 — 모달을 다시 열 때 저장된 시간 복원
+  const [period, setPeriod] = useState<'오전' | '오후'>(() => {
+    if (!initialTimeEnabled) return '오전';
+    return initialDate.getHours() < 12 ? '오전' : '오후';
+  });
+  const [timeValue, setTimeValue] = useState(() => {
+    if (!initialTimeEnabled) return '00:00';
+    const h = initialDate.getHours() % 12 || 12;
+    const m = initialDate.getMinutes();
+    return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+  });
 
   const handleTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const raw = e.target.value.replace(/\D/g, '').slice(0, 4);
@@ -180,9 +188,9 @@ export default function CalendarModal({
                 const m = parseInt(mStr) || 0;
                 const dateWithTime = new Date(selectedDate);
                 dateWithTime.setHours(h, m, 0, 0);
-                onSave(dateWithTime);
+                onSave(dateWithTime, true);
               } else {
-                onSave(selectedDate);
+                onSave(selectedDate, false);
               }
             }
           }}
