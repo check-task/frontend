@@ -104,9 +104,9 @@ const cardWrapperStyle = cva({
         '--card-color-40': 'token(colors.sub.05.40)',
       },
       null: {
-        '--card-color-100': 'token(colors.null)',
-        '--card-color-60': 'token(colors.null)',
-        '--card-color-40': 'token(colors.null)',
+        '--card-color-100': 'token(colors.sub.null.100)',
+        '--card-color-60': 'token(colors.sub.null.60)',
+        '--card-color-40': 'token(colors.sub.null.40)',
       },
     },
     brightness: {

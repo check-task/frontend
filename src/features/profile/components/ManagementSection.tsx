@@ -187,7 +187,7 @@ const folderColorStyle = cva({
       green: { bg: 'sub.03.100' },
       purple: { bg: 'sub.04.100' },
       black: { bg: 'sub.05.100' },
-      null: { bg: 'null' },
+      null: { bg: 'sub.null.100' },
     },
   },
 });
