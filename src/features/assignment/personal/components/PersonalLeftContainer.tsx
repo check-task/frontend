@@ -120,7 +120,7 @@ export const PersonalLeftContainer = ({
                 <button
                   type='button'
                   onClick={enterEditMode}
-                  className={pencilButtonStyle}
+                  className={css({cursor: 'pointer'})}
                   aria-label='세부 task 수정'
                 >
                   <PencilIcon size={24} />
@@ -206,13 +206,4 @@ const taskHeaderStyle = cva({
   },
 });
 
-const pencilButtonStyle = css({
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  bg: 'transparent',
-  border: 'none',
-  cursor: 'pointer',
-  padding: 0,
-  flexShrink: 0,
-});
+
