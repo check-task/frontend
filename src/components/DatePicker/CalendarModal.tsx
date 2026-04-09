@@ -8,6 +8,7 @@ import { RightIcon } from '../icons/RightIcon';
 import { LeftIcon } from '../icons/LeftIcon';
 import { useState } from 'react';
 import { Button } from '../Button';
+import { TimeToggle } from '../TimeToggle';
 
 interface CalenderModalProps {
   onClose: () => void;
@@ -16,6 +17,10 @@ interface CalenderModalProps {
   initialDate: Date;
   // 세부 목록 날짜 선택시 이후 날짜 제한을 위해 추가
   maxDate?: Date;
+  // 시간 추가 토글 초기값
+  initialTimeEnabled?: boolean;
+  // 시간 추가 토글 상태 변경 콜백
+  onTimeToggle?: (enabled: boolean) => void;
 }
 
 export default function CalendarModal({
@@ -23,9 +28,18 @@ export default function CalendarModal({
   onSave,
   initialDate,
   maxDate,
+  initialTimeEnabled = false,
+  onTimeToggle,
 }: CalenderModalProps) {
   // 선택된 날짜
   const [selectedDate, setSelectedDate] = useState<Date | null>(initialDate);
+  // 시간 추가 토글 상태
+  const [timeEnabled, setTimeEnabled] = useState(initialTimeEnabled);
+
+  const handleTimeToggle = (enabled: boolean) => {
+    setTimeEnabled(enabled);
+    onTimeToggle?.(enabled);
+  };
 
   const handleDateChange = (value: any) => {
     // 배열 말고 단일 선택만 고려
@@ -54,6 +68,10 @@ export default function CalendarModal({
         showNeighboringMonth={true} // 기본이 true인데 한번 더 명시
         showFixedNumberOfWeeks={true} // 6주를 보여주는 프롭이 있음
       />
+      <div className={timeToggleRow}>
+        <span className={timeToggleLabel}>시간 추가</span>
+        <TimeToggle checked={timeEnabled} onChange={handleTimeToggle} />
+      </div>
       <div className={footer}>
         <Button
           variant='fillGray'
@@ -263,5 +281,17 @@ const modalWrapper = css({
   },
 });
 
+// 시간 추가 토글 행
+const timeToggleRow = flex({
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  mt: '0.75rem',
+});
+
+const timeToggleLabel = css({
+  textStyle: 'body3.m',
+  color: 'gray.900',
+});
+
 // 하단 버튼 레이아웃
-const footer = flex({ gap: '1.25rem', mt: '1.25rem' });
+const footer = flex({ gap: '1.25rem', mt: '1rem' });
