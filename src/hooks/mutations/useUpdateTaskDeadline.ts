@@ -10,8 +10,8 @@ export const useUpdateTaskDeadline = () => {
       updateTaskDeadline(taskId, deadline),
     onMutate: async ({ taskId, deadline }) => {
       await queryClient.cancelQueries({ queryKey: ['taskList'] });
-      // 날짜 부분만 캐시에 업데이트 (시간 제거)
-      const dueDateOnly = deadline.split(' ')[0];
+      // 날짜 부분만 캐시에 업데이트 (시간 제거, ISO 8601)
+      const dueDateOnly = deadline.split('T')[0];
       queryClient.setQueriesData<{
         assignments: { id: number; dueDate: string }[];
         subTasks: unknown[];
