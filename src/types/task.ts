@@ -347,7 +347,7 @@ export interface UpdateSubTaskAssigneeResponse {
 // ============================
 export interface CreateSubTaskRequest {
   title: string;
-  deadline: string; // YYYY-MM-DD
+  deadline: string; // YYYY-MM-DDTHH:mm:ss
   isAlarm: boolean;
 }
 

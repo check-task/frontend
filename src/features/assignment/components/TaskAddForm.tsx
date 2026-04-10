@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { css } from 'styled-system/css';
-import { useUIStore } from '@/stores/ui-store';
 import { PlusIcon } from '@/components/icons/PlusIcon';
 import { Input } from '@/components/TextField';
 import { FormActionButtons } from '@/features/assignment/components/FormActionButtons';
@@ -14,16 +13,24 @@ interface TaskAddFormProps {
   maxDate?: string | Date;
 }
 
-// Api형태에 맞게 Date형태를 YYYY-MM-DD 문자열로 변환
-const formatDate = (date: Date) => date.toLocaleDateString('en-CA');
+// Api형태에 맞게 Date형태를 YYYY-MM-DDTHH:mm:ss 문자열로 변환
+const formatDeadline = (date: Date) => {
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}:00`;
+};
+
+const todayAtMidnight = () => {
+  const d = new Date();
+  d.setHours(0, 0, 0, 0);
+  return d;
+};
 
 export const TaskAddForm = ({ taskId, maxDate }: TaskAddFormProps) => {
-  const isSidebarCollapsed = useUIStore((state) => state.isSidebarCollapsed);
   const [isAdding, setIsAdding] = useState(false);
   const [taskName, setTaskName] = useState('');
 
   // 선택된 날짜 상태 추가
-  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [selectedDate, setSelectedDate] = useState<Date>(todayAtMidnight());
   // 세부과제 생성 훅 호출
   const { mutate: createSubTask, isPending } = useCreateSubTask(taskId);
 
@@ -31,8 +38,7 @@ export const TaskAddForm = ({ taskId, maxDate }: TaskAddFormProps) => {
   const handleCancelTask = () => {
     setIsAdding(false);
     setTaskName('');
-    // 기본값으로 초기화
-    setSelectedDate(new Date());
+    setSelectedDate(todayAtMidnight());
   };
 
   const handleSaveTask = () => {
@@ -43,14 +49,14 @@ export const TaskAddForm = ({ taskId, maxDate }: TaskAddFormProps) => {
     createSubTask(
       {
         title,
-        deadline: formatDate(selectedDate),
+        deadline: formatDeadline(selectedDate),
         isAlarm: true,
       },
       {
         onSuccess: () => {
           setIsAdding(false); // 입력 폼 닫기
           setTaskName('');
-          setSelectedDate(new Date());
+          setSelectedDate(todayAtMidnight());
         },
       },
     );
