@@ -29,6 +29,7 @@ interface Assignment {
   folderId: number;
   folderColor: FolderColor;
   dueDate: string;
+  deadlineTime?: string;
   assignmentName: string;
   assignmentType: string;
 }
@@ -81,6 +82,7 @@ export const Calendar = ({
       title: assignment.assignmentName,
       start: assignment.dueDate,
       backgroundColor: FOLDER_COLOR_MAP[assignment.folderColor],
+      extendedProps: { deadlineTime: assignment.deadlineTime },
     }));
 
   // 세부과제를 캘린더 이벤트로 변환
@@ -181,15 +183,19 @@ export const Calendar = ({
         { onError: () => info.revert() },
       );
     } else {
-      // 과제 마감일 변경
+      // 과제 마감일 변경 (기존 시간 보존)
       const taskId = Number(eventId);
+      const deadlineTime = info.event.extendedProps.deadlineTime as
+        | string
+        | undefined;
+      const deadline = deadlineTime ? `${newDate}T${deadlineTime}` : newDate;
       setItems((prev) =>
         prev.map((item) =>
           item.id === taskId ? { ...item, dueDate: newDate } : item,
         ),
       );
       updateDeadline.mutate(
-        { taskId, deadline: newDate },
+        { taskId, deadline },
         { onError: () => info.revert() },
       );
     }

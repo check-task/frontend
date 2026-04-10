@@ -21,6 +21,13 @@ const formatDate = (d: Date) => {
   return `${yyyy}-${mm}-${dd}`;
 };
 
+const formatDateWithTime = (d: Date) => {
+  const date = formatDate(d);
+  const hh = String(d.getHours()).padStart(2, '0');
+  const mi = String(d.getMinutes()).padStart(2, '0');
+  return `${date}T${hh}:${mi}:00`;
+};
+
 export const CreateAssignmentForm = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -32,6 +39,7 @@ export const CreateAssignmentForm = () => {
   const [assignmentName, setAssignmentName] = useState('');
   const [selectedFolderId, setSelectedFolderId] = useState<number | null>(null);
   const [deadline, setDeadline] = useState<Date | null>(null);
+  const [deadlineTimeEnabled, setDeadlineTimeEnabled] = useState(false);
   const [isTeamProject, setIsTeamProject] = useState(false);
   const [subTasks, setSubTasks] = useState<SubTaskInput[]>([]);
   const [dataItems, setDataItems] = useState<DataItem[]>([]);
@@ -52,7 +60,9 @@ export const CreateAssignmentForm = () => {
     const payload = {
       title: assignmentName.trim(),
       folderId,
-      deadline: formatDate(deadline ?? new Date()),
+      deadline: deadlineTimeEnabled
+        ? formatDateWithTime(deadline ?? new Date())
+        : formatDate(deadline ?? new Date()),
       type,
       subTasks: subTasks
         .filter((t) => t.title.trim() !== '')
@@ -103,7 +113,10 @@ export const CreateAssignmentForm = () => {
         folders={folders}
         selectedFolderId={selectedFolderId}
         onFolderChange={setSelectedFolderId}
-        onDateChange={(d) => setDeadline(d)}
+        onDateChange={(d, t) => {
+          setDeadline(d);
+          setDeadlineTimeEnabled(t);
+        }}
       />
 
       <Divider mt='1.75rem' mb='1.75rem' />
