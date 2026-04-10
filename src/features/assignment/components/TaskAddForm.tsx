@@ -45,21 +45,13 @@ export const TaskAddForm = ({ taskId, maxDate }: TaskAddFormProps) => {
     const title = taskName.trim();
     if (!title) return;
 
-    // 세부과제 생성 호출
-    createSubTask(
-      {
-        title,
-        deadline: formatDeadline(selectedDate),
-        isAlarm: true,
-      },
-      {
-        onSuccess: () => {
-          setIsAdding(false); // 입력 폼 닫기
-          setTaskName('');
-          setSelectedDate(todayAtMidnight());
-        },
-      },
-    );
+    // 즉시 폼 닫기 + onMutate 낙관적 업데이트로 task 동시 노출 → 깜빡임 방지
+    const deadline = formatDeadline(selectedDate);
+    setIsAdding(false);
+    setTaskName('');
+    setSelectedDate(todayAtMidnight());
+
+    createSubTask({ title, deadline, isAlarm: true });
   };
 
   return (
