@@ -17,7 +17,9 @@ interface DatePickerProps {
 // 날짜 문자열로 온거 Date 객체로 변환 처리
 const parseDate = (value?: string | Date) => {
   if (!value) return null;
-  const parsed = value instanceof Date ? value : new Date(`${value}T00:00:00`);
+  if (value instanceof Date) return value;
+  // 이미 시간이 포함된 문자열(YYYY-MM-DDTHH:mm:ss)은 그대로 파싱
+  const parsed = new Date(value.includes('T') ? value : `${value}T00:00:00`);
   return parsed;
 };
 
