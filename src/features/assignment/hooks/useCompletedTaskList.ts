@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { getCompletedTaskList } from '@/services/task';
-import { FOLDER_COLORS, FolderColor } from '@/types/folder';
+import { FolderColor } from '@/types/folder';
 
 // 완료 과제 목록 화면에서 사용하는 타입만 정의
 export interface CompletedTaskListItem {
@@ -38,7 +38,7 @@ export const useCompletedTaskList = () => {
         type: task.type === '팀' ? 'team' : 'personal',
         folderName: task.folderTitle,
         assignmentName: task.title,
-        dueDate: task.deadline,
+        dueDate: task.deadline ? task.deadline.split('T')[0] : '',
         folderColor: resolveFolderColor(task.color),
       }));
     },
