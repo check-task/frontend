@@ -28,7 +28,7 @@ export const HomeButtonBar = () => {
           transition: 'margin-left 0.3s ease',
         })}
       >
-        <Image src={logoSrc} alt='HomeLogo' width={240} height={44} />
+        <Image src={logoSrc} alt='HomeLogo' width={240} height={44} priority />
       </Link>
 
       <div className={notificationButtonWrapperStyle}>

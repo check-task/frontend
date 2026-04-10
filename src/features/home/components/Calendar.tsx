@@ -77,27 +77,36 @@ export const Calendar = ({
   // 선택된 폴더의 과제만 필터링하여 캘린더 이벤트로 변환
   const taskEvents = items
     .filter((assignment) => selectedFolderIds.includes(assignment.folderId))
-    .map((assignment) => ({
-      id: String(assignment.id), // FullCalendar의 id는 문자열을 요구
-      title: assignment.assignmentName,
-      start: assignment.dueDate,
-      backgroundColor: FOLDER_COLOR_MAP[assignment.folderColor],
-      extendedProps: { deadlineTime: assignment.deadlineTime },
-    }));
+    .map((assignment) => {
+      const type = assignment.assignmentType === '팀' ? 'team' : 'personal';
+      return {
+        id: String(assignment.id), // FullCalendar의 id는 문자열을 요구
+        title: assignment.assignmentName,
+        start: assignment.dueDate,
+        url: `/assignment/${type}/${assignment.id}`,
+        backgroundColor: FOLDER_COLOR_MAP[assignment.folderColor],
+        extendedProps: { deadlineTime: assignment.deadlineTime },
+      };
+    });
 
   // 세부과제를 캘린더 이벤트로 변환
   const filteredTaskIds = new Set(taskEvents.map((e) => Number(e.id)));
   const subTaskEvents = subItems
     .filter((st) => filteredTaskIds.has(st.taskId))
-    .map((st) => ({
-      id: `sub-${st.subTaskId}`,
-      title: st.title,
-      start: st.dueDate,
-      backgroundColor: 'transparent',
-      borderColor: FOLDER_COLOR_MAP[st.folderColor],
-      textColor: FOLDER_COLOR_MAP[st.folderColor],
-      classNames: ['fc-subtask-event'],
-    }));
+    .map((st) => {
+      const parentTask = items.find((a) => a.id === st.taskId);
+      const type = parentTask?.assignmentType === '팀' ? 'team' : 'personal';
+      return {
+        id: `sub-${st.subTaskId}`,
+        title: st.title,
+        start: st.dueDate,
+        url: `/assignment/${type}/${st.taskId}`,
+        backgroundColor: 'transparent',
+        borderColor: FOLDER_COLOR_MAP[st.folderColor],
+        textColor: FOLDER_COLOR_MAP[st.folderColor],
+        classNames: ['fc-subtask-event'],
+      };
+    });
 
   const filteredEvents = [...taskEvents, ...subTaskEvents];
 
@@ -112,6 +121,7 @@ export const Calendar = ({
 
   // 캘린더 이벤트 클릭 시 과제 상세 페이지로 이동
   const handleEventClick = (info: EventClickArg) => {
+    info.jsEvent.preventDefault(); // url 속성으로 인한 전체 페이지 이동 방지
     const eventId = info.event.id;
     let taskId: number;
 
