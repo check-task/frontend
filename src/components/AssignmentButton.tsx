@@ -6,7 +6,6 @@ interface AssignmentButtonProps {
   collapsed?: boolean;
   isOpen?: boolean;
   onClick?: () => void;
-  onToggle?: () => void;
 }
 
 const buttonStyle = cva({
@@ -81,7 +80,6 @@ export const AssignmentButton = ({
   collapsed = false,
   isOpen = false,
   onClick,
-  onToggle,
 }: AssignmentButtonProps) => (
   <button type='button' className={buttonStyle()} onClick={onClick}>
     <div className={leftPartStyle}>
@@ -94,10 +92,6 @@ export const AssignmentButton = ({
       className={chevronWrapperStyle({ collapsed })}
       style={{
         transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
-      }}
-      onClick={(e) => {
-        e.stopPropagation();
-        onToggle?.();
       }}
     >
       <ChevronIcon />
