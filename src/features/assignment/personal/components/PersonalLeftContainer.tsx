@@ -9,6 +9,7 @@ import { FormActionButtons } from '@/features/assignment/components/FormActionBu
 import { useModalStore } from '@/stores/modal-store';
 import { DeleteAllTaskConfirmModal } from '@/features/assignment/components/DeleteAllTaskConfirmModal';
 import { useState } from 'react';
+import { useDeleteAllSubTasks } from '@/features/assignment/hooks/useDeleteAllSubTasks';
 
 interface PersonalLeftContainerProps {
   // 헤더 정보
@@ -44,6 +45,8 @@ export const PersonalLeftContainer = ({
   const [editedTitles, setEditedTitles] = useState<Record<number, string>>({});
   const [deletedTaskIds, setDeletedTaskIds] = useState<Set<number>>(new Set());
 
+  const { mutate: mutateDeleteAll } = useDeleteAllSubTasks(taskId);
+
   const enterEditMode = () => {
     onEditModeChange?.(true);
     setEditedTitles({});
@@ -62,9 +65,12 @@ export const PersonalLeftContainer = ({
   };
 
   const confirmDeleteAll = () => {
-    // TODO: API 연동 (전체 삭제)
-    exitEditMode();
-    closeModal();
+    mutateDeleteAll(undefined, {
+      onSuccess: () => {
+        exitEditMode();
+        closeModal();
+      },
+    });
   };
 
   const handleDeleteAll = () => {

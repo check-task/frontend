@@ -399,3 +399,14 @@ export interface DeleteCommentResponse {
   message: string;
   data: null;
 }
+
+// ============================
+// 세부 TASK 전체 삭제 타입 정의
+// ============================
+export interface DeleteAllSubTasksResponse {
+  resultType: 'SUCCESS' | 'FAIL';
+  message: string;
+  data: {
+    deletedCount: number;
+  };
+}
