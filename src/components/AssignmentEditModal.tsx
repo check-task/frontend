@@ -16,7 +16,7 @@ import {
 
 interface AssignmentEditModalContentProps {
   initialTitle: string;
-  initialColor: FolderColor;
+  initialColor: FolderColor | null;
   initialDueDate?: string;
 }
 
@@ -43,7 +43,7 @@ export const AssignmentEditModalContent = ({
   initialDueDate,
 }: AssignmentEditModalContentProps) => {
   const [title, setTitle] = useState(initialTitle);
-  const [selectedColor, setSelectedColor] = useState<FolderColor>(initialColor);
+  const [selectedColor, setSelectedColor] = useState<FolderColor | null>(initialColor ?? null);
   const [dueDate, setDueDate] = useState<string | undefined>(initialDueDate);
   const { data: myInfo } = useMyInfo();
 
@@ -73,7 +73,7 @@ export const AssignmentEditModalContent = ({
             <button
               key={color}
               type='button'
-              onClick={() => setSelectedColor(color)}
+              onClick={() => setSelectedColor(selectedColor === color ? null : color)}
               className={css({
                 width: '2.25rem',
                 height: '2.25rem',

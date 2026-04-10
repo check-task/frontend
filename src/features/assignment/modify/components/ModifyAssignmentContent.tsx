@@ -12,7 +12,7 @@ interface ModifyAssignmentContentProps {
   selectedFolderId: number | null;
   date?: string | Date | null;
   onNameChange?: (name: string) => void;
-  onFolderChange?: (folderId: number) => void;
+  onFolderChange?: (folderId: number | null) => void;
   onDateChange?: (date: Date | null) => void;
 }
 

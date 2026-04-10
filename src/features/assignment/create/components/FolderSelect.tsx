@@ -17,7 +17,7 @@ const FOLDER_COLOR_TOKEN: Record<Folder['color'], string> = {
 interface FolderSelectProps {
   folders: Folder[];
   selectedFolderId: number | null;
-  onFolderChange: (folderId: number) => void;
+  onFolderChange: (folderId: number | null) => void;
 }
 
 export const FolderSelect = ({
@@ -38,7 +38,8 @@ export const FolderSelect = ({
                 type='radio'
                 name='folder'
                 checked={isSelected}
-                onChange={() => onFolderChange(folder.id)}
+                onChange={() => onFolderChange(isSelected ? null : folder.id)}
+                onClick={() => isSelected && onFolderChange(null)}
                 className={cx('peer', hiddenInputStyle)}
               />
               <div
