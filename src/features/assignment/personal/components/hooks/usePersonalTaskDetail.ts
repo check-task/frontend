@@ -18,13 +18,14 @@ export interface PersonalTaskDetailView {
 
 const mapToPersonalView = (data: TaskDetail): PersonalTaskDetailView => {
   // 자료 모음집 항목에 맞게 매핑
-  const items: ReferenceItem[] = data.references.map((ref, index) => ({
-    id: ref.referenceId ?? index + 1,
-    type: 0,
-    name: ref.name,
-    // URL 자료면 url, 파일 자료면 file_url 사용 (null 방지)
-    path: ref.url ?? ref.file_url ?? '',
-  }));
+  const items: ReferenceItem[] = [...data.references]
+    .sort((a, b) => (a.referenceId ?? 0) - (b.referenceId ?? 0))
+    .map((ref, index) => ({
+      id: ref.referenceId ?? index + 1,
+      type: ref.url != null ? 0 : 1,
+      name: ref.name,
+      path: ref.url ?? ref.file_url ?? '',
+    }));
 
   const tasks: PersonalTaskItem[] = [...data.subTasks]
     .sort((a, b) => a.subTaskId - b.subTaskId)
