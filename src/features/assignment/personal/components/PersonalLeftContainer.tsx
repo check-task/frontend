@@ -8,8 +8,10 @@ import { PencilIcon } from '@/components/icons/PencilIcon';
 import { FormActionButtons } from '@/features/assignment/components/FormActionButtons';
 import { useModalStore } from '@/stores/modal-store';
 import { DeleteAllTaskConfirmModal } from '@/features/assignment/components/DeleteAllTaskConfirmModal';
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useDeleteAllSubTasks } from '@/features/assignment/hooks/useDeleteAllSubTasks';
+import { useDeleteSubTasks } from '@/features/assignment/hooks/useDeleteSubTasks';
+import { UndoToast } from '@/components/UndoToast';
 
 interface PersonalLeftContainerProps {
   // 헤더 정보
@@ -46,6 +48,11 @@ export const PersonalLeftContainer = ({
   const [deletedTaskIds, setDeletedTaskIds] = useState<Set<number>>(new Set());
 
   const { mutate: mutateDeleteAll } = useDeleteAllSubTasks(taskId);
+  const { mutate: mutateDeleteBulk } = useDeleteSubTasks(taskId);
+
+  // 되돌리기를 위해 task 저장
+  const [undoSnapshot, setUndoSnapshot] = useState<PersonalTaskItem | null>(null);
+  const [showUndoToast, setShowUndoToast] = useState(false);
 
   const enterEditMode = () => {
     onEditModeChange?.(true);
@@ -53,24 +60,22 @@ export const PersonalLeftContainer = ({
     setDeletedTaskIds(new Set());
   };
 
-  const exitEditMode = () => {
+  const exitEditMode = (keepDeletedIds = false) => {
     onEditModeChange?.(false);
     setEditedTitles({});
-    setDeletedTaskIds(new Set());
+    if (!keepDeletedIds) setDeletedTaskIds(new Set());
+    setShowUndoToast(false);
+    setUndoSnapshot(null);
   };
 
   const handleSave = () => {
-    // TODO: API 연동 (editedTitles로 변경된 제목 저장, deletedTaskIds로 삭제 처리)
-    exitEditMode();
-  };
-
-  const confirmDeleteAll = () => {
-    mutateDeleteAll(undefined, {
-      onSuccess: () => {
-        exitEditMode();
-        closeModal();
-      },
-    });
+    const ids = Array.from(deletedTaskIds);
+    if (ids.length > 0) {
+      mutateDeleteBulk(ids, { onSuccess: () => exitEditMode(true) });
+    } else {
+      // TODO: 제목 수정 API 연동 (editedTitles)
+      exitEditMode();
+    }
   };
 
   const handleDeleteAll = () => {
@@ -86,13 +91,45 @@ export const PersonalLeftContainer = ({
     });
   };
 
+  const confirmDeleteAll = () => {
+    mutateDeleteAll(undefined, {
+      onSuccess: () => {
+        exitEditMode();
+        closeModal();
+      },
+    });
+  };
+
+
   const handleTitleChange = (id: number, title: string) => {
     setEditedTitles((prev) => ({ ...prev, [id]: title }));
   };
 
-  const handleDeleteTask = (id: number) => {
+  const handleDeleteTask = useCallback((id: number) => {
+    const target = tasks.find((t) => t.id === id);
+    if (target) {
+      setUndoSnapshot(target);
+      setShowUndoToast(true);
+    }
     setDeletedTaskIds((prev) => new Set(prev).add(id));
-  };
+  }, [tasks]);
+
+  const handleUndo = useCallback(() => {
+    if (undoSnapshot) {
+      setDeletedTaskIds((prev) => {
+        const next = new Set(prev);
+        next.delete(undoSnapshot.id);
+        return next;
+      });
+    }
+    setShowUndoToast(false);
+    setUndoSnapshot(null);
+  }, [undoSnapshot]);
+
+  const handleToastClose = useCallback(() => {
+    setShowUndoToast(false);
+    setUndoSnapshot(null);
+  }, []);
 
   const visibleTasks = tasks.filter((t) => !deletedTaskIds.has(t.id));
 
@@ -136,7 +173,7 @@ export const PersonalLeftContainer = ({
             <div className={css({ visibility: isEditMode ? 'visible' : 'hidden' })}>
               <FormActionButtons
                 onSave={handleSave}
-                onCancel={exitEditMode}
+                onCancel={() => exitEditMode()}
                 onDeleteAll={handleDeleteAll}
               />
             </div>
@@ -153,6 +190,14 @@ export const PersonalLeftContainer = ({
           />
         </div>
       </div>
+
+      {showUndoToast && (
+        <UndoToast
+          message={`'${undoSnapshot?.title}' 세부 과제가 삭제됩니다.`}
+          onUndo={handleUndo}
+          onClose={handleToastClose}
+        />
+      )}
     </div>
   );
 };
@@ -163,7 +208,7 @@ const containerStyle = cva({
     display: 'flex',
     flexDirection: 'column',
     flexShrink: 0,
-    transition: 'all 0.3s ease-in-out',
+    transition: 'width 0.3s cubic-bezier(0.4, 0, 0.2, 1), margin 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
   },
   variants: {
     collapsed: {
