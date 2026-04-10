@@ -29,9 +29,9 @@ export const TermsOfServiceContent = () => {
         <div className={sectionStyle}>
           <p className={sectionTitleStyle}>제1조 (목적)</p>
           <p className={sectionBodyStyle}>
-            본 약관은 서비스가 제공하는 과제 및 세부과제 등록, 관리, 리마인드
-            기능 등 제반 서비스의 이용 조건 및 절차, 이용자와 서비스 간의 권리와
-            의무, 책임사항을 정함을 목적으로 합니다.
+            본 약관은 서비스가 제공하는 과제 및 세부과제 등록, 관리, 협업,
+            리마인드 기능 등 제반 서비스의 이용 조건 및 절차, 이용자와 서비스
+            간의 권리와 의무, 책임사항을 정함을 목적으로 합니다.
           </p>
         </div>
 
@@ -42,12 +42,11 @@ export const TermsOfServiceContent = () => {
           </p>
           <ol className={orderedListStyle}>
             <li>
-              &quot;회원&quot;이란 카카오의 카카오 로그인을 통해 가입 후
-              서비스를 이용하는 자를 말합니다.
+              &quot;회원&quot;이란 카카오 로그인을 통해 가입 후 서비스를
+              이용하는 자를 말합니다.
             </li>
             <li>
-              &quot;과제&quot;란 회원이 등록·관리하는 할 일 또는 작업 단위를
-              의미합니다.
+              &quot;과제&quot;란 회원이 등록·관리하는 작업 단위를 의미합니다.
             </li>
             <li>
               &quot;세부과제&quot;란 과제를 구성하는 하위 작업 단위를
@@ -55,7 +54,11 @@ export const TermsOfServiceContent = () => {
             </li>
             <li>
               &quot;콘텐츠&quot;란 회원이 서비스에 작성·업로드하는 텍스트,
-              이미지, 파일 등 일체의 정보를 의미합니다.
+              이미지, 파일, 링크 등 일체의 정보를 의미합니다.
+            </li>
+            <li>
+              &quot;팀&quot;이란 복수의 회원이 공동으로 과제를 관리하기 위해
+              구성한 단위를 의미합니다.
             </li>
           </ol>
         </div>
@@ -83,12 +86,20 @@ export const TermsOfServiceContent = () => {
           <ol className={orderedListStyle}>
             <li>회원 가입은 카카오 로그인 인증 완료 시 성립합니다.</li>
             <li>
-              회원은 자신의 계정을 본인만 사용하여야 하며, 타인에게
+              회원은 본인의 계정을 본인만 사용하여야 하며, 타인에게
               양도·대여·공유할 수 없습니다.
             </li>
             <li>
               계정 관리 소홀로 발생하는 손해에 대한 책임은 회원 본인에게
               있습니다.
+            </li>
+            <li>
+              서비스는 다음의 경우 해당 계정을 제한 또는 삭제할 수 있습니다.
+              <ul className={nestedUnorderedListStyle}>
+                <li>타인의 명의를 도용한 경우</li>
+                <li>부정한 방법으로 가입한 경우</li>
+                <li>본 약관을 위반한 경우</li>
+              </ul>
             </li>
           </ol>
         </div>
@@ -101,12 +112,13 @@ export const TermsOfServiceContent = () => {
               <ul className={nestedUnorderedListStyle}>
                 <li>과제 및 세부과제 등록, 수정, 삭제</li>
                 <li>일정 관리 및 리마인드 제공</li>
+                <li>팀 기반 협업 기능</li>
                 <li>콘텐츠 저장 및 관리</li>
               </ul>
             </li>
             <li>
-              서비스는 이미지 및 파일 저장을 위하여 Amazon Web Services의 Amazon
-              S3을 이용할 수 있습니다.
+              서비스는 이미지 및 파일 저장을 위하여 외부 클라우드 서비스를
+              이용할 수 있습니다.
             </li>
             <li>
               서비스는 운영상 또는 기술상 필요에 따라 제공 기능을
@@ -128,6 +140,7 @@ export const TermsOfServiceContent = () => {
             </li>
             <li>회원이 법령 또는 본 약관을 위반한 경우</li>
             <li>서비스 운영을 현저히 방해하는 행위를 한 경우</li>
+            <li>보안상 문제가 발생하거나 발생할 우려가 있는 경우</li>
           </ol>
         </div>
 
@@ -143,6 +156,7 @@ export const TermsOfServiceContent = () => {
             <li>
               불법, 음란, 명예훼손, 타인의 권리를 침해하는 콘텐츠 게시 행위
             </li>
+            <li>서비스의 정상적인 운영을 방해하는 행위</li>
           </ol>
         </div>
 
@@ -153,12 +167,12 @@ export const TermsOfServiceContent = () => {
               회원이 작성·업로드한 콘텐츠의 저작권은 해당 회원에게 귀속됩니다.
             </li>
             <li>
-              회원은 본인이 등록한 콘텐츠를 자유롭게 수정 또는 삭제할 수
-              있습니다.
+              회원은 서비스 제공 및 운영을 위해 필요한 범위 내에서 콘텐츠 사용을
+              서비스에 허용합니다.
             </li>
             <li>
-              서비스는 법령 위반 또는 운영 정책에 위배되는 콘텐츠에 대해 사전
-              통지 후 또는 긴급 시 사후 통지 후 삭제·제한할 수 있습니다.
+              서비스는 법령 위반 또는 운영 정책에 위배되는 콘텐츠에 대해 삭제
+              또는 접근 제한 조치를 할 수 있습니다.
             </li>
             <li>콘텐츠로 인해 발생하는 법적 책임은 해당 회원에게 있습니다.</li>
           </ol>
@@ -173,7 +187,19 @@ export const TermsOfServiceContent = () => {
         </div>
 
         <div className={sectionStyle}>
-          <p className={sectionTitleStyle}>제10조 (책임의 제한)</p>
+          <p className={sectionTitleStyle}>제10조 (서비스 이용 종료 및 탈퇴)</p>
+          <ol className={orderedListStyle}>
+            <li>회원은 언제든지 서비스 내 기능을 통해 탈퇴할 수 있습니다.</li>
+            <li>탈퇴 시 회원의 계정 정보는 일정 기간 보관 후 삭제됩니다.</li>
+            <li>
+              회원이 서비스 이용 제한 사유에 해당하는 경우 서비스는 해당 계정을
+              삭제하거나 이용을 제한할 수 있습니다.
+            </li>
+          </ol>
+        </div>
+
+        <div className={sectionStyle}>
+          <p className={sectionTitleStyle}>제11조 (책임의 제한)</p>
           <ol className={orderedListStyle}>
             <li>
               서비스는 천재지변, 시스템 장애 등 불가항력적 사유로 인한 손해에
@@ -184,14 +210,28 @@ export const TermsOfServiceContent = () => {
               않습니다.
             </li>
             <li>
-              서비스는 무료로 제공되는 기능과 관련하여 법령상 허용되는 범위
+              서비스는 무료로 제공되는 서비스와 관련하여 법령상 허용되는 범위
               내에서 책임을 제한할 수 있습니다.
+            </li>
+            <li>
+              서비스는 회원 간 또는 회원과 제3자 간 발생한 분쟁에 개입하지
+              않으며 이에 대한 책임을 지지 않습니다.
             </li>
           </ol>
         </div>
 
         <div className={sectionStyle}>
-          <p className={sectionTitleStyle}>제11조 (준거법 및 관할)</p>
+          <p className={sectionTitleStyle}>제12조 (지적재산권)</p>
+          <p className={sectionBodyStyle}>
+            서비스에 포함된 디자인, 로고, 기능 등 일체의 권리는 서비스에
+            귀속됩니다. <br />
+            회원은 서비스의 사전 승인 없이 이를 복제, 배포, 상업적으로 이용할 수
+            없습니다.
+          </p>
+        </div>
+
+        <div className={sectionStyle}>
+          <p className={sectionTitleStyle}>제13조 (준거법 및 관할)</p>
           <p className={sectionBodyStyle}>
             본 약관은 대한민국 법령에 따르며, 서비스 이용과 관련하여 분쟁이
             발생한 경우 관할 법원은 대한민국 민사소송법에 따릅니다.

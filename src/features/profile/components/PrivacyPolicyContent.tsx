@@ -66,17 +66,47 @@ export const PrivacyPolicyContent = () => {
         </div>
 
         <div className={sectionStyle}>
-          <p className={sectionTitleStyle}>제3조 (개인정보의 이용 목적)</p>
+          <p className={sectionTitleStyle}>
+            제3조 (개인정보의 이용 목적 및 처리 근거)
+          </p>
           <p className={sectionBodyStyle}>
-            수집한 개인정보는 다음 목적에 한하여 이용합니다.
+            서비스는 다음의 목적 및 법적 근거에 따라 개인정보를 처리합니다.
           </p>
           <ul className={unorderedListStyle}>
-            <li>회원 식별 및 로그인 인증</li>
-            <li>서비스 제공 및 기능 운영</li>
-            <li>프로필 이미지 설정 등 개인화 서비스 제공</li>
-            <li>콘텐츠 저장 및 관리</li>
-            <li>서비스 품질 개선 및 이용 통계 분석</li>
-            <li>부정 이용 방지 및 보안 관리</li>
+            <li>
+              회원 식별 및 로그인 인증
+              <span className={legalBasisStyle}>
+                → 이용자 동의 및 서비스 이용 계약 이행
+              </span>
+            </li>
+            <li>
+              서비스 제공 및 기능 운영
+              <span className={legalBasisStyle}>
+                → 서비스 제공을 위한 계약 이행
+              </span>
+            </li>
+            <li>
+              프로필 설정 등 개인화 서비스 제공
+              <span className={legalBasisStyle}>→ 이용자 동의</span>
+            </li>
+            <li>
+              콘텐츠 저장 및 관리
+              <span className={legalBasisStyle}>
+                → 서비스 제공 및 운영 목적
+              </span>
+            </li>
+            <li>
+              서비스 품질 개선 및 통계 분석
+              <span className={legalBasisStyle}>
+                → 정당한 이익(서비스 개선)
+              </span>
+            </li>
+            <li>
+              부정 이용 방지 및 보안 관리
+              <span className={legalBasisStyle}>
+                → 법적 의무 및 정당한 이익
+              </span>
+            </li>
           </ul>
         </div>
 
@@ -114,6 +144,10 @@ export const PrivacyPolicyContent = () => {
               이용자가 서비스 내 생성한 팀 과제 등 콘텐츠 데이터는 서비스 운영
               기록으로 남을 수 있으며, 삭제를 원하는 경우 탈퇴 전에 직접
               삭제하여야 합니다.
+            </li>
+            <li>
+              접속 로그 및 이용 기록은 최대 3개월~1년 범위 내에서 보관 후
+              삭제됩니다.
             </li>
             <li>
               개인정보는 보관 기간 경과 또는 처리 목적 달성 시 복구 불가능한
@@ -161,14 +195,35 @@ export const PrivacyPolicyContent = () => {
             </tbody>
           </table>
           <ul className={unorderedListStyle}>
+            <li>
+              이용자의 개인정보는 클라우드 서비스 특성상 해외(미국 등)에
+              저장·처리될 수 있습니다.
+            </li>
             <li>위탁된 개인정보는 계약에 따라 안전하게 관리됩니다.</li>
             <li>위탁업무 종료 시 즉시 파기 또는 반환됩니다.</li>
           </ul>
         </div>
 
         <div className={sectionStyle}>
+          <p className={sectionTitleStyle}>제8조 (쿠키의 사용 및 거부)</p>
+          <p className={sectionBodyStyle}>
+            서비스는 로그인 유지 및 서비스 제공을 위하여 쿠키를 사용합니다.
+          </p>
+          <ul className={unorderedListStyle}>
+            <li>쿠키는 이용자의 브라우저에 저장되는 소량의 정보입니다.</li>
+            <li>
+              이용자는 브라우저 설정을 통해 쿠키 저장을 거부할 수 있습니다.
+            </li>
+            <li>
+              단, 쿠키를 거부할 경우 로그인 유지 등 일부 서비스 이용이 제한될 수
+              있습니다.
+            </li>
+          </ul>
+        </div>
+
+        <div className={sectionStyle}>
           <p className={sectionTitleStyle}>
-            제8조 (이용자의 권리 및 행사 방법)
+            제9조 (이용자의 권리 및 행사 방법)
           </p>
           <ol className={orderedListStyle}>
             <li>
@@ -187,22 +242,32 @@ export const PrivacyPolicyContent = () => {
 
         <div className={sectionStyle}>
           <p className={sectionTitleStyle}>
-            제9조 (개인정보 보호를 위한 안전성 확보 조치)
+            제10조 (개인정보 보호를 위한 안전성 확보 조치)
           </p>
           <p className={sectionBodyStyle}>
             서비스는 개인정보 보호를 위하여 다음과 같은 기술적·관리적 조치를
             시행합니다.
           </p>
           <ul className={unorderedListStyle}>
-            <li>주요 데이터 암호화 저장</li>
-            <li>세션 기반 인증 관리</li>
+            <li>HTTPS 기반 안전한 통신 적용</li>
+            <li>세션 및 쿠키 기반 인증 관리</li>
             <li>접근 권한 최소화 및 통제</li>
+            <li>주요 데이터 암호화 저장</li>
             <li>정기적 보안 점검 및 로그 모니터링</li>
           </ul>
         </div>
 
         <div className={sectionStyle}>
-          <p className={sectionTitleStyle}>제10조 (개인정보 보호책임자)</p>
+          <p className={sectionTitleStyle}>제11조 (아동의 개인정보 보호)</p>
+          <p className={sectionBodyStyle}>
+            서비스는 만 14세 미만 아동을 대상으로 하지 않으며, 이용자는 해당
+            연령 이상이어야 합니다. <br />만 14세 미만 아동의 이용이 확인될 경우
+            해당 계정은 제한 또는 삭제될 수 있습니다.
+          </p>
+        </div>
+
+        <div className={sectionStyle}>
+          <p className={sectionTitleStyle}>제12조 (개인정보 보호책임자)</p>
           <p className={sectionBodyStyle}>
             개인정보 보호 관련 문의 및 민원 처리를 위하여 아래와 같이 책임자를
             지정하고 있습니다.
@@ -219,7 +284,17 @@ export const PrivacyPolicyContent = () => {
         </div>
 
         <div className={sectionStyle}>
-          <p className={sectionTitleStyle}>제11조 (개정 및 고지)</p>
+          <p className={sectionTitleStyle}>
+            제13조 (서비스 종료 시 개인정보 처리)
+          </p>
+          <p className={sectionBodyStyle}>
+            서비스 종료 시 이용자의 개인정보는 관련 법령에 따라 일정 기간 보관
+            후 안전하게 파기됩니다.
+          </p>
+        </div>
+
+        <div className={sectionStyle}>
+          <p className={sectionTitleStyle}>제14조 (개정 및 고지)</p>
           <p className={sectionBodyStyle}>
             본 개인정보 처리방침은 법령, 정책 또는 서비스 내용 변경에 따라
             개정될 수 있으며, 변경 시 서비스 내 공지사항을 통해 사전 안내합니다.
@@ -294,6 +369,11 @@ const listItemStyle = css({
 const unorderedListStyle = css({
   listStyleType: 'disc',
   paddingLeft: '1.125rem',
+  ...legalBodyText,
+});
+
+const legalBasisStyle = css({
+  display: 'block',
   ...legalBodyText,
 });
 
