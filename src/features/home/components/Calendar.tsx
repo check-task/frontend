@@ -20,7 +20,7 @@ const FOLDER_COLOR_MAP: Record<FolderColor, string> = {
   green: token('colors.sub.03.100'),
   purple: token('colors.sub.04.100'),
   black: token('colors.sub.05.100'),
-  null: token('colors.null'),
+  null: token('colors.sub.null.100'),
 };
 
 // 과제 타입

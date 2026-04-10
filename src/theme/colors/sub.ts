@@ -40,4 +40,10 @@ export const sub = defineSemanticTokens.colors({
       },
     },
   },
+
+  null: {
+    '100': { value: '#818892' },
+    '60': { value: 'rgba(129, 136, 146, 0.6)' },
+    '40': { value: 'rgba(129, 136, 146, 0.4)' },
+  },
 });

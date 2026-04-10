@@ -47,9 +47,6 @@ export default defineConfig({
           'primary-button-text': {
             value: '#FFFFFF',
           },
-          null: {
-            value: '#818892',
-          },
 
           fg: {
             default: {
