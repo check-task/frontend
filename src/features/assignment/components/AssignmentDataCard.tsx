@@ -26,10 +26,10 @@ export const AssignmentDataCard = ({
         <p className={cardTitleStyle}>{name}</p>
 
         <div className={iconGroupStyle}>
-          <button onClick={onEdit}>
+          <button onClick={onEdit} aria-label='수정'>
             <PencilIcon />
           </button>
-          <button onClick={onDelete}>
+          <button onClick={onDelete} aria-label='삭제'>
             <CloseIcon color='gray.700' />
           </button>
         </div>

@@ -12,6 +12,7 @@ export interface HomeAssignment {
   folderColor: FolderColor;
   dDay: string;
   dueDate: string;
+  deadlineTime?: string; // 시간이 있는 경우 "HH:mm:ss"
   assignmentName: string;
   assignmentType: string;
   progress: number;
@@ -44,7 +45,10 @@ export const useHomeTaskList = (sort?: TaskSort) => {
         folderName: task.folderTitle ?? '',
         folderColor: resolveFolderColor(task.foldercolor ?? ''),
         dDay: task.dDay,
-        dueDate: task.deadline.replace(/\./g, '-').split(' ')[0], // FullCalendar와 호환을 위해 . -> -로 변경, 시간 제거
+        dueDate: task.deadline ? task.deadline.split('T')[0] : '', // 시간 제거 (ISO 8601)
+        deadlineTime: task.deadline?.includes('T')
+          ? task.deadline.split('T')[1]
+          : undefined,
         assignmentName: task.title,
         assignmentType: task.type === 'TEAM' ? '팀' : '개인',
         progress: task.progressRate,
@@ -61,7 +65,7 @@ export const useHomeTaskList = (sort?: TaskSort) => {
         taskId: st.taskId,
         title: st.title,
         status: st.status,
-        dueDate: st.deadline.replace(/\./g, '-').split(' ')[0],
+        dueDate: st.deadline ? st.deadline.split('T')[0] : '',
         folderColor: taskColorMap.get(st.taskId) ?? 'red',
       }));
 

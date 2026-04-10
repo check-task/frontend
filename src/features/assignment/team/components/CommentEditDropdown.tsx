@@ -31,7 +31,11 @@ export const CommentEditDropdown = ({
 
   return (
     <div className={dropdownWrapperStyle}>
-      <button className={dropdownButtonStyle} onClick={handleToggle}>
+      <button
+        className={dropdownButtonStyle}
+        onClick={handleToggle}
+        aria-label='댓글 옵션'
+      >
         <CommentEditDropdownIcon />
       </button>
       {isOpen && (

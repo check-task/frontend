@@ -15,7 +15,7 @@ export const NotificationButton = () => {
   });
 
   return (
-    <button className={notificationButtonStyle}>
+    <button className={notificationButtonStyle} aria-label='알림'>
       {hasUnread ? <NotificationIconActive /> : <NotificationIcon />}
     </button>
   );

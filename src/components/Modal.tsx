@@ -50,6 +50,7 @@ export const Modal = () => {
       <button
         type='button'
         onClick={handleRightClick}
+        aria-label={headerType === 'withClose' ? '닫기' : '확인'}
         className={css({
           cursor: 'pointer',
           display: 'flex',
@@ -69,20 +70,23 @@ export const Modal = () => {
     <div className={overlayStyle} onClick={closeModal}>
       <div className={innerWrapStyle}>
         {/* 모달 본체 */}
-        <div onClick={(e) => e.stopPropagation()} className={modalContainerStyle}>
-        <div className={stack({ gap: '1rem', width: 'full' })}>
-          {/* 모달 해더 */}
-          <header className={headerRecipe({ type: headerType })}>
-            <div className={css({ textStyle: 'body1.m', color: 'gray.900' })}>
-              {title}
-            </div>
-            {renderIcon()}
-          </header>
-          {/* 선 역할 */}
-          <span className={dividerStyle} />
-        </div>
-        {/* 컨텐츠 영역 */}
-        <div className={css({ width: 'full' })}>{content}</div>
+        <div
+          onClick={(e) => e.stopPropagation()}
+          className={modalContainerStyle}
+        >
+          <div className={stack({ gap: '1rem', width: 'full' })}>
+            {/* 모달 해더 */}
+            <header className={headerRecipe({ type: headerType })}>
+              <div className={css({ textStyle: 'body1.m', color: 'gray.900' })}>
+                {title}
+              </div>
+              {renderIcon()}
+            </header>
+            {/* 선 역할 */}
+            <span className={dividerStyle} />
+          </div>
+          {/* 컨텐츠 영역 */}
+          <div className={css({ width: 'full' })}>{content}</div>
         </div>
       </div>
     </div>,

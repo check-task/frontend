@@ -8,10 +8,10 @@ import { useClickOutside } from '@/hooks/useClickOutside';
 
 interface DatePickerProps {
   value?: string | Date;
-  onChange?: (date: Date) => void;
+  onChange?: (date: Date, timeEnabled: boolean) => void;
   maxDate?: string | Date;
   muted?: boolean; // 데이트 피커는 공용이니까 불리언으로 처리
-  showTimeDisplay?: boolean; // 시간 표시 여부 
+  showTimeDisplay?: boolean; // 시간 표시 여부
 }
 
 // 날짜 문자열로 온거 Date 객체로 변환 처리
@@ -54,7 +54,7 @@ export default function DatePicker({
   const handleSave = (date: Date, withTime: boolean) => {
     setConfirmedDate(date);
     setTimeEnabled(withTime);
-    onChange?.(date);
+    onChange?.(date, withTime);
     setIsOpen(false);
   };
 

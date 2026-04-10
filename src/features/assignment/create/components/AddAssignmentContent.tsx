@@ -10,8 +10,8 @@ interface AddAssignmentContentProps {
   onNameChange?: (name: string) => void;
   folders: Folder[];
   selectedFolderId: number | null;
-  onFolderChange?: (folderId: number) => void;
-  onDateChange?: (date: Date) => void;
+  onFolderChange?: (folderId: number | null) => void;
+  onDateChange?: (date: Date, timeEnabled: boolean) => void;
 }
 
 export const AddAssignmentContent = ({
@@ -44,7 +44,10 @@ export const AddAssignmentContent = ({
 
       <div className={contentItemStyle}>
         <p className={labelTextStyle}>마감일</p>
-        <DatePicker onChange={(d) => onDateChange?.(d)} showTimeDisplay={true} />
+        <DatePicker
+          onChange={(d, t) => onDateChange?.(d, t)}
+          showTimeDisplay={true}
+        />
       </div>
     </div>
   );
