@@ -9,7 +9,7 @@ import {
 interface UpdateReferenceParams {
   referenceId: number;
   name: string;
-  url: string;
+  url?: string;
   file?: File;
 }
 
@@ -28,7 +28,7 @@ export const useUpdateReferenceData = (taskId: number) => {
       file,
     }: UpdateReferenceParams) => {
       const socket = getSocket();
-      const useSocket = socket?.connected && file == null;
+      const useSocket = socket?.connected && file == null && url != null;
 
       if (useSocket) {
         return new Promise<unknown>((resolve, reject) => {
