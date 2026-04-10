@@ -15,7 +15,11 @@ interface SidebarCloseButtonProps {
 
 export const SidebarCloseButton = ({ onClick }: SidebarCloseButtonProps) => {
   return (
-    <button className={sidebarCloseButtonStyle} onClick={onClick}>
+    <button
+      className={sidebarCloseButtonStyle}
+      onClick={onClick}
+      aria-label='사이드바 닫기'
+    >
       <SlideIcon />
     </button>
   );
