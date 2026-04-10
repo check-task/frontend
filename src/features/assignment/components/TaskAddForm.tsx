@@ -131,12 +131,12 @@ const inputRowStyle = css({
   justifyContent: 'space-between',
 });
 
-
 const datePickerWrapperStyle = css({
   display: 'flex',
   alignItems: 'center',
-  w: '10.5rem',
-  ml:'1.5rem',
+  justifyItems: 'left',
+  w: '10.75rem',
+  ml:'2rem',
 });
 
 

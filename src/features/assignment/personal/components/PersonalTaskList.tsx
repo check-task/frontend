@@ -116,16 +116,18 @@ export const PersonalTaskList = ({
                     className={css({
                       display: 'flex',
                       alignItems: 'center',
-                      gap: isEditMode ? '0.5rem' : '1rem',
+                      gap: isEditMode ? '0rem' : '1rem',
                       ...(isEditMode && { opacity: 0.4, pointerEvents: 'none' }),
                     })}
                   >
+                  <div className={datePickerWrapperStyle}>
                     <DatePicker
                       value={task.deadline}
                       onChange={handleDeadlineChange(task.id)}
                       muted={isCompleted}
                       maxDate={maxDate}
                     />
+                    </div>
                     <ClockToggle
                       muted={isCompleted}
                       isOn={alarmStateMap[task.id] ?? task.isAlarm}
@@ -138,14 +140,8 @@ export const PersonalTaskList = ({
                       type='button'
                       onClick={() => onDeleteTask?.(task.id)}
                       className={css({
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
                         cursor: 'pointer',
-                        border: 'none',
-                        padding: 0,
-                        bg: 'transparent',
-                        ml: '0.75rem',
+                        ml: '0.5rem',
                         flexShrink: 0,
                       })}
                     >
@@ -239,4 +235,12 @@ const teamTaskItemRightStyle = css({
   display: 'flex',
   alignItems: 'center',
   flexShrink: 1,
+});
+
+
+const datePickerWrapperStyle = css({
+  display: 'flex',
+  alignItems: 'center',
+  justifyItems: 'left',
+  w: '7.75rem',
 });
