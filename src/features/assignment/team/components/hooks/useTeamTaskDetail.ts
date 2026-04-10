@@ -8,5 +8,11 @@ export const useTeamTaskDetail = (taskId: number) => {
     queryKey: ['taskDetail', taskId],
     queryFn: (): Promise<TaskDetail> => getTaskDetail(taskId),
     enabled: taskId > 0,
+    select: (data): TaskDetail => ({
+      ...data,
+      references: [...data.references].sort(
+        (a, b) => (a.referenceId ?? 0) - (b.referenceId ?? 0),
+      ),
+    }),
   });
 };
