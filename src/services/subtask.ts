@@ -13,6 +13,8 @@ import {
   UpdateCommentResponse,
   DeleteCommentResponse,
   DeleteAllSubTasksResponse,
+  DeleteSubTasksBulkRequest,
+  DeleteSubTasksBulkResponse,
 } from '@/types/task';
 import axiosInstance from '@/lib/axiosInstance';
 
@@ -100,6 +102,18 @@ export const deleteAllSubTasks = async (
 ): Promise<DeleteAllSubTasksResponse> => {
   const res = await axiosInstance.delete<DeleteAllSubTasksResponse>(
     `/task/${taskId}/subtask/all`,
+  );
+  return res.data;
+};
+
+// 세부 TASK 선택 삭제 api 호출
+export const deleteSubTasksBulk = async (
+  taskId: number,
+  body: DeleteSubTasksBulkRequest,
+): Promise<DeleteSubTasksBulkResponse> => {
+  const res = await axiosInstance.delete<DeleteSubTasksBulkResponse>(
+    `/task/${taskId}/subtask`,
+    { data: body },
   );
   return res.data;
 };

@@ -410,3 +410,18 @@ export interface DeleteAllSubTasksResponse {
     deletedCount: number;
   };
 }
+
+// ============================
+// 세부 TASK 선택 삭제 타입 정의
+// ============================
+export interface DeleteSubTasksBulkRequest {
+  subTaskIds: number[];
+}
+
+export interface DeleteSubTasksBulkResponse {
+  resultType: 'SUCCESS' | 'FAIL';
+  message: string;
+  data: {
+    deletedCount: number;
+  };
+}
