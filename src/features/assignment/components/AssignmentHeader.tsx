@@ -23,7 +23,7 @@ export const AssignmentHeader = ({
   deadline,
 }: AssignmentHeaderProps) => {
   const { openModal } = useModalStore();
-  const folderColorToken = hexToFolderColor(folderColorHex) ?? '01';
+  const folderColorToken = hexToFolderColor(folderColorHex) ?? null;
 
   const handleEditClick = () => {
     openModal({
