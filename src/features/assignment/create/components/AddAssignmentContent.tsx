@@ -10,7 +10,7 @@ interface AddAssignmentContentProps {
   onNameChange?: (name: string) => void;
   folders: Folder[];
   selectedFolderId: number | null;
-  onFolderChange?: (folderId: number) => void;
+  onFolderChange?: (folderId: number | null) => void;
   onDateChange?: (date: Date, timeEnabled: boolean) => void;
 }
 
