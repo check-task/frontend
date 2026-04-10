@@ -156,9 +156,7 @@ export const TeamEtc = ({
       content: (
         <AddAssignmentDataModal
           taskId={taskId}
-          onSave={() => {
-            closeModal();
-          }}
+          onSave={closeModal}
         />
       ),
     });

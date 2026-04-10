@@ -29,9 +29,7 @@ export const PersonalEtc = ({ taskId, items }: PersonalEtcProps) => {
       content: (
         <AddAssignmentDataModal
           taskId={taskId}
-          onSave={(items) => {
-            closeModal();
-          }}
+          onSave={closeModal}
         />
       ),
     });
