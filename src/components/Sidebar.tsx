@@ -141,8 +141,7 @@ export const Sidebar = ({ initialCollapsed, initialTheme }: SidebarProps) => {
           <AssignmentButton
             collapsed={isSidebarCollapsed}
             isOpen={isAssignmentOpen}
-            onClick={isSidebarCollapsed ? handleAssignmentClick : undefined}
-            onToggle={() => setIsAssignmentOpen((prev) => !prev)}
+            onClick={isSidebarCollapsed ? handleAssignmentClick : () => setIsAssignmentOpen((prev) => !prev)}
           />
           <SidebarHooks
             collapsed={isSidebarCollapsed}
