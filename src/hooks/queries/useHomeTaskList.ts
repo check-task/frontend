@@ -59,15 +59,17 @@ export const useHomeTaskList = (sort?: TaskSort) => {
         tasks.map((t) => [t.taskId, resolveFolderColor(t.foldercolor ?? '')]),
       );
 
-      // subTask → HomeSubTask 매핑 (부모 과제의 색상 상속)
-      const homeSubTasks: HomeSubTask[] = subTasks.map((st) => ({
-        subTaskId: st.subTaskId,
-        taskId: st.taskId,
-        title: st.title,
-        status: st.status,
-        dueDate: st.deadline ? st.deadline.split('T')[0] : '',
-        folderColor: taskColorMap.get(st.taskId) ?? 'red',
-      }));
+      // subTask → HomeSubTask 매핑 (부모 과제의 색상 상속, 완료된 세부과제 제외)
+      const homeSubTasks: HomeSubTask[] = subTasks
+        .filter((st) => st.status !== 'COMPLETED')
+        .map((st) => ({
+          subTaskId: st.subTaskId,
+          taskId: st.taskId,
+          title: st.title,
+          status: st.status,
+          dueDate: st.deadline ? st.deadline.split('T')[0] : '',
+          folderColor: taskColorMap.get(st.taskId) ?? 'red',
+        }));
 
       return { assignments, subTasks: homeSubTasks };
     },
