@@ -191,9 +191,13 @@ export const createTask = async (body: CreateTaskRequest): Promise<number> => {
 };
 
 // 팀과제 참여 api 호출
-export const joinTask = async (inviteCode: string) => {
+export const joinTask = async (
+  inviteCode: string,
+  folderId?: number | null,
+) => {
   const res = await axiosInstance.post<JoinTaskResponse>('/task/join', {
     inviteCode,
+    folderId: folderId ?? null,
   });
 
   return res.data.data;
