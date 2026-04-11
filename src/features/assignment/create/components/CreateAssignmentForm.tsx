@@ -18,14 +18,16 @@ const formatDate = (d: Date) => {
   const yyyy = d.getFullYear();
   const mm = String(d.getMonth() + 1).padStart(2, '0');
   const dd = String(d.getDate()).padStart(2, '0');
-  return `${yyyy}-${mm}-${dd}`;
+  return `${yyyy}-${mm}-${dd}T23:59:59Z`;
 };
 
 const formatDateWithTime = (d: Date) => {
-  const date = formatDate(d);
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
   const hh = String(d.getHours()).padStart(2, '0');
   const mi = String(d.getMinutes()).padStart(2, '0');
-  return `${date}T${hh}:${mi}:00`;
+  return `${yyyy}-${mm}-${dd}T${hh}:${mi}:00Z`;
 };
 
 export const CreateAssignmentForm = () => {
