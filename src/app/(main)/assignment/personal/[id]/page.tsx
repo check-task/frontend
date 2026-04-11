@@ -39,6 +39,7 @@ export default function PersonalPage() {
         />
         <PersonalRightContainer
           taskId={data.taskId}
+          title={data.title}
           items={data.items}
           isEditMode={isEditMode}
         />

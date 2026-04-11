@@ -347,7 +347,7 @@ export interface UpdateSubTaskAssigneeResponse {
 // ============================
 export interface CreateSubTaskRequest {
   title: string;
-  deadline: string; // YYYY-MM-DD
+  deadline: string; // YYYY-MM-DDTHH:mm:ss
   isAlarm: boolean;
 }
 
@@ -398,4 +398,30 @@ export interface DeleteCommentResponse {
   resultType: 'SUCCESS' | 'FAIL';
   message: string;
   data: null;
+}
+
+// ============================
+// 세부 TASK 전체 삭제 타입 정의
+// ============================
+export interface DeleteAllSubTasksResponse {
+  resultType: 'SUCCESS' | 'FAIL';
+  message: string;
+  data: {
+    deletedCount: number;
+  };
+}
+
+// ============================
+// 세부 TASK 선택 삭제 타입 정의
+// ============================
+export interface DeleteSubTasksBulkRequest {
+  subTaskIds: number[];
+}
+
+export interface DeleteSubTasksBulkResponse {
+  resultType: 'SUCCESS' | 'FAIL';
+  message: string;
+  data: {
+    deletedCount: number;
+  };
 }

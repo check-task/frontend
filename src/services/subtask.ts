@@ -12,6 +12,9 @@ import {
   UpdateCommentRequest,
   UpdateCommentResponse,
   DeleteCommentResponse,
+  DeleteAllSubTasksResponse,
+  DeleteSubTasksBulkRequest,
+  DeleteSubTasksBulkResponse,
 } from '@/types/task';
 import axiosInstance from '@/lib/axiosInstance';
 
@@ -41,18 +44,6 @@ export const updateSubTaskStatus = async (
   return res.data;
 };
 
-// 단일 세부 TASK 생성 api 호출
-// export const createSubTask = async (
-//   taskId: number,
-//   body: CreateSubTaskRequest,
-// ): Promise<CreateSubTaskResponse> => {
-//   const res = await axiosInstance.post<CreateSubTaskResponse>(
-//     `/task/${taskId}/subTask`,
-//     body,
-//   );
-
-//   return res.data;
-// };
 
 // 세부 TASK 담당자 설정 api 호출 (PATCH /task/subtask/{subTaskId}/assignee)
 export const updateSubTaskAssignee = async (
@@ -101,6 +92,28 @@ export const deleteComment = async (
 ): Promise<DeleteCommentResponse> => {
   const res = await axiosInstance.delete<DeleteCommentResponse>(
     `/task/comment/${commentId}`,
+  );
+  return res.data;
+};
+
+// 세부 TASK 전체 삭제 api 호출
+export const deleteAllSubTasks = async (
+  taskId: number,
+): Promise<DeleteAllSubTasksResponse> => {
+  const res = await axiosInstance.delete<DeleteAllSubTasksResponse>(
+    `/task/${taskId}/subtask/all`,
+  );
+  return res.data;
+};
+
+// 세부 TASK 선택 삭제 api 호출
+export const deleteSubTasksBulk = async (
+  taskId: number,
+  body: DeleteSubTasksBulkRequest,
+): Promise<DeleteSubTasksBulkResponse> => {
+  const res = await axiosInstance.delete<DeleteSubTasksBulkResponse>(
+    `/task/${taskId}/subtask`,
+    { data: body },
   );
   return res.data;
 };

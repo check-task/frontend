@@ -34,10 +34,7 @@ export const AddAssignmentData = ({
       content: (
         <AddAssignmentDataModal
           taskId={taskId}
-          onSave={(items) => {
-            onDataItemsChange([...dataItems, ...items]);
-            closeModal();
-          }}
+          onSave={closeModal}
         />
       ),
     });

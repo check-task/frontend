@@ -29,9 +29,7 @@ export const PersonalEtc = ({ taskId, items }: PersonalEtcProps) => {
       content: (
         <AddAssignmentDataModal
           taskId={taskId}
-          onSave={(items) => {
-            closeModal();
-          }}
+          onSave={closeModal}
         />
       ),
     });
@@ -49,7 +47,9 @@ export const PersonalEtc = ({ taskId, items }: PersonalEtcProps) => {
             await updateReference({
               referenceId: item.id,
               name: updated.name.trim(),
-              url: updated.path.trim(),
+              ...(item.type === 0
+                ? { url: updated.path.trim() }
+                : { file: updated.file }),
             });
             closeModal();
           }}

@@ -5,14 +5,15 @@ import { useState } from 'react';
 import { css } from 'styled-system/css';
 import { Input } from '@/components/TextField';
 
-type ReferenceFormData = {
+export type ReferenceFormData = {
   name: string;
   path: string;
+  file?: File;
 };
 
 interface EditAssignmentDataModalProps {
-  type: 0 | 1; // 0은 url, 1은 파일로 지정
-  defaultValue: ReferenceFormData;
+  type: 0 | 1; // 0은 url, 1은 파일
+  defaultValue: { name: string; path: string };
   onSave: (value: ReferenceFormData) => void;
 }
 
@@ -27,22 +28,30 @@ const MODAL_TEXT = {
     nameLabel: '파일명',
     pathLabel: '파일',
     namePlaceholder: '파일명',
-    pathPlaceholder: '파일명.확장자',
+    pathPlaceholder: '파일을 선택하세요.',
   },
 } as const;
 
 export const EditAssignmentDataCardModal = ({
-  type, // 타입 전달
+  type,
   defaultValue,
   onSave,
 }: EditAssignmentDataModalProps) => {
-  // 파일명이랑 경로 기본값으로 설정
   const [name, setName] = useState(defaultValue.name);
   const [path, setPath] = useState(defaultValue.path);
-  // input값이 기본값과 다른지 확인
-  const isDirty = name !== defaultValue.name || path !== defaultValue.path;
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+
+  const isDirty =
+    type === 1
+      ? name !== defaultValue.name || selectedFile != null
+      : name !== defaultValue.name || path !== defaultValue.path;
 
   const text = MODAL_TEXT[type];
+
+  const handleFileChange = (file: File | null) => {
+    setSelectedFile(file);
+    setPath(file?.name ?? defaultValue.path);
+  };
 
   return (
     <div className={css({ marginTop: '1.75rem' })}>
@@ -58,18 +67,39 @@ export const EditAssignmentDataCardModal = ({
         </div>
         <div className={fieldStyle}>
           <label className={labelStyle}>{text.pathLabel}</label>
-          <Input
-            size='modal'
-            value={path}
-            placeholder={text.pathPlaceholder}
-            onChange={(e) => setPath(e.target.value)}
-          />
+          {type === 1 ? (
+            <>
+              <input
+                type='file'
+                id='edit-reference-file'
+                className={css({ display: 'none' })}
+                onChange={(e) => handleFileChange(e.target.files?.[0] ?? null)}
+              />
+              <Input
+                size='modal'
+                value={path}
+                placeholder={text.pathPlaceholder}
+                readOnly
+                className={fileInputTriggerStyle}
+                onClick={() =>
+                  document.getElementById('edit-reference-file')?.click()
+                }
+              />
+            </>
+          ) : (
+            <Input
+              size='modal'
+              value={path}
+              placeholder={text.pathPlaceholder}
+              onChange={(e) => setPath(e.target.value)}
+            />
+          )}
         </div>
       </div>
       <Button
         variant='fillBlue'
         size='xlarge'
-        onClick={() => onSave({ name, path })}
+        onClick={() => onSave({ name, path, file: selectedFile ?? undefined })}
         disabled={!isDirty}
       >
         변경사항 저장
@@ -79,7 +109,6 @@ export const EditAssignmentDataCardModal = ({
 };
 
 // ======== 스타일 정의 ========
-// 모달 콘텐츠 스타일
 const contentWrapperStyle = css({
   display: 'flex',
   flexDirection: 'column',
@@ -96,4 +125,8 @@ const fieldStyle = css({
 const labelStyle = css({
   textStyle: 'body3.m',
   color: 'gray.800',
+});
+
+const fileInputTriggerStyle = css({
+  cursor: 'pointer',
 });

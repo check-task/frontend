@@ -10,18 +10,9 @@ import { AddAssignmentDataModalToggle } from './AddAssignmentDataModalToggle';
 import { css } from 'styled-system/css';
 import { AddURLDataButton } from '../create/components/AddURLDataButton';
 import { useCreateReferenceData } from '@/hooks/mutations/useCreateReferenceData';
-import type { ReferenceDataItem } from '@/types/api/reference';
-
-interface DataItem {
-  id: number;
-  type: 0 | 1;
-  name: string;
-  path: string;
-}
-
 interface AddAssignmentDataModalProps {
   taskId?: number;
-  onSave?: (items: DataItem[]) => void;
+  onSave?: () => void;
 }
 
 /* ===== type별 문구 ===== */
@@ -41,14 +32,6 @@ const FORM_TEXT = {
 } as const;
 
 type InputGroup = { id: number; name: string; path: string; file?: File };
-
-// API 응답 항목을 모달용 DataItem으로 변환
-const refItemToDataItem = (item: ReferenceDataItem): DataItem => ({
-  id: item.reference_id,
-  type: item.file_url ? 1 : 0,
-  name: item.name,
-  path: item.url ?? item.file_url ?? '',
-});
 
 export const AddAssignmentDataModal = ({
   taskId,
@@ -101,28 +84,15 @@ export const AddAssignmentDataModal = ({
       return g.name.trim() && g.file;
     });
 
-    if (taskId != null) {
-      // taskId 있으면 자료 생성 API 순차 호출 후 응답 목록으로 onSave (소켓 사용 시 빈 배열 반환)
-      let lastData: ReferenceDataItem[] = [];
-      for (const group of validGroups) {
-        const type = selectedType === 0 ? 'url' : 'file';
-        const payload =
-          type === 'url'
-            ? { name: group.name, url: group.path }
-            : { name: group.name, file: group.file };
-        const result = await createReference({ type, payload });
-        lastData = Array.isArray(result) ? result : [];
-      }
-      onSave?.(lastData.map(refItemToDataItem));
-    } else {
-      const items: DataItem[] = validGroups.map((g) => ({
-        id: g.id,
-        type: selectedType,
-        name: g.name,
-        path: g.path,
-      }));
-      onSave?.(items);
+    for (const group of validGroups) {
+      const type = selectedType === 0 ? 'url' : 'file';
+      const payload =
+        type === 'url'
+          ? { name: group.name, url: group.path }
+          : { name: group.name, file: group.file };
+      await createReference({ type, payload });
     }
+    onSave?.();
   };
 
   const renderInputGroups = () => {
@@ -131,7 +101,6 @@ export const AddAssignmentDataModal = ({
 
     return (
       <>
-        {/* <div className={scrollableListStyle}> */}
         {inputGroups.map((group, index) => (
           <div key={group.id}>
             {index > 0 && <Divider mt='1.25rem' mb='1.25rem' />}
@@ -186,7 +155,6 @@ export const AddAssignmentDataModal = ({
             </div>
           </div>
         ))}
-        {/* </div> */}
 
         <div className={css({ mt: '1rem', mb: '2.5rem' })}>
           <AddURLDataButton
@@ -265,15 +233,6 @@ const inputContainerStyle = css({
     borderRadius: '6.25rem',
   },
 });
-
-// 파일명/파일경로 목록만 스크롤 — 3개 이상일 때 스크롤
-// const scrollableListStyle = css({
-//   display: 'flex',
-//   flexDirection: 'column',
-//   width: '100%',
-//   maxHeight: '26rem', // 3개부터 스크롤
-//   overflowY: 'auto',
-// });
 
 // 입력 그룹 한 묶음
 const inputGroupStyle = css({

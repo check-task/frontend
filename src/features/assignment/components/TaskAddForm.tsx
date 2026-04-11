@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { css } from 'styled-system/css';
-import { useUIStore } from '@/stores/ui-store';
 import { PlusIcon } from '@/components/icons/PlusIcon';
 import { Input } from '@/components/TextField';
 import { FormActionButtons } from '@/features/assignment/components/FormActionButtons';
@@ -14,16 +13,24 @@ interface TaskAddFormProps {
   maxDate?: string | Date;
 }
 
-// Api형태에 맞게 Date형태를 YYYY-MM-DD 문자열로 변환
-const formatDate = (date: Date) => date.toLocaleDateString('en-CA');
+// Api형태에 맞게 Date형태를 YYYY-MM-DDTHH:mm:ss 문자열로 변환
+const formatDeadline = (date: Date) => {
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}:00`;
+};
+
+const todayAtMidnight = () => {
+  const d = new Date();
+  d.setHours(0, 0, 0, 0);
+  return d;
+};
 
 export const TaskAddForm = ({ taskId, maxDate }: TaskAddFormProps) => {
-  const isSidebarCollapsed = useUIStore((state) => state.isSidebarCollapsed);
   const [isAdding, setIsAdding] = useState(false);
   const [taskName, setTaskName] = useState('');
 
   // 선택된 날짜 상태 추가
-  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [selectedDate, setSelectedDate] = useState<Date>(todayAtMidnight());
   // 세부과제 생성 훅 호출
   const { mutate: createSubTask, isPending } = useCreateSubTask(taskId);
 
@@ -31,29 +38,20 @@ export const TaskAddForm = ({ taskId, maxDate }: TaskAddFormProps) => {
   const handleCancelTask = () => {
     setIsAdding(false);
     setTaskName('');
-    // 기본값으로 초기화
-    setSelectedDate(new Date());
+    setSelectedDate(todayAtMidnight());
   };
 
   const handleSaveTask = () => {
     const title = taskName.trim();
     if (!title) return;
 
-    // 세부과제 생성 호출
-    createSubTask(
-      {
-        title,
-        deadline: formatDate(selectedDate),
-        isAlarm: true,
-      },
-      {
-        onSuccess: () => {
-          setIsAdding(false); // 입력 폼 닫기
-          setTaskName('');
-          setSelectedDate(new Date());
-        },
-      },
-    );
+    // 즉시 폼 닫기 + onMutate 낙관적 업데이트로 task 동시 노출 → 깜빡임 방지
+    const deadline = formatDeadline(selectedDate);
+    setIsAdding(false);
+    setTaskName('');
+    setSelectedDate(todayAtMidnight());
+
+    createSubTask({ title, deadline, isAlarm: true });
   };
 
   return (
@@ -125,12 +123,12 @@ const inputRowStyle = css({
   justifyContent: 'space-between',
 });
 
-
 const datePickerWrapperStyle = css({
   display: 'flex',
   alignItems: 'center',
-  w: '10.5rem',
-  ml:'1.5rem',
+  justifyItems: 'left',
+  w: '10.75rem',
+  ml:'2rem',
 });
 
 

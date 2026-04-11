@@ -200,6 +200,14 @@ export default function CalendarModal({
                 const m = parseInt(mStr) || 0;
                 const dateWithTime = new Date(selectedDate);
                 dateWithTime.setHours(h, m, 0, 0);
+
+                if (maxDate && dateWithTime > maxDate) {
+                  alert('마감 일시 이후 시간은 설정이 불가능합니다.');
+                  setTimeValue('00:00');
+                  setPeriod('오전');
+                  return;
+                }
+
                 onSave(dateWithTime, true);
               } else {
                 onSave(selectedDate, false);

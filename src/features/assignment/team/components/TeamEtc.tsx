@@ -12,8 +12,9 @@ import { CommunicationDeleteIcon } from '@/components/icons/CommunicationDeleteI
 import { useDeleteCommunication } from '@/hooks/mutations/useDeleteCommunication';
 import { useDeleteMeetingLog } from '@/hooks/mutations/useDeleteMeetingLog';
 import { MinutesModal } from './MinutesModal';
-import { ReferenceEditModal } from './ReferenceEditModal';
+import { EditAssignmentDataCardModal } from '@/features/assignment/components/EditAssignmentDataCardModal';
 import { useDeleteReferenceData } from '@/hooks/mutations/useDeleteReferenceData';
+import { useUpdateReferenceData } from '@/hooks/mutations/useUpdateReferenceData';
 import { ConfirmDeleteAssignmentDataModal } from '@/features/assignment/components/ConfirmDeleteAssginmentDataModal';
 import type {
   TaskReference,
@@ -43,6 +44,7 @@ export const TeamEtc = ({
   const { mutate: deleteCommunication } = useDeleteCommunication(taskId);
   const { mutate: deleteReference } = useDeleteReferenceData(taskId);
   const { mutate: deleteMeetingLog } = useDeleteMeetingLog(taskId);
+  const { mutateAsync: updateReference } = useUpdateReferenceData(taskId);
   const [minutesModalOpen, setMinutesModalOpen] = useState(false);
   const [editingMeetingLog, setEditingMeetingLog] =
     useState<TaskMeetingLog | null>(null);
@@ -96,15 +98,23 @@ export const TeamEtc = ({
 
   const handleOpenReferenceEditModal = (ref: TaskReference) => {
     const referenceId = ref.referenceId ?? 0;
+    const type: 0 | 1 = ref.url != null ? 0 : 1;
     openModal({
       title: '자료 수정',
       content: (
-        <ReferenceEditModal
-          taskId={taskId}
-          referenceId={referenceId}
-          initialName={ref.name}
-          initialUrl={ref.url ?? ref.file_url ?? ''}
-          onSuccess={() => closeModal()}
+        <EditAssignmentDataCardModal
+          type={type}
+          defaultValue={{ name: ref.name, path: ref.url ?? ref.file_url ?? '' }}
+          onSave={async (updated) => {
+            await updateReference({
+              referenceId,
+              name: updated.name.trim(),
+              ...(type === 0
+                ? { url: updated.path.trim() }
+                : { file: updated.file }),
+            });
+            closeModal();
+          }}
         />
       ),
     });
@@ -156,9 +166,7 @@ export const TeamEtc = ({
       content: (
         <AddAssignmentDataModal
           taskId={taskId}
-          onSave={() => {
-            closeModal();
-          }}
+          onSave={closeModal}
         />
       ),
     });
