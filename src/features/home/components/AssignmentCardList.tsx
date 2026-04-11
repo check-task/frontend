@@ -4,12 +4,14 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   DndContext,
+  DragOverlay,
   closestCenter,
   KeyboardSensor,
   PointerSensor,
   useSensor,
   useSensors,
   DragEndEvent,
+  DragStartEvent,
 } from '@dnd-kit/core';
 import { restrictToWindowEdges } from '@dnd-kit/modifiers';
 import {
@@ -98,6 +100,7 @@ export const AssignmentCardList = ({
   const updatePriorities = useUpdateTaskPriorities();
   // 드래그 시 즉각적인 UI 반영을 위한 로컬 상태
   const [items, setItems] = useState(assignments);
+  const [activeId, setActiveId] = useState<number | null>(null);
 
   useEffect(() => {
     setItems(assignments);
@@ -116,13 +119,20 @@ export const AssignmentCardList = ({
     }),
   );
 
+  const activeItem = items.find((a) => a.id === activeId);
+
   const handleCardClick = (assignment: Assignment) => {
     const type = assignment.assignmentType === '팀' ? 'team' : 'personal';
     router.push(`/assignment/${type}/${assignment.id}`);
   };
 
+  const handleDragStart = (event: DragStartEvent) => {
+    setActiveId(event.active.id as number);
+  };
+
   // 드래그 완료 시 카드 순서 재정렬 + 우선순위 API 호출
   const handleDragEnd = (event: DragEndEvent) => {
+    setActiveId(null);
     const { active, over } = event;
 
     if (over && active.id !== over.id) {
@@ -146,8 +156,9 @@ export const AssignmentCardList = ({
     <DndContext
       sensors={sensors}
       collisionDetection={closestCenter}
+      onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
-      modifiers={[restrictToWindowEdges]}
+      onDragCancel={() => setActiveId(null)}
     >
       <SortableContext
         items={items.map((a) => a.id)}
@@ -165,6 +176,21 @@ export const AssignmentCardList = ({
           ))}
         </div>
       </SortableContext>
+
+      <DragOverlay modifiers={[restrictToWindowEdges]}>
+        {activeItem && (
+          <div style={{ cursor: 'grabbing' }}>
+            <AssignmentCard
+              folderName={activeItem.folderName}
+              folderColor={activeItem.folderColor}
+              dDay={activeItem.dDay}
+              assignmentName={activeItem.assignmentName}
+              assignmentType={activeItem.assignmentType}
+              progress={activeItem.progress}
+            />
+          </div>
+        )}
+      </DragOverlay>
     </DndContext>
   );
 };
