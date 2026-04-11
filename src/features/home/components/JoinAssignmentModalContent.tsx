@@ -7,10 +7,12 @@ import { useModalStore } from '@/stores/modal-store';
 import { useJoinTask } from '@/hooks/mutations/useJoinTask';
 import { FolderCheckMark } from '@/components/icons/FolderCheckMark';
 import { FOLDER_COLORS, type FolderColor } from '@/types/folder';
+import { useMyInfo } from '@/hooks/queries/useMyInfo';
 
 export const JoinAssignmentModalContent = () => {
   const closeModal = useModalStore((state) => state.closeModal);
   const joinTask = useJoinTask();
+  const { data: myInfo } = useMyInfo();
   const [inviteCode, setInviteCode] = useState('');
   const [selectedColor, setSelectedColor] = useState<FolderColor | null>(null);
 
@@ -19,9 +21,12 @@ export const JoinAssignmentModalContent = () => {
   };
 
   const handleJoin = () => {
-    joinTask.mutate(inviteCode, {
-      onSuccess: () => closeModal(),
-    });
+    const folderId =
+      myInfo?.folders.find((f) => f.color === selectedColor)?.id ?? null;
+    joinTask.mutate(
+      { inviteCode, folderId },
+      { onSuccess: () => closeModal() },
+    );
   };
 
   return (
