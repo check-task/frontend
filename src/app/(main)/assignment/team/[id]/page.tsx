@@ -15,6 +15,7 @@ import { useTaskRoomSocket } from '@/features/assignment/team/hooks/useTaskRoomS
 import { useUIStore } from '@/stores/ui-store';
 import { useModalStore } from '@/stores/modal-store';
 import { DeleteAllTaskConfirmModal } from '@/features/assignment/components/DeleteAllTaskConfirmModal';
+import { useDeleteAllSubTasks } from '@/features/assignment/hooks/useDeleteAllSubTasks';
 
 const HEADER_WIDTH_COLLAPSED = '49.5625rem'; // 사이드바 닫힘 (793px)
 const HEADER_WIDTH_EXPANDED = '43.25rem';  // 사이드바 열림 (692px)
@@ -29,6 +30,7 @@ export default function TeamAssignmentDetailPage() {
   const headerWidth = isSidebarCollapsed ? HEADER_WIDTH_COLLAPSED : HEADER_WIDTH_EXPANDED;
   const contentWidth = isSidebarCollapsed ? CONTENT_WIDTH_COLLAPSED : CONTENT_WIDTH_EXPANDED;
   const { data, isLoading, isError, error } = useTeamTaskDetail(taskId);
+  const { mutate: mutateDeleteAll } = useDeleteAllSubTasks(taskId);
   const [isEditMode, setIsEditMode] = useState(false);
   const [editedTitles, setEditedTitles] = useState<Record<number, string>>({});
   const [deletedSubTaskIds, setDeletedSubTaskIds] = useState<Set<number>>(new Set());
@@ -65,9 +67,12 @@ export default function TeamAssignmentDetailPage() {
       content: (
         <DeleteAllTaskConfirmModal
           onConfirm={() => {
-            // TODO: API 연동 (전체 삭제)
-            exitEditMode();
-            closeModal();
+            mutateDeleteAll(undefined, {
+              onSuccess: () => {
+                exitEditMode();
+                closeModal();
+              },
+            });
           }}
           onCancel={closeModal}
         />
