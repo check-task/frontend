@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useParams } from 'next/navigation';
 import { Divider } from '@/components/Divider';
 import { AssignmentHeader } from '@/features/assignment/components/AssignmentHeader';
@@ -16,6 +16,9 @@ import { useUIStore } from '@/stores/ui-store';
 import { useModalStore } from '@/stores/modal-store';
 import { DeleteAllTaskConfirmModal } from '@/features/assignment/components/DeleteAllTaskConfirmModal';
 import { useDeleteAllSubTasks } from '@/features/assignment/hooks/useDeleteAllSubTasks';
+import { useDeleteSubTasks } from '@/features/assignment/hooks/useDeleteSubTasks';
+import { UndoToast } from '@/components/UndoToast';
+import type { TaskDetailSubTask } from '@/types/task';
 
 const HEADER_WIDTH_COLLAPSED = '49.5625rem'; // 사이드바 닫힘 (793px)
 const HEADER_WIDTH_EXPANDED = '43.25rem';  // 사이드바 열림 (692px)
@@ -31,9 +34,12 @@ export default function TeamAssignmentDetailPage() {
   const contentWidth = isSidebarCollapsed ? CONTENT_WIDTH_COLLAPSED : CONTENT_WIDTH_EXPANDED;
   const { data, isLoading, isError, error } = useTeamTaskDetail(taskId);
   const { mutate: mutateDeleteAll } = useDeleteAllSubTasks(taskId);
+  const { mutate: mutateDeleteBulk } = useDeleteSubTasks(taskId);
   const [isEditMode, setIsEditMode] = useState(false);
   const [editedTitles, setEditedTitles] = useState<Record<number, string>>({});
   const [deletedSubTaskIds, setDeletedSubTaskIds] = useState<Set<number>>(new Set());
+  const [undoSnapshot, setUndoSnapshot] = useState<TaskDetailSubTask | null>(null);
+  const [showUndoToast, setShowUndoToast] = useState(false);
 
   const enterEditMode = () => {
     setIsEditMode(true);
@@ -41,23 +47,52 @@ export default function TeamAssignmentDetailPage() {
     setDeletedSubTaskIds(new Set());
   };
 
-  const exitEditMode = () => {
+  const exitEditMode = (keepDeletedIds = false) => {
     setIsEditMode(false);
     setEditedTitles({});
-    setDeletedSubTaskIds(new Set());
+    if (!keepDeletedIds) setDeletedSubTaskIds(new Set());
+    setShowUndoToast(false);
+    setUndoSnapshot(null);
   };
 
   const handleTitleChange = (subTaskId: number, title: string) => {
     setEditedTitles((prev) => ({ ...prev, [subTaskId]: title }));
   };
 
-  const handleDeleteTask = (subTaskId: number) => {
+  const handleDeleteTask = useCallback((subTaskId: number) => {
+    const target = data?.subTasks.find((t) => t.subTaskId === subTaskId);
+    if (target) {
+      setUndoSnapshot(target);
+      setShowUndoToast(true);
+    }
     setDeletedSubTaskIds((prev) => new Set(prev).add(subTaskId));
-  };
+  }, [data?.subTasks]);
+
+  const handleUndo = useCallback(() => {
+    if (undoSnapshot) {
+      setDeletedSubTaskIds((prev) => {
+        const next = new Set(prev);
+        next.delete(undoSnapshot.subTaskId);
+        return next;
+      });
+    }
+    setShowUndoToast(false);
+    setUndoSnapshot(null);
+  }, [undoSnapshot]);
+
+  const handleToastClose = useCallback(() => {
+    setShowUndoToast(false);
+    setUndoSnapshot(null);
+  }, []);
 
   const handleSave = () => {
-    // TODO: API 연동 (editedTitles, deletedSubTaskIds 사용)
-    exitEditMode();
+    const ids = Array.from(deletedSubTaskIds);
+    if (ids.length > 0) {
+      mutateDeleteBulk(ids, { onSuccess: () => exitEditMode(true) });
+    } else {
+      // TODO: 제목 수정 API 연동 (editedTitles)
+      exitEditMode();
+    }
   };
 
   const handleDeleteAll = () => {
@@ -190,6 +225,13 @@ export default function TeamAssignmentDetailPage() {
           />
         </div>
       </div>
+      {showUndoToast && (
+        <UndoToast
+          message={`'${undoSnapshot?.title}' 세부 과제가 삭제됩니다.`}
+          onUndo={handleUndo}
+          onClose={handleToastClose}
+        />
+      )}
     </div>
   );
 }
