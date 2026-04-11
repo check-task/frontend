@@ -16,7 +16,7 @@ interface TaskAddFormProps {
 // Api형태에 맞게 Date형태를 YYYY-MM-DDTHH:mm:ss 문자열로 변환
 const formatDeadline = (date: Date) => {
   const pad = (n: number) => String(n).padStart(2, '0');
-  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}:00`;
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T23:59:59`;
 };
 
 const todayAtMidnight = () => {
