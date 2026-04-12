@@ -7,6 +7,7 @@ import { useModalStore } from '@/stores/modal-store';
 import { css } from 'styled-system/css';
 
 interface AssignmentHeaderProps {
+  taskId: number;
   completionRate: number;
   folderColorHex?: string;
   title: string;
@@ -16,6 +17,7 @@ interface AssignmentHeaderProps {
 }
 
 export const AssignmentHeader = ({
+  taskId,
   completionRate,
   folderColorHex,
   title,
@@ -30,6 +32,7 @@ export const AssignmentHeader = ({
       title: '과제 수정',
       content: (
         <AssignmentEditModalContent
+          taskId={taskId}
           initialTitle={title}
           initialColor={folderColorToken}
           initialDueDate={deadline}

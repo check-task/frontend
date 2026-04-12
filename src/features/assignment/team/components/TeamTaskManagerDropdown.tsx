@@ -28,6 +28,16 @@ export const TeamTaskManagerDropdown = ({
       <button
         type='button'
         className={dropdownItemStyle}
+        onClick={() => onSelect('none')}
+        role='option'
+        aria-selected={!selectedManager}
+      >
+        <span className={noneCircleStyle} />
+        <span className={nicknameStyle}>none</span>
+      </button>
+      <button
+        type='button'
+        className={dropdownItemStyle}
         onClick={() => onSelect(myNickname)}
         role='option'
         aria-selected={selectedManager === myNickname}
@@ -104,6 +114,14 @@ const dropdownItemStyle = css({
   '&:last-child': {
     borderBottom: 'none',
   },
+});
+
+const noneCircleStyle = css({
+  width: '1.5rem',
+  height: '1.5rem',
+  borderRadius: 'full',
+  bg: 'gray.200',
+  flexShrink: 0,
 });
 
 const profileCircleStyle = css({

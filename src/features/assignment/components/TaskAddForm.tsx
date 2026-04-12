@@ -13,10 +13,15 @@ interface TaskAddFormProps {
   maxDate?: string | Date;
 }
 
-// Api형태에 맞게 Date형태를 YYYY-MM-DDTHH:mm:ss 문자열로 변환
-const formatDeadline = (date: Date) => {
+const DEFAULT_DEADLINE_TIME = 'T23:59:59';
+
+const formatDeadline = (date: Date, withTime: boolean) => {
   const pad = (n: number) => String(n).padStart(2, '0');
-  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}:00`;
+  const base = `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+  if (withTime) {
+    return `${base}T${pad(date.getHours())}:${pad(date.getMinutes())}:00`;
+  }
+  return `${base}${DEFAULT_DEADLINE_TIME}`;
 };
 
 const todayAtMidnight = () => {
@@ -31,6 +36,7 @@ export const TaskAddForm = ({ taskId, maxDate }: TaskAddFormProps) => {
 
   // 선택된 날짜 상태 추가
   const [selectedDate, setSelectedDate] = useState<Date>(todayAtMidnight());
+  const [timeEnabled, setTimeEnabled] = useState(false);
   // 세부과제 생성 훅 호출
   const { mutate: createSubTask, isPending } = useCreateSubTask(taskId);
 
@@ -39,6 +45,7 @@ export const TaskAddForm = ({ taskId, maxDate }: TaskAddFormProps) => {
     setIsAdding(false);
     setTaskName('');
     setSelectedDate(todayAtMidnight());
+    setTimeEnabled(false);
   };
 
   const handleSaveTask = () => {
@@ -46,10 +53,11 @@ export const TaskAddForm = ({ taskId, maxDate }: TaskAddFormProps) => {
     if (!title) return;
 
     // 즉시 폼 닫기 + onMutate 낙관적 업데이트로 task 동시 노출 → 깜빡임 방지
-    const deadline = formatDeadline(selectedDate);
+    const deadline = formatDeadline(selectedDate, timeEnabled);
     setIsAdding(false);
     setTaskName('');
     setSelectedDate(todayAtMidnight());
+    setTimeEnabled(false);
 
     createSubTask({ title, deadline, isAlarm: true });
   };
@@ -77,7 +85,10 @@ export const TaskAddForm = ({ taskId, maxDate }: TaskAddFormProps) => {
             <div className={datePickerWrapperStyle}>
               <DatePicker
                 value={selectedDate}
-                onChange={setSelectedDate}
+                onChange={(date, withTime) => {
+                  setSelectedDate(date);
+                  setTimeEnabled(withTime);
+                }}
                 maxDate={maxDate}
               />
             </div>

@@ -13,16 +13,22 @@ import {
   colorMap,
   type FolderColor,
 } from '@/features/assignment/components/FolderClassification';
+import { usePatchTask } from '@/hooks/mutations/usePatchTask';
+import { useModalStore } from '@/stores/modal-store';
 
 interface AssignmentEditModalContentProps {
+  taskId: number;
   initialTitle: string;
   initialColor: FolderColor | null;
   initialDueDate?: string;
+  onSuccess?: () => void;
 }
 
 const FOLDER_COLORS: FolderColor[] = ['01', '02', '03', '04', '05'];
 
-/** FolderColor 이름 Assignment 토큰 매핑 */
+const DEFAULT_DEADLINE_TIME = 'T23:59:59';
+
+/** FolderColor 이름 → Assignment 토큰 매핑 */
 const NAME_TO_TOKEN: Partial<Record<FolderColorName, FolderColor>> = {
   red: '01',
   yellow: '02',
@@ -31,26 +37,86 @@ const NAME_TO_TOKEN: Partial<Record<FolderColorName, FolderColor>> = {
   black: '05',
 };
 
+/** Assignment 토큰 → FolderColor 이름 역매핑 */
+const TOKEN_TO_NAME: Record<FolderColor, FolderColorName> = {
+  '01': 'red',
+  '02': 'yellow',
+  '03': 'green',
+  '04': 'purple',
+  '05': 'black',
+};
+
 export function hexToFolderColor(hex?: string): FolderColor | undefined {
   if (!hex) return undefined;
   const name = resolveFolderColor(hex);
   return name ? NAME_TO_TOKEN[name] : undefined;
 }
 
+const hasTimeSet = (deadline?: string): boolean => {
+  if (!deadline) return false;
+  return deadline.includes('T') && !deadline.endsWith(':59');
+};
+
+const formatDeadline = (date: Date, withTime: boolean): string => {
+  const pad = (n: number) => String(n).padStart(2, '0');
+  const base = `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+  if (withTime) {
+    return `${base}T${pad(date.getHours())}:${pad(date.getMinutes())}:00`;
+  }
+  return `${base}${DEFAULT_DEADLINE_TIME}`;
+};
+
 export const AssignmentEditModalContent = ({
+  taskId,
   initialTitle,
   initialColor,
   initialDueDate,
+  onSuccess,
 }: AssignmentEditModalContentProps) => {
   const [title, setTitle] = useState(initialTitle);
   const [selectedColor, setSelectedColor] = useState<FolderColor | null>(initialColor ?? null);
-  const [dueDate, setDueDate] = useState<string | undefined>(initialDueDate);
+  const [dueDate, setDueDate] = useState<Date | undefined>(
+    initialDueDate ? new Date(initialDueDate) : undefined,
+  );
+  const [timeEnabled, setTimeEnabled] = useState(() => hasTimeSet(initialDueDate));
   const { data: myInfo } = useMyInfo();
+  const { mutate: patchTask, isPending } = usePatchTask(taskId);
+  const { closeModal } = useModalStore();
 
   // 사용자가 실제 생성한 폴더의 색상(중복 제거)
   const userColors: FolderColor[] = myInfo
     ? [...new Set(myInfo.folders.map((f) => NAME_TO_TOKEN[f.color]).filter((c): c is FolderColor => c !== undefined))]
     : FOLDER_COLORS;
+
+  // 선택된 색상에 해당하는 folderId 조회
+  const resolveFolderId = (): number | undefined => {
+    if (!selectedColor || !myInfo) return undefined;
+    const colorName = TOKEN_TO_NAME[selectedColor];
+    const folder = myInfo.folders.find((f) => f.color === colorName);
+    return folder?.id;
+  };
+
+  const handleSave = () => {
+    const trimmedTitle = title.trim();
+    if (!trimmedTitle) return;
+
+    const folderId = resolveFolderId();
+    if (!folderId) return;
+
+    const deadline = dueDate
+      ? formatDeadline(dueDate, timeEnabled)
+      : initialDueDate ?? '';
+
+    patchTask(
+      { title: trimmedTitle, folderId, deadline },
+      {
+        onSuccess: () => {
+          closeModal();
+          onSuccess?.();
+        },
+      },
+    );
+  };
 
   return (
     <div className={contentStyle}>
@@ -98,16 +164,20 @@ export const AssignmentEditModalContent = ({
         <p className={labelStyle}>마감일</p>
         <DatePicker
           value={dueDate}
-          onChange={(date) => {
-            const yyyy = date.getFullYear();
-            const mm = String(date.getMonth() + 1).padStart(2, '0');
-            const dd = String(date.getDate()).padStart(2, '0');
-            setDueDate(`${yyyy}-${mm}-${dd}`);
+          onChange={(date, withTime) => {
+            setDueDate(date);
+            setTimeEnabled(withTime);
           }}
+          initialTimeEnabled={timeEnabled}
         />
       </div>
 
-      <Button variant='fillBlue' size='xlarge'>
+      <Button
+        variant='fillBlue'
+        size='xlarge'
+        onClick={handleSave}
+        disabled={isPending}
+      >
         변경사항 저장
       </Button>
     </div>

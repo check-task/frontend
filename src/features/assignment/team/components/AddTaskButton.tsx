@@ -5,15 +5,19 @@ import { PlusIcon } from '@/components/icons/PlusIcon';
 import { Input } from '@/components/TextField';
 import { css } from 'styled-system/css';
 import DatePicker from '@/components/DatePicker';
-import { SaveIcon } from '@/components/icons/SaveIcon';
-import { DeleteTaskIcon } from '@/components/icons/DeleteTaskIcon';
+import { FormActionButtons } from '@/features/assignment/components/FormActionButtons';
 import { useCreateSubTask } from '@/hooks/mutations/useCreateSubTask';
 
-const toYYYYMMDD = (d: Date): string => {
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, '0');
-  const day = String(d.getDate()).padStart(2, '0');
-  return `${y}-${m}-${day}`;
+
+const DEFAULT_DEADLINE_TIME = 'T23:59:59';
+
+const formatDeadline = (date: Date, withTime: boolean): string => {
+  const pad = (n: number) => String(n).padStart(2, '0');
+  const base = `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+  if (withTime) {
+    return `${base}T${pad(date.getHours())}:${pad(date.getMinutes())}:00`;
+  }
+  return `${base}${DEFAULT_DEADLINE_TIME}`;
 };
 
 interface AddTaskButtonProps {
@@ -35,6 +39,7 @@ export const AddTaskButton = ({ taskId, maxDate }: AddTaskButtonProps) => {
   const [deadline, setDeadline] = useState<Date>(() =>
     getDefaultDeadline(maxDate),
   );
+  const [timeEnabled, setTimeEnabled] = useState(false);
   const isAlarm = true;
   const [saveError, setSaveError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -50,6 +55,7 @@ export const AddTaskButton = ({ taskId, maxDate }: AddTaskButtonProps) => {
     setIsInputVisible(false);
     setValue('');
     setDeadline(getDefaultDeadline(maxDate));
+    setTimeEnabled(false);
     setSaveError(null);
   };
 
@@ -63,7 +69,7 @@ export const AddTaskButton = ({ taskId, maxDate }: AddTaskButtonProps) => {
     createSubTask(
       {
         title,
-        deadline: toYYYYMMDD(deadline),
+        deadline: formatDeadline(deadline, timeEnabled),
         isAlarm,
       },
       {
@@ -98,33 +104,21 @@ export const AddTaskButton = ({ taskId, maxDate }: AddTaskButtonProps) => {
           />
           <DatePicker
             value={deadline}
-            onChange={(d) => setDeadline(d)}
+            onChange={(d, withTime) => {
+              setDeadline(d);
+              setTimeEnabled(withTime);
+            }}
             maxDate={maxDate}
           />
         </div>
 
         <div className={buttonGroupStyle}>
           {saveError && <p className={errorTextStyle}>{saveError}</p>}
-          <div className={buttonContainerStyle}>
-            <button
-              type='button'
-              className={buttonSaveStyle}
-              onClick={handleSave}
-              disabled={isPending}
-            >
-              <SaveIcon />
-              저장
-            </button>
-            <button
-              type='button'
-              className={buttonDeleteStyle}
-              onClick={handleDelete}
-              disabled={isPending}
-            >
-              <DeleteTaskIcon />
-              삭제
-            </button>
-          </div>
+          <FormActionButtons
+            onSave={handleSave}
+            onCancel={handleDelete}
+            isPending={isPending}
+          />
         </div>
       </div>
     );
@@ -185,40 +179,4 @@ const buttonGroupStyle = css({
 const errorTextStyle = css({
   textStyle: 'body3.r',
   color: 'red.500',
-});
-
-const buttonContainerStyle = css({
-  display: 'flex',
-  alignItems: 'center',
-  gap: '0.75rem',
-});
-
-const buttonSaveStyle = css({
-  display: 'flex',
-  width: '4.875rem',
-  height: '2.375rem',
-  borderRadius: '2.5rem',
-  border: '0.0625rem solid',
-  borderColor: 'blue.500',
-  textStyle: 'body3.m',
-  color: 'blue.500',
-  cursor: 'pointer',
-  justifyContent: 'center',
-  alignItems: 'center',
-  gap: '0.25rem',
-});
-
-const buttonDeleteStyle = css({
-  display: 'flex',
-  width: '4.875rem',
-  height: '2.375rem',
-  borderRadius: '2.5rem',
-  border: '0.0625rem solid',
-  borderColor: 'gray.600',
-  textStyle: 'body3.m',
-  color: 'gray.600',
-  cursor: 'pointer',
-  justifyContent: 'center',
-  alignItems: 'center',
-  gap: '0.25rem',
 });

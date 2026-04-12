@@ -29,8 +29,23 @@ interface PersonalTaskListProps {
   onDeleteTask?: (id: number) => void;
 }
 
-// Api형태에 맞게 Date형태를 YYYY-MM-DD 문자열로 변환
-const formatDate = (date: Date) => date.toLocaleDateString('en-CA');
+/** 시간 미설정 시 사용할 기본 시간 */
+const DEFAULT_DEADLINE_TIME = 'T23:59:59';
+
+// 시간 설정 여부에 따라 YYYY-MM-DDTHH:mm:ss 반환
+const formatDate = (date: Date, withTime: boolean) => {
+  const pad = (n: number) => String(n).padStart(2, '0');
+  const base = `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+  if (withTime) {
+    return `${base}T${pad(date.getHours())}:${pad(date.getMinutes())}:00`;
+  }
+  return `${base}${DEFAULT_DEADLINE_TIME}`;
+};
+
+const hasTimeSet = (deadline?: string | Date): boolean => {
+  if (typeof deadline !== 'string') return false;
+  return deadline.includes('T') && !deadline.endsWith(':59');
+};
 
 // Task 목록
 export const PersonalTaskList = ({
@@ -53,8 +68,8 @@ export const PersonalTaskList = ({
   );
 
   // 달력 날짜 변경 시 호출 핸들러
-  const handleDeadlineChange = (subTaskId: number) => (date: Date) => {
-    mutateDeadline({ subTaskId, endDate: formatDate(date) });
+  const handleDeadlineChange = (subTaskId: number) => (date: Date, timeEnabled: boolean) => {
+    mutateDeadline({ subTaskId, endDate: formatDate(date, timeEnabled) });
   };
 
   // 체크박스 선택 시 호출 핸들러
@@ -126,6 +141,7 @@ export const PersonalTaskList = ({
                       onChange={handleDeadlineChange(task.id)}
                       muted={isCompleted}
                       maxDate={maxDate}
+                      initialTimeEnabled={hasTimeSet(task.deadline)}
                     />
                     </div>
                     <ClockToggle
@@ -168,7 +184,11 @@ const PersonalTaskListContainerStyle = css({
   p: '1.5rem',
   borderRadius: '0.75rem',
   bg: 'bg',
-  shadow: '0 1px 4px 0 rgba(0, 0, 0, 0.16)',
+  boxShadow: '0 1px 4px 0 rgba(0, 0, 0, 0.16)',
+  _dark: {
+    boxShadow:
+      '0 0 4px 0 rgba(238, 239, 241, 0.08), 0 1px 4px 0 rgba(238, 239, 241, 0.08)',
+  },
 });
 
 // 각 리스트 사이 간격을 위해 한번 더 감쌈

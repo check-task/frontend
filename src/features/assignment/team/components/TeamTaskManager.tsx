@@ -66,6 +66,11 @@ export const TeamTaskManager = ({
   };
 
   const handleSelect = (nickname: string) => {
+    if (nickname === 'none') {
+      setDisplay({ name: 'none', profileImage: undefined });
+      setIsOpen(false);
+      return;
+    }
     setDisplay({
       name: nickname,
       profileImage: getProfileImageForNickname(nickname),
@@ -130,6 +135,7 @@ const teamTaskManagerStyle = cva({
     py: '0.5rem',
     border: 'none',
     cursor: 'pointer',
+    outline: 'none',
   },
   variants: {
     empty: {

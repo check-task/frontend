@@ -301,6 +301,15 @@ export interface JoinTaskResponse {
   };
 }
 
+// ============================
+// 과제 기본 정보 수정 타입 정의 (PATCH /task/{taskId})
+// ============================
+export interface PatchTaskRequest {
+  title: string;
+  folderId: number;
+  deadline: string; 
+}
+
 // 과제 우선순위 변경 타입 정의
 export interface UpdateTaskPrioritiesRequest {
   orderedTasks: { taskId: number; rank: number }[];

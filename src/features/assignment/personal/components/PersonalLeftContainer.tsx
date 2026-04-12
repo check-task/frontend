@@ -143,6 +143,7 @@ export const PersonalLeftContainer = ({
           }}
         >
           <AssignmentHeader
+            taskId={taskId}
             completionRate={completionRate}
             title={title}
             daysLeft={daysLeft}

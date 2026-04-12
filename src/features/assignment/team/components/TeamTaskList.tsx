@@ -33,6 +33,13 @@ const getCommentId = (
   c: TaskDetailSubTaskComment & { comment_id?: number; id?: number },
 ) => c.commentId ?? c.comment_id ?? c.id ?? -1;
 
+const DEFAULT_DEADLINE_TIME = 'T23:59:59';
+
+const hasTimeSet = (deadline?: string | Date): boolean => {
+  if (typeof deadline !== 'string') return false;
+  return deadline.includes('T') && !deadline.endsWith(':59');
+};
+
 interface TeamTaskListProps {
   taskId: number;
   subTasks?: TaskDetailSubTask[];
@@ -165,15 +172,17 @@ const TeamTaskList = ({
     });
   };
 
-  const toYYYYMMDD = (d: Date): string => {
-    const y = d.getFullYear();
-    const m = String(d.getMonth() + 1).padStart(2, '0');
-    const day = String(d.getDate()).padStart(2, '0');
-    return `${y}-${m}-${day}`;
+  const toYYYYMMDD = (d: Date, withTime: boolean): string => {
+    const pad = (n: number) => String(n).padStart(2, '0');
+    const base = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+    if (withTime) {
+      return `${base}T${pad(d.getHours())}:${pad(d.getMinutes())}:00`;
+    }
+    return `${base}${DEFAULT_DEADLINE_TIME}`;
   };
 
-  const handleDeadlineChange = (subTaskId: number, date: Date) => {
-    mutateDeadline({ taskId, subTaskId, endDate: toYYYYMMDD(date) });
+  const handleDeadlineChange = (subTaskId: number, date: Date, timeEnabled: boolean) => {
+    mutateDeadline({ taskId, subTaskId, endDate: toYYYYMMDD(date, timeEnabled) });
   };
 
   // 알림 설정 변경 핸들러
@@ -411,11 +420,12 @@ const TeamTaskList = ({
                       >
                         <DatePicker
                           value={task.deadline}
-                          onChange={(date) =>
-                            handleDeadlineChange(task.subTaskId, date)
+                          onChange={(date, timeEnabled) =>
+                            handleDeadlineChange(task.subTaskId, date, timeEnabled)
                           }
                           muted={isCompleted}
                           maxDate={maxDate}
+                          initialTimeEnabled={hasTimeSet(task.deadline)}
                         />
                         <ClockToggle
                           muted={isCompleted}
@@ -628,7 +638,11 @@ const teamTaskListContainerStyle = css({
   p: '1.5rem',
   borderRadius: '0.75rem',
   bg: 'bg',
-  shadow: '0 1px 4px 0 rgba(0, 0, 0, 0.16)',
+  boxShadow: '0 1px 4px 0 rgba(0, 0, 0, 0.16)',
+  _dark: {
+    boxShadow:
+      '0 0 4px 0 rgba(238, 239, 241, 0.08), 0 1px 4px 0 rgba(238, 239, 241, 0.08)',
+  },
 });
 
 const teamTaskListStyle = css({

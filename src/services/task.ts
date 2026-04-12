@@ -18,6 +18,7 @@ import {
   TaskMeetingLog,
   TaskReference,
   UpdateTaskRequest,
+  PatchTaskRequest,
 } from '@/types/task';
 import axiosInstance from '@/lib/axiosInstance';
 
@@ -165,6 +166,14 @@ export const updateTask = async (
   await axiosInstance.patch(`${TASK_BASE}/${taskId}`, formData, {
     headers: { 'Content-Type': undefined } as unknown as Record<string, string>,
   });
+};
+
+// 과제 기본 정보 수정 api 호출 (PATCH /task/{taskId}) - title, folderId, deadline
+export const patchTask = async (
+  taskId: number,
+  body: PatchTaskRequest,
+): Promise<void> => {
+  await axiosInstance.patch(`${TASK_BASE}/${taskId}`, body);
 };
 
 // 과제 삭제 api 호출 (DELETE /task/{taskId})
