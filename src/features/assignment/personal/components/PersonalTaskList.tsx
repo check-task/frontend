@@ -184,7 +184,11 @@ const PersonalTaskListContainerStyle = css({
   p: '1.5rem',
   borderRadius: '0.75rem',
   bg: 'bg',
-  shadow: '0 1px 4px 0 rgba(0, 0, 0, 0.16)',
+  boxShadow: '0 1px 4px 0 rgba(0, 0, 0, 0.16)',
+  _dark: {
+    boxShadow:
+      '0 0 4px 0 rgba(238, 239, 241, 0.08), 0 1px 4px 0 rgba(238, 239, 241, 0.08)',
+  },
 });
 
 // 각 리스트 사이 간격을 위해 한번 더 감쌈
