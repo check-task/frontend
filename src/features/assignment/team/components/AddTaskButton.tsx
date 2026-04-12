@@ -8,9 +8,16 @@ import DatePicker from '@/components/DatePicker';
 import { FormActionButtons } from '@/features/assignment/components/FormActionButtons';
 import { useCreateSubTask } from '@/hooks/mutations/useCreateSubTask';
 
-const formatDeadline = (date: Date): string => {
+
+const DEFAULT_DEADLINE_TIME = 'T23:59:59';
+
+const formatDeadline = (date: Date, withTime: boolean): string => {
   const pad = (n: number) => String(n).padStart(2, '0');
-  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T23:59:59`;
+  const base = `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+  if (withTime) {
+    return `${base}T${pad(date.getHours())}:${pad(date.getMinutes())}:00`;
+  }
+  return `${base}${DEFAULT_DEADLINE_TIME}`;
 };
 
 interface AddTaskButtonProps {
@@ -32,6 +39,7 @@ export const AddTaskButton = ({ taskId, maxDate }: AddTaskButtonProps) => {
   const [deadline, setDeadline] = useState<Date>(() =>
     getDefaultDeadline(maxDate),
   );
+  const [timeEnabled, setTimeEnabled] = useState(false);
   const isAlarm = true;
   const [saveError, setSaveError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -47,6 +55,7 @@ export const AddTaskButton = ({ taskId, maxDate }: AddTaskButtonProps) => {
     setIsInputVisible(false);
     setValue('');
     setDeadline(getDefaultDeadline(maxDate));
+    setTimeEnabled(false);
     setSaveError(null);
   };
 
@@ -60,7 +69,7 @@ export const AddTaskButton = ({ taskId, maxDate }: AddTaskButtonProps) => {
     createSubTask(
       {
         title,
-        deadline: formatDeadline(deadline),
+        deadline: formatDeadline(deadline, timeEnabled),
         isAlarm,
       },
       {
@@ -95,7 +104,10 @@ export const AddTaskButton = ({ taskId, maxDate }: AddTaskButtonProps) => {
           />
           <DatePicker
             value={deadline}
-            onChange={(d) => setDeadline(d)}
+            onChange={(d, withTime) => {
+              setDeadline(d);
+              setTimeEnabled(withTime);
+            }}
             maxDate={maxDate}
           />
         </div>

@@ -12,6 +12,7 @@ interface DatePickerProps {
   maxDate?: string | Date;
   muted?: boolean; // 데이트 피커는 공용이니까 불리언으로 처리
   showTimeDisplay?: boolean; // 시간 표시 여부
+  initialTimeEnabled?: boolean; // 시간 토글 초기 상태
 }
 
 // 날짜 문자열로 온거 Date 객체로 변환 처리
@@ -29,6 +30,7 @@ export default function DatePicker({
   maxDate,
   muted = false,
   showTimeDisplay = false,
+  initialTimeEnabled = false,
 }: DatePickerProps) {
   // ======= 상태 정의 =======
   const [isOpen, setIsOpen] = useState(false);
@@ -37,7 +39,7 @@ export default function DatePicker({
     parseDate(value) ?? new Date(),
   );
   // 시간 추가 여부
-  const [timeEnabled, setTimeEnabled] = useState(false);
+  const [timeEnabled, setTimeEnabled] = useState(initialTimeEnabled);
 
   // datepicker 외 화면 클릭하면 닫히도록 처리.
   const pickerRef = useClickOutside<HTMLDivElement>(() => setIsOpen(false));
