@@ -170,10 +170,12 @@ export default function TeamAssignmentDetailPage() {
             }}
           >
             <AssignmentHeader
+              taskId={data.taskId}
               title={data.title}
               daysLeft={data.dDay}
               completionRate={data.progressRate}
               folderColorHex={data.foldercolor}
+              deadline={data.deadline}
             />
           </div>
           <TeamHeaderButton taskId={data.taskId} title={data.title} />
