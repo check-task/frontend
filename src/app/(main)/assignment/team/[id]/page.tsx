@@ -176,7 +176,7 @@ export default function TeamAssignmentDetailPage() {
               folderColorHex={data.foldercolor}
             />
           </div>
-          <TeamHeaderButton taskId={data.taskId} />
+          <TeamHeaderButton taskId={data.taskId} title={data.title} />
         </div>
 
         <div className={taskContainerStyle}>
