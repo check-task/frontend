@@ -19,11 +19,6 @@ export const EditFolderButton = ({
   const openModal = useModalStore((state) => state.openModal);
 
   const handleOpen = () => {
-    if (folderName === '팀') {
-      alert("'팀' 폴더는 수정할 수 없습니다.");
-      return;
-    }
-
     openModal({
       title: '폴더 수정',
       content: (
