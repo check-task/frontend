@@ -135,6 +135,7 @@ const teamTaskManagerStyle = cva({
     py: '0.5rem',
     border: 'none',
     cursor: 'pointer',
+    outline: 'none',
   },
   variants: {
     empty: {
