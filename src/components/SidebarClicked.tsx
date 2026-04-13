@@ -66,7 +66,11 @@ const DARK_ITEMS = [
   },
 ] as const;
 
-export const SidebarClicked = () => {
+interface SidebarClickedProps {
+  onClose?: () => void;
+}
+
+export const SidebarClicked = ({ onClose }: SidebarClickedProps) => {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const theme = useUIStore((state) => state.theme);
   const ITEMS = theme === 'dark' ? DARK_ITEMS : LIGHT_ITEMS;
@@ -80,6 +84,7 @@ export const SidebarClicked = () => {
           className={item.id === 'create' ? createItemLinkStyle : itemLinkStyle}
           onMouseEnter={() => setHoveredId(item.id)}
           onMouseLeave={() => setHoveredId(null)}
+          onClick={onClose}
         >
           <Image
             src={hoveredId === item.id ? item.hoveredSrc : item.src}

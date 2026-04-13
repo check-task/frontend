@@ -174,7 +174,7 @@ export const Sidebar = ({ initialCollapsed, initialTheme }: SidebarProps) => {
               top: dropdownTop,
             }}
           >
-            <SidebarClicked />
+            <SidebarClicked onClose={() => setIsDropdownOpen(false)} />
           </div>,
           document.body,
         )}
