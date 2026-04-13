@@ -2,9 +2,13 @@
 
 import { CompletionProgressBar } from '@/features/assignment/components/CompletionProgressBar';
 import { PencilIcon } from '@/components/icons/PencilIcon';
-import { AssignmentEditModalContent, hexToFolderColor } from '@/components/AssignmentEditModal';
+import {
+  AssignmentEditModalContent,
+  hexToFolderColor,
+} from '@/components/AssignmentEditModal';
 import { useModalStore } from '@/stores/modal-store';
-import { css } from 'styled-system/css';
+import { resolveFolderColor } from '@/lib/folder-color';
+import { css, cva } from 'styled-system/css';
 
 interface AssignmentHeaderProps {
   taskId: number;
@@ -26,6 +30,9 @@ export const AssignmentHeader = ({
 }: AssignmentHeaderProps) => {
   const { openModal } = useModalStore();
   const folderColorToken = hexToFolderColor(folderColorHex) ?? null;
+  const folderColor = folderColorHex
+    ? (resolveFolderColor(folderColorHex) ?? 'null')
+    : 'null';
 
   const handleEditClick = () => {
     openModal({
@@ -46,24 +53,14 @@ export const AssignmentHeader = ({
     <div className={containerStyle}>
       <div className={titleStyle}>
         <div className={titleContentStyle}>
-          <div
-            className={css({
-              width: '2.5rem',
-              height: '2.5rem',
-              borderRadius: '50%',
-              flexShrink: 0,
-            })}
-            style={{ backgroundColor: folderColorHex }}
-          />
+          <div className={colorDotStyle({ color: folderColor })} />
           <p className={titleTextStyle}>{title}</p>
           <button onClick={handleEditClick} style={{ cursor: 'pointer' }}>
             <PencilIcon />
           </button>
         </div>
 
-        <p className={daysLeftStyle} style={{ color: folderColorHex }}>
-          {daysLeft}
-        </p>
+        <p className={daysLeftStyle({ color: folderColor })}>{daysLeft}</p>
       </div>
 
       <div className={completionRateStyle}>
@@ -111,10 +108,45 @@ const titleTextStyle = css({
   minWidth: 0,
 });
 
-const daysLeftStyle = css({
-  textStyle: 'h4',
-  flexShrink: 0,
-  whiteSpace: 'nowrap',
+// 폴더 색상 원
+const colorDotStyle = cva({
+  base: {
+    width: '2.5rem',
+    height: '2.5rem',
+    borderRadius: '50%',
+    flexShrink: 0,
+  },
+  variants: {
+    color: {
+      red: { bg: 'sub.01.100' },
+      yellow: { bg: 'sub.02.100' },
+      green: { bg: 'sub.03.100' },
+      purple: { bg: 'sub.04.100' },
+      black: { bg: 'sub.05.100' },
+      null: { bg: 'sub.null.100' },
+    },
+  },
+  defaultVariants: { color: 'null' },
+});
+
+// 디데이 텍스트
+const daysLeftStyle = cva({
+  base: {
+    textStyle: 'h4',
+    flexShrink: 0,
+    whiteSpace: 'nowrap',
+  },
+  variants: {
+    color: {
+      red: { color: 'sub.01.100' },
+      yellow: { color: 'sub.02.100' },
+      green: { color: 'sub.03.100' },
+      purple: { color: 'sub.04.100' },
+      black: { color: 'sub.05.100' },
+      null: { color: 'sub.null.100' },
+    },
+  },
+  defaultVariants: { color: 'null' },
 });
 
 const completionRateStyle = css({

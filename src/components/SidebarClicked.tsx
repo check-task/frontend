@@ -4,8 +4,9 @@ import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { css } from 'styled-system/css';
+import { useUIStore } from '@/stores/ui-store';
 
-const ITEMS = [
+const LIGHT_ITEMS = [
   {
     id: 'create',
     label: 'Create',
@@ -35,8 +36,44 @@ const ITEMS = [
   },
 ] as const;
 
-export const SidebarClicked = () => {
+const DARK_ITEMS = [
+  {
+    id: 'create',
+    label: 'Create',
+    src: '/CreateDark.svg',
+    hoveredSrc: '/CreateDarkHovered.svg',
+    width: 178,
+    height: 42,
+    href: '/assignment/create',
+  },
+  {
+    id: 'personal',
+    label: 'Personal',
+    src: '/PersonalDark.svg',
+    hoveredSrc: '/PersonalDarkHovered.svg',
+    width: 158,
+    height: 42,
+    href: '/assignment?type=personal',
+  },
+  {
+    id: 'team',
+    label: 'Team',
+    src: '/TeamDark.svg',
+    hoveredSrc: '/TeamDarkHovered.svg',
+    width: 158,
+    height: 42,
+    href: '/assignment?type=team',
+  },
+] as const;
+
+interface SidebarClickedProps {
+  onClose?: () => void;
+}
+
+export const SidebarClicked = ({ onClose }: SidebarClickedProps) => {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
+  const theme = useUIStore((state) => state.theme);
+  const ITEMS = theme === 'dark' ? DARK_ITEMS : LIGHT_ITEMS;
 
   return (
     <div className={sidebarClickedStyle}>
@@ -47,6 +84,7 @@ export const SidebarClicked = () => {
           className={item.id === 'create' ? createItemLinkStyle : itemLinkStyle}
           onMouseEnter={() => setHoveredId(item.id)}
           onMouseLeave={() => setHoveredId(null)}
+          onClick={onClose}
         >
           <Image
             src={hoveredId === item.id ? item.hoveredSrc : item.src}
