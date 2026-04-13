@@ -6,25 +6,21 @@ import { Input } from '@/components/TextField';
 import { useModalStore } from '@/stores/modal-store';
 import { useJoinTask } from '@/hooks/mutations/useJoinTask';
 import { FolderCheckMark } from '@/components/icons/FolderCheckMark';
-import { FOLDER_COLORS, type FolderColor } from '@/types/folder';
 import { useMyInfo } from '@/hooks/queries/useMyInfo';
+import type { FolderColor } from '@/types/folder';
 
 export const JoinAssignmentModalContent = () => {
   const closeModal = useModalStore((state) => state.closeModal);
   const joinTask = useJoinTask();
   const { data: myInfo } = useMyInfo();
   const [inviteCode, setInviteCode] = useState('');
-  const [selectedColor, setSelectedColor] = useState<FolderColor | null>(null);
+  const [selectedFolderId, setSelectedFolderId] = useState<number | null>(null);
 
-  const handleColorClick = (color: FolderColor) => {
-    setSelectedColor((prev) => (prev === color ? null : color));
-  };
+  const folders = myInfo?.folders.filter((f) => f.name !== '지정안함') ?? [];
 
   const handleJoin = () => {
-    const folderId =
-      myInfo?.folders.find((f) => f.color === selectedColor)?.id ?? null;
     joinTask.mutate(
-      { inviteCode, folderId },
+      { inviteCode, folderId: selectedFolderId },
       { onSuccess: () => closeModal() },
     );
   };
@@ -36,14 +32,20 @@ export const JoinAssignmentModalContent = () => {
         <div className={formFieldStyle}>
           <label className={labelStyle}>폴더색</label>
           <div className={colorRowStyle}>
-            {FOLDER_COLORS.filter((color) => color !== 'null').map((color) => (
+            {folders.map((folder) => (
               <button
-                key={color}
+                key={folder.id}
                 type='button'
-                className={colorButtonStyle({ color })}
-                onClick={() => handleColorClick(color)}
+                className={colorButtonStyle({
+                  color: folder.color as FolderColor,
+                })}
+                onClick={() =>
+                  setSelectedFolderId((prev) =>
+                    prev === folder.id ? null : folder.id,
+                  )
+                }
               >
-                {selectedColor === color && <FolderCheckMark />}
+                {selectedFolderId === folder.id && <FolderCheckMark />}
               </button>
             ))}
           </div>
@@ -118,6 +120,7 @@ const colorButtonStyle = cva({
       green: { bg: 'sub.03.100' },
       purple: { bg: 'sub.04.100' },
       black: { bg: 'sub.05.100' },
+      null: { bg: 'sub.null.100' },
     },
   },
 });
