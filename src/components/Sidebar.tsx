@@ -2,6 +2,7 @@
 
 import { createPortal } from 'react-dom';
 import { AssignmentButton } from './AssignmentButton';
+import { HomeButton } from './HomeButton';
 import { SidebarLogoButton } from './SidebarLogoButton';
 import { CompletedAssignmentButton } from './CompletedAssignmentButton';
 import { MyInfoButton } from './MyInfoButton';
@@ -137,11 +138,16 @@ export const Sidebar = ({ initialCollapsed, initialTheme }: SidebarProps) => {
       </div>
 
       <div className={contentStyle}>
+        <HomeButton collapsed={isSidebarCollapsed} />
         <div ref={assignmentRef} className={assignmentBlockStyle}>
           <AssignmentButton
             collapsed={isSidebarCollapsed}
             isOpen={isAssignmentOpen}
-            onClick={isSidebarCollapsed ? handleAssignmentClick : () => setIsAssignmentOpen((prev) => !prev)}
+            onClick={
+              isSidebarCollapsed
+                ? handleAssignmentClick
+                : () => setIsAssignmentOpen((prev) => !prev)
+            }
           />
           <SidebarHooks
             collapsed={isSidebarCollapsed}
