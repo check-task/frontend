@@ -11,6 +11,7 @@ export interface DataItem {
   type: 0 | 1; // 0: URL, 1: 파일
   name: string;
   path: string;
+  file?: File;
 }
 
 interface AddAssignmentDataProps {
@@ -28,6 +29,17 @@ export const AddAssignmentData = ({
   const openModal = useModalStore((state) => state.openModal);
   const closeModal = useModalStore((state) => state.closeModal);
 
+  const handleLocalSave = (items: { type: 0 | 1; name: string; path: string; file?: File }[]) => {
+    const newItems: DataItem[] = items.map((item) => ({
+      id: Date.now() + Math.random(),
+      type: item.type,
+      name: item.name,
+      path: item.path,
+      file: item.file,
+    }));
+    onDataItemsChange([...dataItems, ...newItems]);
+  };
+
   const handleAddData = () => {
     openModal({
       title: '자료 추가',
@@ -35,6 +47,7 @@ export const AddAssignmentData = ({
         <AddAssignmentDataModal
           taskId={taskId}
           onSave={closeModal}
+          onLocalSave={taskId ? undefined : handleLocalSave}
         />
       ),
     });

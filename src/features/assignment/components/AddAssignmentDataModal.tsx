@@ -1,6 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useCallback } from 'react';
+import { useForm, useFieldArray } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import type { Resolver } from 'react-hook-form';
 import { Button } from '@/components/Button';
 import { Divider } from '@/components/Divider';
 import { Input } from '@/components/TextField';
@@ -10,9 +14,39 @@ import { AddAssignmentDataModalToggle } from './AddAssignmentDataModalToggle';
 import { css } from 'styled-system/css';
 import { AddURLDataButton } from '../create/components/AddURLDataButton';
 import { useCreateReferenceData } from '@/hooks/mutations/useCreateReferenceData';
+
+// ======== Zod 스키마 ========
+const urlSchema = z.object({
+  groups: z.array(
+    z.object({
+      name: z.string().min(1, 'URL명을 입력하세요.'),
+      path: z.url('올바른 URL 형식이 아닙니다. (예: https://example.com)'),
+    }),
+  ),
+});
+
+const fileSchema = z.object({
+  groups: z.array(
+    z.object({
+      name: z.string().min(1, '파일명을 입력하세요.'),
+      path: z.string().min(1, '파일을 선택하세요.'),
+    }),
+  ),
+});
+
+type FormValues = { groups: { name: string; path: string }[] };
+
+interface LocalDataItem {
+  type: 0 | 1;
+  name: string;
+  path: string;
+  file?: File;
+}
+
 interface AddAssignmentDataModalProps {
   taskId?: number;
   onSave?: () => void;
+  onLocalSave?: (items: LocalDataItem[]) => void;
 }
 
 /* ===== type별 문구 ===== */
@@ -31,142 +65,93 @@ const FORM_TEXT = {
   },
 } as const;
 
-type InputGroup = { id: number; name: string; path: string; file?: File };
-
 export const AddAssignmentDataModal = ({
   taskId,
   onSave,
+  onLocalSave,
 }: AddAssignmentDataModalProps) => {
   const [selectedType, setSelectedType] = useState<0 | 1>(0);
-  const [inputGroups, setInputGroups] = useState<InputGroup[]>(() => [
-    { id: Date.now(), name: '', path: '' },
-  ]);
+  const [files, setFiles] = useState<Record<number, File>>({});
+  const selectedTypeRef = useRef<0 | 1>(0);
+
   const { mutateAsync: createReference, isPending } = useCreateReferenceData(
     taskId ?? 0,
-  ); // taskId 없으면 0으로 훅만 호출
+  );
 
-  // 저장 버튼 활성화 조건
-  // 모든 입력 그룹에 값이 있어야 가능
-  const isSaveDisabled =
-    inputGroups.length === 0 ||
-    inputGroups.some((g) => {
-      if (selectedType === 0) {
-        return !g.name.trim() || !g.path.trim();
+  // selectedType이 바뀌어도 form을 재생성하지 않고 ref로 현재 타입을 참조
+  const resolver: Resolver<FormValues> = useCallback(
+    async (values, context, options) => {
+      const schema = selectedTypeRef.current === 0 ? urlSchema : fileSchema;
+      return zodResolver(schema)(values, context, options);
+    },
+    [],
+  );
+
+  const {
+    register,
+    control,
+    handleSubmit,
+    setValue,
+    reset,
+    formState: { errors, isValid },
+  } = useForm<FormValues>({
+    resolver,
+    defaultValues: { groups: [{ name: '', path: '' }] },
+    mode: 'onChange',
+  });
+
+  const { fields, append } = useFieldArray({ control, name: 'groups' });
+
+  const handleTypeChange = (index: number) => {
+    const newType = index as 0 | 1;
+    selectedTypeRef.current = newType;
+    setSelectedType(newType);
+    setFiles({});
+    reset({ groups: [{ name: '', path: '' }] });
+  };
+
+  const handleFileChange = (fieldIndex: number, file: File | null) => {
+    setFiles((prev) => {
+      const next = { ...prev };
+      if (file) {
+        next[fieldIndex] = file;
+      } else {
+        delete next[fieldIndex];
       }
-      return !g.name.trim() || !g.file;
+      return next;
     });
-
-  const handleAddInput = () => {
-    setInputGroups((prev) => [...prev, { id: Date.now(), name: '', path: '' }]);
-  };
-
-  const handleInputChange = (
-    id: number,
-    field: 'name' | 'path',
-    value: string,
-  ) => {
-    setInputGroups((prev) =>
-      prev.map((g) => (g.id === id ? { ...g, [field]: value } : g)),
-    );
-  };
-
-  const handleFileChange = (id: number, file: File | null) => {
-    setInputGroups((prev) =>
-      prev.map((g) =>
-        g.id === id
-          ? { ...g, file: file ?? undefined, path: file?.name ?? '' }
-          : g,
-      ),
-    );
-  };
-
-  const handleSave = async () => {
-    const validGroups = inputGroups.filter((g) => {
-      if (selectedType === 0) return g.name.trim() && g.path.trim();
-      return g.name.trim() && g.file;
+    setValue(`groups.${fieldIndex}.path`, file?.name ?? '', {
+      shouldValidate: true,
     });
+  };
 
-    for (const group of validGroups) {
+  const handleSave = handleSubmit(async (data) => {
+    if (!taskId) {
+      onLocalSave?.(
+        data.groups.map((g, i) => ({
+          type: selectedType,
+          name: g.name,
+          path: g.path,
+          file: selectedType === 1 ? files[i] : undefined,
+        })),
+      );
+      onSave?.();
+      return;
+    }
+
+    for (const [i, group] of data.groups.entries()) {
       const type = selectedType === 0 ? 'url' : 'file';
       const payload =
         type === 'url'
           ? { name: group.name, url: group.path }
-          : { name: group.name, file: group.file };
+          : { name: group.name, file: files[i] };
       await createReference({ type, payload });
     }
     onSave?.();
-  };
+  });
 
-  const renderInputGroups = () => {
-    const text = FORM_TEXT[selectedType];
-    const isFile = selectedType === 1;
-
-    return (
-      <>
-        {inputGroups.map((group, index) => (
-          <div key={group.id}>
-            {index > 0 && <Divider mt='1.25rem' mb='1.25rem' />}
-
-            <div className={inputGroupStyle}>
-              <div className={inputWrapperStyle}>
-                <label className={labelStyle}>{text.nameLabel}</label>
-                <Input
-                  size='modal'
-                  placeholder={text.namePlaceholder}
-                  value={group.name}
-                  onChange={(e) =>
-                    handleInputChange(group.id, 'name', e.target.value)
-                  }
-                />
-              </div>
-
-              <div className={inputWrapperStyle}>
-                <label className={labelStyle}>{text.pathLabel}</label>
-                {isFile ? (
-                  <>
-                    <input
-                      type='file'
-                      id={`file-${group.id}`}
-                      className={hiddenFileInputStyle}
-                      onChange={(e) =>
-                        handleFileChange(group.id, e.target.files?.[0] ?? null)
-                      }
-                    />
-                    <Input
-                      size='modal'
-                      placeholder={text.pathPlaceholder}
-                      value={group.path}
-                      readOnly
-                      className={fileInputTriggerStyle}
-                      onClick={() =>
-                        document.getElementById(`file-${group.id}`)?.click()
-                      }
-                    />
-                  </>
-                ) : (
-                  <Input
-                    size='modal'
-                    placeholder={text.pathPlaceholder}
-                    value={group.path}
-                    onChange={(e) =>
-                      handleInputChange(group.id, 'path', e.target.value)
-                    }
-                  />
-                )}
-              </div>
-            </div>
-          </div>
-        ))}
-
-        <div className={css({ mt: '1rem', mb: '2.5rem' })}>
-          <AddURLDataButton
-            toggleType={selectedType}
-            onClick={handleAddInput}
-          />
-        </div>
-      </>
-    );
-  };
+  const text = FORM_TEXT[selectedType];
+  const isFile = selectedType === 1;
 
   return (
     <div className={containerStyle}>
@@ -185,14 +170,87 @@ export const AddAssignmentDataModal = ({
             label: '파일 업로드',
           },
         ]}
-        onToggle={(index) => setSelectedType(index as 0 | 1)}
+        onToggle={handleTypeChange}
       />
-      <div className={inputContainerStyle}>{renderInputGroups()}</div>
+      <div className={inputContainerStyle}>
+        {fields.map((field, index) => (
+          <div key={field.id}>
+            {index > 0 && <Divider mt='1.25rem' mb='1.25rem' />}
+
+            <div className={inputGroupStyle}>
+              <div className={inputWrapperStyle}>
+                <label className={labelStyle}>{text.nameLabel}</label>
+                <Input
+                  size='modal'
+                  placeholder={text.namePlaceholder}
+                  {...register(`groups.${index}.name`)}
+                />
+                {errors.groups?.[index]?.name && (
+                  <p className={errorStyle}>
+                    {errors.groups[index].name?.message}
+                  </p>
+                )}
+              </div>
+
+              <div className={inputWrapperStyle}>
+                <label className={labelStyle}>{text.pathLabel}</label>
+                {isFile ? (
+                  <>
+                    <input
+                      type='file'
+                      id={`file-${field.id}`}
+                      className={hiddenFileInputStyle}
+                      onChange={(e) =>
+                        handleFileChange(index, e.target.files?.[0] ?? null)
+                      }
+                    />
+                    <Input
+                      size='modal'
+                      placeholder={text.pathPlaceholder}
+                      {...register(`groups.${index}.path`)}
+                      readOnly
+                      className={fileInputTriggerStyle}
+                      onClick={() =>
+                        document.getElementById(`file-${field.id}`)?.click()
+                      }
+                    />
+                    {errors.groups?.[index]?.path && (
+                      <p className={errorStyle}>
+                        {errors.groups[index].path?.message}
+                      </p>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    <Input
+                      size='modal'
+                      placeholder={text.pathPlaceholder}
+                      {...register(`groups.${index}.path`)}
+                    />
+                    {errors.groups?.[index]?.path && (
+                      <p className={errorStyle}>
+                        {errors.groups[index].path?.message}
+                      </p>
+                    )}
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+        ))}
+
+        <div className={css({ mt: '1rem', mb: '2.5rem' })}>
+          <AddURLDataButton
+            toggleType={selectedType}
+            onClick={() => append({ name: '', path: '' })}
+          />
+        </div>
+      </div>
       <Button
         variant='fillBlue'
         size='xlarge'
         onClick={handleSave}
-        disabled={isSaveDisabled || isPending}
+        disabled={!isValid || isPending}
       >
         저장
       </Button>
@@ -256,6 +314,11 @@ const inputWrapperStyle = css({
 const labelStyle = css({
   textStyle: 'body3.m',
   color: 'gray.800',
+});
+
+const errorStyle = css({
+  textStyle: 'body4.r',
+  color: 'sub.01.100',
 });
 
 const hiddenFileInputStyle = css({
