@@ -41,7 +41,9 @@ export const AddAssignmentDataModal = ({
   const [inputGroups, setInputGroups] = useState<InputGroup[]>(() => [
     { id: Date.now(), name: '', path: '' },
   ]);
-  const { mutateAsync: createReference } = useCreateReferenceData(taskId ?? 0); // taskId 없으면 0으로 훅만 호출
+  const { mutateAsync: createReference, isPending } = useCreateReferenceData(
+    taskId ?? 0,
+  ); // taskId 없으면 0으로 훅만 호출
 
   // 저장 버튼 활성화 조건
   // 모든 입력 그룹에 값이 있어야 가능
@@ -190,7 +192,7 @@ export const AddAssignmentDataModal = ({
         variant='fillBlue'
         size='xlarge'
         onClick={handleSave}
-        disabled={isSaveDisabled}
+        disabled={isSaveDisabled || isPending}
       >
         저장
       </Button>
