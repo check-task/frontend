@@ -21,8 +21,7 @@ import { useUpdateSubTasks } from '@/features/assignment/team/components/hooks/u
 import { UndoToast } from '@/components/UndoToast';
 import type { TaskDetailSubTask } from '@/types/task';
 
-const HEADER_WIDTH_COLLAPSED = '49.5625rem'; // 사이드바 닫힘 (793px)
-const HEADER_WIDTH_EXPANDED = '43.25rem'; // 사이드바 열림 (692px)
+const HEADER_WIDTH = '43.25rem'; // 692px
 const CONTENT_WIDTH_COLLAPSED = '75rem'; // 사이드바 닫힘 (1200px)
 const CONTENT_WIDTH_EXPANDED = '70.125rem'; // 사이드바 열림 (1122px)
 
@@ -31,9 +30,6 @@ export default function TeamAssignmentDetailPage() {
   const taskId = Number(params?.id);
   const isSidebarCollapsed = useUIStore((state) => state.isSidebarCollapsed);
   const { openModal, closeModal } = useModalStore();
-  const headerWidth = isSidebarCollapsed
-    ? HEADER_WIDTH_COLLAPSED
-    : HEADER_WIDTH_EXPANDED;
   const contentWidth = isSidebarCollapsed
     ? CONTENT_WIDTH_COLLAPSED
     : CONTENT_WIDTH_EXPANDED;
@@ -205,7 +201,7 @@ export default function TeamAssignmentDetailPage() {
         >
           <div
             style={{
-              width: headerWidth,
+              width: HEADER_WIDTH,
               flexShrink: 0,
               transition: 'width 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
             }}
