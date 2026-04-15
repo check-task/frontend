@@ -11,9 +11,7 @@ import { useAuthStore } from '@/stores/auth-store';
 const getSocketBaseUrl = (): string => {
   if (typeof window === 'undefined') return '';
   const raw =
-    process.env.NEXT_PUBLIC_WS_URL ??
-    process.env.NEXT_PUBLIC_API_URL ??
-    '';
+    process.env.NEXT_PUBLIC_WS_URL ?? process.env.NEXT_PUBLIC_API_URL ?? '';
   if (!raw) return '';
   try {
     const url = new URL(raw.replace(/\/$/, ''));
@@ -44,7 +42,9 @@ const getSocketNamespace = (): string => {
 
 const getAccessToken = (): string | null => {
   if (typeof window === 'undefined') return null;
-  return useAuthStore.getState().accessToken ?? localStorage.getItem('accessToken');
+  return (
+    useAuthStore.getState().accessToken ?? localStorage.getItem('accessToken')
+  );
 };
 
 let socket: Socket | null = null;
@@ -80,14 +80,27 @@ export function getSocket(): Socket | null {
       auth: (cb) => {
         const token = getAccessToken();
         const value = token
-          ? (shouldUseBearerPrefix() ? `Bearer ${token}` : token)
+          ? shouldUseBearerPrefix()
+            ? `Bearer ${token}`
+            : token
           : '';
         cb({ token: value });
       },
     });
-    if (typeof process !== 'undefined' && process.env.NODE_ENV === 'development') {
-      console.log('[Socket] 연결 시도:', url, 'path:', socketPath, namespace ? `(namespace: ${namespace})` : '(기본 namespace /)');
-      socket.on('connect', () => console.log('[Socket] 연결됨, id:', socket?.id));
+    if (
+      typeof process !== 'undefined' &&
+      process.env.NODE_ENV === 'development'
+    ) {
+      console.log(
+        '[Socket] 연결 시도:',
+        url,
+        'path:',
+        socketPath,
+        namespace ? `(namespace: ${namespace})` : '(기본 namespace /)',
+      );
+      socket.on('connect', () =>
+        console.log('[Socket] 연결됨, id:', socket?.id),
+      );
       socket.on('connect_error', (err) => {
         console.error('[Socket] 연결 실패:', err.message);
         if (err.message === 'Invalid namespace') {
@@ -135,6 +148,12 @@ export const SOCKET_UPDATE_DEADLINE = 'updateDeadline';
 export const SOCKET_SET_ASSIGNEE = 'setSubTaskAssignee';
 /** 클라이언트 → 서버: 단일 세부과제 생성 (백엔드 taskEvents.CREATE_SUBTASK) payload: { taskId, title?, deadline?, isAlarm? } */
 export const SOCKET_CREATE_SUBTASK = 'subtask:create';
+/** 클라이언트 → 서버: 세부과제 선택 수정 (백엔드 taskEvents.UPDATE_SUBTASKS) payload: { taskId, data: [{ subTaskId, title?, endDate?, isAlarm? }] } */
+export const SOCKET_UPDATE_SUBTASKS = 'subtask:update';
+/** 클라이언트 → 서버: 세부과제 선택 삭제 (백엔드 taskEvents.DELETED_SUBTASKS) payload: { taskId, subTaskIds: number[] } */
+export const SOCKET_DELETE_SUBTASKS = 'subtask:delete';
+/** 클라이언트 → 서버: 세부과제 전체 삭제 (백엔드 taskEvents.DELETED_ALL_SUBTASKS) payload: { taskId } */
+export const SOCKET_DELETE_ALL_SUBTASKS = 'subtask:deleteAll';
 /** 클라이언트 → 서버: 멤버 역할 변경 (백엔드 taskEvents.UPDATE_MEMBER) payload: { taskId, userId, role: 0|1 } */
 export const SOCKET_UPDATE_MEMBER = 'member:update';
 
@@ -171,6 +190,9 @@ export const TASK_ROOM_UPDATE_EVENTS = [
   'subtaskAssigneeUpdated',
   'member:updated',
   'subtask:created',
+  'subtask:updated',
+  'subtask:deleted',
+  'subtask:deletedAll',
   'reference:created',
   'reference:updated',
   'reference:deleted',
