@@ -28,6 +28,7 @@ import { useMyInfo } from '@/hooks/queries/useMyInfo';
 import { AddTaskButton } from './AddTaskButton';
 import { getSocket, COMMENT_SEND_EVENTS, COMMENT_EVENTS } from '@/lib/socket';
 import { CloseIcon } from '@/components/icons/CloseIcon';
+import { ArrowUpCircleIcon } from '@/components/icons/ArrowUpCircleIcon';
 
 const getCommentId = (
   c: TaskDetailSubTaskComment & { comment_id?: number; id?: number },
@@ -473,8 +474,7 @@ const TeamTaskList = ({
                 {commentOpen && (
                   <div className={commentSectionStyle}>
                     <div className={inputWrapperStyle}>
-                      <Input
-                        size='basic'
+                      <input
                         placeholder='댓글 추가'
                         className={commentInputStyle}
                         value={commentInputs[task.subTaskId] ?? ''}
@@ -488,19 +488,17 @@ const TeamTaskList = ({
                           }
                         }}
                       />
-                      <div
+                      <button
+                        type='button'
                         className={inputProfileIconStyle}
-                        style={
-                          myInfo?.user.profileImage
-                            ? {
-                                backgroundImage: `url(${myInfo.user.profileImage})`,
-                                backgroundSize: 'cover',
-                                backgroundPosition: 'center',
-                              }
-                            : undefined
-                        }
                         onClick={() => handleCommentSubmit(task.subTaskId)}
-                      />
+                      >
+                        {commentInputs[task.subTaskId]?.trim() ? (
+                          <ArrowUpCircleIcon circleColor='var(--colors-blue-500)' arrowColor='var(--colors-blue-50)' />
+                        ) : (
+                          <ArrowUpCircleIcon circleColor='var(--colors-gray-200)' arrowColor='var(--colors-gray-400)' />
+                        )}
+                      </button>
                     </div>
                     <div className={commentItemContainerStyle}>
                       {comments.length > 0 ? (
@@ -765,13 +763,15 @@ const managerLabelStyle = css({
   color: 'gray.600',
 });
 
+// 댓글 섹션 스타일
 const commentSectionStyle = css({
   display: 'flex',
   flexDirection: 'column',
   gap: '1.25rem',
-  w: '37.5rem',
+  w: '40.5rem',
   h: 'auto',
-  ml: '2.25rem',
+  pl: '2.25rem',
+  mt: '1.25rem',
 });
 
 const inputWrapperStyle = css({
@@ -782,20 +782,31 @@ const inputWrapperStyle = css({
 });
 
 const commentInputStyle = css({
+  display: 'block',
   width: '100%',
-  paddingRight: '3rem',
+  h: '2.5rem',
+  borderRadius: '0.5rem',
+  py: '0.5rem',
+  pl: '1.25rem',
+  pr: '3.25rem',
+  border: '1px solid',
+  borderColor: 'gray.200',
+  bg: 'bg',
+  outline: 'none',
+  color: 'gray.900',
+  textStyle: 'body3.r',
+  _placeholder: {
+    color: 'gray.400',
+  },
 });
 
 const inputProfileIconStyle = css({
   position: 'absolute',
-  right: '0.75rem',
+  right: '1.25rem',
   display: 'flex',
   w: '1.5rem',
   h: '1.5rem',
-  borderRadius: '100%',
-  bg: 'blue.100',
   cursor: 'pointer',
-  overflow: 'hidden',
 });
 
 const emptyCommentMessageStyle = css({
@@ -822,6 +833,8 @@ const commentItemHeaderStyle = css({
   display: 'flex',
   alignItems: 'flex-start',
   gap: '0.5rem',
+  flex: 1,
+  minWidth: 0,
 });
 
 const commentNameContentWrapperStyle = css({
@@ -829,6 +842,8 @@ const commentNameContentWrapperStyle = css({
   flexDirection: 'column',
   gap: '0.25rem',
   transform: 'translateY(-0.0625rem)',
+  minWidth: 0,
+  flex: 1,
 });
 
 const commentWriterNameStyle = css({
@@ -848,6 +863,8 @@ const commentItemHeaderCommentStyle = css({
   textStyle: 'body3.r',
   color: 'gray.700',
   ml: '0.125rem',
+  wordBreak: 'break-all',
+  overflowWrap: 'break-word',
 });
 
 const commentEditInputStyle = css({
