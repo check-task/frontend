@@ -17,12 +17,13 @@ import { useModalStore } from '@/stores/modal-store';
 import { DeleteAllTaskConfirmModal } from '@/features/assignment/components/DeleteAllTaskConfirmModal';
 import { useDeleteAllSubTasks } from '@/features/assignment/hooks/useDeleteAllSubTasks';
 import { useDeleteSubTasks } from '@/features/assignment/hooks/useDeleteSubTasks';
+import { useUpdateSubTasks } from '@/features/assignment/team/components/hooks/useUpdateSubTasks';
 import { UndoToast } from '@/components/UndoToast';
 import type { TaskDetailSubTask } from '@/types/task';
 
 const HEADER_WIDTH_COLLAPSED = '49.5625rem'; // 사이드바 닫힘 (793px)
-const HEADER_WIDTH_EXPANDED = '43.25rem';  // 사이드바 열림 (692px)
-const CONTENT_WIDTH_COLLAPSED = '75rem';   // 사이드바 닫힘 (1200px)
+const HEADER_WIDTH_EXPANDED = '43.25rem'; // 사이드바 열림 (692px)
+const CONTENT_WIDTH_COLLAPSED = '75rem'; // 사이드바 닫힘 (1200px)
 const CONTENT_WIDTH_EXPANDED = '70.125rem'; // 사이드바 열림 (1122px)
 
 export default function TeamAssignmentDetailPage() {
@@ -30,15 +31,24 @@ export default function TeamAssignmentDetailPage() {
   const taskId = Number(params?.id);
   const isSidebarCollapsed = useUIStore((state) => state.isSidebarCollapsed);
   const { openModal, closeModal } = useModalStore();
-  const headerWidth = isSidebarCollapsed ? HEADER_WIDTH_COLLAPSED : HEADER_WIDTH_EXPANDED;
-  const contentWidth = isSidebarCollapsed ? CONTENT_WIDTH_COLLAPSED : CONTENT_WIDTH_EXPANDED;
+  const headerWidth = isSidebarCollapsed
+    ? HEADER_WIDTH_COLLAPSED
+    : HEADER_WIDTH_EXPANDED;
+  const contentWidth = isSidebarCollapsed
+    ? CONTENT_WIDTH_COLLAPSED
+    : CONTENT_WIDTH_EXPANDED;
   const { data, isLoading, isError, error } = useTeamTaskDetail(taskId);
   const { mutate: mutateDeleteAll } = useDeleteAllSubTasks(taskId);
   const { mutate: mutateDeleteBulk } = useDeleteSubTasks(taskId);
+  const { mutate: mutateUpdateSubTasks } = useUpdateSubTasks(taskId);
   const [isEditMode, setIsEditMode] = useState(false);
   const [editedTitles, setEditedTitles] = useState<Record<number, string>>({});
-  const [deletedSubTaskIds, setDeletedSubTaskIds] = useState<Set<number>>(new Set());
-  const [undoSnapshot, setUndoSnapshot] = useState<TaskDetailSubTask | null>(null);
+  const [deletedSubTaskIds, setDeletedSubTaskIds] = useState<Set<number>>(
+    new Set(),
+  );
+  const [undoSnapshot, setUndoSnapshot] = useState<TaskDetailSubTask | null>(
+    null,
+  );
   const [showUndoToast, setShowUndoToast] = useState(false);
 
   const enterEditMode = () => {
@@ -59,14 +69,17 @@ export default function TeamAssignmentDetailPage() {
     setEditedTitles((prev) => ({ ...prev, [subTaskId]: title }));
   };
 
-  const handleDeleteTask = useCallback((subTaskId: number) => {
-    const target = data?.subTasks.find((t) => t.subTaskId === subTaskId);
-    if (target) {
-      setUndoSnapshot(target);
-      setShowUndoToast(true);
-    }
-    setDeletedSubTaskIds((prev) => new Set(prev).add(subTaskId));
-  }, [data?.subTasks]);
+  const handleDeleteTask = useCallback(
+    (subTaskId: number) => {
+      const target = data?.subTasks.find((t) => t.subTaskId === subTaskId);
+      if (target) {
+        setUndoSnapshot(target);
+        setShowUndoToast(true);
+      }
+      setDeletedSubTaskIds((prev) => new Set(prev).add(subTaskId));
+    },
+    [data?.subTasks],
+  );
 
   const handleUndo = useCallback(() => {
     if (undoSnapshot) {
@@ -87,8 +100,31 @@ export default function TeamAssignmentDetailPage() {
 
   const handleSave = () => {
     const ids = Array.from(deletedSubTaskIds);
+    const changedTitles = Object.entries(editedTitles)
+      .filter(([id, title]) => {
+        const original = data?.subTasks.find((t) => t.subTaskId === Number(id));
+        return original && original.title !== title;
+      })
+      .map(([id, title]) => ({ subTaskId: Number(id), title }));
+
     if (ids.length > 0) {
-      mutateDeleteBulk(ids, { onSuccess: () => exitEditMode(true) });
+      mutateDeleteBulk(ids, {
+        onSuccess: () => {
+          if (changedTitles.length > 0) {
+            mutateUpdateSubTasks(
+              { data: changedTitles },
+              { onSuccess: () => exitEditMode(true) },
+            );
+          } else {
+            exitEditMode(true);
+          }
+        },
+      });
+    } else if (changedTitles.length > 0) {
+      mutateUpdateSubTasks(
+        { data: changedTitles },
+        { onSuccess: () => exitEditMode() },
+      );
     } else {
       // TODO: 제목 수정 API 연동 (editedTitles)
       exitEditMode();
@@ -155,12 +191,17 @@ export default function TeamAssignmentDetailPage() {
   return (
     <div className={outerContainerStyle}>
       <div
-        style={{ width: contentWidth, transition: 'width 0.3s cubic-bezier(0.4, 0, 0.2, 1)' }}
+        style={{
+          width: contentWidth,
+          transition: 'width 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+        }}
         className={innerContainerStyle}
       >
         <div
           className={headerContainerStyle}
-          style={isEditMode ? { opacity: 0.4, pointerEvents: 'none' } : undefined}
+          style={
+            isEditMode ? { opacity: 0.4, pointerEvents: 'none' } : undefined
+          }
         >
           <div
             style={{
@@ -183,7 +224,13 @@ export default function TeamAssignmentDetailPage() {
 
         <div className={taskContainerStyle}>
           <div className={taskHeaderStyle}>
-            <div className={css({ display: 'flex', alignItems: 'center', gap: '0.5rem' })}>
+            <div
+              className={css({
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+              })}
+            >
               <h2 className={css({ textStyle: 'h4', color: 'gray.900' })}>
                 세부 TASK
               </h2>
@@ -191,14 +238,16 @@ export default function TeamAssignmentDetailPage() {
                 <button
                   type='button'
                   onClick={enterEditMode}
-                  className={css({cursor: 'pointer'})}
+                  className={css({ cursor: 'pointer' })}
                   aria-label='세부 task 수정'
                 >
                   <PencilIcon size={24} />
                 </button>
               )}
             </div>
-            <div className={css({ visibility: isEditMode ? 'visible' : 'hidden' })}>
+            <div
+              className={css({ visibility: isEditMode ? 'visible' : 'hidden' })}
+            >
               <FormActionButtons
                 onSave={handleSave}
                 onCancel={exitEditMode}
@@ -208,7 +257,9 @@ export default function TeamAssignmentDetailPage() {
           </div>
           <TeamTaskList
             taskId={data.taskId}
-            subTasks={data.subTasks.filter((t) => !deletedSubTaskIds.has(t.subTaskId))}
+            subTasks={data.subTasks.filter(
+              (t) => !deletedSubTaskIds.has(t.subTaskId),
+            )}
             maxDate={data.deadline}
             isEditMode={isEditMode}
             editedTitles={editedTitles}
@@ -217,7 +268,13 @@ export default function TeamAssignmentDetailPage() {
           />
         </div>
 
-        <div style={isEditMode ? { opacity: 0.4, pointerEvents: 'none', width: '100%' } : undefined}>
+        <div
+          style={
+            isEditMode
+              ? { opacity: 0.4, pointerEvents: 'none', width: '100%' }
+              : undefined
+          }
+        >
           <Divider className={css({ mt: '3.75rem', mb: '3.75rem' })} />
           <TeamEtc
             taskId={data.taskId}
@@ -273,4 +330,3 @@ const taskHeaderStyle = css({
   justifyContent: 'space-between',
   width: '100%',
 });
-
