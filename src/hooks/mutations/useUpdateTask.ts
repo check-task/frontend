@@ -1,41 +1,28 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { updateTask } from '@/services/task';
 import type { UpdateTaskRequest } from '@/types/task';
-import {
-  getSocket,
-  TASK_UPDATE_SEND_EVENT,
-  type TaskUpdatePayload,
-} from '@/lib/socket';
-
-function toTaskUpdatePayload(
-  taskId: number,
-  body: UpdateTaskRequest,
-): TaskUpdatePayload {
-  return {
-    taskId,
-    title: body.title,
-    deadline: body.deadline,
-    folderId: body.folderId,
-    subTasks: body.subTasks.map((st) => ({
-      title: st.title,
-      status: st.status,
-      endDate: st.endDate,
-    })),
-    references: body.references,
-  };
-}
+import { getSocket, TASK_UPDATE_SEND_EVENT } from '@/lib/socket';
 
 export const useUpdateTask = (taskId: number) => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (body: UpdateTaskRequest) => updateTask(taskId, body),
-    onSuccess: (_, body) => {
-      queryClient.invalidateQueries({ queryKey: ['taskDetail', taskId] });
+    mutationFn: async (body: UpdateTaskRequest): Promise<void> => {
       const socket = getSocket();
       if (socket?.connected) {
-        socket.emit(TASK_UPDATE_SEND_EVENT, toTaskUpdatePayload(taskId, body));
+        const socketOk = await new Promise<boolean>((resolve) => {
+          socket.emit(
+            TASK_UPDATE_SEND_EVENT,
+            { taskId, body },
+            (res: { success?: boolean; error?: string }) => resolve(!!res?.success),
+          );
+        });
+        if (socketOk) return;
       }
+      await updateTask(taskId, body);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['taskDetail', taskId] });
     },
   });
 };
