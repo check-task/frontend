@@ -85,7 +85,7 @@ export const AddAssignmentTask = ({
           onClick={handleAddTask}
           className={css({
             alignSelf: showTaskInput ? 'flex-start' : 'auto',
-            marginTop: showTaskInput ? '1.25rem' : '0',
+            marginTop: showTaskInput ? '0.25rem' : '0',
           })}
         >
           TASK 추가하기
