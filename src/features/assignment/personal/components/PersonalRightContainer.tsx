@@ -13,6 +13,7 @@ export interface ReferenceItem {
   type: 0 | 1; // 0은 url, 1은 파일로 지정
   name: string;
   path: string;
+  fileName?: string;
 }
 
 interface PersonalRightContainerProps {
@@ -56,13 +57,18 @@ export const PersonalRightContainer = ({
       className={containerStyle}
       style={isEditMode ? { opacity: 0.4, pointerEvents: 'none' } : undefined}
     >
-      <Button variant='strokeBlue' size='small' onClick={handleOpenDeleteModal} className={css({ cursor: 'pointer' })}>
+      <Button
+        variant='strokeBlue'
+        size='small'
+        onClick={handleOpenDeleteModal}
+        className={css({ cursor: 'pointer' })}
+      >
         과제삭제
       </Button>
       <div style={{ marginTop: '6.75rem' }}>
         <PersonalEtc taskId={taskId} items={items} />
       </div>
-    </div> 
+    </div>
   );
 };
 

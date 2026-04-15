@@ -92,6 +92,8 @@ export interface TaskReference {
   url: string | null;
   /** 파일 업로드 시 S3 등 URL (과제 상세/자료 생성 응답) */
   file_url?: string | null;
+  /** 파일 업로드 시 원본 파일명 */
+  fileName?: string | null;
 }
 
 // 커뮤니케이션 한 건 (상세 조회 응답, 수정/삭제 시 communicationId 필요)
