@@ -7,6 +7,7 @@ import { css } from 'styled-system/css';
 interface AssignmentDataCardProps {
   name: string;
   path: string;
+  fileName?: string;
   onEdit: () => void;
   onDelete: () => void;
 }
@@ -15,10 +16,12 @@ interface AssignmentDataCardProps {
 export const AssignmentDataCard = ({
   name,
   path,
+  fileName,
   onEdit,
   onDelete,
 }: AssignmentDataCardProps) => {
   const isUrl = /^https?:\/\//i.test(path);
+  const displayText = fileName ?? path;
 
   return (
     <div className={`group ${cardStyle}`}>
@@ -42,10 +45,10 @@ export const AssignmentDataCard = ({
           target='_blank'
           rel='noreferrer'
         >
-          {path}
+          {displayText}
         </a>
       ) : (
-        <p className={cardContentStyle}>{path}</p>
+        <p className={cardContentStyle}>{displayText}</p>
       )}
     </div>
   );

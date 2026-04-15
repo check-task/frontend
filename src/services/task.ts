@@ -84,6 +84,7 @@ export const getTaskDetail = async (taskId: number): Promise<TaskDetail> => {
         name: r.name,
         url: r.url ?? null,
         file_url: r.file_url ?? r.fileUrl ?? null,
+        fileName: r.fileName ?? null,
       }),
     );
   }
