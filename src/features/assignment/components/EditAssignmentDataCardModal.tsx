@@ -1,7 +1,10 @@
 'use client';
 
-import { Button } from '@/components/Button';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import { useState } from 'react';
+import { Button } from '@/components/Button';
 import { css } from 'styled-system/css';
 import { Input } from '@/components/TextField';
 
@@ -32,26 +35,53 @@ const MODAL_TEXT = {
   },
 } as const;
 
+const urlSchema = z.object({
+  name: z.string().min(1, 'URL명을 입력하세요.'),
+  path: z.url('올바른 URL 형식이 아닙니다. (예: https://example.com)'),
+});
+
+const fileSchema = z.object({
+  name: z.string().min(1, '파일명을 입력하세요.'),
+  path: z.string().min(1, '파일을 선택하세요.'),
+});
+
+type FormValues = { name: string; path: string };
+
 export const EditAssignmentDataCardModal = ({
   type,
   defaultValue,
   onSave,
 }: EditAssignmentDataModalProps) => {
-  const [name, setName] = useState(defaultValue.name);
-  const [path, setPath] = useState(defaultValue.path);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
-  const isDirty =
-    type === 1
-      ? name !== defaultValue.name || selectedFile != null
-      : name !== defaultValue.name || path !== defaultValue.path;
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors, isDirty, isValid },
+  } = useForm<FormValues>({
+    resolver: zodResolver(type === 0 ? urlSchema : fileSchema),
+    defaultValues: { name: defaultValue.name, path: defaultValue.path },
+    mode: 'onChange',
+  });
 
   const text = MODAL_TEXT[type];
 
   const handleFileChange = (file: File | null) => {
     setSelectedFile(file);
-    setPath(file?.name ?? defaultValue.path);
+    setValue('path', file?.name ?? defaultValue.path, {
+      shouldValidate: true,
+      shouldDirty: true,
+    });
   };
+
+  const handleSave = handleSubmit((data) => {
+    onSave({
+      name: data.name,
+      path: data.path,
+      file: selectedFile ?? undefined,
+    });
+  });
 
   return (
     <div className={css({ marginTop: '1.75rem' })}>
@@ -60,10 +90,10 @@ export const EditAssignmentDataCardModal = ({
           <label className={labelStyle}>{text.nameLabel}</label>
           <Input
             size='modal'
-            value={name}
             placeholder={text.namePlaceholder}
-            onChange={(e) => setName(e.target.value)}
+            {...register('name')}
           />
+          {errors.name && <p className={errorStyle}>{errors.name.message}</p>}
         </div>
         <div className={fieldStyle}>
           <label className={labelStyle}>{text.pathLabel}</label>
@@ -77,8 +107,8 @@ export const EditAssignmentDataCardModal = ({
               />
               <Input
                 size='modal'
-                value={path}
                 placeholder={text.pathPlaceholder}
+                {...register('path')}
                 readOnly
                 className={fileInputTriggerStyle}
                 onClick={() =>
@@ -89,18 +119,18 @@ export const EditAssignmentDataCardModal = ({
           ) : (
             <Input
               size='modal'
-              value={path}
               placeholder={text.pathPlaceholder}
-              onChange={(e) => setPath(e.target.value)}
+              {...register('path')}
             />
           )}
+          {errors.path && <p className={errorStyle}>{errors.path.message}</p>}
         </div>
       </div>
       <Button
         variant='fillBlue'
         size='xlarge'
-        onClick={() => onSave({ name, path, file: selectedFile ?? undefined })}
-        disabled={!isDirty}
+        onClick={handleSave}
+        disabled={!isDirty || !isValid}
       >
         변경사항 저장
       </Button>
@@ -125,6 +155,11 @@ const fieldStyle = css({
 const labelStyle = css({
   textStyle: 'body3.m',
   color: 'gray.800',
+});
+
+const errorStyle = css({
+  textStyle: 'body4.r',
+  color: 'sub.01.100',
 });
 
 const fileInputTriggerStyle = css({

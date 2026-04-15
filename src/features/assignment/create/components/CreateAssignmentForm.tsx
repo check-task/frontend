@@ -12,6 +12,7 @@ import { css, cva } from 'styled-system/css';
 import { useUIStore } from '@/stores/ui-store';
 import { useMyInfo } from '@/hooks/queries/useMyInfo';
 import { useCreateTask } from '@/hooks/mutations/useCreateTask';
+import { createReferenceData } from '@/lib/reference';
 import type { TaskType } from '@/types/task';
 
 const formatDate = (d: Date) => {
@@ -80,6 +81,15 @@ export const CreateAssignmentForm = () => {
     setSaveError(null);
     try {
       const taskId = await createTask(payload);
+
+      const fileItems = dataItems.filter((r) => r.type === 1 && r.file);
+      for (const item of fileItems) {
+        await createReferenceData(taskId, 'file', {
+          name: item.name,
+          file: item.file,
+        });
+      }
+
       const typePath = type === 'TEAM' ? 'team' : 'personal';
       router.push(`/assignment/${typePath}/${taskId}`);
     } catch (err: unknown) {

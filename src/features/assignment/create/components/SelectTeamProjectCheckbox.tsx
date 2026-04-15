@@ -30,7 +30,7 @@ const checkboxControl = cva({
         transform: 'scale(1)',
       },
       '& svg path': {
-        stroke: 'gray.900',
+        stroke: 'gray.600',
       },
     },
   },
