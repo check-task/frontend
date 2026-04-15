@@ -14,8 +14,9 @@ export const useCreateSubTask = (taskId: number) => {
         const socketOk = await new Promise<boolean>((resolve) => {
           socket.emit(
             SOCKET_CREATE_SUBTASK,
-            { taskId, ...body },
-            (res: { success?: boolean; reason?: string }) => resolve(!!res?.success),
+            { taskId, data: body },
+            (res: { success?: boolean; reason?: string }) =>
+              resolve(!!res?.success),
           );
         });
         if (socketOk) return;
