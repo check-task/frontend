@@ -4,9 +4,16 @@
 export type AlarmOrder = 'asc' | 'desc';
 // 이거는 임시입니다 > 백엔드한테 부탁해야하는 상태
 export type AlarmTaskType = 'PERSONAL' | 'TEAM';
+export type AlarmType =
+  | 'TASK'
+  | 'SUBTASK'
+  | 'MEMBER'
+  | 'NOTIFICATION'
+  | 'OTHER';
 
 export interface AlarmListItem {
   alarmId: number;
+  alarmType?: AlarmType;
   title: string;
   alarmContent: string;
   isRead: boolean;
