@@ -27,6 +27,7 @@ import { useTaskMembers } from '@/hooks/queries/useTaskMembers';
 import { useMyInfo } from '@/hooks/queries/useMyInfo';
 import { AddTaskButton } from './AddTaskButton';
 import { getSocket, COMMENT_SEND_EVENTS, COMMENT_EVENTS } from '@/lib/socket';
+import { useAlertStore } from '@/stores/alert-store';
 import { CloseIcon } from '@/components/icons/CloseIcon';
 import { ArrowUpCircleIcon } from '@/components/icons/ArrowUpCircleIcon';
 
@@ -84,6 +85,7 @@ const TeamTaskList = ({
   const { mutateAsync: updateComment } = useUpdateComment(taskId);
   const { mutate: deleteComment } = useDeleteComment(taskId);
   const { data: myInfo } = useMyInfo();
+  const { showAlert } = useAlertStore();
   const { data: taskMembers = [] } = useTaskMembers(taskId);
   const currentUserId = myInfo?.user?.id;
   const myNickname = myInfo?.user?.nickname ?? '';
@@ -255,8 +257,7 @@ const TeamTaskList = ({
     const commentId = getCommentId(comment);
     if (commentId >= 0) {
       setDeletedCommentIds((prev) => new Set(prev).add(commentId));
-      queryClient.setQueryData<TaskDetail>(['taskDetail', taskId], (old) => {
-        if (!old?.subTasks) return old;
+      queryClient.setQueryData<TaskDetail>(['taskDetail', taskId], (old) => {        if (!old?.subTasks) return old;
         return {
           ...old,
           subTasks: old.subTasks.map((st) =>
@@ -274,6 +275,7 @@ const TeamTaskList = ({
           ),
         };
       });
+      showAlert('댓글이 삭제되었습니다.');
       const socket = getSocket();
       if (socket?.connected) {
         socket.emit(
@@ -325,6 +327,7 @@ const TeamTaskList = ({
           ),
         };
       });
+      showAlert('댓글이 삭제되었습니다.');
     }
   };
 
