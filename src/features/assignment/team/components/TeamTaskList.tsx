@@ -540,8 +540,7 @@ const TeamTaskList = ({
                                     {comment.writer}
                                   </p>
                                 </div>
-                                {!isEditing && (
-                                  <div className={commentItemEtcStyle}>
+                                <div className={commentItemEtcStyle}>
                                     <div className={commentDateTimeWrapperStyle}>
                                       <span className={commentCreatedAtStyle}>
                                         {date}
@@ -550,7 +549,7 @@ const TeamTaskList = ({
                                         {time}
                                       </span>
                                     </div>
-                                    {isMyComment && (
+                                    {!isEditing && isMyComment && (
                                       <CommentEditDropdown
                                         onEditComment={() =>
                                           handleStartEditComment(
@@ -567,31 +566,53 @@ const TeamTaskList = ({
                                       />
                                     )}
                                   </div>
-                                )}
                               </div>
                               {isEditing ? (
-                                <Input
-                                  size='basic'
-                                  value={editingContent}
-                                  onChange={(e) =>
-                                    setEditingContent(e.target.value)
-                                  }
-                                  onKeyDown={(e) => {
-                                    if (e.key === 'Enter' && !e.nativeEvent.isComposing) {
-                                      e.preventDefault();
+                                <div className={commentEditWrapperStyle}>
+                                  <input
+                                    value={editingContent}
+                                    onChange={(e) =>
+                                      setEditingContent(e.target.value)
+                                    }
+                                    onKeyDown={(e) => {
+                                      if (e.key === 'Enter' && !e.nativeEvent.isComposing) {
+                                        e.preventDefault();
+                                        handleSubmitEditComment(
+                                          id,
+                                          task.subTaskId,
+                                        );
+                                      }
+                                      if (e.key === 'Escape') {
+                                        setEditingCommentId(null);
+                                        setEditingContent('');
+                                      }
+                                    }}
+                                    className={commentEditInputStyle}
+                                    autoFocus
+                                  />
+                                  <button
+                                    type='button'
+                                    className={inputProfileIconStyle}
+                                    onClick={() =>
                                       handleSubmitEditComment(
                                         id,
                                         task.subTaskId,
-                                      );
+                                      )
                                     }
-                                    if (e.key === 'Escape') {
-                                      setEditingCommentId(null);
-                                      setEditingContent('');
-                                    }
-                                  }}
-                                  className={commentEditInputStyle}
-                                  autoFocus
-                                />
+                                  >
+                                    {editingContent.trim() ? (
+                                      <ArrowUpCircleIcon
+                                        circleColor='var(--colors-blue-500)'
+                                        arrowColor='var(--colors-blue-50)'
+                                      />
+                                    ) : (
+                                      <ArrowUpCircleIcon
+                                        circleColor='var(--colors-gray-200)'
+                                        arrowColor='var(--colors-gray-400)'
+                                      />
+                                    )}
+                                  </button>
+                                </div>
                               ) : (
                                 <p className={commentItemHeaderCommentStyle}>
                                   {comment.content}
@@ -857,16 +878,37 @@ const commentItemHeaderCommentStyle = css({
   overflowWrap: 'break-word',
 });
 
-const commentEditInputStyle = css({
-  flex: 1,
-  minWidth: 0,
+const commentEditWrapperStyle = css({
+  position: 'relative',
+  display: 'flex',
+  alignItems: 'center',
   pl: '2rem',
+  width: 'full',
+});
+
+const commentEditInputStyle = css({
+  display: 'block',
+  width: 'full',
+  h: '2.5rem',
+  borderRadius: '0.5rem',
+  py: '0.5rem',
+  pl: '1.25rem',
+  pr: '3.25rem',
+  border: '1px solid',
+  borderColor: 'gray.200',
+  bg: 'bg',
+  outline: 'none',
+  color: 'gray.600',
+  textStyle: 'body3.r',
+  _placeholder: {
+    color: 'gray.400',
+  },
 });
 
 const commentItemEtcStyle = css({
   display: 'flex',
   alignItems: 'center',
-  justifyContent: 'flex-start',
+  justifyContent: 'flex-end',
   gap: '0.25rem',
   w: '7.5rem',
   flexShrink: 0,
@@ -876,6 +918,7 @@ const commentDateTimeWrapperStyle = css({
   display: 'flex',
   alignItems: 'center',
   gap: '0.25rem',
+  mr: '0.6rem',
 });
 
 const commentCreatedAtStyle = css({
