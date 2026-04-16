@@ -13,6 +13,8 @@ import { useExpelTaskMember } from '@/hooks/mutations/useExpelTaskMember';
 import { useTaskMembers } from '@/hooks/queries/useTaskMembers';
 import { useUpdateMemberRole } from '@/hooks/mutations/useUpdateMemberRole';
 import { useMyInfo } from '@/hooks/queries/useMyInfo';
+import { useTeamTaskDetail } from './hooks/useTeamTaskDetail';
+import { useAlertStore } from '@/stores/alert-store';
 
 interface TeamMemberManageModalProps {
   taskId: number;
@@ -45,7 +47,8 @@ const getExpelErrorMessage = (err: unknown): string => {
   };
   if (ax.response?.data?.error) return ax.response.data.error;
   if (ax.response?.data?.message) return ax.response.data.message;
-  if (ax.response?.status === 403) return '권한이 없습니다. 팀장만 추방할 수 있습니다.';
+  if (ax.response?.status === 403)
+    return '권한이 없습니다. 팀장만 추방할 수 있습니다.';
   if (ax.response?.status === 404) return '멤버를 찾을 수 없습니다.';
   return '팀원 추방에 실패했습니다.';
 };
@@ -56,6 +59,8 @@ export const TeamMemberManageModal = ({
   const [inviteCode, setInviteCode] = useState('');
   const [roleError, setRoleError] = useState<string | null>(null);
   const { data: myInfo } = useMyInfo();
+  const { data: taskDetail } = useTeamTaskDetail(taskId);
+  const { showAlert } = useAlertStore();
   const { data: membersData } = useTaskMembers(taskId);
   const { mutateAsync: createInvitation, isPending } =
     useCreateInvitationLink(taskId);
@@ -118,13 +123,21 @@ export const TeamMemberManageModal = ({
     );
   };
 
-  const handleExpelMember = (memberId: number) => {
+  const handleExpelMember = (memberId: number, memberName: string) => {
     setRoleError(null);
     if (memberId == null || memberId === 0) {
       setRoleError('팀원 정보에 사용자 ID가 없어 추방할 수 없습니다.');
       return;
     }
+    const taskTitle = taskDetail?.title ?? '';
     expelMember(memberId, {
+      onSuccess: () =>
+        showAlert(
+          <>
+            <strong>{memberName}</strong>님을 task{' '}
+            <strong>&apos;{taskTitle}&apos;</strong>에서 삭제하였습니다.
+          </>,
+        ),
       onError: (err) => setRoleError(getExpelErrorMessage(err)),
     });
   };
@@ -154,7 +167,9 @@ export const TeamMemberManageModal = ({
               isCurrentUser={isCurrentUser(member)}
               canChangeRole={isCurrentUserOwner}
               onRoleChange={handleRoleChange}
-              onExpelMember={() => handleExpelMember(member.memberId)}
+              onExpelMember={() =>
+                handleExpelMember(member.memberId, member.name)
+              }
             />
           ))
         )}
