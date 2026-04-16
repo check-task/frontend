@@ -104,7 +104,11 @@ export const TeamEtc = ({
       content: (
         <EditAssignmentDataCardModal
           type={type}
-          defaultValue={{ name: ref.name, path: ref.url ?? ref.file_url ?? '' }}
+          defaultValue={{
+            name: ref.name,
+            path:
+              ref.url != null ? ref.url : (ref.fileName ?? ref.file_url ?? ''),
+          }}
           onSave={async (updated) => {
             await updateReference({
               referenceId,
@@ -163,12 +167,7 @@ export const TeamEtc = ({
   const handleOpenDataModal = () => {
     openModal({
       title: '자료 추가',
-      content: (
-        <AddAssignmentDataModal
-          taskId={taskId}
-          onSave={closeModal}
-        />
-      ),
+      content: <AddAssignmentDataModal taskId={taskId} onSave={closeModal} />,
     });
   };
 
@@ -361,11 +360,15 @@ export const TeamEtc = ({
                   rel='noopener noreferrer'
                   className={cardContentStyle}
                 >
-                  {ref.url ?? ref.file_url ?? ''}
+                  {ref.url != null
+                    ? ref.url
+                    : (ref.fileName ?? ref.file_url ?? '')}
                 </a>
               ) : (
                 <p className={cardContentStyle}>
-                  {ref.url ?? ref.file_url ?? ''}
+                  {ref.url != null
+                    ? ref.url
+                    : (ref.fileName ?? ref.file_url ?? '')}
                 </p>
               )}
             </div>

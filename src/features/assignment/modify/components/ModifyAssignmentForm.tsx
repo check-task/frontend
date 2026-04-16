@@ -89,7 +89,7 @@ export const ModifyAssignmentForm = () => {
     path: ref.url ?? ref.file_url ?? '',
   }));
 
-  const isFormValid = assignmentName.trim() !== '' && selectedFolderId != null;
+  const isFormValid = assignmentName.trim() !== '';
 
   const toYYYYMMDD = (d: Date) => {
     const yyyy = d.getFullYear();
@@ -113,25 +113,27 @@ export const ModifyAssignmentForm = () => {
   };
 
   const handleSave = async () => {
-    if (!isFormValid || dueDate == null || selectedFolderId == null) return;
+    if (!isFormValid || dueDate == null) return;
 
     const activeTasks = tasks.length > 0 ? tasks : (initialTasks ?? []);
     const type: TaskType = isTeamProject ? 'TEAM' : 'PERSONAL';
 
-    // 타입과 폴더 일치 검증
-    const selectedFolder = folders.find((f) => f.id === selectedFolderId);
-    const isTeamFolder = selectedFolder?.name === '팀';
+    // 타입과 폴더 일치 검증 (폴더가 선택된 경우에만)
+    if (selectedFolderId != null) {
+      const selectedFolder = folders.find((f) => f.id === selectedFolderId);
+      const isTeamFolder = selectedFolder?.name === '팀';
 
-    if (
-      (type === 'TEAM' && !isTeamFolder) ||
-      (type === 'PERSONAL' && isTeamFolder)
-    ) {
-      alert(
-        type === 'TEAM'
-          ? '팀 과제는 팀 폴더에만 저장할 수 있습니다.'
-          : '개인 과제는 개인 폴더에만 저장할 수 있습니다.',
-      );
-      return;
+      if (
+        (type === 'TEAM' && !isTeamFolder) ||
+        (type === 'PERSONAL' && isTeamFolder)
+      ) {
+        alert(
+          type === 'TEAM'
+            ? '팀 과제는 팀 폴더에만 저장할 수 있습니다.'
+            : '개인 과제는 개인 폴더에만 저장할 수 있습니다.',
+        );
+        return;
+      }
     }
 
     const mergeReferences = (

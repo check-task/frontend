@@ -92,6 +92,8 @@ export interface TaskReference {
   url: string | null;
   /** 파일 업로드 시 S3 등 URL (과제 상세/자료 생성 응답) */
   file_url?: string | null;
+  /** 파일 업로드 시 원본 파일명 */
+  fileName?: string | null;
 }
 
 // 커뮤니케이션 한 건 (상세 조회 응답, 수정/삭제 시 communicationId 필요)
@@ -217,7 +219,7 @@ export interface UpdateTaskRequest {
   deadline: string; // YYYY-MM-DD
   type: TaskType;
   status?: TaskStatus;
-  folderId: number;
+  folderId: number | null;
   subTasks: UpdateTaskSubTaskItem[];
   references: { name: string; url: string }[];
   fileNames?: string[] | string;
@@ -298,7 +300,13 @@ export interface JoinTaskResponse {
     task_id: number;
     task_title: string;
     member_id: number;
+    folderId?: number | null;
   };
+}
+
+export interface JoinTaskResult {
+  message: string;
+  data: JoinTaskResponse['data'];
 }
 
 // ============================
@@ -306,8 +314,8 @@ export interface JoinTaskResponse {
 // ============================
 export interface PatchTaskRequest {
   title: string;
-  folderId: number;
-  deadline: string; 
+  folderId: number | null;
+  deadline: string;
 }
 
 // 과제 우선순위 변경 타입 정의

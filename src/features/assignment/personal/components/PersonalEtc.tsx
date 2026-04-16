@@ -26,12 +26,7 @@ export const PersonalEtc = ({ taskId, items }: PersonalEtcProps) => {
   const handleOpenDataModal = () => {
     openModal({
       title: '자료 추가',
-      content: (
-        <AddAssignmentDataModal
-          taskId={taskId}
-          onSave={closeModal}
-        />
-      ),
+      content: <AddAssignmentDataModal taskId={taskId} onSave={closeModal} />,
     });
   };
 
@@ -42,7 +37,10 @@ export const PersonalEtc = ({ taskId, items }: PersonalEtcProps) => {
       content: (
         <EditAssignmentDataCardModal
           type={item.type} // 타입 전달 0,1 형태에 따라 문구 다르게
-          defaultValue={{ name: item.name, path: item.path }} // 이미 작성되어 있던 기본값
+          defaultValue={{
+            name: item.name,
+            path: item.type === 1 ? (item.fileName ?? item.path) : item.path,
+          }} // 이미 작성되어 있던 기본값
           onSave={async (updated) => {
             await updateReference({
               referenceId: item.id,
@@ -89,6 +87,7 @@ export const PersonalEtc = ({ taskId, items }: PersonalEtcProps) => {
             key={item.id}
             name={item.name}
             path={item.path}
+            fileName={item.fileName}
             onEdit={() => handleEdit(item)}
             onDelete={() => handleDelete(item)}
           />

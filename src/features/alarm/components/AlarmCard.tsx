@@ -4,6 +4,8 @@ import { css, cva } from 'styled-system/css';
 import { flex } from 'styled-system/patterns';
 import { AlarmIcon } from '@/components/icons/AlarmIcon';
 import { CloseIcon } from '@/components/icons/CloseIcon';
+import { MyInfoIcon } from '@/components/icons/MyInfoIcon';
+import { NoticeIcon } from '@/components/icons/NoticeIcon';
 import type { AlarmListItem } from '@/types/alarm';
 
 type AlarmCardProps = AlarmListItem & {
@@ -12,12 +14,25 @@ type AlarmCardProps = AlarmListItem & {
 };
 
 export const AlarmCard = ({
+  alarmType,
   title,
   alarmContent,
   isRead,
   onDelete,
   onClick,
 }: AlarmCardProps) => {
+  const renderAlarmIcon = () => {
+    if (alarmType === 'MEMBER') {
+      return <MyInfoIcon color='primary' />;
+    }
+
+    if (alarmType === 'NOTIFICATION') {
+      return <NoticeIcon color='primary' />;
+    }
+
+    return <AlarmIcon />;
+  };
+
   return (
     // 부모 컨테이너에서만 status를 판단하여 전체 투명도를 조절합니다.
     <div
@@ -26,9 +41,7 @@ export const AlarmCard = ({
       })}
       onClick={onClick}
     >
-      <div className={iconWrapper()}>
-        <AlarmIcon />
-      </div>
+      <div className={iconWrapper()}>{renderAlarmIcon()}</div>
 
       <div className={textContent}>
         <h4 className={titleStyle}>{title}</h4>
