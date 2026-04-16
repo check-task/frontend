@@ -851,7 +851,8 @@ const commentItemHeaderProfileStyle = css({
 const commentItemHeaderCommentStyle = css({
   textStyle: 'body3.r',
   color: 'gray.700',
-  pl: '2rem',
+  ml: '2rem',
+  w: '34.125rem',
   wordBreak: 'break-all',
   overflowWrap: 'break-word',
 });
@@ -865,7 +866,10 @@ const commentEditInputStyle = css({
 const commentItemEtcStyle = css({
   display: 'flex',
   alignItems: 'center',
+  justifyContent: 'flex-start',
   gap: '0.25rem',
+  w: '7.5rem',
+  flexShrink: 0,
 });
 
 const commentDateTimeWrapperStyle = css({
