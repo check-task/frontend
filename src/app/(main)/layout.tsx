@@ -4,6 +4,7 @@ import { HomeButtonBar } from '@/components/HomeButtonBar';
 import { parseUICookie } from '@/lib/parse-ui-cookie';
 import { css } from '../../../styled-system/css';
 import { Modal } from '@/components/Modal';
+import { AlertContainer } from '@/components/AlertContainer';
 import { MainContentWrapper } from './MainContentWrapper';
 import { AuthProvider } from '@/providers/auth-provider';
 
@@ -43,6 +44,7 @@ export default async function MainLayout({
           <MainContentWrapper>{children}</MainContentWrapper>
         </main>
         <Modal />
+        <AlertContainer />
       </div>
     </AuthProvider>
   );
