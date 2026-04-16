@@ -93,8 +93,8 @@ export const TeamMemberManageModal = ({
     if (!inviteCode) return;
     navigator.clipboard
       .writeText(inviteCode)
-      .then(() => alert('초대코드를 복사했습니다.'))
-      .catch(() => alert('초대코드 복사에 실패했습니다.'));
+      .then(() => showAlert('초대코드를 복사했습니다.'))
+      .catch(() => showAlert('초대코드 복사에 실패했습니다.'));
   };
 
   const handleRoleChange = (

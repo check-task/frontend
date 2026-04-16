@@ -12,6 +12,7 @@ import { Modal } from '@/features/profile/components/ModalContent';
 import { useCreateFolder } from '@/hooks/mutations/useCreateFolder';
 import { useUpdateFolder } from '@/hooks/mutations/useUpdateFolder';
 import { useMyInfo } from '@/hooks/queries/useMyInfo';
+import { useAlertStore } from '@/stores/alert-store';
 
 interface FolderModalContentProps {
   mode: 'add' | 'edit';
@@ -48,22 +49,23 @@ export const FolderModalContent = ({
   );
 
   const isPending = createFolder.isPending || updateFolder.isPending;
+  const { showAlert } = useAlertStore();
 
   const handleSave = () => {
     if (!selectedColor || !name.trim()) return;
 
     if (name.trim().length > 11) {
-      alert('폴더 이름은 최대 11자까지만 가능합니다.');
+      showAlert('폴더 이름은 최대 11자까지만 가능합니다.');
       return;
     }
 
     if (usedNames.includes(name.trim())) {
-      alert('이미 사용 중인 폴더 이름입니다.');
+      showAlert('이미 사용 중인 폴더 이름입니다.');
       return;
     }
 
     if (usedColors.includes(selectedColor)) {
-      alert('이미 사용 중인 폴더 색상입니다.');
+      showAlert('이미 사용 중인 폴더 색상입니다.');
       return;
     }
 

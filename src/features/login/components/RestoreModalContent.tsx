@@ -7,6 +7,7 @@ import { useModalStore } from '@/stores/modal-store';
 import { Modal } from '@/features/profile/components/ModalContent';
 import { restoreAccount } from '@/services/user';
 import { useAuthStore } from '@/stores/auth-store';
+import { useAlertStore } from '@/stores/alert-store';
 
 interface RestoreModalContentProps {
   token: string;
@@ -17,6 +18,7 @@ export const RestoreModalContent = ({ token }: RestoreModalContentProps) => {
   const login = useAuthStore((state) => state.login);
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const { showAlert } = useAlertStore();
 
   const handleRestore = async () => {
     setIsLoading(true);
@@ -26,7 +28,7 @@ export const RestoreModalContent = ({ token }: RestoreModalContentProps) => {
       closeModal();
       router.replace('/');
     } catch {
-      alert('계정 복구에 실패했습니다. 다시 시도해주세요.');
+      showAlert('계정 복구에 실패했습니다. 다시 시도해주세요.');
       closeModal();
       router.replace('/login');
     } finally {

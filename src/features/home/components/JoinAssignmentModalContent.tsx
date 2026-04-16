@@ -11,6 +11,7 @@ import { useJoinTask } from '@/hooks/mutations/useJoinTask';
 import { FolderCheckMark } from '@/components/icons/FolderCheckMark';
 import { useMyInfo } from '@/hooks/queries/useMyInfo';
 import type { FolderColor } from '@/types/folder';
+import { useAlertStore } from '@/stores/alert-store';
 
 const joinAssignmentSchema = z.object({
   inviteCode: z
@@ -26,6 +27,7 @@ export const JoinAssignmentModalContent = () => {
   const closeModal = useModalStore((state) => state.closeModal);
   const joinTask = useJoinTask();
   const { data: myInfo } = useMyInfo();
+  const { showAlert } = useAlertStore();
   const [selectedFolderId, setSelectedFolderId] = useState<number | null>(null);
   const {
     register,
@@ -44,7 +46,7 @@ export const JoinAssignmentModalContent = () => {
       { inviteCode, folderId: selectedFolderId },
       {
         onSuccess: (result) => {
-          alert(result.message);
+          showAlert(result.message);
           closeModal();
         },
         onError: (err: unknown) => {
@@ -57,7 +59,7 @@ export const JoinAssignmentModalContent = () => {
             ax.response?.data?.message ??
             (typeof ax.message === 'string' ? ax.message : null) ??
             '과제 참여에 실패했습니다.';
-          alert(message);
+          showAlert(message);
         },
       },
     );

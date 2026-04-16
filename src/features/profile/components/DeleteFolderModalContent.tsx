@@ -7,6 +7,7 @@ import { useModalStore } from '@/stores/modal-store';
 import { FolderColor } from '@/types/folder';
 import { Modal } from '@/features/profile/components/ModalContent';
 import { useDeleteFolder } from '@/hooks/mutations/useDeleteFolder';
+import { useAlertStore } from '@/stores/alert-store';
 
 interface DeleteFolderModalContentProps {
   folderId: number;
@@ -21,6 +22,7 @@ export const DeleteFolderModalContent = ({
 }: DeleteFolderModalContentProps) => {
   const { closeModal } = useModalStore();
   const deleteFolder = useDeleteFolder();
+  const { showAlert } = useAlertStore();
 
   const handleDelete = () => {
     deleteFolder.mutate(folderId, {
@@ -30,7 +32,7 @@ export const DeleteFolderModalContent = ({
           ?.response?.data?.errorCode;
         if (code === 'FOLDER_NOT_EMPTY') {
           closeModal();
-          alert('폴더 내부에 과제가 존재해서 삭제할 수 없습니다.');
+          showAlert('폴더 내부에 과제가 존재해서 삭제할 수 없습니다.');
         }
       },
     });
