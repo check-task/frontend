@@ -101,6 +101,8 @@ const profileImageSectionStyle = css(
   stack.raw({
     gap: '1.5rem',
     alignItems: 'center',
+    width: '10rem',
+    minWidth: 0,
   }),
 );
 
@@ -121,6 +123,10 @@ const profileImageActualStyle = css({
 const profileNameStyle = css({
   textStyle: 'body1.m',
   color: 'gray.900',
+  width: '100%',
+  textAlign: 'center',
+  overflowWrap: 'anywhere',
+  wordBreak: 'break-word',
 });
 
 const profileInfoSectionStyle = css(
