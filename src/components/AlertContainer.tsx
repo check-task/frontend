@@ -26,5 +26,5 @@ const containerStyle = css({
   flexDirection: 'column',
   alignItems: 'flex-end',
   gap: '1rem',
-  zIndex: 50,
+  zIndex: 'toast',
 });
