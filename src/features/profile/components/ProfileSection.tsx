@@ -89,11 +89,16 @@ const labelStyle = css({
   textStyle: 'body1.r',
   color: 'gray.400',
   width: '3.4375rem',
+  flexShrink: 0,
 });
 
 const valueStyle = css({
   textStyle: 'body1.m',
   color: 'gray.700',
+  flex: 1,
+  minWidth: 0,
+  overflowWrap: 'anywhere',
+  wordBreak: 'break-word',
 });
 
 // 프로필 섹션 스타일
@@ -151,6 +156,8 @@ const profileInfoContentStyle = css(
 const profileInfoRowStyle = css(
   hstack.raw({
     gap: '1.5rem',
+    alignItems: 'flex-start',
+    width: '100%',
   }),
 );
 
