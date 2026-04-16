@@ -9,6 +9,7 @@ import { LeftIcon } from '../icons/LeftIcon';
 import { useState } from 'react';
 import { Button } from '../Button';
 import { TimeToggle } from '../TimeToggle';
+import { useAlertStore } from '@/stores/alert-store';
 
 interface CalenderModalProps {
   onClose: () => void;
@@ -32,6 +33,7 @@ export default function CalendarModal({
   onTimeToggle,
 }: CalenderModalProps) {
   // 선택된 날짜
+  const { showAlert } = useAlertStore();
   const [selectedDate, setSelectedDate] = useState<Date | null>(initialDate);
   // 시간 추가 토글 상태
   const [timeEnabled, setTimeEnabled] = useState(initialTimeEnabled);
@@ -202,7 +204,7 @@ export default function CalendarModal({
                 dateWithTime.setHours(h, m, 0, 0);
 
                 if (maxDate && dateWithTime > maxDate) {
-                  alert('마감 일시 이후 시간은 설정이 불가능합니다.');
+                  showAlert('마감 일시 이후 시간은 설정이 불가능합니다.');
                   setTimeValue('00:00');
                   setPeriod('오전');
                   return;

@@ -24,6 +24,7 @@ import { useMyInfo } from '@/hooks/queries/useMyInfo';
 import { useUpdateTask } from '@/hooks/mutations/useUpdateTask';
 import { useDeleteTask } from '@/hooks/mutations/useDeleteTask';
 import type { TaskStatus, TaskType, UpdateTaskRequest } from '@/types/task';
+import { useAlertStore } from '@/stores/alert-store';
 
 const getFolderIdFromColor = (
   folderColor: string | undefined,
@@ -52,6 +53,7 @@ export const ModifyAssignmentForm = () => {
   const updateTaskId = Number.isFinite(taskId) ? taskId : 0;
   const { mutateAsync: updateTask, isPending } = useUpdateTask(updateTaskId);
   const { mutateAsync: deleteTask } = useDeleteTask(updateTaskId);
+  const { showAlert } = useAlertStore();
 
   // 과제 수정 페이지이므로 기본값 세팅
   const [assignmentName, setAssignmentName] = useState('');
@@ -127,7 +129,7 @@ export const ModifyAssignmentForm = () => {
         (type === 'TEAM' && !isTeamFolder) ||
         (type === 'PERSONAL' && isTeamFolder)
       ) {
-        alert(
+        showAlert(
           type === 'TEAM'
             ? '팀 과제는 팀 폴더에만 저장할 수 있습니다.'
             : '개인 과제는 개인 폴더에만 저장할 수 있습니다.',
@@ -204,7 +206,7 @@ export const ModifyAssignmentForm = () => {
         ax.response?.data?.message ??
         (typeof ax.message === 'string' ? ax.message : null) ??
         '과제 수정에 실패했습니다.';
-      alert(message);
+      showAlert(message);
     }
   };
 
