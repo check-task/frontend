@@ -21,7 +21,24 @@ export const JoinAssignmentModalContent = () => {
   const handleJoin = () => {
     joinTask.mutate(
       { inviteCode, folderId: selectedFolderId },
-      { onSuccess: () => closeModal() },
+      {
+        onSuccess: (result) => {
+          alert(result.message);
+          closeModal();
+        },
+        onError: (err: unknown) => {
+          const ax = err as {
+            response?: { data?: { reason?: string; message?: string } };
+            message?: string;
+          };
+          const message =
+            ax.response?.data?.reason ??
+            ax.response?.data?.message ??
+            (typeof ax.message === 'string' ? ax.message : null) ??
+            '과제 참여에 실패했습니다.';
+          alert(message);
+        },
+      },
     );
   };
 
