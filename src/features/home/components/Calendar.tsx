@@ -41,6 +41,7 @@ interface SubTask {
   title: string;
   status: string;
   dueDate: string;
+  deadlineTime?: string;
   folderColor: FolderColor;
 }
 
@@ -183,13 +184,16 @@ export const Calendar = ({
     if (eventId.startsWith('sub-')) {
       // 세부과제 마감일 변경
       const subTaskId = Number(eventId.replace('sub-', ''));
+      const subTask = subItems.find((item) => item.subTaskId === subTaskId);
+      const deadlineTime = subTask?.deadlineTime ?? '23:59:59';
+      const endDate = `${newDate}T${deadlineTime}`;
       setSubItems((prev) =>
         prev.map((item) =>
           item.subTaskId === subTaskId ? { ...item, dueDate: newDate } : item,
         ),
       );
       updateSubTaskDeadline.mutate(
-        { subTaskId, endDate: newDate },
+        { subTaskId, endDate },
         { onError: () => info.revert() },
       );
     } else {
