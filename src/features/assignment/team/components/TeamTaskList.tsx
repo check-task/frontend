@@ -509,6 +509,10 @@ const TeamTaskList = ({
                             };
                           const id = getCommentId(commentWithId);
                           const isEditing = id >= 0 && editingCommentId === id;
+                          const { date, time } = formatCommentCreatedAt(
+                            comment.createdAt,
+                          );
+                          const isMyComment = comment.writer === myNickname;
                           return (
                             <div
                               key={
@@ -519,92 +523,80 @@ const TeamTaskList = ({
                               className={commentItemStyle}
                             >
                               <div className={commentItemHeaderStyle}>
-                                <div
-                                  className={commentItemHeaderProfileStyle}
-                                  style={
-                                    comment.profileImage
-                                      ? {
-                                          backgroundImage: `url(${comment.profileImage})`,
-                                          backgroundSize: 'cover',
-                                          backgroundPosition: 'center',
-                                        }
-                                      : undefined
-                                  }
-                                />
-                                <div className={commentNameContentWrapperStyle}>
+                                <div className={commentAvatarNameStyle}>
+                                  <div
+                                    className={commentItemHeaderProfileStyle}
+                                    style={
+                                      comment.profileImage
+                                        ? {
+                                            backgroundImage: `url(${comment.profileImage})`,
+                                            backgroundSize: 'cover',
+                                            backgroundPosition: 'center',
+                                          }
+                                        : undefined
+                                    }
+                                  />
                                   <p className={commentWriterNameStyle}>
                                     {comment.writer}
                                   </p>
-                                  {isEditing ? (
-                                    <Input
-                                      size='basic'
-                                      value={editingContent}
-                                      onChange={(e) =>
-                                        setEditingContent(e.target.value)
-                                      }
-                                      onKeyDown={(e) => {
-                                        if (e.key === 'Enter') {
-                                          e.preventDefault();
-                                          handleSubmitEditComment(
-                                            id,
-                                            task.subTaskId,
-                                          );
-                                        }
-                                        if (e.key === 'Escape') {
-                                          setEditingCommentId(null);
-                                          setEditingContent('');
-                                        }
-                                      }}
-                                      className={commentEditInputStyle}
-                                      autoFocus
-                                    />
-                                  ) : (
-                                    <p
-                                      className={commentItemHeaderCommentStyle}
-                                    >
-                                      {comment.content}
-                                    </p>
-                                  )}
                                 </div>
-                              </div>
-                              {!isEditing &&
-                                (() => {
-                                  const { date, time } = formatCommentCreatedAt(
-                                    comment.createdAt,
-                                  );
-                                  const isMyComment =
-                                    comment.writer === myNickname;
-                                  return (
-                                    <div className={commentItemEtcStyle}>
-                                      <div
-                                        className={commentDateTimeWrapperStyle}
-                                      >
-                                        <span className={commentCreatedAtStyle}>
-                                          {date}
-                                        </span>
-                                        <span className={commentCreatedAtStyle}>
-                                          {time}
-                                        </span>
-                                      </div>
-                                      {isMyComment && (
-                                        <CommentEditDropdown
-                                          onEditComment={() =>
-                                            handleStartEditComment(
-                                              id,
-                                              comment.content,
-                                            )
-                                          }
-                                          onDeleteComment={() =>
-                                            handleDeleteComment(
-                                              comment,
-                                              task.subTaskId,
-                                            )
-                                          }
-                                        />
-                                      )}
+                                {!isEditing && (
+                                  <div className={commentItemEtcStyle}>
+                                    <div className={commentDateTimeWrapperStyle}>
+                                      <span className={commentCreatedAtStyle}>
+                                        {date}
+                                      </span>
+                                      <span className={commentCreatedAtStyle}>
+                                        {time}
+                                      </span>
                                     </div>
-                                  );
-                                })()}
+                                    {isMyComment && (
+                                      <CommentEditDropdown
+                                        onEditComment={() =>
+                                          handleStartEditComment(
+                                            id,
+                                            comment.content,
+                                          )
+                                        }
+                                        onDeleteComment={() =>
+                                          handleDeleteComment(
+                                            comment,
+                                            task.subTaskId,
+                                          )
+                                        }
+                                      />
+                                    )}
+                                  </div>
+                                )}
+                              </div>
+                              {isEditing ? (
+                                <Input
+                                  size='basic'
+                                  value={editingContent}
+                                  onChange={(e) =>
+                                    setEditingContent(e.target.value)
+                                  }
+                                  onKeyDown={(e) => {
+                                    if (e.key === 'Enter') {
+                                      e.preventDefault();
+                                      handleSubmitEditComment(
+                                        id,
+                                        task.subTaskId,
+                                      );
+                                    }
+                                    if (e.key === 'Escape') {
+                                      setEditingCommentId(null);
+                                      setEditingContent('');
+                                    }
+                                  }}
+                                  className={commentEditInputStyle}
+                                  autoFocus
+                                />
+                              ) : (
+                                <p className={commentItemHeaderCommentStyle}>
+                                  {comment.content}
+                                </p>
+                              )}
                             </div>
                           );
                         })
@@ -815,6 +807,7 @@ const emptyCommentMessageStyle = css({
   width: '100%',
 });
 
+// 여기서 부터 봐
 const commentItemContainerStyle = css({
   display: 'flex',
   flexDirection: 'column',
@@ -824,26 +817,22 @@ const commentItemContainerStyle = css({
 
 const commentItemStyle = css({
   display: 'flex',
-  alignItems: 'flex-end',
-  justifyContent: 'space-between',
+  flexDirection: 'column',
+  gap: '0.5rem',
   width: 'full',
 });
 
 const commentItemHeaderStyle = css({
   display: 'flex',
-  alignItems: 'flex-start',
-  gap: '0.5rem',
-  flex: 1,
-  minWidth: 0,
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  width: 'full',
 });
 
-const commentNameContentWrapperStyle = css({
+const commentAvatarNameStyle = css({
   display: 'flex',
-  flexDirection: 'column',
-  gap: '0.25rem',
-  transform: 'translateY(-0.0625rem)',
-  minWidth: 0,
-  flex: 1,
+  alignItems: 'center',
+  gap: '0.5rem',
 });
 
 const commentWriterNameStyle = css({
@@ -853,8 +842,8 @@ const commentWriterNameStyle = css({
 
 const commentItemHeaderProfileStyle = css({
   display: 'flex',
-  w: '1.25rem',
-  h: '1.25rem',
+  w: '1.5rem',
+  h: '1.5rem',
   borderRadius: '100%',
   bg: 'blue.100',
 });
@@ -862,7 +851,7 @@ const commentItemHeaderProfileStyle = css({
 const commentItemHeaderCommentStyle = css({
   textStyle: 'body3.r',
   color: 'gray.700',
-  ml: '0.125rem',
+  pl: '2rem',
   wordBreak: 'break-all',
   overflowWrap: 'break-word',
 });
@@ -870,6 +859,7 @@ const commentItemHeaderCommentStyle = css({
 const commentEditInputStyle = css({
   flex: 1,
   minWidth: 0,
+  pl: '2rem',
 });
 
 const commentItemEtcStyle = css({
@@ -885,7 +875,7 @@ const commentDateTimeWrapperStyle = css({
 });
 
 const commentCreatedAtStyle = css({
-  fontSize: '0.875rem',
+  textStyle: 'body4.r',
   color: 'gray.400',
 });
 
