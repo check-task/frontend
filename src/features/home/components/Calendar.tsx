@@ -84,6 +84,7 @@ export const Calendar = ({
         id: String(assignment.id), // FullCalendar의 id는 문자열을 요구
         title: assignment.assignmentName,
         start: assignment.dueDate,
+        allDay: true,
         url: `/assignment/${type}/${assignment.id}`,
         backgroundColor: FOLDER_COLOR_MAP[assignment.folderColor],
         extendedProps: { deadlineTime: assignment.deadlineTime },
@@ -101,6 +102,7 @@ export const Calendar = ({
         id: `sub-${st.subTaskId}`,
         title: st.title,
         start: st.dueDate,
+        allDay: true,
         url: `/assignment/${type}/${st.taskId}`,
         backgroundColor: 'transparent',
         borderColor: FOLDER_COLOR_MAP[st.folderColor],
@@ -228,6 +230,7 @@ export const Calendar = ({
       eventClick={handleEventClick}
       headerToolbar={false}
       height='auto'
+      displayEventTime={false}
       // 6주 고정
       fixedWeekCount={true}
     />
