@@ -210,15 +210,11 @@ export const TASK_ROOM_UPDATE_EVENTS = [
 /** 과제 수정 소켓 페이로드 (task:update) */
 export interface TaskUpdatePayload {
   taskId: number;
-  title: string;
-  deadline: string;
-  folderId: number | null;
-  subTasks: {
+  body: {
     title: string;
-    status: string;
-    endDate: string;
-  }[];
-  references: { name: string; url: string }[];
+    deadline: string;
+    folderId: number | null;
+  };
 }
 
 /** 댓글: 클라이언트 → 서버 (명령) */
