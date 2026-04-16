@@ -482,7 +482,7 @@ const TeamTaskList = ({
                           handleCommentChange(task.subTaskId, e.target.value)
                         }
                         onKeyDown={(e) => {
-                          if (e.key === 'Enter') {
+                          if (e.key === 'Enter'&& !e.nativeEvent.isComposing) {
                             e.preventDefault();
                             handleCommentSubmit(task.subTaskId);
                           }
@@ -577,7 +577,7 @@ const TeamTaskList = ({
                                     setEditingContent(e.target.value)
                                   }
                                   onKeyDown={(e) => {
-                                    if (e.key === 'Enter') {
+                                    if (e.key === 'Enter' && !e.nativeEvent.isComposing) {
                                       e.preventDefault();
                                       handleSubmitEditComment(
                                         id,
