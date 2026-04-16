@@ -25,7 +25,9 @@ const schema = z.object({
       /^01[0-9]-\d{3,4}-\d{4}$/,
       '올바른 연락처 형식으로 입력해주세요 (예: 010-1234-5678)',
     ),
-  email: z.email('올바른 이메일 형식으로 입력해주세요'),
+  email: z
+    .email('올바른 이메일 형식으로 입력해주세요')
+    .max(50, '이메일은 50글자 이하여야 합니다.'),
 });
 
 type FormValues = z.infer<typeof schema>;
