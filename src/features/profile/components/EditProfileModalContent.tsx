@@ -14,7 +14,10 @@ import { useModalStore } from '@/stores/modal-store';
 import type { User } from '@/types/api/user';
 
 const schema = z.object({
-  nickname: z.string().min(1, '닉네임을 입력해주세요'),
+  nickname: z
+    .string()
+    .min(1, '닉네임을 입력해주세요')
+    .max(30, '닉네임은 30글자 이하여야 합니다.'),
   phone: z
     .string()
     .min(1, '연락처를 입력해주세요')
