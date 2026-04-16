@@ -1,4 +1,7 @@
 import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import { css, cva } from 'styled-system/css';
 import { stack, hstack } from 'styled-system/patterns';
 import { Button } from '@/components/Button';
@@ -9,16 +12,34 @@ import { FolderCheckMark } from '@/components/icons/FolderCheckMark';
 import { useMyInfo } from '@/hooks/queries/useMyInfo';
 import type { FolderColor } from '@/types/folder';
 
+const joinAssignmentSchema = z.object({
+  inviteCode: z
+    .string()
+    .trim()
+    .min(1, '초대코드를 입력하세요.')
+    .length(8, '초대코드는 8글자여야 합니다.'),
+});
+
+type JoinAssignmentFormValues = z.infer<typeof joinAssignmentSchema>;
+
 export const JoinAssignmentModalContent = () => {
   const closeModal = useModalStore((state) => state.closeModal);
   const joinTask = useJoinTask();
   const { data: myInfo } = useMyInfo();
-  const [inviteCode, setInviteCode] = useState('');
   const [selectedFolderId, setSelectedFolderId] = useState<number | null>(null);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isValid },
+  } = useForm<JoinAssignmentFormValues>({
+    resolver: zodResolver(joinAssignmentSchema),
+    defaultValues: { inviteCode: '' },
+    mode: 'onChange',
+  });
 
   const folders = myInfo?.folders.filter((f) => f.name !== '지정안함') ?? [];
 
-  const handleJoin = () => {
+  const handleJoin = handleSubmit(({ inviteCode }) => {
     joinTask.mutate(
       { inviteCode, folderId: selectedFolderId },
       {
@@ -40,7 +61,7 @@ export const JoinAssignmentModalContent = () => {
         },
       },
     );
-  };
+  });
 
   return (
     <>
@@ -75,9 +96,11 @@ export const JoinAssignmentModalContent = () => {
             size='modal'
             type='text'
             placeholder='공유받은 코드를 붙여 넣으세요.'
-            value={inviteCode}
-            onChange={(e) => setInviteCode(e.target.value)}
+            {...register('inviteCode')}
           />
+          {errors.inviteCode && (
+            <p className={errorStyle}>{errors.inviteCode.message}</p>
+          )}
         </div>
       </div>
 
@@ -85,7 +108,7 @@ export const JoinAssignmentModalContent = () => {
         variant='fillBlue'
         size='xlarge'
         onClick={handleJoin}
-        disabled={!inviteCode.trim() || joinTask.isPending}
+        disabled={!isValid || joinTask.isPending}
         className={css({ marginTop: '2rem' })}
       >
         팀과제 참여
@@ -110,6 +133,11 @@ const formFieldStyle = css(
 const labelStyle = css({
   textStyle: 'body3.m',
   color: 'gray.800',
+});
+
+const errorStyle = css({
+  textStyle: 'body4.r',
+  color: 'sub.01.100',
 });
 
 const colorRowStyle = css(
