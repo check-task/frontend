@@ -19,6 +19,7 @@ import {
   TaskReference,
   UpdateTaskRequest,
   PatchTaskRequest,
+  JoinTaskResult,
 } from '@/types/task';
 import axiosInstance from '@/lib/axiosInstance';
 
@@ -204,13 +205,16 @@ export const createTask = async (body: CreateTaskRequest): Promise<number> => {
 export const joinTask = async (
   inviteCode: string,
   folderId?: number | null,
-) => {
+) : Promise<JoinTaskResult> => {
   const res = await axiosInstance.post<JoinTaskResponse>('/task/join', {
     inviteCode,
     folderId: folderId ?? null,
   });
 
-  return res.data.data;
+  return {
+    message: res.data.message,
+    data: res.data.data,
+  };
 };
 
 // 과제 우선순위 일괄 변경 api 호출

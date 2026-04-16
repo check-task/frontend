@@ -300,7 +300,13 @@ export interface JoinTaskResponse {
     task_id: number;
     task_title: string;
     member_id: number;
+    folderId?: number | null;
   };
+}
+
+export interface JoinTaskResult {
+  message: string;
+  data: JoinTaskResponse['data'];
 }
 
 // ============================
