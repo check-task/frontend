@@ -41,6 +41,7 @@ interface SubTask {
   title: string;
   status: string;
   dueDate: string;
+  deadlineTime?: string;
   folderColor: FolderColor;
 }
 
@@ -83,6 +84,7 @@ export const Calendar = ({
         id: String(assignment.id), // FullCalendar의 id는 문자열을 요구
         title: assignment.assignmentName,
         start: assignment.dueDate,
+        allDay: true,
         url: `/assignment/${type}/${assignment.id}`,
         backgroundColor: FOLDER_COLOR_MAP[assignment.folderColor],
         extendedProps: { deadlineTime: assignment.deadlineTime },
@@ -100,6 +102,7 @@ export const Calendar = ({
         id: `sub-${st.subTaskId}`,
         title: st.title,
         start: st.dueDate,
+        allDay: true,
         url: `/assignment/${type}/${st.taskId}`,
         backgroundColor: 'transparent',
         borderColor: FOLDER_COLOR_MAP[st.folderColor],
@@ -183,13 +186,16 @@ export const Calendar = ({
     if (eventId.startsWith('sub-')) {
       // 세부과제 마감일 변경
       const subTaskId = Number(eventId.replace('sub-', ''));
+      const subTask = subItems.find((item) => item.subTaskId === subTaskId);
+      const deadlineTime = subTask?.deadlineTime ?? '23:59:59';
+      const endDate = `${newDate}T${deadlineTime}`;
       setSubItems((prev) =>
         prev.map((item) =>
           item.subTaskId === subTaskId ? { ...item, dueDate: newDate } : item,
         ),
       );
       updateSubTaskDeadline.mutate(
-        { subTaskId, endDate: newDate },
+        { subTaskId, endDate },
         { onError: () => info.revert() },
       );
     } else {
@@ -224,6 +230,7 @@ export const Calendar = ({
       eventClick={handleEventClick}
       headerToolbar={false}
       height='auto'
+      displayEventTime={false}
       // 6주 고정
       fixedWeekCount={true}
     />
