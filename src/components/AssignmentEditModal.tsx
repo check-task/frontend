@@ -74,26 +74,36 @@ export const AssignmentEditModalContent = ({
   onSuccess,
 }: AssignmentEditModalContentProps) => {
   const [title, setTitle] = useState(initialTitle);
-  const [selectedColor, setSelectedColor] = useState<FolderColor | null>(initialColor ?? null);
+  const [selectedColor, setSelectedColor] = useState<FolderColor | null>(
+    initialColor ?? null,
+  );
   const [dueDate, setDueDate] = useState<Date | undefined>(
     initialDueDate ? new Date(initialDueDate) : undefined,
   );
-  const [timeEnabled, setTimeEnabled] = useState(() => hasTimeSet(initialDueDate));
+  const [timeEnabled, setTimeEnabled] = useState(() =>
+    hasTimeSet(initialDueDate),
+  );
   const { data: myInfo } = useMyInfo();
   const { mutate: patchTask, isPending } = usePatchTask(taskId);
   const { closeModal } = useModalStore();
 
   // 사용자가 실제 생성한 폴더의 색상(중복 제거)
   const userColors: FolderColor[] = myInfo
-    ? [...new Set(myInfo.folders.map((f) => NAME_TO_TOKEN[f.color]).filter((c): c is FolderColor => c !== undefined))]
+    ? [
+        ...new Set(
+          myInfo.folders
+            .map((f) => NAME_TO_TOKEN[f.color])
+            .filter((c): c is FolderColor => c !== undefined),
+        ),
+      ]
     : FOLDER_COLORS;
 
   // 선택된 색상에 해당하는 folderId 조회
-  const resolveFolderId = (): number | undefined => {
-    if (!selectedColor || !myInfo) return undefined;
+  const resolveFolderId = (): number | null => {
+    if (!selectedColor || !myInfo) return null;
     const colorName = TOKEN_TO_NAME[selectedColor];
     const folder = myInfo.folders.find((f) => f.color === colorName);
-    return folder?.id;
+    return folder?.id ?? null;
   };
 
   const handleSave = () => {
@@ -101,11 +111,10 @@ export const AssignmentEditModalContent = ({
     if (!trimmedTitle) return;
 
     const folderId = resolveFolderId();
-    if (!folderId) return;
 
     const deadline = dueDate
       ? formatDeadline(dueDate, timeEnabled)
-      : initialDueDate ?? '';
+      : (initialDueDate ?? '');
 
     patchTask(
       { title: trimmedTitle, folderId, deadline },
@@ -139,7 +148,9 @@ export const AssignmentEditModalContent = ({
             <button
               key={color}
               type='button'
-              onClick={() => setSelectedColor(selectedColor === color ? null : color)}
+              onClick={() =>
+                setSelectedColor(selectedColor === color ? null : color)
+              }
               className={css({
                 width: '2.25rem',
                 height: '2.25rem',
@@ -188,14 +199,14 @@ export const AssignmentEditModalContent = ({
 const contentStyle = css({
   display: 'flex',
   flexDirection: 'column',
-  gap: '1.25rem', 
+  gap: '1.25rem',
   pt: '1.75rem',
 });
 
 const fieldStyle = css({
   display: 'flex',
   flexDirection: 'column',
-  gap: '0.5rem', 
+  gap: '0.5rem',
 });
 
 const labelStyle = css({
@@ -208,5 +219,3 @@ const colorRowStyle = css({
   gap: '0.75rem', // 12px
   alignItems: 'center',
 });
-
-

@@ -219,7 +219,7 @@ export interface UpdateTaskRequest {
   deadline: string; // YYYY-MM-DD
   type: TaskType;
   status?: TaskStatus;
-  folderId: number;
+  folderId: number | null;
   subTasks: UpdateTaskSubTaskItem[];
   references: { name: string; url: string }[];
   fileNames?: string[] | string;
@@ -308,8 +308,8 @@ export interface JoinTaskResponse {
 // ============================
 export interface PatchTaskRequest {
   title: string;
-  folderId: number;
-  deadline: string; 
+  folderId: number | null;
+  deadline: string;
 }
 
 // 과제 우선순위 변경 타입 정의

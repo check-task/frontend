@@ -212,7 +212,7 @@ export interface TaskUpdatePayload {
   taskId: number;
   title: string;
   deadline: string;
-  folderId: number;
+  folderId: number | null;
   subTasks: {
     title: string;
     status: string;
