@@ -90,7 +90,7 @@ const dropdownContainerStyle = css({
 
 const dropdownItemStyle = css({
   paddingX: '1rem',
-  paddingY: '0.75rem',
+  paddingY: '0.5rem',
   textStyle: 'body4.r',
   color: 'gray.700',
   cursor: 'pointer',
