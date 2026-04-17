@@ -13,6 +13,7 @@ import { useDeleteAllSubTasks } from '@/features/assignment/hooks/useDeleteAllSu
 import { useDeleteSubTasks } from '@/features/assignment/hooks/useDeleteSubTasks';
 import { useUpdateSubTasksBatch } from '@/features/assignment/hooks/useUpdateSubTasksBatch';
 import { UndoToast } from '@/components/UndoToast';
+import { useAlertStore } from '@/stores/alert-store';
 
 interface PersonalLeftContainerProps {
   // 헤더 정보
@@ -51,6 +52,7 @@ export const PersonalLeftContainer = ({
   const { mutate: mutateDeleteAll } = useDeleteAllSubTasks(taskId);
   const { mutate: mutateDeleteBulk } = useDeleteSubTasks(taskId);
   const { mutate: mutateUpdateBatch } = useUpdateSubTasksBatch(taskId);
+  const showAlert = useAlertStore((state) => state.showAlert);
 
   // 되돌리기를 위해 task 저장
   const [undoSnapshot, setUndoSnapshot] = useState<PersonalTaskItem | null>(null);
@@ -71,6 +73,11 @@ export const PersonalLeftContainer = ({
   };
 
   const handleSave = () => {
+    if (Object.values(editedTitles).some((title) => title.trim() === '')) {
+      showAlert('세부과제명을 입력하세요.');
+      return;
+    }
+
     const ids = Array.from(deletedTaskIds);
 
     const changedSubTasks = Object.entries(editedTitles)

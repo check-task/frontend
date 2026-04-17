@@ -19,6 +19,7 @@ import { useDeleteAllSubTasks } from '@/features/assignment/hooks/useDeleteAllSu
 import { useDeleteSubTasks } from '@/features/assignment/hooks/useDeleteSubTasks';
 import { useUpdateSubTasksBatch } from '@/features/assignment/hooks/useUpdateSubTasksBatch';
 import { UndoToast } from '@/components/UndoToast';
+import { useAlertStore } from '@/stores/alert-store';
 import type { TaskDetailSubTask } from '@/types/task';
 
 const HEADER_WIDTH = '43.25rem'; // 692px
@@ -37,6 +38,7 @@ export default function TeamAssignmentDetailPage() {
   const { mutate: mutateDeleteAll } = useDeleteAllSubTasks(taskId);
   const { mutate: mutateDeleteBulk } = useDeleteSubTasks(taskId);
   const { mutate: mutateUpdateBatch } = useUpdateSubTasksBatch(taskId);
+  const showAlert = useAlertStore((state) => state.showAlert);
   const [isEditMode, setIsEditMode] = useState(false);
   const [editedTitles, setEditedTitles] = useState<Record<number, string>>({});
   const [deletedSubTaskIds, setDeletedSubTaskIds] = useState<Set<number>>(
@@ -95,6 +97,11 @@ export default function TeamAssignmentDetailPage() {
   }, []);
 
   const handleSave = () => {
+    if (Object.values(editedTitles).some((title) => title.trim() === '')) {
+      showAlert('세부과제명을 입력하세요.');
+      return;
+    }
+
     const ids = Array.from(deletedSubTaskIds);
 
     const changedSubTasks = Object.entries(editedTitles)
