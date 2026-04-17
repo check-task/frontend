@@ -251,7 +251,7 @@ export const TeamEtc = ({
         </div>
 
         <div className={etcCardContainerStyle}>
-          {meetingLogs.map((item, index) => (
+          {[...meetingLogs].sort((a, b) => a.logId - b.logId).map((item, index) => (
             <div
               key={`log-${item.logId}-${item.date}-${index}`}
               className={meetingLogCardStyle}
