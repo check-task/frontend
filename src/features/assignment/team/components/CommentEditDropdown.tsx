@@ -94,7 +94,6 @@ const dropdownItemStyle = css({
   textStyle: 'body4.r',
   color: 'gray.700',
   cursor: 'pointer',
-  transition: 'background-color 0.2s',
   whiteSpace: 'nowrap',
   _hover: {
     backgroundColor: 'gray.50',
