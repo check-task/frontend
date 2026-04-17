@@ -103,6 +103,8 @@ const { showAlert } = useAlertStore();
     currentRole: MemberRole,
   ) => {
     if (newRole === currentRole) return;
+    const confirmed = window.confirm('역할을 변경하시겠습니까?');
+    if (!confirmed) return;
     setRoleError(null);
     // API는 path/body 모두 userId 사용 (GET 팀원 목록의 id가 user id)
     const id = userId ?? memberId;
