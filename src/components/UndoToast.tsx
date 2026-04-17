@@ -79,6 +79,9 @@ const toastContainerStyle = css({
   // border: '1px solid',
   // borderColor: 'gray.100',
   shadow: '0 4px 16px 0 rgba(0, 0, 0, 0.12)',
+  _dark: {
+    shadow: '0 0 4px 0 rgba(238, 239, 241, 0.08), 0 1px 4px 0 rgba(238, 239, 241, 0.08)',
+  },
   width: '100%',
 });
 
