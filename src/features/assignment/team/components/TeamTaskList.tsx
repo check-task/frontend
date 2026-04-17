@@ -544,7 +544,10 @@ const TeamTaskList = ({
                                     {comment.writer}
                                   </p>
                                 </div>
-                                <div className={commentItemEtcStyle}>
+                                <div
+                                  className={commentItemEtcStyle}
+                                  style={(!isEditing && isMyComment) ? undefined : { justifyContent: 'flex-end' }}
+                                >
                                     <div className={commentDateTimeWrapperStyle}>
                                       <span className={commentCreatedAtStyle}>
                                         {date}
@@ -912,7 +915,8 @@ const commentEditInputStyle = css({
 const commentItemEtcStyle = css({
   display: 'flex',
   alignItems: 'center',
-  justifyContent: 'flex-end',
+  // justifyContent: 'flex-end',
+  justifyContent: 'space-between',
   gap: '0.25rem',
   w: '7.5rem',
   flexShrink: 0,
@@ -922,7 +926,7 @@ const commentDateTimeWrapperStyle = css({
   display: 'flex',
   alignItems: 'center',
   gap: '0.25rem',
-  mr: '0.6rem',
+  mr: '0.45rem',
 });
 
 const commentCreatedAtStyle = css({
