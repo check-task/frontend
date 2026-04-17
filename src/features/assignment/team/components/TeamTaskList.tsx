@@ -136,10 +136,11 @@ const TeamTaskList = ({
       /^(\d{4})[.-](\d{1,2})[.-](\d{1,2})(?:\s+(\d{1,2}):(\d{1,2}))?/,
     );
     if (isoMatch) {
-      const [, y, m, d, h, min] = isoMatch;
+      const date = new Date(trimmed);
+      const pad = (n: number) => String(n).padStart(2, '0');
       return {
-        date: `${y!.slice(-2)}.${m!}.${d!}`,
-        time: `${h!.padStart(2, '0')}:${min!.padStart(2, '0')}`,
+        date: `${String(date.getFullYear()).slice(-2)}.${pad(date.getMonth() + 1)}.${pad(date.getDate())}`,
+        time: `${pad(date.getHours())}:${pad(date.getMinutes())}`,
       };
     }
     if (dotMatch) {
