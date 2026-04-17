@@ -180,6 +180,7 @@ export const AssignmentEditModalContent = ({
             setTimeEnabled(withTime);
           }}
           initialTimeEnabled={timeEnabled}
+          showTimeDisplay={true}
         />
       </div>
 
