@@ -7,6 +7,7 @@ import { css } from 'styled-system/css';
 import DatePicker from '@/components/DatePicker';
 import { FormActionButtons } from '@/features/assignment/components/FormActionButtons';
 import { useCreateSubTask } from '@/hooks/mutations/useCreateSubTask';
+import { useAlertStore } from '@/stores/alert-store';
 
 
 const DEFAULT_DEADLINE_TIME = 'T23:59:59';
@@ -41,9 +42,9 @@ export const AddTaskButton = ({ taskId, maxDate }: AddTaskButtonProps) => {
   );
   const [timeEnabled, setTimeEnabled] = useState(false);
   const isAlarm = true;
-  const [saveError, setSaveError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const { mutate: createSubTask, isPending } = useCreateSubTask(taskId);
+  const showAlert = useAlertStore((state) => state.showAlert);
 
   useEffect(() => {
     if (isInputVisible) {
@@ -56,16 +57,14 @@ export const AddTaskButton = ({ taskId, maxDate }: AddTaskButtonProps) => {
     setValue('');
     setDeadline(getDefaultDeadline(maxDate));
     setTimeEnabled(false);
-    setSaveError(null);
   };
 
   const handleSave = () => {
     const title = value.trim();
     if (!title) {
-      setSaveError('세부과제명을 입력하세요.');
+      showAlert('세부과제명을 입력하세요.');
       return;
     }
-    setSaveError(null);
     createSubTask(
       {
         title,
@@ -78,9 +77,7 @@ export const AddTaskButton = ({ taskId, maxDate }: AddTaskButtonProps) => {
           const ax = err as unknown as {
             response?: { data?: { reason?: string } };
           };
-          setSaveError(
-            ax?.response?.data?.reason ?? '세부과제 추가에 실패했습니다.',
-          );
+          showAlert(ax?.response?.data?.reason ?? '세부과제 추가에 실패했습니다.');
         },
       },
     );
@@ -113,7 +110,6 @@ export const AddTaskButton = ({ taskId, maxDate }: AddTaskButtonProps) => {
         </div>
 
         <div className={buttonGroupStyle}>
-          {saveError && <p className={errorTextStyle}>{saveError}</p>}
           <FormActionButtons
             onSave={handleSave}
             onCancel={handleDelete}
@@ -129,7 +125,6 @@ export const AddTaskButton = ({ taskId, maxDate }: AddTaskButtonProps) => {
       type='button'
       className={addTaskButtonStyle}
       onClick={() => {
-        setSaveError(null);
         setDeadline(getDefaultDeadline(maxDate));
         setIsInputVisible(true);
       }}
@@ -176,7 +171,3 @@ const buttonGroupStyle = css({
   mr:'3rem',
 });
 
-const errorTextStyle = css({
-  textStyle: 'body3.r',
-  color: 'red.500',
-});
