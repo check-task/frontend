@@ -15,6 +15,7 @@ import {
   DeleteAllSubTasksResponse,
   DeleteSubTasksBulkRequest,
   DeleteSubTasksBulkResponse,
+  UpdateSubTasksBatchRequest,
 } from '@/types/task';
 import axiosInstance from '@/lib/axiosInstance';
 
@@ -94,6 +95,14 @@ export const deleteComment = async (
     `/task/comment/${commentId}`,
   );
   return res.data;
+};
+
+// 세부 TASK 배치 수정 api 호출 (PATCH /task/{taskId}/subtask)
+export const updateSubTasksBatch = async (
+  taskId: number,
+  body: UpdateSubTasksBatchRequest,
+): Promise<void> => {
+  await axiosInstance.patch(`/task/${taskId}/subtask`, body);
 };
 
 // 세부 TASK 전체 삭제 api 호출

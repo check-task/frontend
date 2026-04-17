@@ -11,6 +11,7 @@ import { DeleteAllTaskConfirmModal } from '@/features/assignment/components/Dele
 import { useState, useCallback } from 'react';
 import { useDeleteAllSubTasks } from '@/features/assignment/hooks/useDeleteAllSubTasks';
 import { useDeleteSubTasks } from '@/features/assignment/hooks/useDeleteSubTasks';
+import { useUpdateSubTasksBatch } from '@/features/assignment/hooks/useUpdateSubTasksBatch';
 import { UndoToast } from '@/components/UndoToast';
 
 interface PersonalLeftContainerProps {
@@ -49,6 +50,7 @@ export const PersonalLeftContainer = ({
 
   const { mutate: mutateDeleteAll } = useDeleteAllSubTasks(taskId);
   const { mutate: mutateDeleteBulk } = useDeleteSubTasks(taskId);
+  const { mutate: mutateUpdateBatch } = useUpdateSubTasksBatch(taskId);
 
   // 되돌리기를 위해 task 저장
   const [undoSnapshot, setUndoSnapshot] = useState<PersonalTaskItem | null>(null);
@@ -70,10 +72,35 @@ export const PersonalLeftContainer = ({
 
   const handleSave = () => {
     const ids = Array.from(deletedTaskIds);
-    if (ids.length > 0) {
+
+    const changedSubTasks = Object.entries(editedTitles)
+      .filter(([id, title]) => {
+        const original = tasks.find((t) => t.id === Number(id));
+        return original && original.title !== title && title.trim() !== '';
+      })
+      .map(([id, title]) => {
+        const task = tasks.find((t) => t.id === Number(id))!;
+        return {
+          subTaskId: Number(id),
+          title,
+          deadline: task.deadline,
+          isAlarm: task.isAlarm,
+        };
+      });
+
+    const hasDeletes = ids.length > 0;
+    const hasUpdates = changedSubTasks.length > 0;
+
+    if (hasDeletes && hasUpdates) {
+      mutateDeleteBulk(ids, {
+        onSuccess: () =>
+          mutateUpdateBatch(changedSubTasks, { onSuccess: () => exitEditMode(true) }),
+      });
+    } else if (hasDeletes) {
       mutateDeleteBulk(ids, { onSuccess: () => exitEditMode(true) });
+    } else if (hasUpdates) {
+      mutateUpdateBatch(changedSubTasks, { onSuccess: () => exitEditMode() });
     } else {
-      // TODO: 제목 수정 API 연동 (editedTitles)
       exitEditMode();
     }
   };
