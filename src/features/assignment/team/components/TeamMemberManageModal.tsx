@@ -13,7 +13,6 @@ import { useExpelTaskMember } from '@/hooks/mutations/useExpelTaskMember';
 import { useTaskMembers } from '@/hooks/queries/useTaskMembers';
 import { useUpdateMemberRole } from '@/hooks/mutations/useUpdateMemberRole';
 import { useMyInfo } from '@/hooks/queries/useMyInfo';
-import { useTeamTaskDetail } from './hooks/useTeamTaskDetail';
 import { useAlertStore } from '@/stores/alert-store';
 
 interface TeamMemberManageModalProps {
@@ -59,8 +58,7 @@ export const TeamMemberManageModal = ({
   const [inviteCode, setInviteCode] = useState('');
   const [roleError, setRoleError] = useState<string | null>(null);
   const { data: myInfo } = useMyInfo();
-  const { data: taskDetail } = useTeamTaskDetail(taskId);
-  const { showAlert } = useAlertStore();
+const { showAlert } = useAlertStore();
   const { data: membersData } = useTaskMembers(taskId);
   const { mutateAsync: createInvitation, isPending } =
     useCreateInvitationLink(taskId);
@@ -105,6 +103,8 @@ export const TeamMemberManageModal = ({
     currentRole: MemberRole,
   ) => {
     if (newRole === currentRole) return;
+    const confirmed = window.confirm('역할을 변경하시겠습니까?');
+    if (!confirmed) return;
     setRoleError(null);
     // API는 path/body 모두 userId 사용 (GET 팀원 목록의 id가 user id)
     const id = userId ?? memberId;
@@ -124,20 +124,14 @@ export const TeamMemberManageModal = ({
   };
 
   const handleExpelMember = (memberId: number, memberName: string) => {
+    const confirmed = window.confirm(`${memberName}을(를) 팀에서 삭제하시겠습니까?`);
+    if (!confirmed) return;
     setRoleError(null);
     if (memberId == null || memberId === 0) {
       setRoleError('팀원 정보에 사용자 ID가 없어 추방할 수 없습니다.');
       return;
     }
-    const taskTitle = taskDetail?.title ?? '';
     expelMember(memberId, {
-      onSuccess: () =>
-        showAlert(
-          <>
-            <strong>{memberName}</strong>님을 task{' '}
-            <strong>&apos;{taskTitle}&apos;</strong>에서 삭제하였습니다.
-          </>,
-        ),
       onError: (err) => setRoleError(getExpelErrorMessage(err)),
     });
   };

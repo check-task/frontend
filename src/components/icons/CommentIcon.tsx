@@ -2,14 +2,10 @@ import { css } from 'styled-system/css';
 import type { SystemStyleObject } from 'styled-system/types';
 
 interface CommentIconProps {
-  color?: SystemStyleObject['fill'];
+  color?: SystemStyleObject['color'];
 }
 
 export const CommentIcon = ({ color = 'blue.300' }: CommentIconProps) => {
-  const iconStyle = css({
-    fill: color,
-  });
-
   return (
     <svg
       xmlns='http://www.w3.org/2000/svg'
@@ -17,10 +13,11 @@ export const CommentIcon = ({ color = 'blue.300' }: CommentIconProps) => {
       height='24'
       viewBox='0 0 24 24'
       fill='none'
+      className={css({ color })}
     >
       <path
         d='M12 3C16.9706 3 21 7.02944 21 12C21 13.6807 20.5372 15.2542 19.7344 16.6006C19.6347 16.7679 19.62 16.9539 19.6797 17.1035L20.0977 18.1475C20.5874 19.3719 19.3719 20.5874 18.1475 20.0977L17.1035 19.6797C16.9539 19.62 16.768 19.6347 16.6006 19.7344C15.2542 20.5372 13.6807 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3ZM12 4C7.58172 4 4 7.58172 4 12C4 16.4183 7.58172 20 12 20C13.4947 20 14.8916 19.5892 16.0879 18.876C16.4934 18.6342 17.0058 18.5641 17.4756 18.752L18.5195 19.1689C18.9276 19.332 19.332 18.9276 19.1689 18.5195L18.752 17.4756C18.5641 17.0058 18.6342 16.4934 18.876 16.0879C19.5892 14.8916 20 13.4947 20 12C20 7.58172 16.4183 4 12 4Z'
-        className={iconStyle}
+        fill='currentColor'
       />
     </svg>
   );

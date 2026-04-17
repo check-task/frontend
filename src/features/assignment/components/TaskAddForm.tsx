@@ -7,6 +7,7 @@ import { Input } from '@/components/TextField';
 import { FormActionButtons } from '@/features/assignment/components/FormActionButtons';
 import DatePicker from '@/components/DatePicker';
 import { useCreateSubTask } from '@/hooks/mutations/useCreateSubTask';
+import { useAlertStore } from '@/stores/alert-store';
 
 interface TaskAddFormProps {
   taskId: number;
@@ -39,6 +40,7 @@ export const TaskAddForm = ({ taskId, maxDate }: TaskAddFormProps) => {
   const [timeEnabled, setTimeEnabled] = useState(false);
   // 세부과제 생성 훅 호출
   const { mutate: createSubTask, isPending } = useCreateSubTask(taskId);
+  const showAlert = useAlertStore((state) => state.showAlert);
 
   const handleAddTask = () => setIsAdding(true);
   const handleCancelTask = () => {
@@ -50,7 +52,10 @@ export const TaskAddForm = ({ taskId, maxDate }: TaskAddFormProps) => {
 
   const handleSaveTask = () => {
     const title = taskName.trim();
-    if (!title) return;
+    if (!title) {
+      showAlert('세부과제명을 입력하세요.');
+      return;
+    }
 
     // 즉시 폼 닫기 + onMutate 낙관적 업데이트로 task 동시 노출 → 깜빡임 방지
     const deadline = formatDeadline(selectedDate, timeEnabled);

@@ -1,12 +1,26 @@
 'use client';
 
-import { useState } from 'react';
+import { useForm, useFieldArray } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import { Button } from '@/components/Button';
 import { Divider } from '@/components/Divider';
 import { Input } from '@/components/TextField';
 import { AddURLDataButton } from '@/features/assignment/create/components/AddURLDataButton';
 import { useCreateCommunication } from '@/hooks/mutations/useCreateCommunication';
 import { css } from 'styled-system/css';
+
+// ======== Zod 스키마 ========
+const schema = z.object({
+  groups: z.array(
+    z.object({
+      name: z.string().min(1, '커뮤니케이션명을 입력하세요.'),
+      url: z.url('올바른 URL 형식이 아닙니다. (예: https://example.com)'),
+    }),
+  ),
+});
+
+type FormValues = { groups: { name: string; url: string }[] };
 
 interface CommunicationItem {
   id: number;
@@ -23,57 +37,49 @@ export const TeamCommunicationModal = ({
   taskId,
   onSave,
 }: TeamCommunicationModalProps) => {
-  const [inputGroups, setInputGroups] = useState<
-    Array<{ id: number; name: string; url: string }>
-  >(() => [{ id: Date.now(), name: '', url: '' }]);
+  const { mutateAsync: createCommunication, isPending } =
+    useCreateCommunication(taskId);
 
-  const { mutateAsync: createCommunication } = useCreateCommunication(taskId);
+  const {
+    register,
+    control,
+    handleSubmit,
+    formState: { errors, isValid },
+  } = useForm<FormValues>({
+    resolver: zodResolver(schema),
+    defaultValues: { groups: [{ name: '', url: '' }] },
+    mode: 'onChange',
+  });
 
-  const handleAddInput = () => {
-    setInputGroups((prev) => [...prev, { id: Date.now(), name: '', url: '' }]);
-  };
+  const { fields, append } = useFieldArray({ control, name: 'groups' });
 
-  const handleInputChange = (
-    id: number,
-    field: 'name' | 'url',
-    value: string,
-  ) => {
-    setInputGroups((prev) =>
-      prev.map((group) =>
-        group.id === id ? { ...group, [field]: value } : group,
-      ),
-    );
-  };
-
-  const handleSave = async () => {
-    const validGroups = inputGroups.filter(
-      (group) => group.name.trim() && group.url.trim(),
-    );
-
+  const handleSave = handleSubmit(async (data) => {
     let latest: CommunicationItem[] = [];
 
-    for (const group of validGroups) {
-      const data = await createCommunication({
+    for (const group of data.groups) {
+      const res = await createCommunication({
         name: group.name.trim(),
         url: group.url.trim(),
       });
-      const list = Array.isArray(data) ? data : [];
-      latest = list.map((item: { communication_id?: number; name: string; url: string }) => ({
-        id: item.communication_id ?? 0,
-        name: item.name,
-        url: item.url,
-      }));
+      const list = Array.isArray(res) ? res : [];
+      latest = list.map(
+        (item: { communication_id?: number; name: string; url: string }) => ({
+          id: item.communication_id ?? 0,
+          name: item.name,
+          url: item.url,
+        }),
+      );
     }
 
     onSave?.(latest);
-  };
+  });
 
   return (
     <div className={containerStyle}>
       <div className={inputContainerStyle}>
         {/* <div className={scrollableListStyle}> */}
-        {inputGroups.map((group, index) => (
-          <div key={group.id}>
+        {fields.map((field, index) => (
+          <div key={field.id}>
             {index > 0 && <Divider mt='1.25rem' mb='1.25rem' />}
             <div className={inputGroupStyle}>
               <div className={inputWrapperStyle}>
@@ -81,33 +87,45 @@ export const TeamCommunicationModal = ({
                 <Input
                   size='modal'
                   placeholder='커뮤니케이션명을 입력하세요.'
-                  value={group.name}
-                  onChange={(e) =>
-                    handleInputChange(group.id, 'name', e.target.value)
-                  }
+                  {...register(`groups.${index}.name`)}
                 />
+                {errors.groups?.[index]?.name && (
+                  <p className={errorStyle}>
+                    {errors.groups[index].name?.message}
+                  </p>
+                )}
               </div>
               <div className={inputWrapperStyle}>
                 <label className={labelStyle}>URL경로</label>
                 <Input
                   size='modal'
                   placeholder='URL을 붙여넣으세요.'
-                  value={group.url}
-                  onChange={(e) =>
-                    handleInputChange(group.id, 'url', e.target.value)
-                  }
+                  {...register(`groups.${index}.url`)}
                 />
+                {errors.groups?.[index]?.url && (
+                  <p className={errorStyle}>
+                    {errors.groups[index].url?.message}
+                  </p>
+                )}
               </div>
             </div>
           </div>
         ))}
         {/* </div> */}
         <div className={css({ mt: '1rem', mb: '1.25rem' })}>
-          <AddURLDataButton toggleType={0} onClick={handleAddInput} />
+          <AddURLDataButton
+            toggleType={0}
+            onClick={() => append({ name: '', url: '' })}
+          />
         </div>
       </div>
 
-      <Button variant='fillBlue' size='xlarge' onClick={handleSave}>
+      <Button
+        variant='fillBlue'
+        size='xlarge'
+        onClick={handleSave}
+        disabled={!isValid || isPending}
+      >
         등록
       </Button>
     </div>
@@ -174,4 +192,9 @@ const inputWrapperStyle = css({
 const labelStyle = css({
   textStyle: 'body3.m',
   color: 'gray.800',
+});
+
+const errorStyle = css({
+  textStyle: 'body4.r',
+  color: 'sub.01.100',
 });

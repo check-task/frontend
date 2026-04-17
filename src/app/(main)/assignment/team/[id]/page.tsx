@@ -17,12 +17,12 @@ import { useModalStore } from '@/stores/modal-store';
 import { DeleteAllTaskConfirmModal } from '@/features/assignment/components/DeleteAllTaskConfirmModal';
 import { useDeleteAllSubTasks } from '@/features/assignment/hooks/useDeleteAllSubTasks';
 import { useDeleteSubTasks } from '@/features/assignment/hooks/useDeleteSubTasks';
-import { useUpdateSubTasks } from '@/features/assignment/team/components/hooks/useUpdateSubTasks';
+import { useUpdateSubTasksBatch } from '@/features/assignment/hooks/useUpdateSubTasksBatch';
 import { UndoToast } from '@/components/UndoToast';
+import { useAlertStore } from '@/stores/alert-store';
 import type { TaskDetailSubTask } from '@/types/task';
 
-const HEADER_WIDTH_COLLAPSED = '49.5625rem'; // 사이드바 닫힘 (793px)
-const HEADER_WIDTH_EXPANDED = '43.25rem'; // 사이드바 열림 (692px)
+const HEADER_WIDTH = '43.25rem'; // 692px
 const CONTENT_WIDTH_COLLAPSED = '75rem'; // 사이드바 닫힘 (1200px)
 const CONTENT_WIDTH_EXPANDED = '70.125rem'; // 사이드바 열림 (1122px)
 
@@ -31,16 +31,14 @@ export default function TeamAssignmentDetailPage() {
   const taskId = Number(params?.id);
   const isSidebarCollapsed = useUIStore((state) => state.isSidebarCollapsed);
   const { openModal, closeModal } = useModalStore();
-  const headerWidth = isSidebarCollapsed
-    ? HEADER_WIDTH_COLLAPSED
-    : HEADER_WIDTH_EXPANDED;
   const contentWidth = isSidebarCollapsed
     ? CONTENT_WIDTH_COLLAPSED
     : CONTENT_WIDTH_EXPANDED;
   const { data, isLoading, isError, error } = useTeamTaskDetail(taskId);
   const { mutate: mutateDeleteAll } = useDeleteAllSubTasks(taskId);
   const { mutate: mutateDeleteBulk } = useDeleteSubTasks(taskId);
-  const { mutate: mutateUpdateSubTasks } = useUpdateSubTasks(taskId);
+  const { mutate: mutateUpdateBatch } = useUpdateSubTasksBatch(taskId);
+  const showAlert = useAlertStore((state) => state.showAlert);
   const [isEditMode, setIsEditMode] = useState(false);
   const [editedTitles, setEditedTitles] = useState<Record<number, string>>({});
   const [deletedSubTaskIds, setDeletedSubTaskIds] = useState<Set<number>>(
@@ -99,34 +97,41 @@ export default function TeamAssignmentDetailPage() {
   }, []);
 
   const handleSave = () => {
+    if (Object.values(editedTitles).some((title) => title.trim() === '')) {
+      showAlert('세부과제명을 입력하세요.');
+      return;
+    }
+
     const ids = Array.from(deletedSubTaskIds);
-    const changedTitles = Object.entries(editedTitles)
+
+    const changedSubTasks = Object.entries(editedTitles)
       .filter(([id, title]) => {
         const original = data?.subTasks.find((t) => t.subTaskId === Number(id));
-        return original && original.title !== title;
+        return original && original.title !== title && title.trim() !== '';
       })
-      .map(([id, title]) => ({ subTaskId: Number(id), title }));
-
-    if (ids.length > 0) {
-      mutateDeleteBulk(ids, {
-        onSuccess: () => {
-          if (changedTitles.length > 0) {
-            mutateUpdateSubTasks(
-              { data: changedTitles },
-              { onSuccess: () => exitEditMode(true) },
-            );
-          } else {
-            exitEditMode(true);
-          }
-        },
+      .map(([id, title]) => {
+        const task = data!.subTasks.find((t) => t.subTaskId === Number(id))!;
+        return {
+          subTaskId: Number(id),
+          title,
+          deadline: task.deadline as string,
+          isAlarm: task.isAlarm,
+        };
       });
-    } else if (changedTitles.length > 0) {
-      mutateUpdateSubTasks(
-        { data: changedTitles },
-        { onSuccess: () => exitEditMode() },
-      );
+
+    const hasDeletes = ids.length > 0;
+    const hasUpdates = changedSubTasks.length > 0;
+
+    if (hasDeletes && hasUpdates) {
+      mutateDeleteBulk(ids, {
+        onSuccess: () =>
+          mutateUpdateBatch(changedSubTasks, { onSuccess: () => exitEditMode(true) }),
+      });
+    } else if (hasDeletes) {
+      mutateDeleteBulk(ids, { onSuccess: () => exitEditMode(true) });
+    } else if (hasUpdates) {
+      mutateUpdateBatch(changedSubTasks, { onSuccess: () => exitEditMode() });
     } else {
-      // TODO: 제목 수정 API 연동 (editedTitles)
       exitEditMode();
     }
   };
@@ -205,7 +210,7 @@ export default function TeamAssignmentDetailPage() {
         >
           <div
             style={{
-              width: headerWidth,
+              width: HEADER_WIDTH,
               flexShrink: 0,
               transition: 'width 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
             }}

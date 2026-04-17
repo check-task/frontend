@@ -347,7 +347,7 @@ export interface UpdateSubTaskStatusResponse {
 // 세부 TASK 담당자 설정 타입 정의
 // ============================
 export interface UpdateSubTaskAssigneeRequest {
-  assigneeId: number;
+  assigneeId: number | null;
 }
 
 export interface UpdateSubTaskAssigneeResponse {
@@ -441,4 +441,18 @@ export interface DeleteSubTasksBulkResponse {
   data: {
     deletedCount: number;
   };
+}
+
+// ============================
+// 세부 TASK 배치 수정 타입 정의
+// ============================
+export interface UpdateSubTasksBatchItem {
+  subTaskId: number;
+  title: string;
+  deadline: string;
+  isAlarm: boolean;
+}
+
+export interface UpdateSubTasksBatchRequest {
+  subTasks: UpdateSubTasksBatchItem[];
 }

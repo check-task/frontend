@@ -176,6 +176,7 @@ const separatorStyle = css({
   height: '1.125rem',
   flexShrink: 0,
   backgroundColor: 'gray.600',
+  borderRadius: '9999px',
 });
 
 // 시간 텍스트 스타일

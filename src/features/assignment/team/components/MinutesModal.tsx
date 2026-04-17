@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { isAxiosError } from 'axios';
 import { css } from 'styled-system/css';
@@ -11,6 +11,7 @@ import DatePicker from '@/components/DatePicker';
 import { Textarea } from '@/components/TextField';
 import { useCreateMeetingLog } from '@/hooks/mutations/useCreateMeetingLog';
 import { useUpdateMeetingLog } from '@/hooks/mutations/useUpdateMeetingLog';
+import { useAlertStore } from '@/stores/alert-store';
 
 // Date → YYYY-MM-DD
 function toDateString(d: Date): string {
@@ -50,11 +51,34 @@ const overlayStyle = center({
 
 const modalContainerStyle = css({
   width: '45rem',
-  height: '38.25rem',
+  maxHeight: '80vh',
   bg: 'bg',
   borderRadius: '0.75rem',
   padding: '2rem',
   boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+  display: 'flex',
+  flexDirection: 'column',
+  overflow: 'hidden',
+});
+
+const scrollableContentStyle = css({
+  flex: 1,
+  overflowY: 'auto',
+  marginRight: '-1rem',
+  pr: '0.8rem',
+  scrollbarGutter: 'stable',
+  '&::-webkit-scrollbar': {
+    width: '0.25rem',
+  },
+  '&::-webkit-scrollbar-button': {
+    width: 0,
+    height: 0,
+    display: 'none !important',
+  },
+  '&::-webkit-scrollbar-thumb': {
+    background: 'gray.200',
+    borderRadius: '6.25rem',
+  },
 });
 
 const headerStyle = css({
@@ -130,12 +154,40 @@ export const MinutesModal = ({
   const [discussion, setDiscussion] = useState(editLog?.discussion ?? '');
   const [validationError, setValidationError] = useState<string | null>(null);
 
+  const agendaRef = useRef<HTMLTextAreaElement>(null);
+  const conclusionRef = useRef<HTMLTextAreaElement>(null);
+  const discussionRef = useRef<HTMLTextAreaElement>(null);
+
+  const resizeTextarea = (el: HTMLTextAreaElement | null) => {
+    if (!el) return;
+    el.style.height = 'auto';
+    el.style.height = `${el.scrollHeight}px`;
+  };
+
   // 부모에서 key로 모달을 열 때마다 새로 마운트하므로 open/editLog 기준 초기 state만 사용
 
   const { mutateAsync: createLog, isPending: isCreating } =
     useCreateMeetingLog(taskId);
   const { mutateAsync: updateLog, isPending: isUpdating } =
     useUpdateMeetingLog(taskId);
+  const showAlert = useAlertStore((state) => state.showAlert);
+
+  // editLog이 바뀔 때마다 내용 업데이트
+  useEffect(() => {
+    if (!open || !editLog) return;
+    setDateStr(editLog.date);
+    setAgenda(editLog.agenda ?? '');
+    setConclusion(editLog.conclusion ?? '');
+    setDiscussion(editLog.discussion ?? '');
+  }, [open, editLog?.logId]); 
+
+  // 텍스트 크기 자동 조절
+  useEffect(() => {
+    if (!open) return;
+    resizeTextarea(agendaRef.current);
+    resizeTextarea(conclusionRef.current);
+    resizeTextarea(discussionRef.current);
+  }, [open, agenda, conclusion, discussion]);
 
   const handleOverlayClick = () => onClose();
   const handleBoxClick = (e: React.MouseEvent) => e.stopPropagation();
@@ -149,8 +201,8 @@ export const MinutesModal = ({
     const agendaVal = agenda.trim();
     const conclusionVal = conclusion.trim();
     const discussionVal = discussion.trim();
-    if (!agendaVal || !conclusionVal || !discussionVal) {
-      setValidationError('안건, 결과, 논의를 모두 입력해주세요.');
+    if (!agendaVal) {
+      showAlert('안건을 입력해주세요.');
       return;
     }
     // API는 대부분 YYYY-MM-DD 형식 사용 (dateStr이 이미 YYYY-MM-DD)
@@ -218,40 +270,57 @@ export const MinutesModal = ({
         </header>
         <Divider />
 
-        <div className={datePickerContainerStyle}>
-          <DatePicker value={dateStr} onChange={handleDateChange} />
-        </div>
+        <div className={scrollableContentStyle}>
+          <div className={datePickerContainerStyle}>
+            <DatePicker value={dateStr} onChange={handleDateChange} />
+          </div>
 
-        {validationError && (
-          <p className={validationErrorStyle}>{validationError}</p>
-        )}
-        <div className={contentContainerStyle}>
-          <div className={contentItemStyle}>
-            <label className={contentItemLabelStyle}>안건</label>
-            <Textarea
-              size='modal'
-              placeholder='안건'
-              value={agenda}
-              onChange={(e) => setAgenda(e.target.value)}
-            />
-          </div>
-          <div className={contentItemStyle}>
-            <label className={contentItemLabelStyle}>결과</label>
-            <Textarea
-              size='modal'
-              placeholder='결과'
-              value={conclusion}
-              onChange={(e) => setConclusion(e.target.value)}
-            />
-          </div>
-          <div className={contentItemStyle}>
-            <label className={contentItemLabelStyle}>논의</label>
-            <Textarea
-              size='modal'
-              placeholder='논의'
-              value={discussion}
-              onChange={(e) => setDiscussion(e.target.value)}
-            />
+          {validationError && (
+            <p className={validationErrorStyle}>{validationError}</p>
+          )}
+          <div className={contentContainerStyle}>
+            <div className={contentItemStyle}>
+              <label className={contentItemLabelStyle}>안건</label>
+              <Textarea
+                ref={agendaRef}
+                size='modal'
+                placeholder='안건'
+                value={agenda}
+                style={{ overflow: 'hidden' }}
+                onChange={(e) => {
+                  setAgenda(e.target.value);
+                  resizeTextarea(e.target);
+                }}
+              />
+            </div>
+            <div className={contentItemStyle}>
+              <label className={contentItemLabelStyle}>결과</label>
+              <Textarea
+                ref={conclusionRef}
+                size='modal'
+                placeholder='결과'
+                value={conclusion}
+                style={{ overflow: 'hidden' }}
+                onChange={(e) => {
+                  setConclusion(e.target.value);
+                  resizeTextarea(e.target);
+                }}
+              />
+            </div>
+            <div className={contentItemStyle}>
+              <label className={contentItemLabelStyle}>할일</label>
+              <Textarea
+                ref={discussionRef}
+                size='modal'
+                placeholder='할일'
+                value={discussion}
+                style={{ overflow: 'hidden' }}
+                onChange={(e) => {
+                  setDiscussion(e.target.value);
+                  resizeTextarea(e.target);
+                }}
+              />
+            </div>
           </div>
         </div>
       </div>

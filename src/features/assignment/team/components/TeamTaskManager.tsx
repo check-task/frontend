@@ -29,8 +29,8 @@ interface TeamTaskManagerProps {
   profileImage?: string;
   /** 드롭다운에 표시할 팀원 목록 (내 정보 제외, id 있으면 과제 수정 API에 사용) */
   members?: TeamTaskManagerMember[];
-  /** 선택 시 (닉네임, 담당자 사용자 ID). ID 없으면 API 미전송 가능 */
-  onSelectMember?: (nickname: string, assigneeId?: number) => void;
+  /** 선택 시 (닉네임, 담당자 사용자 ID). null이면 담당자 없음(none) */
+  onSelectMember?: (nickname: string, assigneeId?: number | null) => void;
 }
 
 export const TeamTaskManager = ({
@@ -68,6 +68,7 @@ export const TeamTaskManager = ({
   const handleSelect = (nickname: string) => {
     if (nickname === 'none') {
       setDisplay({ name: 'none', profileImage: undefined });
+      onSelectMember?.('none', null);
       setIsOpen(false);
       return;
     }

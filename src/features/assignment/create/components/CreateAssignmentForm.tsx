@@ -13,6 +13,7 @@ import { useUIStore } from '@/stores/ui-store';
 import { useMyInfo } from '@/hooks/queries/useMyInfo';
 import { useCreateTask } from '@/hooks/mutations/useCreateTask';
 import { createReferenceData } from '@/lib/reference';
+import { useAlertStore } from '@/stores/alert-store';
 import type { TaskType } from '@/types/task';
 
 const formatDate = (d: Date) => {
@@ -46,7 +47,7 @@ export const CreateAssignmentForm = () => {
   const [isTeamProject, setIsTeamProject] = useState(false);
   const [subTasks, setSubTasks] = useState<SubTaskInput[]>([]);
   const [dataItems, setDataItems] = useState<DataItem[]>([]);
-  const [saveError, setSaveError] = useState<string | null>(null);
+  const showAlert = useAlertStore((state) => state.showAlert);
 
   const folders = myInfo?.folders ?? [];
   const isFormValid = assignmentName.trim() !== '';
@@ -57,6 +58,11 @@ export const CreateAssignmentForm = () => {
 
   const handleSave = async () => {
     if (!isFormValid) return;
+
+    if (assignmentName.trim().length > 10) {
+      showAlert('과제명은 10글자 이하로 입력해주세요.');
+      return;
+    }
 
     const folderId = selectedFolderId;
     const type: TaskType = isTeamProject ? 'TEAM' : 'PERSONAL';
@@ -78,7 +84,6 @@ export const CreateAssignmentForm = () => {
         .map((r) => ({ name: r.name, url: r.path })),
     };
 
-    setSaveError(null);
     try {
       const taskId = await createTask(payload);
 
@@ -102,7 +107,7 @@ export const CreateAssignmentForm = () => {
         ax.response?.data?.message ??
         (typeof ax.message === 'string' ? ax.message : null) ??
         '과제 생성에 실패했습니다.';
-      setSaveError(message);
+      showAlert(message);
     }
   };
 
@@ -145,17 +150,6 @@ export const CreateAssignmentForm = () => {
         />
       </div>
 
-      {saveError && (
-        <p
-          className={css({
-            textStyle: 'body3.r',
-            color: 'red.500',
-            mb: '0.5rem',
-          })}
-        >
-          {saveError}
-        </p>
-      )}
       <div className={buttonWrapperStyle}>
         <Button variant='fillGray' size='xlarge' onClick={handleCancel}>
           취소

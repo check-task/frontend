@@ -28,6 +28,7 @@ import { useMyInfo } from '@/hooks/queries/useMyInfo';
 import { AddTaskButton } from './AddTaskButton';
 import { getSocket, COMMENT_SEND_EVENTS, COMMENT_EVENTS } from '@/lib/socket';
 import { CloseIcon } from '@/components/icons/CloseIcon';
+import { ArrowUpCircleIcon } from '@/components/icons/ArrowUpCircleIcon';
 
 const getCommentId = (
   c: TaskDetailSubTaskComment & { comment_id?: number; id?: number },
@@ -62,6 +63,13 @@ const TeamTaskList = ({
   const [openComments, setOpenComments] = useState<{ [key: number]: boolean }>(
     {},
   );
+
+  useEffect(() => {
+    if (isEditMode) {
+      setOpenComments({});
+    }
+  }, [isEditMode]);
+
   const [commentInputs, setCommentInputs] = useState<{ [key: number]: string }>(
     {},
   );
@@ -119,7 +127,7 @@ const TeamTaskList = ({
     };
   }, [clearPendingAndRefetch]);
 
-  const handleSelectAssignee = (subTaskId: number, assigneeId: number) => {
+  const handleSelectAssignee = (subTaskId: number, assigneeId: number | null) => {
     updateAssignee({ taskId, subTaskId, assigneeId });
   };
 
@@ -133,10 +141,11 @@ const TeamTaskList = ({
       /^(\d{4})[.-](\d{1,2})[.-](\d{1,2})(?:\s+(\d{1,2}):(\d{1,2}))?/,
     );
     if (isoMatch) {
-      const [, y, m, d, h, min] = isoMatch;
+      const date = new Date(trimmed);
+      const pad = (n: number) => String(n).padStart(2, '0');
       return {
-        date: `${y!.slice(-2)}.${m!}.${d!}`,
-        time: `${h!.padStart(2, '0')}:${min!.padStart(2, '0')}`,
+        date: `${String(date.getFullYear()).slice(-2)}.${pad(date.getMonth() + 1)}.${pad(date.getDate())}`,
+        time: `${pad(date.getHours())}:${pad(date.getMinutes())}`,
       };
     }
     if (dotMatch) {
@@ -251,11 +260,12 @@ const TeamTaskList = ({
     comment: TaskDetailSubTaskComment & { comment_id?: number },
     subTaskId: number,
   ) => {
+    if (!window.confirm('댓글을 삭제하시겠습니까?')) return;
+
     const commentId = getCommentId(comment);
     if (commentId >= 0) {
       setDeletedCommentIds((prev) => new Set(prev).add(commentId));
-      queryClient.setQueryData<TaskDetail>(['taskDetail', taskId], (old) => {
-        if (!old?.subTasks) return old;
+      queryClient.setQueryData<TaskDetail>(['taskDetail', taskId], (old) => {        if (!old?.subTasks) return old;
         return {
           ...old,
           subTasks: old.subTasks.map((st) =>
@@ -414,6 +424,8 @@ const TeamTaskList = ({
                           </p>
                         </div>
                       )}
+                    </div>
+                    <div className={calendarAlarmCommentGroupStyle}>
                       <div
                         className={dateAlarmStyle}
                         style={isEditMode ? { opacity: 0.4, pointerEvents: 'none' } : undefined}
@@ -433,14 +445,14 @@ const TeamTaskList = ({
                           onToggle={handleAlarmToggle(task.subTaskId)}
                         />
                       </div>
-                    </div>
-                    <div style={isEditMode ? { opacity: 0.4, pointerEvents: 'none' } : undefined}>
-                      <CommentButton
-                        isOpen={commentOpen}
-                        onClick={() => handleCommentToggle(task.subTaskId)}
-                        commentCount={comments.length}
-                        muted={isCompleted}
-                      />
+                      <div style={isEditMode ? { opacity: 0.4, pointerEvents: 'none' } : undefined}>
+                        <CommentButton
+                          isOpen={commentOpen}
+                          onClick={() => handleCommentToggle(task.subTaskId)}
+                          commentCount={comments.length}
+                          muted={isCompleted}
+                        />
+                      </div>
                     </div>
                   </div>
                   <div className={rightSectionStyle({ editMode: isEditMode })}>
@@ -454,7 +466,7 @@ const TeamTaskList = ({
                         profileImage={task.assigneeProfileImage ?? undefined}
                         members={teamMembersForDropdown}
                         onSelectMember={(_, assigneeId) => {
-                          if (assigneeId != null)
+                          if (assigneeId !== undefined)
                             handleSelectAssignee(task.subTaskId, assigneeId);
                         }}
                       />
@@ -473,8 +485,7 @@ const TeamTaskList = ({
                 {commentOpen && (
                   <div className={commentSectionStyle}>
                     <div className={inputWrapperStyle}>
-                      <Input
-                        size='basic'
+                      <input
                         placeholder='댓글 추가'
                         className={commentInputStyle}
                         value={commentInputs[task.subTaskId] ?? ''}
@@ -482,25 +493,23 @@ const TeamTaskList = ({
                           handleCommentChange(task.subTaskId, e.target.value)
                         }
                         onKeyDown={(e) => {
-                          if (e.key === 'Enter') {
+                          if (e.key === 'Enter'&& !e.nativeEvent.isComposing) {
                             e.preventDefault();
                             handleCommentSubmit(task.subTaskId);
                           }
                         }}
                       />
-                      <div
+                      <button
+                        type='button'
                         className={inputProfileIconStyle}
-                        style={
-                          myInfo?.user.profileImage
-                            ? {
-                                backgroundImage: `url(${myInfo.user.profileImage})`,
-                                backgroundSize: 'cover',
-                                backgroundPosition: 'center',
-                              }
-                            : undefined
-                        }
                         onClick={() => handleCommentSubmit(task.subTaskId)}
-                      />
+                      >
+                        {commentInputs[task.subTaskId]?.trim() ? (
+                          <ArrowUpCircleIcon circleColor='var(--colors-blue-500)' arrowColor='var(--colors-blue-50)' />
+                        ) : (
+                          <ArrowUpCircleIcon circleColor='var(--colors-gray-200)' arrowColor='var(--colors-gray-400)' />
+                        )}
+                      </button>
                     </div>
                     <div className={commentItemContainerStyle}>
                       {comments.length > 0 ? (
@@ -511,6 +520,10 @@ const TeamTaskList = ({
                             };
                           const id = getCommentId(commentWithId);
                           const isEditing = id >= 0 && editingCommentId === id;
+                          const { date, time } = formatCommentCreatedAt(
+                            comment.createdAt,
+                          );
+                          const isMyComment = comment.writer === myNickname;
                           return (
                             <div
                               key={
@@ -521,92 +534,104 @@ const TeamTaskList = ({
                               className={commentItemStyle}
                             >
                               <div className={commentItemHeaderStyle}>
-                                <div
-                                  className={commentItemHeaderProfileStyle}
-                                  style={
-                                    comment.profileImage
-                                      ? {
-                                          backgroundImage: `url(${comment.profileImage})`,
-                                          backgroundSize: 'cover',
-                                          backgroundPosition: 'center',
-                                        }
-                                      : undefined
-                                  }
-                                />
-                                <div className={commentNameContentWrapperStyle}>
+                                <div className={commentAvatarNameStyle}>
+                                  <div
+                                    className={commentItemHeaderProfileStyle}
+                                    style={
+                                      comment.profileImage
+                                        ? {
+                                            backgroundImage: `url(${comment.profileImage})`,
+                                            backgroundSize: 'cover',
+                                            backgroundPosition: 'center',
+                                          }
+                                        : undefined
+                                    }
+                                  />
                                   <p className={commentWriterNameStyle}>
                                     {comment.writer}
                                   </p>
-                                  {isEditing ? (
-                                    <Input
-                                      size='basic'
-                                      value={editingContent}
-                                      onChange={(e) =>
-                                        setEditingContent(e.target.value)
-                                      }
-                                      onKeyDown={(e) => {
-                                        if (e.key === 'Enter') {
-                                          e.preventDefault();
-                                          handleSubmitEditComment(
-                                            id,
-                                            task.subTaskId,
-                                          );
-                                        }
-                                        if (e.key === 'Escape') {
-                                          setEditingCommentId(null);
-                                          setEditingContent('');
-                                        }
-                                      }}
-                                      className={commentEditInputStyle}
-                                      autoFocus
-                                    />
-                                  ) : (
-                                    <p
-                                      className={commentItemHeaderCommentStyle}
-                                    >
-                                      {comment.content}
-                                    </p>
-                                  )}
                                 </div>
-                              </div>
-                              {!isEditing &&
-                                (() => {
-                                  const { date, time } = formatCommentCreatedAt(
-                                    comment.createdAt,
-                                  );
-                                  const isMyComment =
-                                    comment.writer === myNickname;
-                                  return (
-                                    <div className={commentItemEtcStyle}>
-                                      <div
-                                        className={commentDateTimeWrapperStyle}
-                                      >
-                                        <span className={commentCreatedAtStyle}>
-                                          {date}
-                                        </span>
-                                        <span className={commentCreatedAtStyle}>
-                                          {time}
-                                        </span>
-                                      </div>
-                                      {isMyComment && (
-                                        <CommentEditDropdown
-                                          onEditComment={() =>
-                                            handleStartEditComment(
-                                              id,
-                                              comment.content,
-                                            )
-                                          }
-                                          onDeleteComment={() =>
-                                            handleDeleteComment(
-                                              comment,
-                                              task.subTaskId,
-                                            )
-                                          }
-                                        />
-                                      )}
+                                <div
+                                  className={commentItemEtcStyle}
+                                  style={(!isEditing && isMyComment) ? undefined : { justifyContent: 'flex-end' }}
+                                >
+                                    <div className={commentDateTimeWrapperStyle}>
+                                      <span className={commentCreatedAtStyle}>
+                                        {date}
+                                      </span>
+                                      <span className={commentCreatedAtStyle}>
+                                        {time}
+                                      </span>
                                     </div>
-                                  );
-                                })()}
+                                    {!isEditing && isMyComment && (
+                                      <CommentEditDropdown
+                                        onEditComment={() =>
+                                          handleStartEditComment(
+                                            id,
+                                            comment.content,
+                                          )
+                                        }
+                                        onDeleteComment={() =>
+                                          handleDeleteComment(
+                                            comment,
+                                            task.subTaskId,
+                                          )
+                                        }
+                                      />
+                                    )}
+                                  </div>
+                              </div>
+                              {isEditing ? (
+                                <div className={commentEditWrapperStyle}>
+                                  <input
+                                    value={editingContent}
+                                    onChange={(e) =>
+                                      setEditingContent(e.target.value)
+                                    }
+                                    onKeyDown={(e) => {
+                                      if (e.key === 'Enter' && !e.nativeEvent.isComposing) {
+                                        e.preventDefault();
+                                        handleSubmitEditComment(
+                                          id,
+                                          task.subTaskId,
+                                        );
+                                      }
+                                      if (e.key === 'Escape') {
+                                        setEditingCommentId(null);
+                                        setEditingContent('');
+                                      }
+                                    }}
+                                    className={commentEditInputStyle}
+                                    autoFocus
+                                  />
+                                  <button
+                                    type='button'
+                                    className={inputProfileIconStyle}
+                                    onClick={() =>
+                                      handleSubmitEditComment(
+                                        id,
+                                        task.subTaskId,
+                                      )
+                                    }
+                                  >
+                                    {editingContent.trim() ? (
+                                      <ArrowUpCircleIcon
+                                        circleColor='var(--colors-blue-500)'
+                                        arrowColor='var(--colors-blue-50)'
+                                      />
+                                    ) : (
+                                      <ArrowUpCircleIcon
+                                        circleColor='var(--colors-gray-200)'
+                                        arrowColor='var(--colors-gray-400)'
+                                      />
+                                    )}
+                                  </button>
+                                </div>
+                              ) : (
+                                <p className={commentItemHeaderCommentStyle}>
+                                  {comment.content}
+                                </p>
+                              )}
                             </div>
                           );
                         })
@@ -654,7 +679,6 @@ const teamTaskListStyle = css({
 const teamTaskItemTitleStyle = css({
   display: 'flex',
   alignItems: 'center',
-  justifyContent: 'space-between',
   gap: '1.25rem',
   width: '46.5rem',
 });
@@ -662,8 +686,16 @@ const teamTaskItemTitleStyle = css({
 const taskInnerStyle = css({
   display: 'flex',
   alignItems: 'center',
-  justifyContent: 'space-between',
-  flex: 1,
+  width: '27.875rem',
+  flexShrink: 0,
+});
+
+const calendarAlarmCommentGroupStyle = css({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'flex-start',
+  gap: '1.25rem',
+  flexShrink: 0,
 });
 
 const teamTaskItemCheckTitleStyle = css({
@@ -765,13 +797,15 @@ const managerLabelStyle = css({
   color: 'gray.600',
 });
 
+// 댓글 섹션 스타일
 const commentSectionStyle = css({
   display: 'flex',
   flexDirection: 'column',
   gap: '1.25rem',
-  w: '37.5rem',
+  w: '40.5rem',
   h: 'auto',
-  ml: '2.25rem',
+  pl: '2.25rem',
+  mt: '1.25rem',
 });
 
 const inputWrapperStyle = css({
@@ -782,20 +816,31 @@ const inputWrapperStyle = css({
 });
 
 const commentInputStyle = css({
+  display: 'block',
   width: '100%',
-  paddingRight: '3rem',
+  h: '2.5rem',
+  borderRadius: '0.5rem',
+  py: '0.5rem',
+  pl: '1.25rem',
+  pr: '3.25rem',
+  border: '1px solid',
+  borderColor: 'gray.200',
+  bg: 'bg',
+  outline: 'none',
+  color: 'gray.900',
+  textStyle: 'body3.r',
+  _placeholder: {
+    color: 'gray.400',
+  },
 });
 
 const inputProfileIconStyle = css({
   position: 'absolute',
-  right: '0.75rem',
+  right: '1.25rem',
   display: 'flex',
   w: '1.5rem',
   h: '1.5rem',
-  borderRadius: '100%',
-  bg: 'blue.100',
   cursor: 'pointer',
-  overflow: 'hidden',
 });
 
 const emptyCommentMessageStyle = css({
@@ -804,6 +849,7 @@ const emptyCommentMessageStyle = css({
   width: '100%',
 });
 
+// 여기서 부터 봐
 const commentItemContainerStyle = css({
   display: 'flex',
   flexDirection: 'column',
@@ -813,22 +859,22 @@ const commentItemContainerStyle = css({
 
 const commentItemStyle = css({
   display: 'flex',
-  alignItems: 'flex-end',
-  justifyContent: 'space-between',
+  flexDirection: 'column',
+  gap: '0.5rem',
   width: 'full',
 });
 
 const commentItemHeaderStyle = css({
   display: 'flex',
-  alignItems: 'flex-start',
-  gap: '0.5rem',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  width: 'full',
 });
 
-const commentNameContentWrapperStyle = css({
+const commentAvatarNameStyle = css({
   display: 'flex',
-  flexDirection: 'column',
-  gap: '0.25rem',
-  transform: 'translateY(-0.0625rem)',
+  alignItems: 'center',
+  gap: '0.5rem',
 });
 
 const commentWriterNameStyle = css({
@@ -838,8 +884,8 @@ const commentWriterNameStyle = css({
 
 const commentItemHeaderProfileStyle = css({
   display: 'flex',
-  w: '1.25rem',
-  h: '1.25rem',
+  w: '1.5rem',
+  h: '1.5rem',
   borderRadius: '100%',
   bg: 'blue.100',
 });
@@ -847,28 +893,58 @@ const commentItemHeaderProfileStyle = css({
 const commentItemHeaderCommentStyle = css({
   textStyle: 'body3.r',
   color: 'gray.700',
-  ml: '0.125rem',
+  ml: '2rem',
+  w: '34.125rem',
+  wordBreak: 'break-all',
+  overflowWrap: 'break-word',
+});
+
+const commentEditWrapperStyle = css({
+  position: 'relative',
+  display: 'flex',
+  alignItems: 'center',
+  pl: '2rem',
+  width: 'full',
 });
 
 const commentEditInputStyle = css({
-  flex: 1,
-  minWidth: 0,
+  display: 'block',
+  width: 'full',
+  h: '2.5rem',
+  borderRadius: '0.5rem',
+  py: '0.5rem',
+  pl: '1.25rem',
+  pr: '3.25rem',
+  border: '1px solid',
+  borderColor: 'gray.200',
+  bg: 'bg',
+  outline: 'none',
+  color: 'gray.600',
+  textStyle: 'body3.r',
+  _placeholder: {
+    color: 'gray.400',
+  },
 });
 
 const commentItemEtcStyle = css({
   display: 'flex',
   alignItems: 'center',
+  // justifyContent: 'flex-end',
+  justifyContent: 'space-between',
   gap: '0.25rem',
+  w: '7.5rem',
+  flexShrink: 0,
 });
 
 const commentDateTimeWrapperStyle = css({
   display: 'flex',
   alignItems: 'center',
   gap: '0.25rem',
+  mr: '0.45rem',
 });
 
 const commentCreatedAtStyle = css({
-  fontSize: '0.875rem',
+  textStyle: 'body4.r',
   color: 'gray.400',
 });
 
