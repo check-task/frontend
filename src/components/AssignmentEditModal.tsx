@@ -188,7 +188,7 @@ export const AssignmentEditModalContent = ({
         variant='fillBlue'
         size='xlarge'
         onClick={handleSave}
-        disabled={isPending}
+        disabled={isPending || !title.trim()}
       >
         변경사항 저장
       </Button>
