@@ -419,6 +419,8 @@ const TeamTaskList = ({
                           </p>
                         </div>
                       )}
+                    </div>
+                    <div className={calendarAlarmCommentGroupStyle}>
                       <div
                         className={dateAlarmStyle}
                         style={isEditMode ? { opacity: 0.4, pointerEvents: 'none' } : undefined}
@@ -438,14 +440,14 @@ const TeamTaskList = ({
                           onToggle={handleAlarmToggle(task.subTaskId)}
                         />
                       </div>
-                    </div>
-                    <div style={isEditMode ? { opacity: 0.4, pointerEvents: 'none' } : undefined}>
-                      <CommentButton
-                        isOpen={commentOpen}
-                        onClick={() => handleCommentToggle(task.subTaskId)}
-                        commentCount={comments.length}
-                        muted={isCompleted}
-                      />
+                      <div style={isEditMode ? { opacity: 0.4, pointerEvents: 'none' } : undefined}>
+                        <CommentButton
+                          isOpen={commentOpen}
+                          onClick={() => handleCommentToggle(task.subTaskId)}
+                          commentCount={comments.length}
+                          muted={isCompleted}
+                        />
+                      </div>
                     </div>
                   </div>
                   <div className={rightSectionStyle({ editMode: isEditMode })}>
@@ -672,7 +674,6 @@ const teamTaskListStyle = css({
 const teamTaskItemTitleStyle = css({
   display: 'flex',
   alignItems: 'center',
-  justifyContent: 'space-between',
   gap: '1.25rem',
   width: '46.5rem',
 });
@@ -680,8 +681,16 @@ const teamTaskItemTitleStyle = css({
 const taskInnerStyle = css({
   display: 'flex',
   alignItems: 'center',
-  justifyContent: 'space-between',
-  flex: 1,
+  width: '27.875rem',
+  flexShrink: 0,
+});
+
+const calendarAlarmCommentGroupStyle = css({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'flex-start',
+  gap: '1.25rem',
+  flexShrink: 0,
 });
 
 const teamTaskItemCheckTitleStyle = css({
