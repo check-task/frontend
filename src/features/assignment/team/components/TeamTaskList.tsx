@@ -64,6 +64,13 @@ const TeamTaskList = ({
   const [openComments, setOpenComments] = useState<{ [key: number]: boolean }>(
     {},
   );
+
+  useEffect(() => {
+    if (isEditMode) {
+      setOpenComments({});
+    }
+  }, [isEditMode]);
+
   const [commentInputs, setCommentInputs] = useState<{ [key: number]: string }>(
     {},
   );
