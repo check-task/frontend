@@ -11,6 +11,7 @@ import DatePicker from '@/components/DatePicker';
 import { Textarea } from '@/components/TextField';
 import { useCreateMeetingLog } from '@/hooks/mutations/useCreateMeetingLog';
 import { useUpdateMeetingLog } from '@/hooks/mutations/useUpdateMeetingLog';
+import { useAlertStore } from '@/stores/alert-store';
 
 // Date → YYYY-MM-DD
 function toDateString(d: Date): string {
@@ -136,6 +137,7 @@ export const MinutesModal = ({
     useCreateMeetingLog(taskId);
   const { mutateAsync: updateLog, isPending: isUpdating } =
     useUpdateMeetingLog(taskId);
+  const showAlert = useAlertStore((state) => state.showAlert);
 
   const handleOverlayClick = () => onClose();
   const handleBoxClick = (e: React.MouseEvent) => e.stopPropagation();
@@ -149,8 +151,8 @@ export const MinutesModal = ({
     const agendaVal = agenda.trim();
     const conclusionVal = conclusion.trim();
     const discussionVal = discussion.trim();
-    if (!agendaVal || !conclusionVal || !discussionVal) {
-      setValidationError('안건, 결과, 논의를 모두 입력해주세요.');
+    if (!agendaVal || !conclusionVal) {
+      showAlert('안건과 결과를 입력해주세요.');
       return;
     }
     // API는 대부분 YYYY-MM-DD 형식 사용 (dateStr이 이미 YYYY-MM-DD)
