@@ -7,7 +7,7 @@ import { updateSubTaskAssignee } from '@/services/subtask';
 interface UpdateSubTaskAssigneeInput {
   taskId: number;
   subTaskId: number;
-  assigneeId: number;
+  assigneeId: number | null;
 }
 
 /** 팀 과제 세부 TASK 담당자 설정 (소켓 우선, 미연결 시 REST 폴백) */

@@ -347,7 +347,7 @@ export interface UpdateSubTaskStatusResponse {
 // 세부 TASK 담당자 설정 타입 정의
 // ============================
 export interface UpdateSubTaskAssigneeRequest {
-  assigneeId: number;
+  assigneeId: number | null;
 }
 
 export interface UpdateSubTaskAssigneeResponse {

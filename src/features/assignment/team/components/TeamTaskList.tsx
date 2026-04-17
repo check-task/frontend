@@ -129,7 +129,7 @@ const TeamTaskList = ({
     };
   }, [clearPendingAndRefetch]);
 
-  const handleSelectAssignee = (subTaskId: number, assigneeId: number) => {
+  const handleSelectAssignee = (subTaskId: number, assigneeId: number | null) => {
     updateAssignee({ taskId, subTaskId, assigneeId });
   };
 
@@ -468,7 +468,7 @@ const TeamTaskList = ({
                         profileImage={task.assigneeProfileImage ?? undefined}
                         members={teamMembersForDropdown}
                         onSelectMember={(_, assigneeId) => {
-                          if (assigneeId != null)
+                          if (assigneeId !== undefined)
                             handleSelectAssignee(task.subTaskId, assigneeId);
                         }}
                       />
