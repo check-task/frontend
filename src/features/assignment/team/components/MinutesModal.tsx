@@ -202,7 +202,7 @@ export const MinutesModal = ({
     const conclusionVal = conclusion.trim();
     const discussionVal = discussion.trim();
     if (!agendaVal) {
-      showAlert('안건을 입력해주세요.');
+      showAlert('회의 안건을 입력해주세요.');
       return;
     }
     // API는 대부분 YYYY-MM-DD 형식 사용 (dateStr이 이미 YYYY-MM-DD)
