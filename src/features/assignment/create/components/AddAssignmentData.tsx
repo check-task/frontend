@@ -4,6 +4,7 @@ import { Input } from '@/components/TextField';
 import { PlusButton } from '@/components/PlusButton';
 import { CloseIcon } from '@/components/icons/CloseIcon';
 import { useModalStore } from '@/stores/modal-store';
+import { useAlertStore } from '@/stores/alert-store';
 import { AddAssignmentDataModal } from '../../components/AddAssignmentDataModal';
 import { css,cx } from 'styled-system/css';
 
@@ -62,8 +63,12 @@ export const AddAssignmentData = ({
     );
   };
 
+  const showAlert = useAlertStore((state) => state.showAlert);
+
   const handleRemoveData = (id: number) => {
-    onDataItemsChange(dataItems.filter((item) => item.id !== id));
+    const item = dataItems.find((d) => d.id === id);
+    onDataItemsChange(dataItems.filter((d) => d.id !== id));
+    if (item) showAlert(`${item.name}가 삭제되었습니다`);
   };
 
   return (
