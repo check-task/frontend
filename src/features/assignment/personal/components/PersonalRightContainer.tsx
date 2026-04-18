@@ -44,7 +44,7 @@ export const PersonalRightContainer = ({
           onConfirm={async () => {
             await deleteTask();
             closeModal();
-            router.push('/assignment');
+            router.back();
           }}
           onCancel={closeModal}
         />

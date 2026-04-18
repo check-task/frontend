@@ -37,7 +37,7 @@ export const TeamHeaderButton = ({ taskId, title }: TeamHeaderButtonProps) => {
           onConfirm={async () => {
             await deleteTask();
             closeModal();
-            router.push('/assignment?type=team');
+            router.back();
           }}
           onCancel={closeModal}
         />
