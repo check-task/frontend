@@ -144,14 +144,11 @@ const containerStyle = css({
 const inputContainerStyle = css({
   display: 'flex',
   flexDirection: 'column',
-  width: 'calc(100% + 1.25rem)',
-  maxH: '32rem',
+  maxH: '28rem',
   overflowY: 'auto',
-  pr: '1rem',
+  marginRight: '-1rem',
+  pr: '0.8rem',
   scrollbarGutter: 'stable',
-  boxSizing: 'border-box',
-
-  // 스크롤바 스타일 초기화 및 스타일 설정
   '&::-webkit-scrollbar': {
     width: '0.25rem',
   },
@@ -165,15 +162,6 @@ const inputContainerStyle = css({
     borderRadius: '6.25rem',
   },
 });
-
-// 입력 목록만 스크롤 — 3개 이상일 때 스크롤 (자료 모달과 동일)
-// const scrollableListStyle = css({
-//   display: 'flex',
-//   flexDirection: 'column',
-//   width: '100%',
-//   maxHeight: '26rem',
-//   overflowY: 'auto',
-// });
 
 const inputGroupStyle = css({
   display: 'flex',
