@@ -2,6 +2,7 @@
 
 import { Input } from '@/components/TextField';
 import { PlusButton } from '@/components/PlusButton';
+import { CloseIcon } from '@/components/icons/CloseIcon';
 import { useModalStore } from '@/stores/modal-store';
 import { AddAssignmentDataModal } from '../../components/AddAssignmentDataModal';
 import { css } from 'styled-system/css';
@@ -61,6 +62,10 @@ export const AddAssignmentData = ({
     );
   };
 
+  const handleRemoveData = (id: number) => {
+    onDataItemsChange(dataItems.filter((item) => item.id !== id));
+  };
+
   return (
     <div className={taskDataItemStyle}>
       <p className={labelTextStyle}>자료</p>
@@ -68,11 +73,23 @@ export const AddAssignmentData = ({
         {dataItems.map((item) => (
           <div key={item.id} className={dataItemStyle}>
             <p className={dataNameStyle}>{item.name}</p>
-            <Input
-              size='basic'
-              value={item.path}
-              onChange={(e) => handleUpdatePath(item.id, e.target.value)}
-            />
+            <div className={dataInputRowStyle}>
+              <div className={css({ flex: 1 })}>
+                <Input
+                  size='basic'
+                  value={item.path}
+                  onChange={(e) => handleUpdatePath(item.id, e.target.value)}
+                  className={css({ width: '100%' })}
+                />
+              </div>
+              <button
+                type='button'
+                onClick={() => handleRemoveData(item.id)}
+                className={css({ cursor: 'pointer' })}
+              >
+                <CloseIcon size='2rem' color='gray.600' />
+              </button>
+            </div>
           </div>
         ))}
         <div className={buttonWrapperStyle}>
@@ -106,7 +123,7 @@ const dataItemStyle = css({
   flexDirection: 'column',
   gap: '0.5rem',
   width: '100%',
-  ml: '1rem',
+  pl: '1rem',
 });
 
 const dataNameStyle = css({
@@ -117,5 +134,12 @@ const dataNameStyle = css({
 const buttonWrapperStyle = css({
   display: 'flex',
   width: 'fit-content',
-  ml: '1rem',
+  pl: '1rem',
 });
+
+const dataInputRowStyle = css({
+  display: 'flex',
+  alignItems: 'center',
+  gap: '0.5rem',
+});
+
