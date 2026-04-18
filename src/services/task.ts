@@ -352,11 +352,7 @@ export const updateMemberRole = async (
   if (id <= 0) {
     throw new Error('유효한 사용자 ID가 필요합니다.');
   }
-  await axiosInstance.patch(`${TASK_BASE}/${taskId}/member/${id}`, {
-    taskId,
-    userId: id,
-    role,
-  });
+  await axiosInstance.patch(`${TASK_BASE}/${taskId}/member/${id}`, { role });
 };
 
 /** 팀원 추방 (DELETE /task/{taskId}/member/{memberId}) — 팀장만 가능 */
