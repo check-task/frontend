@@ -264,22 +264,19 @@ const containerStyle = css({
   display: 'flex',
   flexDirection: 'column',
   width: '100%',
-  mt: '1.25rem', // 모달 헤더와 토글 사이 간격
+  mt: '1.25rem', 
 });
 
 // 모든 입력 그룹 컨테이너
 const inputContainerStyle = css({
   display: 'flex',
   flexDirection: 'column',
-  width: 'calc(100% + 1.25rem)',
   mt: '1.75rem',
-  maxH: '32rem',
+  maxH: '28rem',
   overflowY: 'auto',
-  pr: '1rem',
+  marginRight: '-1rem',
+  pr: '0.8rem',
   scrollbarGutter: 'stable',
-  boxSizing: 'border-box',
-
-  // 스크롤바 스타일 초기화 및 스타일 설정
   '&::-webkit-scrollbar': {
     width: '0.25rem',
   },
