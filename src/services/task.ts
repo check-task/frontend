@@ -316,7 +316,7 @@ export const getTaskMembers = async (taskId: number): Promise<TaskMember[]> => {
   );
   const raw = res.data?.data?.members;
   if (!Array.isArray(raw)) return [];
-  return raw.map((m) => {
+  return [...raw].sort((a, b) => toSingleId(a.id) - toSingleId(b.id)).map((m) => {
     const id = toSingleId(m.id);
     // PATCH path는 task_member PK 필요. GET에 taskMemberId 또는 task_member_id 없으면 user id로 보내져 404 발생
     const rawPatchId = m.taskMemberId ?? m.task_member_id;
@@ -352,11 +352,7 @@ export const updateMemberRole = async (
   if (id <= 0) {
     throw new Error('유효한 사용자 ID가 필요합니다.');
   }
-  await axiosInstance.patch(`${TASK_BASE}/${taskId}/member/${id}`, {
-    taskId,
-    userId: id,
-    role,
-  });
+  await axiosInstance.patch(`${TASK_BASE}/${taskId}/member/${id}`, { role });
 };
 
 /** 팀원 추방 (DELETE /task/{taskId}/member/{memberId}) — 팀장만 가능 */

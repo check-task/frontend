@@ -15,6 +15,7 @@ const isDev =
 const refetchTaskDetail = (
   queryClient: ReturnType<typeof useQueryClient>,
   taskId: number,
+  event?: string,
 ) => {
   if (isDev) {
     console.log('[Socket] 이벤트 수신 → taskDetail 재요청, taskId:', taskId);
@@ -26,6 +27,10 @@ const refetchTaskDetail = (
       if (isDev)
         console.log('[Socket] taskDetail 재요청 완료, taskId:', taskId);
     });
+
+  if (event === 'member:updated') {
+    queryClient.invalidateQueries({ queryKey: ['taskMembers', taskId] });
+  }
 };
 
 /**
@@ -63,11 +68,9 @@ export function useTaskRoomSocket(taskId: number) {
       });
     }
 
-    const onRefetch = () => refetchTaskDetail(queryClient, taskId);
-
     const handleRoomUpdate = (event: string) => {
       if (isDev) console.log('[Socket] 수신 → refetch:', event);
-      onRefetch();
+      refetchTaskDetail(queryClient, taskId, event);
     };
 
     const boundHandlers = new Map<string, () => void>();
