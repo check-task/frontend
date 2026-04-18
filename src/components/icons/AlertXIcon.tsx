@@ -1,29 +1,29 @@
 export const AlertXIcon = () => (
   <svg
     xmlns='http://www.w3.org/2000/svg'
-    width='36'
-    height='36'
-    viewBox='0 0 36 36'
+    width='27'
+    height='27'
+    viewBox='0 0 27 27'
     fill='none'
   >
-    <g clip-path='url(#clip0_5616_31952)'>
-      <circle cx='18' cy='18' r='18' fill='#F55757' />
+    <g clipPath='url(#clip0_5616_31949)'>
+      <circle cx='13.5' cy='13.5' r='13.5' fill='#F55757' />
       <path
-        d='M25.5 10.5L10.5 25.5'
+        d='M19.625 8.375L8.375 19.625'
         stroke='white'
         strokeWidth='1.5'
         strokeLinecap='round'
       />
       <path
-        d='M10.5 10.5L25.5 25.5'
+        d='M8.375 8.375L19.625 19.625'
         stroke='white'
         strokeWidth='1.5'
         strokeLinecap='round'
       />
     </g>
     <defs>
-      <clipPath id='clip0_5616_31952'>
-        <rect width='36' height='36' fill='white' />
+      <clipPath id='clip0_5616_31949'>
+        <rect width='27' height='27' fill='white' />
       </clipPath>
     </defs>
   </svg>

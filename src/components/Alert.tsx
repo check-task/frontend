@@ -35,6 +35,11 @@ const containerStyle = css({
 });
 
 const iconStyle = css({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  width: '2.25rem',
+  height: '2.25rem',
   flexShrink: 0,
 });
 
