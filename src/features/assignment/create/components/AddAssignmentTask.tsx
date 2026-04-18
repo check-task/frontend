@@ -4,6 +4,7 @@ import { PlusButton } from '@/components/PlusButton';
 import { Input } from '@/components/TextField';
 import DatePicker from '@/components/DatePicker';
 import { CloseIcon } from '@/components/icons/CloseIcon';
+import { useAlertStore } from '@/stores/alert-store';
 import { css } from 'styled-system/css';
 
 export interface SubTaskInput {
@@ -45,8 +46,12 @@ export const AddAssignmentTask = ({
     );
   };
 
+  const showAlert = useAlertStore((state) => state.showAlert);
+
   const handleRemoveTask = (id: number) => {
+    const task = subTasks.find((t) => t.id === id);
     onSubTasksChange(subTasks.filter((t) => t.id !== id));
+    if (task) showAlert(`${task.title || 'TASK'}가 삭제되었습니다`);
   };
 
   const showTaskInput = subTasks.length > 0;
