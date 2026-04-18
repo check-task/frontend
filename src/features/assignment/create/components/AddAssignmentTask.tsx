@@ -3,6 +3,7 @@
 import { PlusButton } from '@/components/PlusButton';
 import { Input } from '@/components/TextField';
 import DatePicker from '@/components/DatePicker';
+import { CloseIcon } from '@/components/icons/CloseIcon';
 import { css } from 'styled-system/css';
 
 export interface SubTaskInput {
@@ -44,6 +45,10 @@ export const AddAssignmentTask = ({
     );
   };
 
+  const handleRemoveTask = (id: number) => {
+    onSubTasksChange(subTasks.filter((t) => t.id !== id));
+  };
+
   const showTaskInput = subTasks.length > 0;
 
   return (
@@ -63,7 +68,7 @@ export const AddAssignmentTask = ({
             className={css({
               display: 'flex',
               alignItems: 'center',
-              gap: '0.5rem',
+              gap: '1rem',
             })}
           >
             <Input
@@ -73,11 +78,20 @@ export const AddAssignmentTask = ({
               value={task.title}
               onChange={(e) => handleUpdate(task.id, 'title', e.target.value)}
             />
-            <DatePicker
-              value={task.endDate}
-              onChange={(d) => handleUpdate(task.id, 'endDate', d)}
-              maxDate={maxDate ?? undefined}
-            />
+            <div className={css({ display: 'flex', alignItems: 'center', gap: '0.25rem' })}>
+              <DatePicker
+                value={task.endDate}
+                onChange={(d) => handleUpdate(task.id, 'endDate', d)}
+                maxDate={maxDate ?? undefined}
+              />
+              <button
+                type='button'
+                onClick={() => handleRemoveTask(task.id)}
+                className={css({ cursor: 'pointer' })}
+              >
+                <CloseIcon size='2rem' color='gray.600' />
+              </button>
+            </div>
           </div>
         ))}
 
@@ -105,3 +119,4 @@ const taskDataItemStyle = css({
   gap: '2rem',
   alignItems: 'flex-start',
 });
+
