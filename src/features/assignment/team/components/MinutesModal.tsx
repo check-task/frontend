@@ -280,11 +280,11 @@ export const MinutesModal = ({
           )}
           <div className={contentContainerStyle}>
             <div className={contentItemStyle}>
-              <label className={contentItemLabelStyle}>안건</label>
+              <label className={contentItemLabelStyle}>회의 안건</label>
               <Textarea
                 ref={agendaRef}
                 size='modal'
-                placeholder='안건'
+                placeholder='회의 안건'
                 value={agenda}
                 style={{ overflow: 'hidden' }}
                 onChange={(e) => {
@@ -294,11 +294,11 @@ export const MinutesModal = ({
               />
             </div>
             <div className={contentItemStyle}>
-              <label className={contentItemLabelStyle}>결과</label>
+              <label className={contentItemLabelStyle}>회의 내용</label>
               <Textarea
                 ref={conclusionRef}
                 size='modal'
-                placeholder='결과'
+                placeholder='회의 내용'
                 value={conclusion}
                 style={{ overflow: 'hidden' }}
                 onChange={(e) => {
@@ -308,11 +308,11 @@ export const MinutesModal = ({
               />
             </div>
             <div className={contentItemStyle}>
-              <label className={contentItemLabelStyle}>할일</label>
+              <label className={contentItemLabelStyle}>이후에 할 일</label>
               <Textarea
                 ref={discussionRef}
                 size='modal'
-                placeholder='할일'
+                placeholder='이후에 할 일'
                 value={discussion}
                 style={{ overflow: 'hidden' }}
                 onChange={(e) => {
