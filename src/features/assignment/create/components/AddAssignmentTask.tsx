@@ -52,7 +52,7 @@ export const AddAssignmentTask = ({
   const showTaskInput = subTasks.length > 0;
 
   return (
-    <div className={taskDataItemStyle}>
+    <div className={css({ display: 'flex', gap: '2rem', alignItems: showTaskInput ? 'flex-start' : 'center' })}>
       <p className={labelTextStyle}>TASK</p>
       <div
         className={css({
@@ -114,9 +114,4 @@ const labelTextStyle = css({
   color: 'gray.900',
 });
 
-const taskDataItemStyle = css({
-  display: 'flex',
-  gap: '2rem',
-  alignItems: 'flex-start',
-});
 

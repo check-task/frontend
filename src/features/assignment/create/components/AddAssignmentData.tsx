@@ -67,7 +67,7 @@ export const AddAssignmentData = ({
   };
 
   return (
-    <div className={taskDataItemStyle}>
+    <div className={css({ display: 'flex', gap: '2rem', alignItems: dataItems.length > 0 ? 'flex-start' : 'center' })}>
       <p className={labelTextStyle}>자료</p>
       <div className={dataContainerStyle}>
         {dataItems.map((item) => (
@@ -104,12 +104,6 @@ export const AddAssignmentData = ({
 const labelTextStyle = css({
   textStyle: 'body1.m',
   color: 'gray.900',
-});
-
-const taskDataItemStyle = css({
-  display: 'flex',
-  gap: '2rem',
-  alignItems: 'flex-start',
 });
 
 const dataContainerStyle = css({
