@@ -5,7 +5,7 @@ import { PlusButton } from '@/components/PlusButton';
 import { CloseIcon } from '@/components/icons/CloseIcon';
 import { useModalStore } from '@/stores/modal-store';
 import { AddAssignmentDataModal } from '../../components/AddAssignmentDataModal';
-import { css } from 'styled-system/css';
+import { css,cx } from 'styled-system/css';
 
 export interface DataItem {
   id: number;
@@ -93,7 +93,7 @@ export const AddAssignmentData = ({
             </div>
           </div>
         ))}
-        <div className={buttonWrapperStyle}>
+        <div className={cx(buttonWrapperStyle, css({ mt: dataItems.length > 0 ? '0.25rem' : '0' }))}>
           <PlusButton onClick={handleAddData}>자료 추가하기</PlusButton>
         </div>
       </div>
@@ -109,7 +109,7 @@ const labelTextStyle = css({
 const dataContainerStyle = css({
   display: 'flex',
   flexDirection: 'column',
-  gap: '1.25rem',
+  gap: '1rem',
   flex: 1,
 });
 
