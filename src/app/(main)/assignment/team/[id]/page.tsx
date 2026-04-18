@@ -17,7 +17,7 @@ import { useModalStore } from '@/stores/modal-store';
 import { DeleteAllTaskConfirmModal } from '@/features/assignment/components/DeleteAllTaskConfirmModal';
 import { useDeleteAllSubTasks } from '@/features/assignment/hooks/useDeleteAllSubTasks';
 import { useDeleteSubTasks } from '@/features/assignment/hooks/useDeleteSubTasks';
-import { useUpdateSubTasksBatch } from '@/features/assignment/hooks/useUpdateSubTasksBatch';
+import { useUpdateSubTasks } from '@/features/assignment/team/components/hooks/useUpdateSubTasks';
 import { UndoToast } from '@/components/UndoToast';
 import { useAlertStore } from '@/stores/alert-store';
 import type { TaskDetailSubTask } from '@/types/task';
@@ -37,7 +37,7 @@ export default function TeamAssignmentDetailPage() {
   const { data, isLoading, isError, error } = useTeamTaskDetail(taskId);
   const { mutate: mutateDeleteAll } = useDeleteAllSubTasks(taskId);
   const { mutate: mutateDeleteBulk } = useDeleteSubTasks(taskId);
-  const { mutate: mutateUpdateBatch } = useUpdateSubTasksBatch(taskId);
+  const { mutate: mutateUpdateBatch } = useUpdateSubTasks(taskId);
   const showAlert = useAlertStore((state) => state.showAlert);
   const [isEditMode, setIsEditMode] = useState(false);
   const [editedTitles, setEditedTitles] = useState<Record<number, string>>({});
@@ -114,7 +114,7 @@ export default function TeamAssignmentDetailPage() {
         return {
           subTaskId: Number(id),
           title,
-          deadline: task.deadline as string,
+          endDate: task.deadline as string,
           isAlarm: task.isAlarm,
         };
       });
@@ -125,12 +125,12 @@ export default function TeamAssignmentDetailPage() {
     if (hasDeletes && hasUpdates) {
       mutateDeleteBulk(ids, {
         onSuccess: () =>
-          mutateUpdateBatch(changedSubTasks, { onSuccess: () => exitEditMode(true) }),
+          mutateUpdateBatch({ data: changedSubTasks }, { onSuccess: () => exitEditMode(true) }),
       });
     } else if (hasDeletes) {
       mutateDeleteBulk(ids, { onSuccess: () => exitEditMode(true) });
     } else if (hasUpdates) {
-      mutateUpdateBatch(changedSubTasks, { onSuccess: () => exitEditMode() });
+      mutateUpdateBatch({ data: changedSubTasks }, { onSuccess: () => exitEditMode() });
     } else {
       exitEditMode();
     }

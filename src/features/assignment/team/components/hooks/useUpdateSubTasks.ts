@@ -2,6 +2,7 @@
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { getSocket, SOCKET_UPDATE_SUBTASKS } from '@/lib/socket';
+import { updateSubTasksBatch } from '@/services/subtask';
 
 interface SubTaskUpdateItem {
   subTaskId: number;
@@ -14,29 +15,32 @@ interface UpdateSubTasksInput {
   data: SubTaskUpdateItem[];
 }
 
-/** 팀 과제 세부 TASK 선택 수정 (소켓 우선, 미연결 시 저장 불가) */
+/** 팀 과제 세부 TASK 선택 수정 (소켓 우선, 미연결 시 REST fallback) */
 export const useUpdateSubTasks = (taskId: number) => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async ({ data }: UpdateSubTasksInput): Promise<void> => {
       const socket = getSocket();
-      if (!socket?.connected) {
-        throw new Error(
-          '소켓에 연결되어 있지 않습니다. 잠시 후 다시 시도해주세요.',
-        );
+      if (socket?.connected) {
+        const socketOk = await new Promise<boolean>((resolve) => {
+          socket.emit(
+            SOCKET_UPDATE_SUBTASKS,
+            { taskId, data },
+            (res: { success?: boolean; error?: string }) =>
+              resolve(!!res?.success),
+          );
+        });
+        if (socketOk) return;
       }
-      const socketOk = await new Promise<boolean>((resolve) => {
-        socket.emit(
-          SOCKET_UPDATE_SUBTASKS,
-          { taskId, data },
-          (res: { success?: boolean; error?: string }) =>
-            resolve(!!res?.success),
-        );
+      await updateSubTasksBatch(taskId, {
+        subTasks: data.map((item) => ({
+          subTaskId: item.subTaskId,
+          title: item.title ?? '',
+          deadline: item.endDate ?? '',
+          isAlarm: item.isAlarm ?? false,
+        })),
       });
-      if (!socketOk) {
-        throw new Error('세부 과제 수정에 실패했습니다.');
-      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['taskDetail', taskId] });
