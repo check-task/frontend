@@ -32,7 +32,7 @@ export const DeleteFolderModalContent = ({
           ?.response?.data?.errorCode;
         if (code === 'FOLDER_NOT_EMPTY') {
           closeModal();
-          showAlert('폴더 내부에 과제가 존재해서 삭제할 수 없습니다.');
+          showAlert('폴더 내부에 과제가 존재해서 삭제할 수 없습니다.', 'x');
         }
       },
     });

@@ -1,18 +1,20 @@
 'use client';
 
 import { AlertCheckIcon } from '@/components/icons/AlertCheckIcon';
+import { AlertXIcon } from '@/components/icons/AlertXIcon';
 import { css } from 'styled-system/css';
 import type { ReactNode } from 'react';
 
 interface AlertProps {
   message: ReactNode;
+  variant?: 'check' | 'x';
 }
 
-export const Alert = ({ message }: AlertProps) => {
+export const Alert = ({ message, variant = 'check' }: AlertProps) => {
   return (
     <div className={containerStyle}>
       <span className={iconStyle}>
-        <AlertCheckIcon />
+        {variant === 'x' ? <AlertXIcon /> : <AlertCheckIcon />}
       </span>
       <p className={textStyle}>{message}</p>
     </div>
@@ -33,6 +35,11 @@ const containerStyle = css({
 });
 
 const iconStyle = css({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  width: '2.25rem',
+  height: '2.25rem',
   flexShrink: 0,
 });
 

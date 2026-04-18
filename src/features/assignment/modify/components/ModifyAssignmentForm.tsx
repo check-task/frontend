@@ -133,6 +133,7 @@ export const ModifyAssignmentForm = () => {
           type === 'TEAM'
             ? '팀 과제는 팀 폴더에만 저장할 수 있습니다.'
             : '개인 과제는 개인 폴더에만 저장할 수 있습니다.',
+          'x',
         );
         return;
       }
@@ -206,7 +207,7 @@ export const ModifyAssignmentForm = () => {
         ax.response?.data?.message ??
         (typeof ax.message === 'string' ? ax.message : null) ??
         '과제 수정에 실패했습니다.';
-      showAlert(message);
+      showAlert(message, 'x');
     }
   };
 
