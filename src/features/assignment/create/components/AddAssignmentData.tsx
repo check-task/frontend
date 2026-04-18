@@ -80,6 +80,7 @@ export const AddAssignmentData = ({
                   value={item.path}
                   onChange={(e) => handleUpdatePath(item.id, e.target.value)}
                   className={css({ width: '100%' })}
+                  readOnly
                 />
               </div>
               <button
