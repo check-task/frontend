@@ -98,9 +98,7 @@ export default function CalendarModal({
       h = 12;
     }
 
-    setTimeValue(
-      `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`,
-    );
+    setTimeValue(`${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`);
   };
 
   const handleTimeToggle = (enabled: boolean) => {
@@ -157,18 +155,18 @@ export default function CalendarModal({
                 {period}
               </button>
               <input
-                  className={timeInput}
-                  value={timeValue}
-                  onChange={handleTimeChange}
-                  onBlur={handleTimeBlur}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.currentTarget.blur();
-                    }
-                  }}
-                  placeholder='00:00'
-                  maxLength={5}
-                />
+                className={timeInput}
+                value={timeValue}
+                onChange={handleTimeChange}
+                onBlur={handleTimeBlur}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.currentTarget.blur();
+                  }
+                }}
+                placeholder='00:00'
+                maxLength={5}
+              />
             </div>
           </div>
         )}
@@ -196,15 +194,13 @@ export default function CalendarModal({
                 const [hStr, mStr] = timeValue.split(':');
                 const rawHour = parseInt(hStr) || 0;
                 const h =
-                  period === '오후'
-                    ? (rawHour % 12) + 12
-                    : rawHour % 12;
+                  period === '오후' ? (rawHour % 12) + 12 : rawHour % 12;
                 const m = parseInt(mStr) || 0;
                 const dateWithTime = new Date(selectedDate);
                 dateWithTime.setHours(h, m, 0, 0);
 
                 if (maxDate && dateWithTime > maxDate) {
-                  showAlert('마감 일시 이후 시간은 설정이 불가능합니다.');
+                  showAlert('마감 일시 이후 시간은 설정이 불가능합니다.', 'x');
                   setTimeValue('00:00');
                   setPeriod('오전');
                   return;

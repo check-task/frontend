@@ -28,7 +28,7 @@ export const RestoreModalContent = ({ token }: RestoreModalContentProps) => {
       closeModal();
       router.replace('/');
     } catch {
-      showAlert('계정 복구에 실패했습니다. 다시 시도해주세요.');
+      showAlert('계정 복구에 실패했습니다. 다시 시도해주세요.', 'x');
       closeModal();
       router.replace('/login');
     } finally {

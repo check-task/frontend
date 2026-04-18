@@ -9,7 +9,6 @@ import { FormActionButtons } from '@/features/assignment/components/FormActionBu
 import { useCreateSubTask } from '@/hooks/mutations/useCreateSubTask';
 import { useAlertStore } from '@/stores/alert-store';
 
-
 const DEFAULT_DEADLINE_TIME = 'T23:59:59';
 
 const formatDeadline = (date: Date, withTime: boolean): string => {
@@ -62,7 +61,7 @@ export const AddTaskButton = ({ taskId, maxDate }: AddTaskButtonProps) => {
   const handleSave = () => {
     const title = value.trim();
     if (!title) {
-      showAlert('세부과제명을 입력하세요.');
+      showAlert('세부과제명을 입력하세요.', 'x');
       return;
     }
     createSubTask(
@@ -77,7 +76,10 @@ export const AddTaskButton = ({ taskId, maxDate }: AddTaskButtonProps) => {
           const ax = err as unknown as {
             response?: { data?: { reason?: string } };
           };
-          showAlert(ax?.response?.data?.reason ?? '세부과제 추가에 실패했습니다.');
+          showAlert(
+            ax?.response?.data?.reason ?? '세부과제 추가에 실패했습니다.',
+            'x',
+          );
         },
       },
     );
@@ -168,6 +170,5 @@ const buttonGroupStyle = css({
   flexDirection: 'column',
   alignItems: 'flex-end',
   gap: '0.5rem',
-  mr:'3rem',
+  mr: '3rem',
 });
-

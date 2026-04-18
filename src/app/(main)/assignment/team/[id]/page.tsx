@@ -98,7 +98,7 @@ export default function TeamAssignmentDetailPage() {
 
   const handleSave = () => {
     if (Object.values(editedTitles).some((title) => title.trim() === '')) {
-      showAlert('세부과제명을 입력하세요.');
+      showAlert('세부과제명을 입력하세요.', 'x');
       return;
     }
 
@@ -125,12 +125,18 @@ export default function TeamAssignmentDetailPage() {
     if (hasDeletes && hasUpdates) {
       mutateDeleteBulk(ids, {
         onSuccess: () =>
-          mutateUpdateBatch({ data: changedSubTasks }, { onSuccess: () => exitEditMode(true) }),
+          mutateUpdateBatch(
+            { data: changedSubTasks },
+            { onSuccess: () => exitEditMode(true) },
+          ),
       });
     } else if (hasDeletes) {
       mutateDeleteBulk(ids, { onSuccess: () => exitEditMode(true) });
     } else if (hasUpdates) {
-      mutateUpdateBatch({ data: changedSubTasks }, { onSuccess: () => exitEditMode() });
+      mutateUpdateBatch(
+        { data: changedSubTasks },
+        { onSuccess: () => exitEditMode() },
+      );
     } else {
       exitEditMode();
     }

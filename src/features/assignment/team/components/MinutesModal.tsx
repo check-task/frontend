@@ -179,7 +179,7 @@ export const MinutesModal = ({
     setAgenda(editLog.agenda ?? '');
     setConclusion(editLog.conclusion ?? '');
     setDiscussion(editLog.discussion ?? '');
-  }, [open, editLog?.logId]); 
+  }, [open, editLog?.logId]);
 
   // 텍스트 크기 자동 조절
   useEffect(() => {
@@ -202,7 +202,7 @@ export const MinutesModal = ({
     const conclusionVal = conclusion.trim();
     const discussionVal = discussion.trim();
     if (!agendaVal) {
-      showAlert('안건을 입력해주세요.');
+      showAlert('안건을 입력해주세요.', 'x');
       return;
     }
     // API는 대부분 YYYY-MM-DD 형식 사용 (dateStr이 이미 YYYY-MM-DD)
@@ -226,7 +226,11 @@ export const MinutesModal = ({
     } catch (err) {
       let message = '저장에 실패했습니다. 다시 시도해주세요.';
       if (isAxiosError(err) && err.response?.data) {
-        const d = err.response.data as { message?: string; msg?: string; error?: string };
+        const d = err.response.data as {
+          message?: string;
+          msg?: string;
+          error?: string;
+        };
         message = d.message ?? d.msg ?? d.error ?? message;
       } else if (err instanceof Error) {
         message = err.message;
