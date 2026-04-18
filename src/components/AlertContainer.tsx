@@ -12,7 +12,7 @@ export const AlertContainer = () => {
   return (
     <div className={containerStyle}>
       {alerts.map((alert) => (
-        <Alert key={alert.id} message={alert.message} />
+        <Alert key={alert.id} message={alert.message} variant={alert.variant} />
       ))}
     </div>
   );

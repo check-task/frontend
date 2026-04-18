@@ -53,7 +53,7 @@ export const TaskAddForm = ({ taskId, maxDate }: TaskAddFormProps) => {
   const handleSaveTask = () => {
     const title = taskName.trim();
     if (!title) {
-      showAlert('세부과제명을 입력하세요.');
+      showAlert('세부과제명을 입력하세요.', 'x');
       return;
     }
 
@@ -144,7 +144,5 @@ const datePickerWrapperStyle = css({
   alignItems: 'center',
   justifyItems: 'left',
   w: '10.75rem',
-  ml:'2rem',
+  ml: '2rem',
 });
-
-

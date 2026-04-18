@@ -55,7 +55,9 @@ export const PersonalLeftContainer = ({
   const showAlert = useAlertStore((state) => state.showAlert);
 
   // 되돌리기를 위해 task 저장
-  const [undoSnapshot, setUndoSnapshot] = useState<PersonalTaskItem | null>(null);
+  const [undoSnapshot, setUndoSnapshot] = useState<PersonalTaskItem | null>(
+    null,
+  );
   const [showUndoToast, setShowUndoToast] = useState(false);
 
   const enterEditMode = () => {
@@ -74,7 +76,7 @@ export const PersonalLeftContainer = ({
 
   const handleSave = () => {
     if (Object.values(editedTitles).some((title) => title.trim() === '')) {
-      showAlert('세부과제명을 입력하세요.');
+      showAlert('세부과제명을 입력하세요.', 'x');
       return;
     }
 
@@ -101,7 +103,9 @@ export const PersonalLeftContainer = ({
     if (hasDeletes && hasUpdates) {
       mutateDeleteBulk(ids, {
         onSuccess: () =>
-          mutateUpdateBatch(changedSubTasks, { onSuccess: () => exitEditMode(true) }),
+          mutateUpdateBatch(changedSubTasks, {
+            onSuccess: () => exitEditMode(true),
+          }),
       });
     } else if (hasDeletes) {
       mutateDeleteBulk(ids, { onSuccess: () => exitEditMode(true) });
@@ -134,19 +138,21 @@ export const PersonalLeftContainer = ({
     });
   };
 
-
   const handleTitleChange = (id: number, title: string) => {
     setEditedTitles((prev) => ({ ...prev, [id]: title }));
   };
 
-  const handleDeleteTask = useCallback((id: number) => {
-    const target = tasks.find((t) => t.id === id);
-    if (target) {
-      setUndoSnapshot(target);
-      setShowUndoToast(true);
-    }
-    setDeletedTaskIds((prev) => new Set(prev).add(id));
-  }, [tasks]);
+  const handleDeleteTask = useCallback(
+    (id: number) => {
+      const target = tasks.find((t) => t.id === id);
+      if (target) {
+        setUndoSnapshot(target);
+        setShowUndoToast(true);
+      }
+      setDeletedTaskIds((prev) => new Set(prev).add(id));
+    },
+    [tasks],
+  );
 
   const handleUndo = useCallback(() => {
     if (undoSnapshot) {
@@ -190,7 +196,13 @@ export const PersonalLeftContainer = ({
         <div className={taskContainerStyle}>
           {/* 제목 + 연필 아이콘 / 편집 버튼 바 */}
           <div className={taskHeaderStyle({ editMode: isEditMode })}>
-            <div className={css({ display: 'flex', alignItems: 'center', gap: '0.5rem' })}>
+            <div
+              className={css({
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+              })}
+            >
               <h2 className={css({ textStyle: 'h4', color: 'gray.900' })}>
                 세부 TASK
               </h2>
@@ -198,14 +210,16 @@ export const PersonalLeftContainer = ({
                 <button
                   type='button'
                   onClick={enterEditMode}
-                  className={css({cursor: 'pointer'})}
+                  className={css({ cursor: 'pointer' })}
                   aria-label='세부 task 수정'
                 >
                   <PencilIcon size={24} />
                 </button>
               )}
             </div>
-            <div className={css({ visibility: isEditMode ? 'visible' : 'hidden' })}>
+            <div
+              className={css({ visibility: isEditMode ? 'visible' : 'hidden' })}
+            >
               <FormActionButtons
                 onSave={handleSave}
                 onCancel={() => exitEditMode()}
@@ -243,7 +257,8 @@ const containerStyle = cva({
     display: 'flex',
     flexDirection: 'column',
     flexShrink: 0,
-    transition: 'width 0.3s cubic-bezier(0.4, 0, 0.2, 1), margin 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+    transition:
+      'width 0.3s cubic-bezier(0.4, 0, 0.2, 1), margin 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
   },
   variants: {
     collapsed: {
@@ -291,5 +306,3 @@ const taskHeaderStyle = cva({
     },
   },
 });
-
-

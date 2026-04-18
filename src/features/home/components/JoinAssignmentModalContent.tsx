@@ -59,7 +59,7 @@ export const JoinAssignmentModalContent = () => {
             ax.response?.data?.message ??
             (typeof ax.message === 'string' ? ax.message : null) ??
             '과제 참여에 실패했습니다.';
-          showAlert(message);
+          showAlert(message, 'x');
         },
       },
     );

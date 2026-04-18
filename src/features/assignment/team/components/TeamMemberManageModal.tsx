@@ -58,7 +58,7 @@ export const TeamMemberManageModal = ({
   const [inviteCode, setInviteCode] = useState('');
   const [roleError, setRoleError] = useState<string | null>(null);
   const { data: myInfo } = useMyInfo();
-const { showAlert } = useAlertStore();
+  const { showAlert } = useAlertStore();
   const { data: membersData } = useTaskMembers(taskId);
   const { mutateAsync: createInvitation, isPending } =
     useCreateInvitationLink(taskId);
@@ -92,7 +92,7 @@ const { showAlert } = useAlertStore();
     navigator.clipboard
       .writeText(inviteCode)
       .then(() => showAlert('초대코드를 복사했습니다.'))
-      .catch(() => showAlert('초대코드 복사에 실패했습니다.'));
+      .catch(() => showAlert('초대코드 복사에 실패했습니다.', 'x'));
   };
 
   const handleRoleChange = (
@@ -124,7 +124,9 @@ const { showAlert } = useAlertStore();
   };
 
   const handleExpelMember = (memberId: number, memberName: string) => {
-    const confirmed = window.confirm(`${memberName}을(를) 팀에서 삭제하시겠습니까?`);
+    const confirmed = window.confirm(
+      `${memberName}을(를) 팀에서 삭제하시겠습니까?`,
+    );
     if (!confirmed) return;
     setRoleError(null);
     if (memberId == null || memberId === 0) {

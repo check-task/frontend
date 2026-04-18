@@ -60,7 +60,7 @@ export const CreateAssignmentForm = () => {
     if (!isFormValid) return;
 
     if (assignmentName.trim().length > 10) {
-      showAlert('과제명은 10글자 이하로 입력해주세요.');
+      showAlert('과제명은 10글자 이하로 입력해주세요.', 'x');
       return;
     }
 
@@ -107,7 +107,7 @@ export const CreateAssignmentForm = () => {
         ax.response?.data?.message ??
         (typeof ax.message === 'string' ? ax.message : null) ??
         '과제 생성에 실패했습니다.';
-      showAlert(message);
+      showAlert(message, 'x');
     }
   };
 
