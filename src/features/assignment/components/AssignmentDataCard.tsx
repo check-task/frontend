@@ -1,0 +1,110 @@
+'use client';
+
+import { CloseIcon } from '@/components/icons/CloseIcon';
+import { PencilIcon } from '@/components/icons/PencilIcon';
+import { css } from 'styled-system/css';
+
+interface AssignmentDataCardProps {
+  name: string;
+  path: string;
+  fileName?: string;
+  onEdit: () => void;
+  onDelete: () => void;
+}
+
+// 자료 모음집 카드 컴포넌트
+export const AssignmentDataCard = ({
+  name,
+  path,
+  fileName,
+  onEdit,
+  onDelete,
+}: AssignmentDataCardProps) => {
+  const isUrl = /^https?:\/\//i.test(path);
+  const displayText = fileName ?? path;
+
+  return (
+    <div className={`group ${cardStyle}`}>
+      <div className={headerStyle}>
+        <p className={cardTitleStyle}>{name}</p>
+
+        <div className={iconGroupStyle}>
+          <button onClick={onEdit} aria-label='수정'>
+            <PencilIcon />
+          </button>
+          <button onClick={onDelete} aria-label='삭제'>
+            <CloseIcon color='gray.700' />
+          </button>
+        </div>
+      </div>
+      {/* url인경우는 a태그로 변경 */}
+      {isUrl ? (
+        <a
+          className={cardContentStyle}
+          href={path}
+          target='_blank'
+          rel='noreferrer'
+        >
+          {displayText}
+        </a>
+      ) : (
+        <p className={cardContentStyle}>{displayText}</p>
+      )}
+    </div>
+  );
+};
+
+// ======== 스타일 정의 ========
+const cardStyle = css({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '0.25rem',
+  p: '1.25rem 1rem', //상하 좌우
+  bg: 'blue.50',
+  borderRadius: '0.5rem',
+  width: '100%', // 제목+버튼 w 길이에 맞출거임
+  shadow: '0 1px 4px 0 rgba(0, 0, 0, 0.16)',
+});
+
+// 파일명 + 아이콘
+const headerStyle = css({
+  display: 'flex',
+  alignItems: 'flex-start',
+  justifyContent: 'space-between',
+  gap: '0.5rem',
+});
+
+// 아이콘 묶음
+const iconGroupStyle = css({
+  display: 'flex',
+  alignItems: 'center',
+  gap: '0.5rem',
+  flexShrink: 0,
+  opacity: 0,
+  transition: 'opacity 0.4s ease',
+
+  // 카드 호버시 아이콘 나타나도록
+  _groupHover: {
+    opacity: 1,
+  },
+
+  '& svg': {
+    cursor: 'pointer',
+  },
+});
+
+// 파일명
+const cardTitleStyle = css({
+  textStyle: 'body2.r',
+  color: 'gray.900',
+  wordBreak: 'break-word',
+  flex: 1,
+});
+
+// 파일 URL
+const cardContentStyle = css({
+  textStyle: 'body3.r',
+  color: 'gray.600',
+  textDecoration: 'underline',
+  wordBreak: 'break-all', // 줄바꿈
+});
