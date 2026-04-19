@@ -2,9 +2,11 @@
 
 import { Input } from '@/components/TextField';
 import { PlusButton } from '@/components/PlusButton';
+import { CloseIcon } from '@/components/icons/CloseIcon';
 import { useModalStore } from '@/stores/modal-store';
+import { useAlertStore } from '@/stores/alert-store';
 import { AddAssignmentDataModal } from '../../components/AddAssignmentDataModal';
-import { css } from 'styled-system/css';
+import { css,cx } from 'styled-system/css';
 
 export interface DataItem {
   id: number;
@@ -61,21 +63,42 @@ export const AddAssignmentData = ({
     );
   };
 
+  const showAlert = useAlertStore((state) => state.showAlert);
+
+  const handleRemoveData = (id: number) => {
+    const item = dataItems.find((d) => d.id === id);
+    onDataItemsChange(dataItems.filter((d) => d.id !== id));
+    if (item) showAlert(`${item.name}가 삭제되었습니다`);
+  };
+
   return (
-    <div className={taskDataItemStyle}>
+    <div className={css({ display: 'flex', gap: '2rem', alignItems: dataItems.length > 0 ? 'flex-start' : 'center' })}>
       <p className={labelTextStyle}>자료</p>
       <div className={dataContainerStyle}>
         {dataItems.map((item) => (
           <div key={item.id} className={dataItemStyle}>
             <p className={dataNameStyle}>{item.name}</p>
-            <Input
-              size='basic'
-              value={item.path}
-              onChange={(e) => handleUpdatePath(item.id, e.target.value)}
-            />
+            <div className={dataInputRowStyle}>
+              <div className={css({ flex: 1 })}>
+                <Input
+                  size='basic'
+                  value={item.path}
+                  onChange={(e) => handleUpdatePath(item.id, e.target.value)}
+                  className={css({ width: '100%' })}
+                  readOnly
+                />
+              </div>
+              <button
+                type='button'
+                onClick={() => handleRemoveData(item.id)}
+                className={css({ cursor: 'pointer' })}
+              >
+                <CloseIcon size='2rem' color='gray.600' />
+              </button>
+            </div>
           </div>
         ))}
-        <div className={buttonWrapperStyle}>
+        <div className={cx(buttonWrapperStyle, css({ mt: dataItems.length > 0 ? '0.25rem' : '0' }))}>
           <PlusButton onClick={handleAddData}>자료 추가하기</PlusButton>
         </div>
       </div>
@@ -88,16 +111,10 @@ const labelTextStyle = css({
   color: 'gray.900',
 });
 
-const taskDataItemStyle = css({
-  display: 'flex',
-  gap: '2rem',
-  alignItems: 'flex-start',
-});
-
 const dataContainerStyle = css({
   display: 'flex',
   flexDirection: 'column',
-  gap: '1.25rem',
+  gap: '1rem',
   flex: 1,
 });
 
@@ -106,7 +123,7 @@ const dataItemStyle = css({
   flexDirection: 'column',
   gap: '0.5rem',
   width: '100%',
-  ml: '1rem',
+  pl: '1rem',
 });
 
 const dataNameStyle = css({
@@ -117,5 +134,12 @@ const dataNameStyle = css({
 const buttonWrapperStyle = css({
   display: 'flex',
   width: 'fit-content',
-  ml: '1rem',
+  pl: '1rem',
 });
+
+const dataInputRowStyle = css({
+  display: 'flex',
+  alignItems: 'center',
+  gap: '0.5rem',
+});
+
