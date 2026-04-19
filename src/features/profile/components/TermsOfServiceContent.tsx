@@ -237,6 +237,21 @@ export const TermsOfServiceContent = () => {
             발생한 경우 관할 법원은 대한민국 민사소송법에 따릅니다.
           </p>
         </div>
+
+        <div className={sectionStyle}>
+          <p className={sectionTitleStyle}>부칙</p>
+          <p className={sectionBodyStyle}>
+            본 약관은 2026년 4월 20일부터 시행됩니다.
+          </p>
+        </div>
+
+        <div className={businessInfoStyle}>
+          <p>상호: 코메트리</p>
+          <p>대표자: 정유진</p>
+          <p>사업자등록번호: 292-20-02148</p>
+          <p>주소: 경기도 시흥시 산기대학로 237 TIP 319-2호</p>
+          <p>이메일: songwol@tukorea.ac.kr</p>
+        </div>
       </div>
     </div>
   );
@@ -301,4 +316,14 @@ const orderedListStyle = css({
 const nestedUnorderedListStyle = css({
   listStyleType: 'disc',
   paddingLeft: '1.125rem',
+});
+
+const businessInfoStyle = css({
+  ...legalBodyText,
+  borderTop: '1px solid',
+  borderColor: 'gray.200',
+  paddingTop: '0.75rem',
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '0.25rem',
 });
