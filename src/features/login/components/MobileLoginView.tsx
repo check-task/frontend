@@ -54,6 +54,7 @@ export const MobileLoginView = () => {
               src={slide.image}
               alt={slide.title}
               fill
+              sizes='302px'
               style={{ objectFit: 'contain' }}
               priority={i === 0}
             />

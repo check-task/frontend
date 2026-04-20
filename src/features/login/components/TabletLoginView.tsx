@@ -114,6 +114,7 @@ export const TabletLoginView = () => {
               src={slide.image}
               alt={slide.title}
               fill
+              sizes="50vw"
               style={{
                 objectFit: 'contain',
                 padding: '30px',
