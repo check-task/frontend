@@ -57,7 +57,13 @@ export const AddAssignmentTask = ({
   const showTaskInput = subTasks.length > 0;
 
   return (
-    <div className={css({ display: 'flex', gap: '2rem', alignItems: showTaskInput ? 'flex-start' : 'center' })}>
+    <div
+      className={css({
+        display: 'flex',
+        gap: '2rem',
+        alignItems: showTaskInput ? 'flex-start' : 'center',
+      })}
+    >
       <p className={labelTextStyle}>TASK</p>
       <div
         className={css({
@@ -83,11 +89,17 @@ export const AddAssignmentTask = ({
               value={task.title}
               onChange={(e) => handleUpdate(task.id, 'title', e.target.value)}
             />
-            <div className={css({ display: 'flex', alignItems: 'center', gap: '0.25rem' })}>
+            <div
+              className={css({
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.25rem',
+              })}
+            >
               <DatePicker
                 value={task.endDate}
                 onChange={(d) => handleUpdate(task.id, 'endDate', d)}
-                maxDate={maxDate ?? undefined}
+                maxDate={maxDate ?? new Date()}
               />
               <button
                 type='button'
@@ -118,5 +130,3 @@ const labelTextStyle = css({
   textStyle: 'body1.m',
   color: 'gray.900',
 });
-
-

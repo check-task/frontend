@@ -20,9 +20,8 @@ const schema = z.object({
     .max(30, '닉네임은 30글자 이하여야 합니다.'),
   phone: z
     .string()
-    .min(1, '연락처를 입력해주세요')
-    .regex(
-      /^01[0-9]-\d{3,4}-\d{4}$/,
+    .refine(
+      (val) => val === '' || /^01[0-9]-\d{3,4}-\d{4}$/.test(val),
       '올바른 연락처 형식으로 입력해주세요 (예: 010-1234-5678)',
     ),
   email: z
@@ -56,7 +55,7 @@ export const EditProfileModalContent = ({
     resolver: zodResolver(schema),
     defaultValues: {
       nickname: user.nickname,
-      phone: user.phoneNum,
+      phone: user.phoneNum === '전화번호를 입력해 주세요.' ? '' : user.phoneNum,
       email: user.email,
     },
     mode: 'onChange',
@@ -122,7 +121,7 @@ export const EditProfileModalContent = ({
           <Input
             size='modal'
             type='text'
-            placeholder='송월'
+            placeholder='닉네임'
             {...register('nickname')}
           />
           {errors.nickname && (
