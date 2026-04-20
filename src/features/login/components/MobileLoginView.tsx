@@ -55,6 +55,7 @@ export const MobileLoginView = () => {
               alt={slide.title}
               fill
               sizes='302px'
+              unoptimized
               style={{ objectFit: 'contain' }}
               priority={i === 0}
             />
