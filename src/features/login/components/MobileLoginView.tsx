@@ -50,12 +50,11 @@ export const MobileLoginView = () => {
             </div>
           </div>
           <div className={slideImageAreaStyle}>
-            <Image
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
               src={slide.image}
               alt={slide.title}
-              fill
-              style={{ objectFit: 'contain' }}
-              priority={i === 0}
+              style={{ width: '100%', height: '100%', objectFit: 'contain' }}
             />
           </div>
           {i === PREVIEW_SLIDES.length - 1 ? (
