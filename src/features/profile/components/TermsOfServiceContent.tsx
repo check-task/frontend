@@ -249,7 +249,7 @@ export const TermsOfServiceContent = () => {
           <p>상호: 코메트리</p>
           <p>대표자: 정유진</p>
           <p>사업자등록번호: 292-20-02148</p>
-          <p>주소: 경기도 시흥시 산기대학로 237 TIP 319-2호</p>
+          <p>주소: 서울특별시 영등포구 대림로31길 39</p>
           <p>이메일: songwol@tukorea.ac.kr</p>
         </div>
       </div>
