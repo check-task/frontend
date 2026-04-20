@@ -52,11 +52,17 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
             height={25.85}
           />
           <div className={bottomRightStyle}>
-            <p className={kakaoGuideStyle}>
-              아이디와 비밀번호 입력하기 귀찮으시죠?
-              <br />
-              1초 회원가입으로 입력없이 간편하게 로그인 하세요.
-            </p>
+            <div className={textColumnStyle}>
+              <p className={kakaoGuideStyle}>
+                아이디와 비밀번호 입력하기 귀찮으시죠?
+                <br />
+                1초 회원가입으로 입력없이 간편하게 로그인 하세요.
+              </p>
+              <p className={consentStyle}>
+                로그인 시 이용약관 및 개인정보 처리방침에 동의한 것으로
+                간주됩니다.
+              </p>
+            </div>
             <KakaoLoginButton />
           </div>
         </div>
@@ -81,7 +87,7 @@ const bottomBarStyle = css(
   hstack.raw({
     justifyContent: 'space-between',
     alignItems: 'center',
-    height: '5.3125rem',
+    height: '6.375rem',
     paddingX: '7.5rem',
     paddingY: '1.25rem',
     position: 'relative',
@@ -98,7 +104,18 @@ const bottomRightStyle = css(
 );
 
 // 텍스트 스타일
+const textColumnStyle = css({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '0.25rem',
+});
+
 const kakaoGuideStyle = css({
   textStyle: 'body3.r',
   color: 'gray.600',
+});
+
+const consentStyle = css({
+  textStyle: 'body4.r',
+  color: 'gray.500',
 });
