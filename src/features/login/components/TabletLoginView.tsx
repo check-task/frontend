@@ -110,18 +110,17 @@ export const TabletLoginView = () => {
         >
           {/* 좌: 앱 목업 이미지 */}
           <div className={imagePanelStyle}>
-            <Image
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
               src={slide.image}
               alt={slide.title}
-              fill
-              sizes='50vw'
-              unoptimized
               style={{
+                width: '100%',
+                height: '100%',
                 objectFit: 'contain',
                 padding: '30px',
                 paddingRight: '0px',
               }}
-              priority={i === 0}
             />
           </div>
 
