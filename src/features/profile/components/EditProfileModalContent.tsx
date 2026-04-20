@@ -122,7 +122,7 @@ export const EditProfileModalContent = ({
           <Input
             size='modal'
             type='text'
-            placeholder='송월'
+            placeholder='닉네임'
             {...register('nickname')}
           />
           {errors.nickname && (
