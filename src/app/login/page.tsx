@@ -1,6 +1,7 @@
 import { css } from 'styled-system/css';
 import { hstack } from 'styled-system/patterns';
 import { KakaoLoginButton } from '@/features/login/components/KakaoLoginButton';
+import { LoginConsentText } from '@/features/login/components/LoginConsentText';
 import { LoginCarousel } from '@/features/login/components/LoginCarousel';
 import { MobileLoginView } from '@/features/login/components/MobileLoginView';
 import { TabletLoginView } from '@/features/login/components/TabletLoginView';
@@ -58,10 +59,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
                 <br />
                 1초 회원가입으로 입력없이 간편하게 로그인 하세요.
               </p>
-              <p className={consentStyle}>
-                로그인 시 이용약관 및 개인정보 처리방침에 동의한 것으로
-                간주됩니다.
-              </p>
+              <LoginConsentText />
             </div>
             <KakaoLoginButton />
           </div>
@@ -113,9 +111,4 @@ const textColumnStyle = css({
 const kakaoGuideStyle = css({
   textStyle: 'body3.r',
   color: 'gray.600',
-});
-
-const consentStyle = css({
-  textStyle: 'body4.r',
-  color: 'gray.500',
 });
