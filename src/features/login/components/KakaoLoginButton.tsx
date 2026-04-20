@@ -21,7 +21,6 @@ export const KakaoLoginButton = () => {
 
 const buttonStyle = css(
   hstack.raw({
-    marginTop: 'auto',
     paddingX: '0.875rem',
     paddingY: '0.6875rem',
     justifyContent: 'center',
