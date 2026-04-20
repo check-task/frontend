@@ -1,3 +1,4 @@
+import { headers } from 'next/headers';
 import { css } from 'styled-system/css';
 import { hstack } from 'styled-system/patterns';
 import { KakaoLoginButton } from '@/features/login/components/KakaoLoginButton';
@@ -15,6 +16,28 @@ interface LoginPageProps {
 export default async function LoginPage({ searchParams }: LoginPageProps) {
   const { status, token } = await searchParams;
   const isWithdrawn = status === 'withdrawn' && !!token;
+
+  const headersList = await headers();
+  const ua = headersList.get('user-agent') ?? '';
+  const isMobile = /iPhone|Android.*Mobile|Mobile.*Android|Windows Phone/i.test(
+    ua,
+  );
+  const isTablet = /iPad|Android(?!.*Mobile)|Tablet/i.test(ua);
+
+  if (isMobile)
+    return (
+      <>
+        <MobileLoginView />
+        {isWithdrawn && <WithdrawnAlert token={token!} />}
+      </>
+    );
+  if (isTablet)
+    return (
+      <>
+        <TabletLoginView />
+        {isWithdrawn && <WithdrawnAlert token={token!} />}
+      </>
+    );
 
   return (
     <>
