@@ -1,4 +1,5 @@
 import { headers } from 'next/headers';
+import { userAgent } from 'next/server';
 import { css } from 'styled-system/css';
 import { hstack } from 'styled-system/patterns';
 import { KakaoLoginButton } from '@/features/login/components/KakaoLoginButton';
@@ -18,11 +19,9 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
   const isWithdrawn = status === 'withdrawn' && !!token;
 
   const headersList = await headers();
-  const ua = headersList.get('user-agent') ?? '';
-  const isMobile = /iPhone|Android.*Mobile|Mobile.*Android|Windows Phone/i.test(
-    ua,
-  );
-  const isTablet = /iPad|Android(?!.*Mobile)|Tablet/i.test(ua);
+  const { device } = userAgent({ headers: headersList });
+  const isMobile = device.type === 'mobile';
+  const isTablet = device.type === 'tablet';
 
   if (isMobile)
     return (
