@@ -5,7 +5,7 @@ import { useParams } from 'next/navigation';
 import { PersonalLeftContainer } from '@/features/assignment/personal/components/PersonalLeftContainer';
 import { PersonalRightContainer } from '@/features/assignment/personal/components/PersonalRightContainer';
 import { usePersonalTaskDetail } from '@/features/assignment/personal/components/hooks/usePersonalTaskDetail';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function PersonalPage() {
   const params = useParams();
@@ -14,6 +14,13 @@ export default function PersonalPage() {
   const { data, isLoading } = usePersonalTaskDetail(taskId);
   // 수정 모드 상태 (오른쪽 영역도 비활성화하기 위해 page 레벨에서 관리)
   const [isEditMode, setIsEditMode] = useState(false);
+
+  useEffect(() => {
+    if (data?.title) {
+      document.title = `${data.title} | CHECKTASK`;
+    }
+    return () => { document.title = 'CHECKTASK'; };
+  }, [data?.title]);
 
   if (isLoading || !data) {
     return (

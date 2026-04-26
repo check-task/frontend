@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { Divider } from '@/components/Divider';
 import { AssignmentHeader } from '@/features/assignment/components/AssignmentHeader';
@@ -48,6 +48,15 @@ export default function TeamAssignmentDetailPage() {
     null,
   );
   const [showUndoToast, setShowUndoToast] = useState(false);
+
+  useEffect(() => {
+    if (data?.title) {
+      document.title = `${data.title} | CHECKTASK`;
+    }
+    return () => {
+      document.title = 'CHECKTASK';
+    };
+  }, [data?.title]);
 
   const enterEditMode = () => {
     setIsEditMode(true);
