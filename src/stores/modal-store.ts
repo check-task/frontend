@@ -3,10 +3,11 @@ import { ReactNode } from 'react';
 
 // 모달을 열 때 넘겨줄 것들
 interface ModalOptions {
-  title: string;
+  title?: string;
   content: ReactNode; // 모달 내부 내용
   headerType?: 'none' | 'withClose' | 'withCheck';
   onRightClick?: () => void;
+  presentation?: 'default' | 'bare';
 }
 
 // 모달 상태

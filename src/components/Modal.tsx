@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { css, cva } from '../../styled-system/css';
 import { stack } from '../../styled-system/patterns';
 import { CloseIcon } from './icons/CloseIcon';
@@ -63,7 +63,13 @@ export const Modal = () => {
 
   // 모달이 열려있지 않거나 서버에서 실행되는 경우를 차단
   if (!isOpen || !options || typeof window === 'undefined') return null;
-  const { title, content, headerType = 'withClose', onRightClick } = options;
+  const {
+    title,
+    content,
+    headerType = 'withClose',
+    onRightClick,
+    presentation = 'default',
+  } = options;
 
   return createPortal(
     // 오버레이 부분
@@ -74,19 +80,27 @@ export const Modal = () => {
           onClick={(e) => e.stopPropagation()}
           className={modalContainerStyle}
         >
-          <div className={stack({ gap: '1rem', width: 'full' })}>
-            {/* 모달 해더 */}
-            <header className={headerRecipe({ type: headerType })}>
-              <div className={css({ textStyle: 'body1.m', color: 'gray.900' })}>
-                {title}
+          {presentation === 'bare' ? (
+            content
+          ) : (
+            <>
+              <div className={stack({ gap: '1rem', width: 'full' })}>
+                {/* 모달 해더 */}
+                <header className={headerRecipe({ type: headerType })}>
+                  <div
+                    className={css({ textStyle: 'body1.m', color: 'gray.900' })}
+                  >
+                    {title}
+                  </div>
+                  {renderIcon()}
+                </header>
+                {/* 선 역할 */}
+                <span className={dividerStyle} />
               </div>
-              {renderIcon()}
-            </header>
-            {/* 선 역할 */}
-            <span className={dividerStyle} />
-          </div>
-          {/* 컨텐츠 영역 */}
-          <div className={css({ width: 'full' })}>{content}</div>
+              {/* 컨텐츠 영역 */}
+              <div className={css({ width: 'full' })}>{content}</div>
+            </>
+          )}
         </div>
       </div>
     </div>,
