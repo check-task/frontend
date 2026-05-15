@@ -55,7 +55,7 @@ export const LoginModalContent = () => {
             <Input
               className={cx(
                 passwordInputStyle,
-                emailFocused && css({ borderTopColor: 'gray.400!' }),
+                emailFocused && css({ borderTopColor: 'gray.600!' }),
               )}
               type={showPassword ? 'text' : 'password'}
               size='basic'
@@ -165,17 +165,9 @@ const inputGroupStyle = css(
   }),
 );
 
-const inputBaseStyle = {
+const emailInputStyle = css({
   width: 'full',
   height: '3rem',
-  borderColor: 'gray.200!',
-  _focus: {
-    borderColor: 'gray.400!',
-  },
-} as const;
-
-const emailInputStyle = css({
-  ...inputBaseStyle,
   borderWidth: '1px',
   borderStyle: 'solid',
   borderBottomWidth: 0,
@@ -189,7 +181,8 @@ const passwordFieldStyle = css({
 });
 
 const passwordInputStyle = css({
-  ...inputBaseStyle,
+  width: 'full',
+  height: '3rem',
   pr: '3rem',
   borderWidth: '1px',
   borderStyle: 'solid',
