@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { Modal } from '@/components/Modal';
 import { GuestGuard } from '@/providers/auth-provider';
 
 export const metadata: Metadata = {
@@ -10,5 +11,10 @@ export default function SignupLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <GuestGuard>{children}</GuestGuard>;
+  return (
+    <GuestGuard>
+      {children}
+      <Modal />
+    </GuestGuard>
+  );
 }

@@ -6,16 +6,32 @@ import { css } from 'styled-system/css';
 import { hstack, stack } from 'styled-system/patterns';
 import { Button } from '@/components/Button';
 import { ModalCheckIcon } from '@/components/icons/ModalCheckIcon';
+import { PrivacyPolicyContent } from '@/features/profile/components/PrivacyPolicyContent';
+import { TermsOfServiceContent } from '@/features/profile/components/TermsOfServiceContent';
+import { useModalStore } from '@/stores/modal-store';
 
 type TermKey = 'privacy' | 'terms' | 'age';
+type ViewableTermKey = Exclude<TermKey, 'age'>;
 
 const REQUIRED_KEYS: TermKey[] = ['privacy', 'terms', 'age'];
+
+const TERM_MODAL_CONFIG = {
+  privacy: {
+    title: '개인정보 처리방침',
+    content: <PrivacyPolicyContent />,
+  },
+  terms: {
+    title: '서비스 이용 약관',
+    content: <TermsOfServiceContent />,
+  },
+} as const;
 
 interface SignupTermsStepProps {
   onNext: () => void;
 }
 
 export const SignupTermsStep = ({ onNext }: SignupTermsStepProps) => {
+  const openModal = useModalStore((state) => state.openModal);
   const [agreed, setAgreed] = useState<Record<TermKey, boolean>>({
     privacy: false,
     terms: false,
@@ -31,6 +47,14 @@ export const SignupTermsStep = ({ onNext }: SignupTermsStepProps) => {
 
   const toggleTerm = (key: TermKey) => {
     setAgreed((prev) => ({ ...prev, [key]: !prev[key] }));
+  };
+
+  const openTermModal = (key: ViewableTermKey) => {
+    openModal({
+      title: TERM_MODAL_CONFIG[key].title,
+      content: TERM_MODAL_CONFIG[key].content,
+      headerType: 'withClose',
+    });
   };
 
   return (
@@ -70,13 +94,13 @@ export const SignupTermsStep = ({ onNext }: SignupTermsStepProps) => {
                 label='개인정보 처리방침'
                 checked={agreed.privacy}
                 onToggle={() => toggleTerm('privacy')}
-                showViewAll
+                onViewAll={() => openTermModal('privacy')}
               />
               <TermRow
-                label='서비스 이용약관'
+                label='서비스 이용 약관'
                 checked={agreed.terms}
                 onToggle={() => toggleTerm('terms')}
-                showViewAll
+                onViewAll={() => openTermModal('terms')}
               />
               <TermRow
                 label='만 14세 이상입니다'
@@ -106,15 +130,15 @@ const TermRow = ({
   label,
   checked,
   onToggle,
-  showViewAll = false,
+  onViewAll,
 }: {
   label: string;
   checked: boolean;
   onToggle: () => void;
-  showViewAll?: boolean;
+  onViewAll?: () => void;
 }) => {
   return (
-    <div className={showViewAll ? termRowStyle : termToggleStyle}>
+    <div className={onViewAll ? termRowStyle : termToggleStyle}>
       <div className={termToggleStyle}>
         <button
           type='button'
@@ -134,8 +158,12 @@ const TermRow = ({
           <span className={termTextStyle}>{label}</span>
         </button>
       </div>
-      {showViewAll && (
-        <button type='button' className={viewAllButtonStyle}>
+      {onViewAll && (
+        <button
+          type='button'
+          className={viewAllButtonStyle}
+          onClick={onViewAll}
+        >
           전체보기
         </button>
       )}
