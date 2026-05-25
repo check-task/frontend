@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useEffect } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, notFound } from 'next/navigation';
 import { Divider } from '@/components/Divider';
 import { AssignmentHeader } from '@/features/assignment/components/AssignmentHeader';
 import { TeamHeaderButton } from '@/features/assignment/team/components/TeamHeaderButtonGroup';
@@ -34,7 +34,7 @@ export default function TeamAssignmentDetailPage() {
   const contentWidth = isSidebarCollapsed
     ? CONTENT_WIDTH_COLLAPSED
     : CONTENT_WIDTH_EXPANDED;
-  const { data, isLoading, isError, error } = useTeamTaskDetail(taskId);
+  const { data, isLoading, isError } = useTeamTaskDetail(taskId);
   const { mutate: mutateDeleteAll } = useDeleteAllSubTasks(taskId);
   const { mutate: mutateDeleteBulk } = useDeleteSubTasks(taskId);
   const { mutate: mutateUpdateBatch } = useUpdateSubTasks(taskId);
@@ -190,22 +190,7 @@ export default function TeamAssignmentDetailPage() {
   }
 
   if (isError) {
-    const message =
-      (error as { response?: { data?: { reason?: string } } })?.response?.data
-        ?.reason ?? '과제를 찾을 수 없습니다.';
-    return (
-      <div className={outerContainerStyle}>
-        <div
-          className={css({
-            py: '3rem',
-            textStyle: 'body1.m',
-            color: 'red.500',
-          })}
-        >
-          {message}
-        </div>
-      </div>
-    );
+    notFound();
   }
 
   return (

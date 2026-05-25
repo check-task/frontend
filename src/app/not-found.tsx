@@ -1,11 +1,17 @@
-import Link from 'next/link';
+'use client';
+
+import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { css } from 'styled-system/css';
+import { Button } from '@/components/Button';
 
 const img404 = '/404.png';
 const imgEllipse1 = '/404-ellipse-1.svg';
 const imgEllipse2 = '/404-ellipse-2.svg';
 
 export default function NotFound() {
+  const router = useRouter();
+
   return (
     <div className={pageStyle}>
       <div className={ellipse1OuterStyle}>
@@ -54,9 +60,11 @@ export default function NotFound() {
 
       <div className={contentStyle}>
         <div className={upperGroupStyle}>
-          <img
+          <Image
             alt="404"
             src={img404}
+            width={440}
+            height={172}
             className={css({
               w: '27.5rem',
               h: '10.75rem',
@@ -70,10 +78,10 @@ export default function NotFound() {
             <div className={descGroupStyle}>
               <p className={subtitleStyle}>길을 잃으셨나요? 걱정 마세요. 기록은 안전합니다.</p>
               <div className={descStyle}>
-                <p className={css({ mb: '0', lineHeight: 1.5, whiteSpace: 'pre' })}>
+                <p className={css({ mb: '0', lineHeight: 'normal', whiteSpace: 'pre' })}>
                   {` 요청하신 페이지를 찾을 수 없지만, 과제들은 잘 보관되어 있어요. `}
                 </p>
-                <p className={css({ lineHeight: 1.5, whiteSpace: 'pre' })}>
+                <p className={css({ lineHeight: 'normal', whiteSpace: 'pre' })}>
                   다시 홈으로 가서 남은 일정을 관리해 볼까요?
                 </p>
               </div>
@@ -81,9 +89,7 @@ export default function NotFound() {
           </div>
         </div>
 
-        <Link href="/" className={homeButtonStyle}>
-          홈으로 가기
-        </Link>
+        <Button onClick={() => router.push('/')}>홈으로 가기</Button>
       </div>
     </div>
   );
@@ -160,13 +166,13 @@ const textBlockStyle = css({
   flexDir: 'column',
   alignItems: 'center',
   gap: '1.25rem',
-  fontWeight: 500,
+  fontWeight: 'medium',
 });
 
 const titleStyle = css({
   fontSize: '2.75rem',
-  fontWeight: 500,
-  lineHeight: 1.5,
+  fontWeight: 'medium',
+  lineHeight: 'normal',
   letterSpacing: '-0.01em',
   color: 'blue.700',
   whiteSpace: 'nowrap',
@@ -182,32 +188,10 @@ const descGroupStyle = css({
 });
 
 const subtitleStyle = css({
-  fontSize: '1.5rem',
-  lineHeight: 1.4,
-  letterSpacing: '-0.01em',
+  textStyle: 'h3',
   whiteSpace: 'nowrap',
 });
 
 const descStyle = css({
-  fontSize: '1.25rem',
-  letterSpacing: '-0.02em',
-});
-
-const homeButtonStyle = css({
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  h: '3.375rem',
-  w: '24.125rem',
-  py: '0.9375rem',
-  borderRadius: '0.5rem',
-  bg: 'primary',
-  color: 'primary-button-text',
-  textStyle: 'btn',
-  cursor: 'pointer',
-  textDecoration: 'none',
-  _hover: {
-    bg: '#1D6BDD',
-    transition: 'background-color 0.3s ease-out',
-  },
+  textStyle: 'h4',
 });
