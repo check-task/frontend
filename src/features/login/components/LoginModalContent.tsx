@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from 'react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { css, cx } from 'styled-system/css';
 import { hstack, stack } from 'styled-system/patterns';
 import { Button } from '@/components/Button';
@@ -9,8 +10,11 @@ import { Input } from '@/components/TextField';
 import { KakaoLoginButton } from '@/features/login/components/KakaoLoginButton';
 import { EyeIcon } from '@/components/icons/EyeIcon';
 import { EyeOffIcon } from '@/components/icons/EyeOffIcon';
+import { useModalStore } from '@/stores/modal-store';
 
 export const LoginModalContent = () => {
+  const router = useRouter();
+  const closeModal = useModalStore((state) => state.closeModal);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -19,6 +23,11 @@ export const LoginModalContent = () => {
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+  };
+
+  const handleSignupClick = () => {
+    closeModal();
+    router.push('/signup');
   };
 
   return (
@@ -77,7 +86,11 @@ export const LoginModalContent = () => {
         </div>
 
         <div className={linkRowStyle}>
-          <button type='button' className={subLinkStyle}>
+          <button
+            type='button'
+            className={subLinkStyle}
+            onClick={handleSignupClick}
+          >
             회원가입
           </button>
           <div className={findLinkGroupStyle}>
