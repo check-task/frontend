@@ -11,10 +11,12 @@ import { KakaoLoginButton } from '@/features/login/components/KakaoLoginButton';
 import { EyeIcon } from '@/components/icons/EyeIcon';
 import { EyeOffIcon } from '@/components/icons/EyeOffIcon';
 import { useModalStore } from '@/stores/modal-store';
+import { PasswordResetModalContent } from '@/features/login/components/PasswordResetModalContent';
 
 export const LoginModalContent = () => {
   const router = useRouter();
   const closeModal = useModalStore((state) => state.closeModal);
+  const [mode, setMode] = useState<'login' | 'passwordReset'>('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -29,6 +31,10 @@ export const LoginModalContent = () => {
     closeModal();
     router.push('/signup');
   };
+
+  if (mode === 'passwordReset') {
+    return <PasswordResetModalContent onBackToLogin={() => setMode('login')} />;
+  }
 
   return (
     <form className={containerStyle} onSubmit={handleSubmit}>
@@ -93,15 +99,13 @@ export const LoginModalContent = () => {
           >
             회원가입
           </button>
-          <div className={findLinkGroupStyle}>
-            <button type='button' className={subLinkStyle}>
-              이메일 찾기
-            </button>
-            <span className={verticalDividerStyle} />
-            <button type='button' className={subLinkStyle}>
-              비밀번호 찾기
-            </button>
-          </div>
+          <button
+            type='button'
+            className={subLinkStyle}
+            onClick={() => setMode('passwordReset')}
+          >
+            비밀번호 찾기
+          </button>
         </div>
       </div>
 
@@ -225,22 +229,10 @@ const linkRowStyle = css(
   }),
 );
 
-const findLinkGroupStyle = css(
-  hstack.raw({
-    gap: '0.25rem',
-  }),
-);
-
 const subLinkStyle = css({
   textStyle: 'body4.r',
   color: 'gray.400',
   cursor: 'pointer',
-});
-
-const verticalDividerStyle = css({
-  width: '0.0625rem',
-  height: '0.875rem',
-  bg: 'gray.400',
 });
 
 const dividerRowStyle = css(
