@@ -28,7 +28,7 @@ export const ModeSwitchToggle = ({
     return (
       <div
         style={{
-          width: collapsed ? '2.5rem' : '6.25rem',
+          width: collapsed ? '2.5rem' : '6.0625rem',
           height: '2.5rem',
           visibility: 'hidden',
         }}
@@ -132,7 +132,7 @@ const containerStyle = cva({
         justifyContent: 'center',
       },
       false: {
-        w: '6.25rem',
+        w: '6.0625rem',
         h: '2.5rem',
         px: '0.75rem',
       },
@@ -173,12 +173,12 @@ const iconContainerStyle = cva({
       },
       false: {
         position: 'absolute',
-        left: '0.75rem',
+        left: '0.5rem',
       },
     },
     isLightAndExpanded: {
       true: {
-        transform: 'translateX(calc(6.25rem - 0.75rem - 0.75rem - 1.5rem))',
+        transform: 'translateX(calc(6.0625rem - 0.5rem - 0.5rem - 1.75rem))',
       },
       false: {
         transform: 'translateX(0)',
