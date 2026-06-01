@@ -22,3 +22,27 @@ export interface SignupRequest {
   password: string;
   nickname: string;
 }
+
+export interface SigninRequest {
+  email: string;
+  password: string;
+}
+
+export interface SigninUser {
+  id: number;
+  email: string;
+  nickname: string;
+}
+
+export interface SigninSuccessData {
+  accessToken: string;
+  accessTokenExpireIn: number;
+  user: SigninUser;
+}
+
+export interface SigninWithdrawnData {
+  withdrawnUser: true;
+  restoreToken: string;
+}
+
+export type SigninResponseData = SigninSuccessData | SigninWithdrawnData;

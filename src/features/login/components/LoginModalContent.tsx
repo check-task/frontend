@@ -1,8 +1,9 @@
 'use client';
 
-import { FormEvent, useState } from 'react';
+import { ChangeEvent, FormEvent, useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { isAxiosError } from 'axios';
 import { css, cx } from 'styled-system/css';
 import { hstack, stack } from 'styled-system/patterns';
 import { Button } from '@/components/Button';
@@ -12,24 +13,79 @@ import { EyeIcon } from '@/components/icons/EyeIcon';
 import { EyeOffIcon } from '@/components/icons/EyeOffIcon';
 import { useModalStore } from '@/stores/modal-store';
 import { PasswordResetModalContent } from '@/features/login/components/PasswordResetModalContent';
+import { signin } from '@/services/auth';
+import { useAuthStore } from '@/stores/auth-store';
+
+const getLoginErrorMessage = (error: unknown) => {
+  if (!isAxiosError(error)) return '로그인에 실패했습니다.';
+
+  const data = error.response?.data as
+    | { reason?: string; message?: string; errorCode?: string }
+    | undefined;
+
+  if (data?.errorCode === 'INVALID_CREDENTIALS') {
+    return '이메일 또는 비밀번호가 올바르지 않습니다.';
+  }
+
+  return data?.reason ?? data?.message ?? '로그인에 실패했습니다.';
+};
 
 export const LoginModalContent = () => {
   const router = useRouter();
   const closeModal = useModalStore((state) => state.closeModal);
+  const login = useAuthStore((state) => state.login);
   const [mode, setMode] = useState<'login' | 'passwordReset'>('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [emailFocused, setEmailFocused] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [loginError, setLoginError] = useState('');
   const canSubmit = email.trim().length > 0 && password.length > 0;
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (!canSubmit || isSubmitting) return;
+
+    setIsSubmitting(true);
+    setLoginError('');
+
+    try {
+      const data = await signin({
+        email: email.trim(),
+        password,
+      });
+
+      if ('withdrawnUser' in data) {
+        setLoginError(
+          '탈퇴 처리된 계정입니다. 계정 복구는 다음 단계에서 지원할 예정입니다.',
+        );
+        return;
+      }
+
+      login(data.accessToken);
+      closeModal();
+      router.replace('/');
+    } catch (error) {
+      setLoginError(getLoginErrorMessage(error));
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleSignupClick = () => {
     closeModal();
     router.push('/signup');
+  };
+
+  const handleEmailChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setEmail(event.target.value);
+    setLoginError('');
+  };
+
+  const handlePasswordChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setPassword(event.target.value);
+    setLoginError('');
   };
 
   if (mode === 'passwordReset') {
@@ -62,7 +118,7 @@ export const LoginModalContent = () => {
             size='basic'
             value={email}
             placeholder='이메일을 입력하세요.'
-            onChange={(event) => setEmail(event.target.value)}
+            onChange={handleEmailChange}
             onFocus={() => setEmailFocused(true)}
             onBlur={() => setEmailFocused(false)}
           />
@@ -76,7 +132,7 @@ export const LoginModalContent = () => {
               size='basic'
               value={password}
               placeholder='비밀번호를 입력하세요.'
-              onChange={(event) => setPassword(event.target.value)}
+              onChange={handlePasswordChange}
             />
             {password.length > 0 && (
               <button
@@ -109,13 +165,15 @@ export const LoginModalContent = () => {
         </div>
       </div>
 
+      {loginError && <p className={loginErrorStyle}>{loginError}</p>}
+
       <Button
         type='submit'
         variant='fillBlue'
         size='xlarge'
-        disabled={!canSubmit}
+        disabled={!canSubmit || isSubmitting}
       >
-        로그인
+        {isSubmitting ? '로그인 중...' : '로그인'}
       </Button>
 
       <div className={dividerRowStyle}>
@@ -233,6 +291,14 @@ const subLinkStyle = css({
   textStyle: 'body4.r',
   color: 'gray.400',
   cursor: 'pointer',
+});
+
+const loginErrorStyle = css({
+  width: '24.125rem',
+  mt: '0.5rem',
+  mb: '0.75rem',
+  textStyle: 'body3.r',
+  color: 'sub.01.100',
 });
 
 const dividerRowStyle = css(

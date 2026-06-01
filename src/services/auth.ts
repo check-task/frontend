@@ -3,6 +3,8 @@ import type {
   ApiResponse,
   CheckEmailResponseData,
   SendEmailCodeRequest,
+  SigninRequest,
+  SigninResponseData,
   SignupRequest,
   VerifyEmailCodeRequest,
 } from '@/types/api/auth';
@@ -37,4 +39,19 @@ export const verifySignupEmailCode = async (
 
 export const signup = async (body: SignupRequest): Promise<void> => {
   await axiosInstance.post<ApiResponse>('/auth/signup', body);
+};
+
+export const signin = async (
+  body: SigninRequest,
+): Promise<SigninResponseData> => {
+  const res = await axiosInstance.post<ApiResponse<SigninResponseData>>(
+    '/auth/signin',
+    body,
+  );
+
+  if (!res.data.data) {
+    throw new Error('로그인 응답이 올바르지 않습니다.');
+  }
+
+  return res.data.data;
 };

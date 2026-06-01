@@ -27,9 +27,18 @@ axiosInstance.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
+    const isSigninRequest = originalRequest?.url?.includes('/auth/signin');
+
+    if (isSigninRequest) {
+      return Promise.reject(error);
+    }
 
     // 401 에러이고, 아직 재시도하지 않은 요청인 경우
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    if (
+      error.response?.status === 401 &&
+      originalRequest &&
+      !originalRequest._retry
+    ) {
       originalRequest._retry = true; // 무한 루프 방지
 
       // 서버 환경에서는 토큰 갱신 불가
