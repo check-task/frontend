@@ -3,6 +3,7 @@
 import { ChangeEvent, FormEvent, useState } from 'react';
 import Image from 'next/image';
 import { isAxiosError } from 'axios';
+import { z } from 'zod';
 import { css } from 'styled-system/css';
 import { hstack, stack } from 'styled-system/patterns';
 import { Button } from '@/components/Button';
@@ -19,11 +20,36 @@ import {
 
 const PASSWORD_MIN = 8;
 const PASSWORD_MAX = 20;
+const PASSWORD_SPECIAL_REGEX = /[!@#$%^&*(),.?":{}|<>]/;
 
-const hasSpecialChar = (str: string) => /[!@#$%^&*(),.?":{}|<>]/.test(str);
+const hasSpecialChar = (str: string) => PASSWORD_SPECIAL_REGEX.test(str);
 
 type ResetStep = 'email' | 'code' | 'password' | 'confirm' | 'complete';
 type RuleState = 'idle' | 'valid' | 'invalid';
+
+const emailSchema = z.email('올바른 이메일 형식으로 입력해 주세요.');
+
+const passwordResetCodeSchema = z.object({
+  email: emailSchema,
+  code: z.string().trim().length(6, '인증코드는 6자리입니다.'),
+});
+
+const passwordSchema = z
+  .string()
+  .min(PASSWORD_MIN, `비밀번호는 ${PASSWORD_MIN}자 이상이어야 합니다.`)
+  .max(PASSWORD_MAX, `비밀번호는 ${PASSWORD_MAX}자 이하여야 합니다.`)
+  .regex(PASSWORD_SPECIAL_REGEX, '비밀번호에 특수문자가 포함되어야 합니다.');
+
+const passwordResetConfirmSchema = z
+  .object({
+    resetToken: z.string().min(1, '인증을 다시 진행해 주세요.'),
+    password: passwordSchema,
+    passwordConfirm: z.string().min(1, '비밀번호 확인을 입력해 주세요.'),
+  })
+  .refine((data) => data.password === data.passwordConfirm, {
+    path: ['passwordConfirm'],
+    message: '비밀번호가 불일치합니다.',
+  });
 
 const getApiErrorMessage = (error: unknown, fallback: string) => {
   if (!isAxiosError(error)) return fallback;
@@ -98,11 +124,32 @@ export const PasswordResetModalContent = ({
     setPasswordResetError('');
   };
 
+  const handlePasswordChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setPassword(event.target.value);
+    setPasswordResetError('');
+  };
+
+  const handlePasswordConfirmChange = (
+    event: ChangeEvent<HTMLInputElement>,
+  ) => {
+    setPasswordConfirm(event.target.value);
+    setPasswordResetError('');
+  };
+
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (isSubmitting) return;
 
-    if (step === 'email' && email.trim()) {
+    if (step === 'email') {
+      const parsed = emailSchema.safeParse(email.trim());
+
+      if (!parsed.success) {
+        setEmailError(
+          parsed.error.issues[0]?.message ?? '이메일을 확인해 주세요.',
+        );
+        return;
+      }
+
       setIsSubmitting(true);
       setEmailError('');
       setCode('');
@@ -110,7 +157,7 @@ export const PasswordResetModalContent = ({
       setCodeStatus('idle');
 
       try {
-        await sendPasswordResetCode({ email: email.trim() });
+        await sendPasswordResetCode({ email: parsed.data });
         setStep('code');
       } catch (error) {
         setEmailError(
@@ -122,15 +169,28 @@ export const PasswordResetModalContent = ({
       return;
     }
 
-    if (step === 'code' && code.trim().length === 6) {
+    if (step === 'code') {
+      const parsed = passwordResetCodeSchema.safeParse({
+        email: email.trim(),
+        code: code.trim(),
+      });
+
+      if (!parsed.success) {
+        setCodeStatus('invalid');
+        setCodeError(
+          parsed.error.issues[0]?.message ?? '인증코드를 확인해 주세요.',
+        );
+        return;
+      }
+
       setIsSubmitting(true);
       setCodeError('');
       setCodeStatus('idle');
 
       try {
         const { resetToken } = await verifyPasswordResetCode({
-          email: email.trim(),
-          code: code.trim(),
+          email: parsed.data.email,
+          code: parsed.data.code,
         });
         setResetToken(resetToken);
         setCodeStatus('valid');
@@ -145,14 +205,31 @@ export const PasswordResetModalContent = ({
       return;
     }
 
-    if (step === 'password' && isPasswordValid) {
+    if (step === 'password') {
+      const parsed = passwordSchema.safeParse(password);
+
+      if (!parsed.success) {
+        setPasswordResetError(
+          parsed.error.issues[0]?.message ?? '비밀번호를 확인해 주세요.',
+        );
+        return;
+      }
+
       setStep('confirm');
       return;
     }
 
-    if (step === 'confirm' && isPasswordConfirmValid) {
-      if (!resetToken) {
-        setPasswordResetError('인증을 다시 진행해 주세요.');
+    if (step === 'confirm') {
+      const parsed = passwordResetConfirmSchema.safeParse({
+        resetToken,
+        password,
+        passwordConfirm,
+      });
+
+      if (!parsed.success) {
+        setPasswordResetError(
+          parsed.error.issues[0]?.message ?? '비밀번호를 확인해 주세요.',
+        );
         return;
       }
 
@@ -161,8 +238,8 @@ export const PasswordResetModalContent = ({
 
       try {
         await confirmPasswordReset({
-          resetToken,
-          newPassword: password,
+          resetToken: parsed.data.resetToken,
+          newPassword: parsed.data.password,
         });
         setStep('complete');
       } catch (error) {
@@ -179,6 +256,7 @@ export const PasswordResetModalContent = ({
     <form
       className={step === 'complete' ? completeContainerStyle : containerStyle}
       onSubmit={handleSubmit}
+      noValidate
     >
       <Header />
 
@@ -247,12 +325,15 @@ export const PasswordResetModalContent = ({
               placeholder='비밀번호'
               showPassword={showPassword}
               onToggleShow={() => setShowPassword((prev) => !prev)}
-              onChange={(event) => setPassword(event.target.value)}
+              onChange={handlePasswordChange}
             />
             <PasswordRules
               lengthState={getRuleState(password, isPasswordLengthValid)}
               specialState={getRuleState(password, isPasswordSpecialValid)}
             />
+            {passwordResetError && (
+              <p className={errorStyle}>{passwordResetError}</p>
+            )}
           </div>
         </ResetPanel>
       )}
@@ -270,7 +351,7 @@ export const PasswordResetModalContent = ({
               placeholder='비밀번호'
               showPassword={showPasswordConfirm}
               onToggleShow={() => setShowPasswordConfirm((prev) => !prev)}
-              onChange={(event) => setPasswordConfirm(event.target.value)}
+              onChange={handlePasswordConfirmChange}
             />
             {isPasswordConfirmInvalid && (
               <p className={errorStyle}>비밀번호가 불일치합니다.</p>
