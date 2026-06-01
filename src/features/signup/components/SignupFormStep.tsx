@@ -2,6 +2,8 @@
 
 import { ChangeEvent, FormEvent, useRef, useState } from 'react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import { isAxiosError } from 'axios';
 import { css } from 'styled-system/css';
 import { hstack, stack } from 'styled-system/patterns';
 import { Button } from '@/components/Button';
@@ -11,6 +13,13 @@ import { CloseIcon } from '@/components/icons/CloseIcon';
 import { EyeIcon } from '@/components/icons/EyeIcon';
 import { EyeOffIcon } from '@/components/icons/EyeOffIcon';
 import { ProfileChangeIcon } from '@/components/icons/ProfileChangeIcon';
+import {
+  checkEmailDuplicate,
+  resendSignupEmailCode,
+  sendSignupEmailCode,
+  signup,
+  verifySignupEmailCode,
+} from '@/services/auth';
 
 const NICKNAME_MAX = 30;
 const PASSWORD_MIN = 8;
@@ -18,21 +27,61 @@ const PASSWORD_MAX = 20;
 
 const hasSpecialChar = (str: string) => /[!@#$%^&*(),.?":{}|<>]/.test(str);
 
+const getApiErrorMessage = (error: unknown, fallback: string) => {
+  if (!isAxiosError(error)) return fallback;
+
+  const data = error.response?.data as
+    | { reason?: string; message?: string; errorCode?: string }
+    | undefined;
+
+  return data?.reason ?? data?.message ?? fallback;
+};
+
+const getEmailCodeErrorMessage = (error: unknown) => {
+  if (!isAxiosError(error)) return '인증코드가 불일치합니다.';
+
+  const data = error.response?.data as
+    | { reason?: string; message?: string; errorCode?: string }
+    | undefined;
+
+  if (data?.errorCode === 'INVALID_CODE') {
+    return '인증코드가 불일치합니다.';
+  }
+
+  return data?.reason ?? data?.message ?? '인증코드가 불일치합니다.';
+};
+
+type Feedback = {
+  type: 'success' | 'error';
+  message: string;
+};
+
 interface SignupFormStepProps {
   onCancel: () => void;
 }
 
 export const SignupFormStep = ({ onCancel }: SignupFormStepProps) => {
+  const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const [email, setEmail] = useState('');
+  const [emailCode, setEmailCode] = useState('');
+  const [emailCodeSent, setEmailCodeSent] = useState(false);
   const [emailVerified, setEmailVerified] = useState(false);
+  const [emailSendError, setEmailSendError] = useState('');
+  const [emailCodeFeedback, setEmailCodeFeedback] = useState<Feedback | null>(
+    null,
+  );
   const [password, setPassword] = useState('');
   const [passwordConfirm, setPasswordConfirm] = useState('');
   const [nickname, setNickname] = useState('');
   const [phone, setPhone] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
+  const [isEmailCodeSending, setIsEmailCodeSending] = useState(false);
+  const [isEmailCodeVerifying, setIsEmailCodeVerifying] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState('');
 
   const isPasswordLengthValid =
     password.length >= PASSWORD_MIN && password.length <= PASSWORD_MAX;
@@ -57,9 +106,117 @@ export const SignupFormStep = ({ onCancel }: SignupFormStepProps) => {
     nickname.length > 0 &&
     nickname.length <= NICKNAME_MAX;
 
+  const emailActionButtonVariant =
+    emailVerified || email.trim().length === 0
+      ? 'fillGray'
+      : emailCodeSent
+        ? 'strokeBlue'
+        : 'fillBlue';
+
+  const emailActionButtonLabel = emailVerified
+    ? '인증완료'
+    : emailCodeSent
+      ? isEmailCodeSending
+        ? '재발송중'
+        : '인증코드 재발송'
+      : isEmailCodeSending
+        ? '발송중'
+        : '인증코드 발송';
+
+  const canVerifyEmailCode =
+    emailCodeSent &&
+    !emailVerified &&
+    emailCode.trim().length > 0 &&
+    !isEmailCodeVerifying;
+
   const handleEmailChange = (e: ChangeEvent<HTMLInputElement>) => {
     setEmail(e.target.value);
+    setEmailCode('');
+    setEmailCodeSent(false);
     setEmailVerified(false);
+    setEmailSendError('');
+    setEmailCodeFeedback(null);
+    setSubmitError('');
+  };
+
+  const handleEmailCodeChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setEmailCode(e.target.value);
+    setEmailCodeFeedback(null);
+    setSubmitError('');
+  };
+
+  const handleSendEmailCode = async () => {
+    const trimmedEmail = email.trim();
+    if (!trimmedEmail || isEmailCodeSending) return;
+
+    const shouldResend = emailCodeSent && !emailVerified;
+
+    setIsEmailCodeSending(true);
+    setEmailCode('');
+    setEmailVerified(false);
+    setEmailSendError('');
+    setEmailCodeFeedback(null);
+    setSubmitError('');
+
+    try {
+      const { isDuplicate } = await checkEmailDuplicate(trimmedEmail);
+
+      if (isDuplicate) {
+        setEmailSendError('이미 가입된 이메일입니다.');
+        setEmailCodeSent(false);
+        return;
+      }
+
+      if (shouldResend) {
+        await resendSignupEmailCode({ email: trimmedEmail });
+      } else {
+        await sendSignupEmailCode({ email: trimmedEmail });
+      }
+      setEmailCodeSent(true);
+    } catch (error) {
+      setEmailSendError(
+        getApiErrorMessage(error, '인증코드 발송에 실패했습니다.'),
+      );
+    } finally {
+      setIsEmailCodeSending(false);
+    }
+  };
+
+  const handleVerifyEmailCode = async () => {
+    const trimmedEmail = email.trim();
+    const trimmedCode = emailCode.trim();
+    if (
+      !trimmedEmail ||
+      !emailCodeSent ||
+      !trimmedCode ||
+      isEmailCodeVerifying
+    ) {
+      return;
+    }
+
+    setIsEmailCodeVerifying(true);
+    setEmailCodeFeedback(null);
+    setSubmitError('');
+
+    try {
+      await verifySignupEmailCode({
+        email: trimmedEmail,
+        code: trimmedCode,
+      });
+      setEmailVerified(true);
+      setEmailCodeFeedback({
+        type: 'success',
+        message: '인증되었습니다.',
+      });
+    } catch (error) {
+      setEmailVerified(false);
+      setEmailCodeFeedback({
+        type: 'error',
+        message: getEmailCodeErrorMessage(error),
+      });
+    } finally {
+      setIsEmailCodeVerifying(false);
+    }
   };
 
   const handleProfileChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -73,8 +230,25 @@ export const SignupFormStep = ({ onCancel }: SignupFormStepProps) => {
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!canSubmit || isSubmitting) return;
+
+    setIsSubmitting(true);
+    setSubmitError('');
+
+    try {
+      await signup({
+        email: email.trim(),
+        password,
+        nickname: nickname.trim(),
+      });
+      router.replace('/login');
+    } catch (error) {
+      setSubmitError(getApiErrorMessage(error, '회원가입에 실패했습니다.'));
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -94,28 +268,76 @@ export const SignupFormStep = ({ onCancel }: SignupFormStepProps) => {
 
           <div className={bodyStyle}>
             <div className={fieldsStyle}>
-              <div className={emailFieldStyle}>
-                <FieldRow label='이메일' required>
-                  <Input
-                    type='email'
-                    size='basic'
-                    placeholder='이메일'
-                    value={email}
-                    onChange={handleEmailChange}
-                    className={inputStyle}
-                  />
-                </FieldRow>
-                <div className={fieldAsideStyle}>
-                  <Button
-                    type='button'
-                    variant='fillBlue'
-                    size='small'
-                    className={emailVerifyButtonStyle}
-                    disabled={email.trim().length === 0 || emailVerified}
-                    onClick={() => setEmailVerified(true)}
-                  >
-                    {emailVerified ? '인증완료' : '이메일 인증'}
-                  </Button>
+              <div className={emailAuthGroupStyle}>
+                <div className={emailFieldStyle}>
+                  <FieldRow label='이메일' required>
+                    <Input
+                      type='email'
+                      size='basic'
+                      placeholder='이메일'
+                      value={email}
+                      onChange={handleEmailChange}
+                      className={inputStyle}
+                      readOnly={emailVerified}
+                    />
+                  </FieldRow>
+                  <div className={fieldAsideStyle}>
+                    <Button
+                      type='button'
+                      variant={emailActionButtonVariant}
+                      size='small'
+                      className={emailVerifyButtonStyle}
+                      disabled={
+                        email.trim().length === 0 ||
+                        emailVerified ||
+                        isEmailCodeSending
+                      }
+                      onClick={handleSendEmailCode}
+                    >
+                      {emailActionButtonLabel}
+                    </Button>
+                    {emailSendError && (
+                      <p className={fieldAsideErrorStyle}>{emailSendError}</p>
+                    )}
+                  </div>
+                </div>
+
+                <div className={emailFieldStyle}>
+                  <FieldRow label='인증코드' required>
+                    <Input
+                      type='text'
+                      size='basic'
+                      placeholder='인증코드'
+                      value={emailCode}
+                      onChange={handleEmailCodeChange}
+                      className={inputStyle}
+                      readOnly={emailVerified}
+                    />
+                  </FieldRow>
+                  <div className={fieldAsideStyle}>
+                    {emailCodeFeedback ? (
+                      <p
+                        className={
+                          emailCodeFeedback.type === 'success'
+                            ? fieldAsideSuccessStyle
+                            : fieldAsideErrorStyle
+                        }
+                      >
+                        {emailCodeFeedback.message}
+                      </p>
+                    ) : (
+                      <Button
+                        type='button'
+                        variant='fillBlue'
+                        size='small'
+                        className={emailVerifyButtonStyle}
+                        disabled={!canVerifyEmailCode}
+                        onClick={handleVerifyEmailCode}
+                      >
+                        {isEmailCodeVerifying ? '확인중' : '인증하기'}
+                      </Button>
+                    )}
+                  </div>
                 </div>
               </div>
 
@@ -290,6 +512,7 @@ export const SignupFormStep = ({ onCancel }: SignupFormStepProps) => {
               <span>*</span>
               항목은 필수입니다.
             </p>
+            {submitError && <p className={submitErrorStyle}>{submitError}</p>}
           </div>
         </section>
 
@@ -308,9 +531,9 @@ export const SignupFormStep = ({ onCancel }: SignupFormStepProps) => {
             variant='fillBlue'
             size='medium'
             className={actionButtonStyle}
-            disabled={!canSubmit}
+            disabled={!canSubmit || isSubmitting}
           >
-            회원가입
+            {isSubmitting ? '가입중' : '회원가입'}
           </Button>
         </div>
       </form>
@@ -396,8 +619,8 @@ const cardStyle = css(
     width: 'full',
     alignItems: 'flex-start',
     px: '1.875rem',
-    py: '3rem',
-    gap: '2.25rem',
+    py: '3.5rem',
+    gap: '3rem',
     borderWidth: '0.0625rem',
     borderColor: 'gray.200',
     borderRadius: '0.75rem',
@@ -408,7 +631,7 @@ const cardStyle = css(
 const headerStyle = css(
   hstack.raw({
     justifyContent: 'space-between',
-    width: 'full',
+    width: '31.875rem',
     height: '1.8125rem',
   }),
 );
@@ -428,7 +651,7 @@ const bodyStyle = css(
 
 const fieldsStyle = css(
   stack.raw({
-    gap: '1.75rem',
+    gap: '2.5rem',
     width: 'full',
   }),
 );
@@ -498,6 +721,13 @@ const eyeButtonStyle = css({
   cursor: 'pointer',
 });
 
+const emailAuthGroupStyle = css(
+  stack.raw({
+    gap: '1.25rem',
+    width: 'full',
+  }),
+);
+
 const emailFieldStyle = css(
   stack.raw({
     gap: '0.75rem',
@@ -514,11 +744,14 @@ const fieldWithHintStyle = css(
 
 const fieldAsideStyle = css({
   pl: '8.5rem',
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'flex-start',
+  gap: '0.5rem',
 });
 
 const emailVerifyButtonStyle = css({
   width: '11.5rem',
-  height: '2.625rem',
 });
 
 const passwordHintListStyle = css(
@@ -564,6 +797,16 @@ const fieldSuccessStyle = css({
 
 const fieldErrorStyle = css({
   pl: '8.5rem',
+  textStyle: 'body3.r',
+  color: 'sub.01.100',
+});
+
+const fieldAsideSuccessStyle = css({
+  textStyle: 'body3.r',
+  color: 'primary',
+});
+
+const fieldAsideErrorStyle = css({
   textStyle: 'body3.r',
   color: 'sub.01.100',
 });
@@ -616,6 +859,11 @@ const requiredNoticeStyle = css({
   '& span': {
     fontWeight: 500,
   },
+});
+
+const submitErrorStyle = css({
+  textStyle: 'body3.r',
+  color: 'sub.01.100',
 });
 
 const hiddenInputStyle = css({
