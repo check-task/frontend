@@ -2,6 +2,7 @@
 
 import { ChangeEvent, FormEvent, useState } from 'react';
 import Image from 'next/image';
+import { isAxiosError } from 'axios';
 import { css } from 'styled-system/css';
 import { hstack, stack } from 'styled-system/patterns';
 import { Button } from '@/components/Button';
@@ -10,6 +11,11 @@ import { CheckMark } from '@/components/icons/CheckMark';
 import { CloseIcon } from '@/components/icons/CloseIcon';
 import { EyeIcon } from '@/components/icons/EyeIcon';
 import { EyeOffIcon } from '@/components/icons/EyeOffIcon';
+import {
+  confirmPasswordReset,
+  sendPasswordResetCode,
+  verifyPasswordResetCode,
+} from '@/services/auth';
 
 const PASSWORD_MIN = 8;
 const PASSWORD_MAX = 20;
@@ -18,6 +24,30 @@ const hasSpecialChar = (str: string) => /[!@#$%^&*(),.?":{}|<>]/.test(str);
 
 type ResetStep = 'email' | 'code' | 'password' | 'confirm' | 'complete';
 type RuleState = 'idle' | 'valid' | 'invalid';
+
+const getApiErrorMessage = (error: unknown, fallback: string) => {
+  if (!isAxiosError(error)) return fallback;
+
+  const data = error.response?.data as
+    | { reason?: string; message?: string; errorCode?: string }
+    | undefined;
+
+  return data?.reason ?? data?.message ?? fallback;
+};
+
+const getPasswordResetCodeErrorMessage = (error: unknown) => {
+  if (!isAxiosError(error)) return '인증번호가 불일치합니다.';
+
+  const data = error.response?.data as
+    | { reason?: string; message?: string; errorCode?: string }
+    | undefined;
+
+  if (data?.errorCode === 'INVALID_CODE') {
+    return '인증번호가 불일치합니다.';
+  }
+
+  return data?.reason ?? data?.message ?? '인증번호가 불일치합니다.';
+};
 
 interface PasswordResetModalContentProps {
   onBackToLogin: () => void;
@@ -29,6 +59,7 @@ export const PasswordResetModalContent = ({
   const [step, setStep] = useState<ResetStep>('email');
   const [email, setEmail] = useState('');
   const [code, setCode] = useState('');
+  const [resetToken, setResetToken] = useState('');
   const [password, setPassword] = useState('');
   const [passwordConfirm, setPasswordConfirm] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -36,6 +67,10 @@ export const PasswordResetModalContent = ({
   const [codeStatus, setCodeStatus] = useState<'idle' | 'valid' | 'invalid'>(
     'idle',
   );
+  const [emailError, setEmailError] = useState('');
+  const [codeError, setCodeError] = useState('');
+  const [passwordResetError, setPasswordResetError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const isPasswordLengthValid =
     password.length >= PASSWORD_MIN && password.length <= PASSWORD_MAX;
@@ -48,34 +83,95 @@ export const PasswordResetModalContent = ({
 
   const handleEmailChange = (event: ChangeEvent<HTMLInputElement>) => {
     setEmail(event.target.value);
+    setCode('');
+    setResetToken('');
+    setCodeStatus('idle');
+    setEmailError('');
+    setCodeError('');
+    setPasswordResetError('');
   };
 
   const handleCodeChange = (event: ChangeEvent<HTMLInputElement>) => {
     setCode(event.target.value);
     setCodeStatus('idle');
+    setCodeError('');
+    setPasswordResetError('');
   };
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (isSubmitting) return;
 
     if (step === 'email' && email.trim()) {
-      setStep('code');
-      return;
-    }
-    if (step === 'code' && code.trim().length === 6) {
-      if (codeStatus === 'valid') {
-        setStep('password');
-        return;
+      setIsSubmitting(true);
+      setEmailError('');
+      setCode('');
+      setResetToken('');
+      setCodeStatus('idle');
+
+      try {
+        await sendPasswordResetCode({ email: email.trim() });
+        setStep('code');
+      } catch (error) {
+        setEmailError(
+          getApiErrorMessage(error, '인증코드 발송에 실패했습니다.'),
+        );
+      } finally {
+        setIsSubmitting(false);
       }
-      setCodeStatus('valid');
       return;
     }
+
+    if (step === 'code' && code.trim().length === 6) {
+      setIsSubmitting(true);
+      setCodeError('');
+      setCodeStatus('idle');
+
+      try {
+        const { resetToken } = await verifyPasswordResetCode({
+          email: email.trim(),
+          code: code.trim(),
+        });
+        setResetToken(resetToken);
+        setCodeStatus('valid');
+        setStep('password');
+      } catch (error) {
+        setResetToken('');
+        setCodeStatus('invalid');
+        setCodeError(getPasswordResetCodeErrorMessage(error));
+      } finally {
+        setIsSubmitting(false);
+      }
+      return;
+    }
+
     if (step === 'password' && isPasswordValid) {
       setStep('confirm');
       return;
     }
+
     if (step === 'confirm' && isPasswordConfirmValid) {
-      setStep('complete');
+      if (!resetToken) {
+        setPasswordResetError('인증을 다시 진행해 주세요.');
+        return;
+      }
+
+      setIsSubmitting(true);
+      setPasswordResetError('');
+
+      try {
+        await confirmPasswordReset({
+          resetToken,
+          newPassword: password,
+        });
+        setStep('complete');
+      } catch (error) {
+        setPasswordResetError(
+          getApiErrorMessage(error, '비밀번호 재설정에 실패했습니다.'),
+        );
+      } finally {
+        setIsSubmitting(false);
+      }
     }
   };
 
@@ -90,16 +186,20 @@ export const PasswordResetModalContent = ({
         <ResetPanel
           title='이메일 입력'
           description='가입하신 이메일을 입력하세요.'
-          buttonDisabled={!email.trim()}
+          buttonDisabled={!email.trim() || isSubmitting}
+          buttonLabel={isSubmitting ? '발송중' : '다음'}
         >
-          <Input
-            type='email'
-            size='basic'
-            value={email}
-            placeholder='이메일'
-            onChange={handleEmailChange}
-            className={inputStyle}
-          />
+          <div className={fieldWithMessageStyle}>
+            <Input
+              type='email'
+              size='basic'
+              value={email}
+              placeholder='이메일'
+              onChange={handleEmailChange}
+              className={inputStyle}
+            />
+            {emailError && <p className={errorStyle}>{emailError}</p>}
+          </div>
         </ResetPanel>
       )}
 
@@ -107,7 +207,8 @@ export const PasswordResetModalContent = ({
         <ResetPanel
           title='인증코드 입력'
           description='이메일로 전송된 인증코드를 입력하세요.'
-          buttonDisabled={code.trim().length !== 6}
+          buttonDisabled={code.trim().length !== 6 || isSubmitting}
+          buttonLabel={isSubmitting ? '확인중' : '다음'}
         >
           <div className={fieldWithMessageStyle}>
             <Input
@@ -127,7 +228,7 @@ export const PasswordResetModalContent = ({
               >
                 {codeStatus === 'valid'
                   ? '인증번호가 일치합니다.'
-                  : '인증번호가 불일치합니다.'}
+                  : codeError || '인증번호가 불일치합니다.'}
               </p>
             )}
           </div>
@@ -138,7 +239,7 @@ export const PasswordResetModalContent = ({
         <ResetPanel
           title='비밀번호 설정'
           description='사용하실 새로운 비밀번호를 입력하세요.'
-          buttonDisabled={!isPasswordValid}
+          buttonDisabled={!isPasswordValid || isSubmitting}
         >
           <div className={passwordFieldGroupStyle}>
             <PasswordField
@@ -160,7 +261,8 @@ export const PasswordResetModalContent = ({
         <ResetPanel
           title='비밀번호 확인'
           description='사용하실 새로운 비밀번호를 다시 입력하세요.'
-          buttonDisabled={!isPasswordConfirmValid}
+          buttonDisabled={!isPasswordConfirmValid || isSubmitting}
+          buttonLabel={isSubmitting ? '변경중' : '다음'}
         >
           <div className={fieldWithMessageStyle}>
             <PasswordField
@@ -175,6 +277,9 @@ export const PasswordResetModalContent = ({
             )}
             {isPasswordConfirmValid && (
               <p className={successMessageStyle}>비밀번호가 일치합니다.</p>
+            )}
+            {passwordResetError && (
+              <p className={errorStyle}>{passwordResetError}</p>
             )}
           </div>
         </ResetPanel>
@@ -222,11 +327,13 @@ const ResetPanel = ({
   title,
   description,
   buttonDisabled,
+  buttonLabel = '다음',
   children,
 }: {
   title: string;
   description: string;
   buttonDisabled: boolean;
+  buttonLabel?: string;
   children: React.ReactNode;
 }) => {
   return (
@@ -246,7 +353,7 @@ const ResetPanel = ({
         className={nextButtonStyle}
         disabled={buttonDisabled}
       >
-        다음
+        {buttonLabel}
       </Button>
     </div>
   );

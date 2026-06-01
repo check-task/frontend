@@ -2,6 +2,10 @@ import axiosInstance from '@/lib/axiosInstance';
 import type {
   ApiResponse,
   CheckEmailResponseData,
+  PasswordResetConfirmRequest,
+  PasswordResetSendCodeRequest,
+  PasswordResetVerifyCodeRequest,
+  PasswordResetVerifyCodeResponseData,
   RestoreLocalAccountRequest,
   RestoreLocalAccountResponseData,
   SendEmailCodeRequest,
@@ -70,4 +74,30 @@ export const restoreLocalAccount = async (
   }
 
   return res.data.data;
+};
+
+export const sendPasswordResetCode = async (
+  body: PasswordResetSendCodeRequest,
+): Promise<void> => {
+  await axiosInstance.post<ApiResponse>('/auth/password/reset/send', body);
+};
+
+export const verifyPasswordResetCode = async (
+  body: PasswordResetVerifyCodeRequest,
+): Promise<PasswordResetVerifyCodeResponseData> => {
+  const res = await axiosInstance.post<
+    ApiResponse<PasswordResetVerifyCodeResponseData>
+  >('/auth/password/reset/verify', body);
+
+  if (!res.data.data) {
+    throw new Error('인증코드 검증 응답이 올바르지 않습니다.');
+  }
+
+  return res.data.data;
+};
+
+export const confirmPasswordReset = async (
+  body: PasswordResetConfirmRequest,
+): Promise<void> => {
+  await axiosInstance.post<ApiResponse>('/auth/password/reset/confirm', body);
 };

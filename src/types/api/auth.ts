@@ -55,3 +55,21 @@ export interface RestoreLocalAccountResponseData {
   accessToken: string;
   accessTokenExpireIn: number;
 }
+
+export interface PasswordResetSendCodeRequest {
+  email: string;
+}
+
+export interface PasswordResetVerifyCodeRequest {
+  email: string;
+  code: string;
+}
+
+export interface PasswordResetVerifyCodeResponseData {
+  resetToken: string;
+}
+
+export interface PasswordResetConfirmRequest {
+  resetToken: string;
+  newPassword: string;
+}
