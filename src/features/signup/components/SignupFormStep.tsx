@@ -4,6 +4,7 @@ import { ChangeEvent, FormEvent, useRef, useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { isAxiosError } from 'axios';
+import { z } from 'zod';
 import { css } from 'styled-system/css';
 import { hstack, stack } from 'styled-system/patterns';
 import { Button } from '@/components/Button';
@@ -24,8 +25,42 @@ import {
 const NICKNAME_MAX = 30;
 const PASSWORD_MIN = 8;
 const PASSWORD_MAX = 20;
+const PASSWORD_SPECIAL_REGEX = /[!@#$%^&*(),.?":{}|<>]/;
 
-const hasSpecialChar = (str: string) => /[!@#$%^&*(),.?":{}|<>]/.test(str);
+const hasSpecialChar = (str: string) => PASSWORD_SPECIAL_REGEX.test(str);
+
+const emailSchema = z.email('올바른 이메일 형식으로 입력해 주세요.');
+
+const emailCodeSchema = z.object({
+  email: emailSchema,
+  code: z.string().trim().length(6, '인증코드는 6자리입니다.'),
+});
+
+const signupSchema = z
+  .object({
+    email: emailSchema,
+    password: z
+      .string()
+      .min(PASSWORD_MIN, `비밀번호는 ${PASSWORD_MIN}자 이상이어야 합니다.`)
+      .max(PASSWORD_MAX, `비밀번호는 ${PASSWORD_MAX}자 이하여야 합니다.`)
+      .regex(
+        PASSWORD_SPECIAL_REGEX,
+        '비밀번호에 특수문자가 포함되어야 합니다.',
+      ),
+    passwordConfirm: z.string().min(1, '비밀번호 확인을 입력해 주세요.'),
+    nickname: z
+      .string()
+      .trim()
+      .min(1, '닉네임을 입력해 주세요.')
+      .max(
+        NICKNAME_MAX,
+        `닉네임은 최대 ${NICKNAME_MAX}자까지 입력할 수 있어요`,
+      ),
+  })
+  .refine((data) => data.password === data.passwordConfirm, {
+    path: ['passwordConfirm'],
+    message: '비밀번호가 일치하지 않아요',
+  });
 
 const getApiErrorMessage = (error: unknown, fallback: string) => {
   if (!isAxiosError(error)) return fallback;
@@ -146,8 +181,20 @@ export const SignupFormStep = ({ onCancel }: SignupFormStepProps) => {
   };
 
   const handleSendEmailCode = async () => {
-    const trimmedEmail = email.trim();
-    if (!trimmedEmail || isEmailCodeSending) return;
+    if (isEmailCodeSending) return;
+
+    const parsed = emailSchema.safeParse(email.trim());
+
+    if (!parsed.success) {
+      setEmailSendError(
+        parsed.error.issues[0]?.message ?? '이메일을 확인해 주세요.',
+      );
+      setEmailCodeSent(false);
+      setEmailVerified(false);
+      return;
+    }
+
+    const trimmedEmail = parsed.data;
 
     const shouldResend = emailCodeSent && !emailVerified;
 
@@ -183,14 +230,20 @@ export const SignupFormStep = ({ onCancel }: SignupFormStepProps) => {
   };
 
   const handleVerifyEmailCode = async () => {
-    const trimmedEmail = email.trim();
-    const trimmedCode = emailCode.trim();
-    if (
-      !trimmedEmail ||
-      !emailCodeSent ||
-      !trimmedCode ||
-      isEmailCodeVerifying
-    ) {
+    if (!emailCodeSent || isEmailCodeVerifying) {
+      return;
+    }
+
+    const parsed = emailCodeSchema.safeParse({
+      email: email.trim(),
+      code: emailCode.trim(),
+    });
+
+    if (!parsed.success) {
+      setEmailCodeFeedback({
+        type: 'error',
+        message: parsed.error.issues[0]?.message ?? '인증코드를 확인해 주세요.',
+      });
       return;
     }
 
@@ -200,8 +253,8 @@ export const SignupFormStep = ({ onCancel }: SignupFormStepProps) => {
 
     try {
       await verifySignupEmailCode({
-        email: trimmedEmail,
-        code: trimmedCode,
+        email: parsed.data.email,
+        code: parsed.data.code,
       });
       setEmailVerified(true);
       setEmailCodeFeedback({
@@ -232,16 +285,35 @@ export const SignupFormStep = ({ onCancel }: SignupFormStepProps) => {
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!canSubmit || isSubmitting) return;
+    if (isSubmitting) return;
+
+    const parsed = signupSchema.safeParse({
+      email: email.trim(),
+      password,
+      passwordConfirm,
+      nickname,
+    });
+
+    if (!parsed.success) {
+      setSubmitError(
+        parsed.error.issues[0]?.message ?? '회원가입 정보를 확인해 주세요.',
+      );
+      return;
+    }
+
+    if (!emailVerified) {
+      setSubmitError('이메일 인증이 필요합니다.');
+      return;
+    }
 
     setIsSubmitting(true);
     setSubmitError('');
 
     try {
       await signup({
-        email: email.trim(),
-        password,
-        nickname: nickname.trim(),
+        email: parsed.data.email,
+        password: parsed.data.password,
+        nickname: parsed.data.nickname,
       });
       router.replace('/login');
     } catch (error) {
@@ -253,7 +325,7 @@ export const SignupFormStep = ({ onCancel }: SignupFormStepProps) => {
 
   return (
     <div className={pageStyle}>
-      <form className={formStyle} onSubmit={handleSubmit}>
+      <form className={formStyle} onSubmit={handleSubmit} noValidate>
         <section className={cardStyle}>
           <header className={headerStyle}>
             <Image
