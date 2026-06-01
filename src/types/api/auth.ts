@@ -46,3 +46,12 @@ export interface SigninWithdrawnData {
 }
 
 export type SigninResponseData = SigninSuccessData | SigninWithdrawnData;
+
+export interface RestoreLocalAccountRequest {
+  token: string;
+}
+
+export interface RestoreLocalAccountResponseData {
+  accessToken: string;
+  accessTokenExpireIn: number;
+}

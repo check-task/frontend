@@ -15,6 +15,7 @@ import { useModalStore } from '@/stores/modal-store';
 import { PasswordResetModalContent } from '@/features/login/components/PasswordResetModalContent';
 import { signin } from '@/services/auth';
 import { useAuthStore } from '@/stores/auth-store';
+import { RestoreModalContent } from '@/features/login/components/RestoreModalContent';
 
 const getLoginErrorMessage = (error: unknown) => {
   if (!isAxiosError(error)) return '로그인에 실패했습니다.';
@@ -33,6 +34,7 @@ const getLoginErrorMessage = (error: unknown) => {
 export const LoginModalContent = () => {
   const router = useRouter();
   const closeModal = useModalStore((state) => state.closeModal);
+  const openModal = useModalStore((state) => state.openModal);
   const login = useAuthStore((state) => state.login);
   const [mode, setMode] = useState<'login' | 'passwordReset'>('login');
   const [email, setEmail] = useState('');
@@ -57,9 +59,16 @@ export const LoginModalContent = () => {
       });
 
       if ('withdrawnUser' in data) {
-        setLoginError(
-          '탈퇴 처리된 계정입니다. 계정 복구는 다음 단계에서 지원할 예정입니다.',
-        );
+        openModal({
+          title: '계정 복구 안내',
+          content: (
+            <RestoreModalContent
+              token={data.restoreToken}
+              restoreType='local'
+            />
+          ),
+          headerType: 'none',
+        });
         return;
       }
 

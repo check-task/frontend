@@ -2,6 +2,8 @@ import axiosInstance from '@/lib/axiosInstance';
 import type {
   ApiResponse,
   CheckEmailResponseData,
+  RestoreLocalAccountRequest,
+  RestoreLocalAccountResponseData,
   SendEmailCodeRequest,
   SigninRequest,
   SigninResponseData,
@@ -51,6 +53,20 @@ export const signin = async (
 
   if (!res.data.data) {
     throw new Error('로그인 응답이 올바르지 않습니다.');
+  }
+
+  return res.data.data;
+};
+
+export const restoreLocalAccount = async (
+  token: RestoreLocalAccountRequest['token'],
+): Promise<RestoreLocalAccountResponseData> => {
+  const res = await axiosInstance.post<
+    ApiResponse<RestoreLocalAccountResponseData>
+  >('/auth/local/restore', { token });
+
+  if (!res.data.data) {
+    throw new Error('계정 복구 응답이 올바르지 않습니다.');
   }
 
   return res.data.data;

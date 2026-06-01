@@ -8,12 +8,19 @@ import { Modal } from '@/features/profile/components/ModalContent';
 import { restoreAccount } from '@/services/user';
 import { useAuthStore } from '@/stores/auth-store';
 import { useAlertStore } from '@/stores/alert-store';
+import { restoreLocalAccount } from '@/services/auth';
+
+type RestoreType = 'kakao' | 'local';
 
 interface RestoreModalContentProps {
   token: string;
+  restoreType?: RestoreType;
 }
 
-export const RestoreModalContent = ({ token }: RestoreModalContentProps) => {
+export const RestoreModalContent = ({
+  token,
+  restoreType = 'kakao',
+}: RestoreModalContentProps) => {
   const closeModal = useModalStore((state) => state.closeModal);
   const login = useAuthStore((state) => state.login);
   const router = useRouter();
@@ -23,7 +30,9 @@ export const RestoreModalContent = ({ token }: RestoreModalContentProps) => {
   const handleRestore = async () => {
     setIsLoading(true);
     try {
-      const { accessToken } = await restoreAccount(token);
+      const restore =
+        restoreType === 'local' ? restoreLocalAccount : restoreAccount;
+      const { accessToken } = await restore(token);
       login(accessToken);
       closeModal();
       router.replace('/');
