@@ -1,6 +1,12 @@
 'use client';
 
-import { ChangeEvent, FormEvent, useEffect, useRef, useState } from 'react';
+import {
+  ChangeEvent,
+  FormEvent,
+  useEffect,
+  // useRef,
+  useState,
+} from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { isAxiosError } from 'axios';
@@ -13,7 +19,7 @@ import { CheckMark } from '@/components/icons/CheckMark';
 import { CloseIcon } from '@/components/icons/CloseIcon';
 import { EyeIcon } from '@/components/icons/EyeIcon';
 import { EyeOffIcon } from '@/components/icons/EyeOffIcon';
-import { ProfileChangeIcon } from '@/components/icons/ProfileChangeIcon';
+// import { ProfileChangeIcon } from '@/components/icons/ProfileChangeIcon';
 import {
   checkEmailDuplicate,
   resendSignupEmailCode,
@@ -105,8 +111,8 @@ interface SignupFormStepProps {
 
 export const SignupFormStep = ({ onCancel }: SignupFormStepProps) => {
   const router = useRouter();
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const [profileImage, setProfileImage] = useState<string | null>(null);
+  // const fileInputRef = useRef<HTMLInputElement>(null);
+  // const [profileImage, setProfileImage] = useState<string | null>(null);
   const [email, setEmail] = useState('');
   const [emailCode, setEmailCode] = useState('');
   const [emailCodeSent, setEmailCodeSent] = useState(false);
@@ -122,7 +128,7 @@ export const SignupFormStep = ({ onCancel }: SignupFormStepProps) => {
   const [password, setPassword] = useState('');
   const [passwordConfirm, setPasswordConfirm] = useState('');
   const [nickname, setNickname] = useState('');
-  const [phone, setPhone] = useState('');
+  // const [phone, setPhone] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
   const [isEmailCodeSending, setIsEmailCodeSending] = useState(false);
@@ -339,16 +345,16 @@ export const SignupFormStep = ({ onCancel }: SignupFormStepProps) => {
     }
   };
 
-  const handleProfileChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setProfileImage(URL.createObjectURL(file));
-  };
+  // const handleProfileChange = (e: ChangeEvent<HTMLInputElement>) => {
+  //   const file = e.target.files?.[0];
+  //   if (!file) return;
+  //   setProfileImage(URL.createObjectURL(file));
+  // };
 
-  const handleProfileDelete = () => {
-    setProfileImage(null);
-    if (fileInputRef.current) fileInputRef.current.value = '';
-  };
+  // const handleProfileDelete = () => {
+  //   setProfileImage(null);
+  //   if (fileInputRef.current) fileInputRef.current.value = '';
+  // };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -595,7 +601,7 @@ export const SignupFormStep = ({ onCancel }: SignupFormStepProps) => {
                 )}
               </div>
 
-              <FieldRow label='전화번호'>
+              {/* <FieldRow label='전화번호'>
                 <Input
                   type='tel'
                   size='basic'
@@ -604,9 +610,9 @@ export const SignupFormStep = ({ onCancel }: SignupFormStepProps) => {
                   onChange={(e) => setPhone(e.target.value)}
                   className={inputStyle}
                 />
-              </FieldRow>
+              </FieldRow> */}
 
-              <FieldRow label='프로필 사진' align='start'>
+              {/* <FieldRow label='프로필 사진' align='start'>
                 {profileImage ? (
                   <div className={profilePreviewGroupStyle}>
                     <div className={profileImageWrapperStyle}>
@@ -658,7 +664,7 @@ export const SignupFormStep = ({ onCancel }: SignupFormStepProps) => {
                   className={hiddenInputStyle}
                   onChange={handleProfileChange}
                 />
-              </FieldRow>
+              </FieldRow> */}
             </div>
 
             <p className={requiredNoticeStyle}>
@@ -997,44 +1003,44 @@ const fieldAsideErrorStyle = css({
   color: 'sub.01.100',
 });
 
-const imageAddButtonStyle = css({
-  width: '11.5rem',
-  height: '2.625rem',
-});
+// const imageAddButtonStyle = css({
+//   width: '11.5rem',
+//   height: '2.625rem',
+// });
 
-const profilePreviewGroupStyle = css(
-  stack.raw({
-    alignItems: 'flex-start',
-    gap: '0.75rem',
-  }),
-);
+// const profilePreviewGroupStyle = css(
+//   stack.raw({
+//     alignItems: 'flex-start',
+//     gap: '0.75rem',
+//   }),
+// );
 
-const profileImageWrapperStyle = css({
-  position: 'relative',
-  width: '7.5rem',
-  height: '7.5rem',
-  borderRadius: 'full',
-  overflow: 'hidden',
-  bg: '#D9D9D9',
-});
+// const profileImageWrapperStyle = css({
+//   position: 'relative',
+//   width: '7.5rem',
+//   height: '7.5rem',
+//   borderRadius: 'full',
+//   overflow: 'hidden',
+//   bg: '#D9D9D9',
+// });
 
-const profileButtonsStyle = css(
-  hstack.raw({
-    alignItems: 'flex-start',
-    gap: '0.5rem',
-  }),
-);
+// const profileButtonsStyle = css(
+//   hstack.raw({
+//     alignItems: 'flex-start',
+//     gap: '0.5rem',
+//   }),
+// );
 
-const profileActionButtonStyle = css({
-  display: 'inline-flex',
-  alignItems: 'flex-start',
-  pb: '0.125rem',
-  borderBottom: '0.0625rem solid',
-  borderColor: 'gray.200',
-  textStyle: 'body4.r',
-  color: 'gray.400',
-  cursor: 'pointer',
-});
+// const profileActionButtonStyle = css({
+//   display: 'inline-flex',
+//   alignItems: 'flex-start',
+//   pb: '0.125rem',
+//   borderBottom: '0.0625rem solid',
+//   borderColor: 'gray.200',
+//   textStyle: 'body4.r',
+//   color: 'gray.400',
+//   cursor: 'pointer',
+// });
 
 const requiredNoticeStyle = css({
   display: 'flex',
@@ -1052,9 +1058,9 @@ const submitErrorStyle = css({
   color: 'sub.01.100',
 });
 
-const hiddenInputStyle = css({
-  display: 'none',
-});
+// const hiddenInputStyle = css({
+//   display: 'none',
+// });
 
 const bottomButtonsStyle = css(
   hstack.raw({
