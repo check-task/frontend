@@ -4,6 +4,7 @@ import { ChangeEvent, FormEvent, useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { isAxiosError } from 'axios';
+import { z } from 'zod';
 import { css, cx } from 'styled-system/css';
 import { hstack, stack } from 'styled-system/patterns';
 import { Button } from '@/components/Button';
@@ -16,6 +17,11 @@ import { PasswordResetModalContent } from '@/features/login/components/PasswordR
 import { signin } from '@/services/auth';
 import { useAuthStore } from '@/stores/auth-store';
 import { RestoreModalContent } from '@/features/login/components/RestoreModalContent';
+
+const loginSchema = z.object({
+  email: z.email('올바른 이메일 형식으로 입력해 주세요.'),
+  password: z.string().min(1, '비밀번호를 입력해 주세요.'),
+});
 
 const getLoginErrorMessage = (error: unknown) => {
   if (!isAxiosError(error)) return '로그인에 실패했습니다.';
@@ -49,14 +55,23 @@ export const LoginModalContent = () => {
     event.preventDefault();
     if (!canSubmit || isSubmitting) return;
 
+    const parsed = loginSchema.safeParse({
+      email: email.trim(),
+      password,
+    });
+
+    if (!parsed.success) {
+      setLoginError(
+        parsed.error.issues[0]?.message ?? '로그인 정보를 확인해 주세요.',
+      );
+      return;
+    }
+
     setIsSubmitting(true);
     setLoginError('');
 
     try {
-      const data = await signin({
-        email: email.trim(),
-        password,
-      });
+      const data = await signin(parsed.data);
 
       if ('withdrawnUser' in data) {
         openModal({
@@ -102,7 +117,7 @@ export const LoginModalContent = () => {
   }
 
   return (
-    <form className={containerStyle} onSubmit={handleSubmit}>
+    <form className={containerStyle} onSubmit={handleSubmit} noValidate>
       <div className={introStyle}>
         <Image
           src='/login-logo.svg'
