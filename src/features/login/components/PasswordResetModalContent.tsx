@@ -1,6 +1,6 @@
 'use client';
 
-import { ChangeEvent, FormEvent, useState } from 'react';
+import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import Image from 'next/image';
 import { isAxiosError } from 'axios';
 import { z } from 'zod';
@@ -20,9 +20,17 @@ import {
 
 const PASSWORD_MIN = 8;
 const PASSWORD_MAX = 20;
+const PASSWORD_RESET_CODE_TTL_SECONDS = 120;
+const PASSWORD_RESET_CODE_URGENT_SECONDS = 30;
 const PASSWORD_SPECIAL_REGEX = /[!@#$%^&*(),.?":{}|<>]/;
 
 const hasSpecialChar = (str: string) => PASSWORD_SPECIAL_REGEX.test(str);
+
+const formatRemainingTime = (seconds: number) => {
+  const minutes = Math.floor(seconds / 60);
+  const restSeconds = seconds % 60;
+  return `${String(minutes).padStart(2, '0')}:${String(restSeconds).padStart(2, '0')}`;
+};
 
 type ResetStep = 'email' | 'code' | 'password' | 'confirm' | 'complete';
 type RuleState = 'idle' | 'valid' | 'invalid';
@@ -85,6 +93,8 @@ export const PasswordResetModalContent = ({
   const [step, setStep] = useState<ResetStep>('email');
   const [email, setEmail] = useState('');
   const [code, setCode] = useState('');
+  const [codeExpiresAt, setCodeExpiresAt] = useState<number | null>(null);
+  const [codeRemainingSeconds, setCodeRemainingSeconds] = useState(0);
   const [resetToken, setResetToken] = useState('');
   const [password, setPassword] = useState('');
   const [passwordConfirm, setPasswordConfirm] = useState('');
@@ -106,10 +116,39 @@ export const PasswordResetModalContent = ({
     passwordConfirm.length > 0 && password === passwordConfirm;
   const isPasswordConfirmInvalid =
     passwordConfirm.length > 0 && password !== passwordConfirm;
+  const hasActiveCodeTimer = step === 'code' && codeExpiresAt !== null;
+  const isCodeExpired = hasActiveCodeTimer && codeRemainingSeconds <= 0;
+  const isCodeTimerUrgent =
+    hasActiveCodeTimer &&
+    codeRemainingSeconds <= PASSWORD_RESET_CODE_URGENT_SECONDS;
+
+  useEffect(() => {
+    if (!codeExpiresAt || step !== 'code') return;
+
+    const updateRemainingSeconds = () => {
+      setCodeRemainingSeconds(
+        Math.max(0, Math.ceil((codeExpiresAt - Date.now()) / 1000)),
+      );
+    };
+
+    updateRemainingSeconds();
+    const timerId = window.setInterval(updateRemainingSeconds, 1000);
+
+    return () => window.clearInterval(timerId);
+  }, [codeExpiresAt, step]);
+
+  useEffect(() => {
+    if (!isCodeExpired) return;
+
+    setCodeStatus('invalid');
+    setCodeError('인증 시간이 만료되었습니다. 다시 시도해 주세요.');
+  }, [isCodeExpired]);
 
   const handleEmailChange = (event: ChangeEvent<HTMLInputElement>) => {
     setEmail(event.target.value);
     setCode('');
+    setCodeExpiresAt(null);
+    setCodeRemainingSeconds(0);
     setResetToken('');
     setCodeStatus('idle');
     setEmailError('');
@@ -153,13 +192,19 @@ export const PasswordResetModalContent = ({
       setIsSubmitting(true);
       setEmailError('');
       setCode('');
+      setCodeExpiresAt(null);
+      setCodeRemainingSeconds(0);
       setResetToken('');
       setCodeStatus('idle');
 
       try {
         await sendPasswordResetCode({ email: parsed.data });
+        setCodeExpiresAt(Date.now() + PASSWORD_RESET_CODE_TTL_SECONDS * 1000);
+        setCodeRemainingSeconds(PASSWORD_RESET_CODE_TTL_SECONDS);
         setStep('code');
       } catch (error) {
+        setCodeExpiresAt(null);
+        setCodeRemainingSeconds(0);
         setEmailError(
           getApiErrorMessage(error, '인증코드 발송에 실패했습니다.'),
         );
@@ -170,6 +215,12 @@ export const PasswordResetModalContent = ({
     }
 
     if (step === 'code') {
+      if (isCodeExpired) {
+        setCodeStatus('invalid');
+        setCodeError('인증 시간이 만료되었습니다. 다시 시도해 주세요.');
+        return;
+      }
+
       const parsed = passwordResetCodeSchema.safeParse({
         email: email.trim(),
         code: code.trim(),
@@ -193,6 +244,8 @@ export const PasswordResetModalContent = ({
           code: parsed.data.code,
         });
         setResetToken(resetToken);
+        setCodeExpiresAt(null);
+        setCodeRemainingSeconds(0);
         setCodeStatus('valid');
         setStep('password');
       } catch (error) {
@@ -274,7 +327,7 @@ export const PasswordResetModalContent = ({
               value={email}
               placeholder='이메일'
               onChange={handleEmailChange}
-              className={inputStyle}
+              className={modalInputStyle}
             />
             {emailError && <p className={errorStyle}>{emailError}</p>}
           </div>
@@ -285,19 +338,33 @@ export const PasswordResetModalContent = ({
         <ResetPanel
           title='인증코드 입력'
           description='이메일로 전송된 인증코드를 입력하세요.'
-          buttonDisabled={code.trim().length !== 6 || isSubmitting}
+          buttonDisabled={
+            code.trim().length !== 6 || isCodeExpired || isSubmitting
+          }
           buttonLabel={isSubmitting ? '확인중' : '다음'}
         >
           <div className={fieldWithMessageStyle}>
-            <Input
-              type='text'
-              inputMode='numeric'
-              size='basic'
-              value={code}
-              placeholder='인증코드'
-              onChange={handleCodeChange}
-              className={inputStyle}
-            />
+            <div className={codeInputWrapperStyle}>
+              <Input
+                type='text'
+                inputMode='numeric'
+                size='basic'
+                value={code}
+                placeholder='인증코드'
+                onChange={handleCodeChange}
+                className={codeInputStyle}
+              />
+              {hasActiveCodeTimer && (
+                <span
+                  className={
+                    isCodeTimerUrgent ? codeTimerUrgentStyle : codeTimerStyle
+                  }
+                  aria-live='polite'
+                >
+                  {formatRemainingTime(codeRemainingSeconds)}
+                </span>
+              )}
+            </div>
             {codeStatus !== 'idle' && (
               <p
                 className={
@@ -595,11 +662,42 @@ const sectionDescriptionStyle = css({
   color: 'gray.800',
 });
 
-const inputStyle = css({
+const codeInputWrapperStyle = css({
+  position: 'relative',
+  width: '24.125rem',
+});
+
+const modalInputStyle = css({
   width: '24.125rem',
   height: '3rem',
-  borderColor: 'gray.200',
   color: 'gray.600',
+});
+
+const codeInputStyle = css({
+  width: '24.125rem',
+  height: '3rem',
+  pr: '4rem',
+  color: 'gray.600',
+});
+
+const codeTimerStyle = css({
+  position: 'absolute',
+  top: '50%',
+  right: '0.75rem',
+  transform: 'translateY(-50%)',
+  textStyle: 'body3.m',
+  color: 'blue.500',
+  pointerEvents: 'none',
+});
+
+const codeTimerUrgentStyle = css({
+  position: 'absolute',
+  top: '50%',
+  right: '0.75rem',
+  transform: 'translateY(-50%)',
+  textStyle: 'body3.m',
+  color: 'sub.01.100',
+  pointerEvents: 'none',
 });
 
 const passwordFieldStyle = css({

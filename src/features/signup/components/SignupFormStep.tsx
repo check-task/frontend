@@ -1,6 +1,6 @@
 'use client';
 
-import { ChangeEvent, FormEvent, useRef, useState } from 'react';
+import { ChangeEvent, FormEvent, useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { isAxiosError } from 'axios';
@@ -25,9 +25,17 @@ import {
 const NICKNAME_MAX = 30;
 const PASSWORD_MIN = 8;
 const PASSWORD_MAX = 20;
+const EMAIL_CODE_TTL_SECONDS = 120;
+const EMAIL_CODE_URGENT_SECONDS = 30;
 const PASSWORD_SPECIAL_REGEX = /[!@#$%^&*(),.?":{}|<>]/;
 
 const hasSpecialChar = (str: string) => PASSWORD_SPECIAL_REGEX.test(str);
+
+const formatRemainingTime = (seconds: number) => {
+  const minutes = Math.floor(seconds / 60);
+  const restSeconds = seconds % 60;
+  return `${String(minutes).padStart(2, '0')}:${String(restSeconds).padStart(2, '0')}`;
+};
 
 const emailSchema = z.email('올바른 이메일 형식으로 입력해 주세요.');
 
@@ -103,6 +111,10 @@ export const SignupFormStep = ({ onCancel }: SignupFormStepProps) => {
   const [emailCode, setEmailCode] = useState('');
   const [emailCodeSent, setEmailCodeSent] = useState(false);
   const [emailVerified, setEmailVerified] = useState(false);
+  const [emailCodeExpiresAt, setEmailCodeExpiresAt] = useState<number | null>(
+    null,
+  );
+  const [emailCodeRemainingSeconds, setEmailCodeRemainingSeconds] = useState(0);
   const [emailSendError, setEmailSendError] = useState('');
   const [emailCodeFeedback, setEmailCodeFeedback] = useState<Feedback | null>(
     null,
@@ -122,6 +134,13 @@ export const SignupFormStep = ({ onCancel }: SignupFormStepProps) => {
     password.length >= PASSWORD_MIN && password.length <= PASSWORD_MAX;
   const isPasswordSpecialValid = hasSpecialChar(password);
   const isPasswordValid = isPasswordLengthValid && isPasswordSpecialValid;
+  const hasActiveEmailCodeTimer =
+    emailCodeSent && !emailVerified && emailCodeExpiresAt !== null;
+  const isEmailCodeExpired =
+    hasActiveEmailCodeTimer && emailCodeRemainingSeconds <= 0;
+  const isEmailCodeUrgent =
+    hasActiveEmailCodeTimer &&
+    emailCodeRemainingSeconds <= EMAIL_CODE_URGENT_SECONDS;
 
   const passwordConfirmError =
     passwordConfirm.length > 0 && password !== passwordConfirm
@@ -161,14 +180,41 @@ export const SignupFormStep = ({ onCancel }: SignupFormStepProps) => {
   const canVerifyEmailCode =
     emailCodeSent &&
     !emailVerified &&
+    !isEmailCodeExpired &&
     emailCode.trim().length > 0 &&
     !isEmailCodeVerifying;
+
+  useEffect(() => {
+    if (!emailCodeExpiresAt || emailVerified) return;
+
+    const updateRemainingSeconds = () => {
+      setEmailCodeRemainingSeconds(
+        Math.max(0, Math.ceil((emailCodeExpiresAt - Date.now()) / 1000)),
+      );
+    };
+
+    updateRemainingSeconds();
+    const timerId = window.setInterval(updateRemainingSeconds, 1000);
+
+    return () => window.clearInterval(timerId);
+  }, [emailCodeExpiresAt, emailVerified]);
+
+  useEffect(() => {
+    if (!isEmailCodeExpired || emailCodeFeedback) return;
+
+    setEmailCodeFeedback({
+      type: 'error',
+      message: '인증 시간이 만료되었습니다. 다시 발송해 주세요.',
+    });
+  }, [emailCodeFeedback, isEmailCodeExpired]);
 
   const handleEmailChange = (e: ChangeEvent<HTMLInputElement>) => {
     setEmail(e.target.value);
     setEmailCode('');
     setEmailCodeSent(false);
     setEmailVerified(false);
+    setEmailCodeExpiresAt(null);
+    setEmailCodeRemainingSeconds(0);
     setEmailSendError('');
     setEmailCodeFeedback(null);
     setSubmitError('');
@@ -191,6 +237,8 @@ export const SignupFormStep = ({ onCancel }: SignupFormStepProps) => {
       );
       setEmailCodeSent(false);
       setEmailVerified(false);
+      setEmailCodeExpiresAt(null);
+      setEmailCodeRemainingSeconds(0);
       return;
     }
 
@@ -201,6 +249,8 @@ export const SignupFormStep = ({ onCancel }: SignupFormStepProps) => {
     setIsEmailCodeSending(true);
     setEmailCode('');
     setEmailVerified(false);
+    setEmailCodeExpiresAt(null);
+    setEmailCodeRemainingSeconds(0);
     setEmailSendError('');
     setEmailCodeFeedback(null);
     setSubmitError('');
@@ -211,6 +261,8 @@ export const SignupFormStep = ({ onCancel }: SignupFormStepProps) => {
       if (isDuplicate) {
         setEmailSendError('이미 가입된 이메일입니다.');
         setEmailCodeSent(false);
+        setEmailCodeExpiresAt(null);
+        setEmailCodeRemainingSeconds(0);
         return;
       }
 
@@ -220,7 +272,12 @@ export const SignupFormStep = ({ onCancel }: SignupFormStepProps) => {
         await sendSignupEmailCode({ email: trimmedEmail });
       }
       setEmailCodeSent(true);
+      setEmailCodeFeedback(null);
+      setEmailCodeExpiresAt(Date.now() + EMAIL_CODE_TTL_SECONDS * 1000);
+      setEmailCodeRemainingSeconds(EMAIL_CODE_TTL_SECONDS);
     } catch (error) {
+      setEmailCodeExpiresAt(null);
+      setEmailCodeRemainingSeconds(0);
       setEmailSendError(
         getApiErrorMessage(error, '인증코드 발송에 실패했습니다.'),
       );
@@ -231,6 +288,14 @@ export const SignupFormStep = ({ onCancel }: SignupFormStepProps) => {
 
   const handleVerifyEmailCode = async () => {
     if (!emailCodeSent || isEmailCodeVerifying) {
+      return;
+    }
+
+    if (isEmailCodeExpired) {
+      setEmailCodeFeedback({
+        type: 'error',
+        message: '인증 시간이 만료되었습니다. 다시 발송해 주세요.',
+      });
       return;
     }
 
@@ -257,6 +322,8 @@ export const SignupFormStep = ({ onCancel }: SignupFormStepProps) => {
         code: parsed.data.code,
       });
       setEmailVerified(true);
+      setEmailCodeExpiresAt(null);
+      setEmailCodeRemainingSeconds(0);
       setEmailCodeFeedback({
         type: 'success',
         message: '인증되었습니다.',
@@ -376,15 +443,29 @@ export const SignupFormStep = ({ onCancel }: SignupFormStepProps) => {
 
                 <div className={emailFieldStyle}>
                   <FieldRow label='인증코드' required>
-                    <Input
-                      type='text'
-                      size='basic'
-                      placeholder='인증코드'
-                      value={emailCode}
-                      onChange={handleEmailCodeChange}
-                      className={inputStyle}
-                      readOnly={emailVerified}
-                    />
+                    <div className={emailCodeInputWrapperStyle}>
+                      <Input
+                        type='text'
+                        size='basic'
+                        placeholder='인증코드'
+                        value={emailCode}
+                        onChange={handleEmailCodeChange}
+                        className={emailCodeInputStyle}
+                        readOnly={emailVerified}
+                      />
+                      {hasActiveEmailCodeTimer && (
+                        <span
+                          className={
+                            isEmailCodeUrgent
+                              ? emailCodeTimerUrgentStyle
+                              : emailCodeTimerStyle
+                          }
+                          aria-live='polite'
+                        >
+                          {formatRemainingTime(emailCodeRemainingSeconds)}
+                        </span>
+                      )}
+                    </div>
                   </FieldRow>
                   <div className={fieldAsideStyle}>
                     {emailCodeFeedback ? (
@@ -764,6 +845,39 @@ const inputStyle = css({
   height: '2.625rem',
   color: 'gray.600',
   flexShrink: 0,
+});
+
+const emailCodeInputWrapperStyle = css({
+  position: 'relative',
+  width: '24.75rem',
+  flexShrink: 0,
+});
+
+const emailCodeInputStyle = css({
+  width: '24.75rem',
+  height: '2.625rem',
+  pr: '4rem',
+  color: 'gray.600',
+});
+
+const emailCodeTimerStyle = css({
+  position: 'absolute',
+  top: '50%',
+  right: '0.75rem',
+  transform: 'translateY(-50%)',
+  textStyle: 'body3.m',
+  color: 'blue.500',
+  pointerEvents: 'none',
+});
+
+const emailCodeTimerUrgentStyle = css({
+  position: 'absolute',
+  top: '50%',
+  right: '0.75rem',
+  transform: 'translateY(-50%)',
+  textStyle: 'body3.m',
+  color: 'sub.01.100',
+  pointerEvents: 'none',
 });
 
 const passwordInputStyle = css({
