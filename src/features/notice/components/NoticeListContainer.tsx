@@ -51,6 +51,18 @@ export const NoticeListContainer = () => {
                       ))}
                     </ul>
                   )}
+                  {section.subSections?.map((subSection, subIdx) => (
+                    <div key={subIdx} className={subSectionStyle}>
+                      <p className={subSectionHeadingStyle}>
+                        {subSection.heading}
+                      </p>
+                      <ul className={bulletListStyle}>
+                        {subSection.items.map((item, i) => (
+                          <li key={i}>{item}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
                   {section.text && (
                     <p className={sectionTextStyle}>
                       {renderNoticeText(section.text)}
@@ -135,6 +147,18 @@ const sectionStyle = css({
 });
 
 const sectionHeadingStyle = css({
+  textStyle: 'body2.m',
+  color: 'gray.800',
+});
+
+const subSectionStyle = css({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '0.25rem',
+  mt: '0.5rem',
+});
+
+const subSectionHeadingStyle = css({
   textStyle: 'body2.m',
   color: 'gray.800',
 });
