@@ -2,18 +2,30 @@
 
 import { css } from 'styled-system/css';
 import { useParams } from 'next/navigation';
+import { notFound } from 'next/navigation';
 import { PersonalLeftContainer } from '@/features/assignment/personal/components/PersonalLeftContainer';
 import { PersonalRightContainer } from '@/features/assignment/personal/components/PersonalRightContainer';
 import { usePersonalTaskDetail } from '@/features/assignment/personal/components/hooks/usePersonalTaskDetail';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function PersonalPage() {
   const params = useParams();
   const taskId = Number(params?.id);
   // 개인 과제 상세 커스텀 훅 호출
-  const { data, isLoading } = usePersonalTaskDetail(taskId);
+  const { data, isLoading, isError } = usePersonalTaskDetail(taskId);
   // 수정 모드 상태 (오른쪽 영역도 비활성화하기 위해 page 레벨에서 관리)
   const [isEditMode, setIsEditMode] = useState(false);
+
+  if (isError) {
+    notFound();
+  }
+
+  useEffect(() => {
+    if (data?.title) {
+      document.title = `${data.title} | CHECKTASK`;
+    }
+    return () => { document.title = 'CHECKTASK'; };
+  }, [data?.title]);
 
   if (isLoading || !data) {
     return (

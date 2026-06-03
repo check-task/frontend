@@ -2,8 +2,7 @@ import { headers } from 'next/headers';
 import { userAgent } from 'next/server';
 import { css } from 'styled-system/css';
 import { hstack } from 'styled-system/patterns';
-import { KakaoLoginButton } from '@/features/login/components/KakaoLoginButton';
-import { LoginConsentText } from '@/features/login/components/LoginConsentText';
+import { LoginButton } from '@/features/login/components/LoginButton';
 import { LoginCarousel } from '@/features/login/components/LoginCarousel';
 import { MobileLoginView } from '@/features/login/components/MobileLoginView';
 import { TabletLoginView } from '@/features/login/components/TabletLoginView';
@@ -45,23 +44,29 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
         <MobileLoginView />
       </div>
 
-      {/* 태블릿 전용 (768px – 1024px) */}
+      {/* 태블릿 전용: 768px 이상 터치 기반 환경 */}
       <div
         className={css({
           display: 'none',
-          md: { display: 'block' },
-          lg: { display: 'none' },
+          '@media (min-width: 768px) and (hover: none)': {
+            display: 'block',
+          },
+          '@media (min-width: 768px) and (pointer: coarse)': {
+            display: 'block',
+          },
         })}
       >
         <TabletLoginView />
       </div>
 
-      {/* 데스크톱 전용 (≥ 1024px) */}
+      {/* 데스크톱 전용: 768px 이상 마우스/트랙패드 기반 환경 */}
       <div
         className={css({
           ...pageStyle,
           display: 'none',
-          lg: { display: 'flex' },
+          '@media (min-width: 768px) and (hover: hover) and (pointer: fine)': {
+            display: 'flex',
+          },
         })}
       >
         <LoginCarousel />
@@ -74,17 +79,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
             width={140}
             height={25.85}
           />
-          <div className={bottomRightStyle}>
-            <div className={textColumnStyle}>
-              <p className={kakaoGuideStyle}>
-                아이디와 비밀번호 입력하기 귀찮으시죠?
-                <br />
-                1초 회원가입으로 입력없이 간편하게 로그인 하세요.
-              </p>
-              <LoginConsentText />
-            </div>
-            <KakaoLoginButton />
-          </div>
+          <LoginButton />
         </div>
 
         {/* 탈퇴 계정 복구 모달 */}
@@ -107,7 +102,7 @@ const bottomBarStyle = css(
   hstack.raw({
     justifyContent: 'space-between',
     alignItems: 'center',
-    height: '6.375rem',
+    height: '5.375rem',
     paddingX: '7.5rem',
     paddingY: '1.25rem',
     position: 'relative',
@@ -115,22 +110,3 @@ const bottomBarStyle = css(
     boxShadow: '0 -1px 4px 0 rgba(0, 0, 0, 0.08)',
   }),
 );
-
-const bottomRightStyle = css(
-  hstack.raw({
-    gap: '1.5rem',
-    alignItems: 'center',
-  }),
-);
-
-// 텍스트 스타일
-const textColumnStyle = css({
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '0.25rem',
-});
-
-const kakaoGuideStyle = css({
-  textStyle: 'body3.r',
-  color: 'gray.600',
-});

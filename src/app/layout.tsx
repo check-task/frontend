@@ -13,7 +13,10 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://checktask.kro.kr'),
-  title: 'CHECKTASK',
+  title: {
+    template: '%s | CHECKTASK',
+    default: 'CHECKTASK',
+  },
   description: '대학생을 위한 경량 과제 관리 서비스',
   openGraph: {
     url: 'https://checktask.kro.kr',

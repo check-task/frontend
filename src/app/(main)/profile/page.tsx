@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { css } from '../../../../styled-system/css';
 import { hstack, stack } from '../../../../styled-system/patterns';
 import { ProfileSection } from '@/features/profile/components/ProfileSection';
@@ -5,6 +6,10 @@ import { ManagementSection } from '@/features/profile/components/ManagementSecti
 import { WithdrawalButton } from '@/features/profile/components/WithdrawalButton';
 import { ProfileFooter } from '@/features/profile/components/ProfileFooter';
 import { PolicyLink } from '@/features/profile/components/PolicyLink';
+
+export const metadata: Metadata = {
+  title: '프로필',
+};
 
 // 프로필 설정 페이지
 export default function ProfilePage() {

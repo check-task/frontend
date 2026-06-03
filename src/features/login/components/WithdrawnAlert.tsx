@@ -18,7 +18,7 @@ export const WithdrawnAlert = ({ token }: WithdrawnAlertProps) => {
 
     openModal({
       title: '계정 복구 안내',
-      content: <RestoreModalContent token={token} />,
+      content: <RestoreModalContent token={token} restoreType='kakao' />,
       headerType: 'none',
     });
   }, [openModal, token]);
