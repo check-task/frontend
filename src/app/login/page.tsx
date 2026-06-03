@@ -44,23 +44,29 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
         <MobileLoginView />
       </div>
 
-      {/* 태블릿 전용 (768px – 1024px) */}
+      {/* 태블릿 전용: 768px 이상 터치 기반 환경 */}
       <div
         className={css({
           display: 'none',
-          md: { display: 'block' },
-          lg: { display: 'none' },
+          '@media (min-width: 768px) and (hover: none)': {
+            display: 'block',
+          },
+          '@media (min-width: 768px) and (pointer: coarse)': {
+            display: 'block',
+          },
         })}
       >
         <TabletLoginView />
       </div>
 
-      {/* 데스크톱 전용 (≥ 1024px) */}
+      {/* 데스크톱 전용: 768px 이상 마우스/트랙패드 기반 환경 */}
       <div
         className={css({
           ...pageStyle,
           display: 'none',
-          lg: { display: 'flex' },
+          '@media (min-width: 768px) and (hover: hover) and (pointer: fine)': {
+            display: 'flex',
+          },
         })}
       >
         <LoginCarousel />
