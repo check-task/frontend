@@ -2,6 +2,10 @@ export interface NoticeSection {
   heading: string;
   items?: string[];
   text?: string;
+  subSections?: {
+    heading: string;
+    items: string[];
+  }[];
 }
 
 export interface NoticeItem {
@@ -14,6 +18,38 @@ export interface NoticeItem {
 }
 
 export const NOTICES: NoticeItem[] = [
+  {
+    id: '2',
+    title: '📢 1차 릴리즈 안내',
+    intro: 'CHECKTASK(채택) 서비스가 더 편리하게 발전됐어요! 👏',
+    sections: [
+      {
+        heading: '🔔 주요 업데이트',
+        subSections: [
+          {
+            heading: '자체 로그인이 가능해졌어요.',
+            items: [
+              '⚠️ 자체 회원가입 시 카카오 계정과 같은 이메일로 가입할 수 없어요.',
+              '기존 사용자 분들은 카카오 로그인으로 진행해주세요.',
+            ],
+          },
+          // {
+          //   heading: '이제 아이패드에서도 사용할 수 있어요.',
+          //   items: [
+          //     '아이패드에서도 웹사이트와 같은 화면으로 서비스를 사용할 수 있어요.',
+          //     '모바일은 아직 준비중이에요. 완성되면 알려드릴게요!',
+          //   ],
+          // },
+        ],
+      },
+      {
+        heading: '📬 문의 및 피드백',
+        text: '기능 추가 요청이나 문의사항은 인스타그램 (@checktask_) DM으로 보내주세요.',
+      },
+    ],
+    footer: '',
+    date: '2026.06.03',
+  },
   {
     id: '1',
     title: '📢 서비스 출시 안내',
