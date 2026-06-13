@@ -51,7 +51,7 @@ export const updateProfile = async (
 
 // 회원 탈퇴 API 호출
 export const withdrawAccount = async (): Promise<void> => {
-  await axiosInstance.delete('/auth/kakao/unlink');
+  await axiosInstance.delete('/auth/withdraw');
 };
 
 // 탈퇴 계정 복구 API 호출
