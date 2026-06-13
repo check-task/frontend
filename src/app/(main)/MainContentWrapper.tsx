@@ -8,6 +8,7 @@ interface MainContentWrapperProps {
 }
 
 const SIDEBAR_OPEN_WIDTH = '15rem';
+const SIDEBAR_CLOSED_WIDTH = '3.75rem';
 
 export const MainContentWrapper = ({ children }: MainContentWrapperProps) => {
   const isSidebarCollapsed = useUIStore((state) => state.isSidebarCollapsed);
