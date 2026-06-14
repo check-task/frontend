@@ -13,7 +13,14 @@ export const HomeButtonBar = () => {
   const logoSrc = theme === 'dark' ? '/HomeLogoDark.svg' : '/HomeLogo.svg';
 
   return (
-    <div className={containerStyle}>
+    <div
+      className={containerStyle}
+      style={{
+        width: isSidebarCollapsed ? 'calc(100% - 3.75rem)' : 'calc(100% - 15rem)',
+        left: isSidebarCollapsed ? '3.75rem' : '15rem',
+        transition: 'width 0.3s cubic-bezier(0.4, 0, 0.2, 1), left 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+      }}
+    >
       <Link
         href='/'
         className={css({
@@ -22,10 +29,6 @@ export const HomeButtonBar = () => {
           cursor: 'pointer',
           textDecoration: 'none',
           display: 'inline-block',
-          // 사이드바가 접혀있을 때는 전체 화면 기준으로 중앙 정렬하기 위해 사이드바 너비만큼 왼쪽으로 이동
-          // 사이드바가 펼쳐져있을 때는 main 영역 기준으로 중앙 정렬
-          marginLeft: isSidebarCollapsed ? '0' : '14.75rem',
-          transition: 'margin-left 0.3s ease',
         })}
       >
         <Image src={logoSrc} alt='HomeLogo' width={240} height={44} priority />
@@ -46,7 +49,6 @@ const containerStyle = css({
   bg: 'bg',
   pt: '1.25rem',
   pb: '1.25rem',
-  width: '100%',
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
