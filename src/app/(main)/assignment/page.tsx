@@ -9,9 +9,10 @@ export default function AssignmentPage() {
   const { data = [], isLoading } = useTaskList();
 
   return (
-    // 전체 컨테이너
     <div
       className={css({
+        paddingX: '1.5rem',
+        marginX: 'auto',
         my: '3.25rem',
       })}
     >

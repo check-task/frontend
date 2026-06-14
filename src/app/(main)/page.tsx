@@ -22,6 +22,7 @@ export default function Home() {
 const pageStyle = css(
   stack.raw({
     gap: '1.5rem',
+    paddingX: '1.5rem',
     marginX: 'auto',
     marginTop: '2rem',
     marginBottom: '3.75rem',

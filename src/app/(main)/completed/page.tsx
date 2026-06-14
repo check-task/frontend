@@ -8,7 +8,7 @@ export default function CompletedPage() {
   const { data = [], isLoading } = useCompletedTaskList();
 
   return (
-    <div className={css({ my: '3.25rem' })}>
+    <div className={css({ my: '3.25rem', paddingX: '1.5rem', marginX: 'auto' })}>
       <h3 className={titleStyle}>완료 과제</h3>
       {isLoading ? (
         <div>로딩 중...</div>
