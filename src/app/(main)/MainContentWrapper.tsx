@@ -6,8 +6,7 @@ import { css } from '../../../styled-system/css';
 interface MainContentWrapperProps {
   children: React.ReactNode;
 }
-
-const SIDEBAR_OPEN_WIDTH = '15rem';
+const SIDEBAR_CLOSED_CENTER_OFFSET = '1.875rem';
 
 export const MainContentWrapper = ({ children }: MainContentWrapperProps) => {
   const isSidebarCollapsed = useUIStore((state) => state.isSidebarCollapsed);
@@ -15,7 +14,6 @@ export const MainContentWrapper = ({ children }: MainContentWrapperProps) => {
   return (
     <div
       className={css({
-        // width: '100%',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -26,13 +24,16 @@ export const MainContentWrapper = ({ children }: MainContentWrapperProps) => {
         // transition: 'margin-left 0.3s ease',
 
         // 사이드바 상태에 따라 너비를 다르게 설정
-        width: isSidebarCollapsed
-          ? '100%'
-          : `calc(100% - ${SIDEBAR_OPEN_WIDTH})`,
-        marginLeft: isSidebarCollapsed ? '0' : SIDEBAR_OPEN_WIDTH,
-
-        transition:
-          'margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+        // width: isSidebarCollapsed
+        //   ? '100%'
+        //   : `calc(100% - ${SIDEBAR_OPEN_WIDTH})`,
+        width: '100%',
+        transform: isSidebarCollapsed
+          ? `translateX(-${SIDEBAR_CLOSED_CENTER_OFFSET})`
+          : 'translateX(0)',
+        '@media (max-width: 82.5rem)': {
+          transform: 'translateX(0)',
+        },
       })}
     >
       {children}

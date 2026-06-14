@@ -175,6 +175,8 @@ const containerStyle = cva({
     minHeight: 'calc(100vh - 5.25rem - 2.5rem)',
     pb: '14.5rem',
     transition: 'width 0.3s ease',
+    marginX: 'auto',
+    paddingX: '1.5rem',
   },
   variants: {
     collapsed: {

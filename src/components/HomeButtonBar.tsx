@@ -6,6 +6,9 @@ import { css } from 'styled-system/css';
 import { useUIStore } from '@/stores/ui-store';
 import { NotificationButton } from './NotificationButton';
 
+const SIDEBAR_CLOSED_CENTER_OFFSET = '1.875rem';
+const SIDEBAR_OPEN_WIDTH = '15rem';
+
 export const HomeButtonBar = () => {
   const isSidebarCollapsed = useUIStore((state) => state.isSidebarCollapsed);
   const theme = useUIStore((state) => state.theme);
@@ -13,7 +16,17 @@ export const HomeButtonBar = () => {
   const logoSrc = theme === 'dark' ? '/HomeLogoDark.svg' : '/HomeLogo.svg';
 
   return (
-    <div className={containerStyle}>
+    <div
+      className={containerStyle}
+      style={{
+        left: isSidebarCollapsed ? '0' : SIDEBAR_OPEN_WIDTH,
+        width: isSidebarCollapsed
+          ? '100%'
+          : `calc(100% - ${SIDEBAR_OPEN_WIDTH})`,
+        transition:
+          'left 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+      }}
+    >
       <Link
         href='/'
         className={css({
@@ -22,10 +35,12 @@ export const HomeButtonBar = () => {
           cursor: 'pointer',
           textDecoration: 'none',
           display: 'inline-block',
-          // 사이드바가 접혀있을 때는 전체 화면 기준으로 중앙 정렬하기 위해 사이드바 너비만큼 왼쪽으로 이동
-          // 사이드바가 펼쳐져있을 때는 main 영역 기준으로 중앙 정렬
-          marginLeft: isSidebarCollapsed ? '0' : '14.75rem',
-          transition: 'margin-left 0.3s ease',
+          transform: isSidebarCollapsed
+            ? `translateX(-${SIDEBAR_CLOSED_CENTER_OFFSET})`
+            : 'translateX(0)',
+          '@media (max-width: 82.5rem)': {
+            transform: 'translateX(0)',
+          },
         })}
       >
         <Image src={logoSrc} alt='HomeLogo' width={240} height={44} priority />
@@ -43,6 +58,7 @@ export const HomeButtonBar = () => {
 // 홈 버튼 바 컨테이너
 const containerStyle = css({
   position: 'fixed',
+  top: 0,
   bg: 'bg',
   pt: '1.25rem',
   pb: '1.25rem',

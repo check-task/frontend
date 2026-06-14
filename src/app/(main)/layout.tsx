@@ -17,6 +17,8 @@ const layoutContainerStyle = css({
 
 const mainContentStyle = css({
   flex: 1,
+  minWidth: 0,
+  width: '100%',
   display: 'flex',
   flexDirection: 'column',
   overflow: 'auto',
