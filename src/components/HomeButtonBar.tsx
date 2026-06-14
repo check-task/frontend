@@ -6,27 +6,15 @@ import { css } from 'styled-system/css';
 import { useUIStore } from '@/stores/ui-store';
 import { NotificationButton } from './NotificationButton';
 
-const SIDEBAR_CLOSED_CENTER_OFFSET = '1.875rem';
-const SIDEBAR_OPEN_WIDTH = '15rem';
+const SIDEBAR_WIDTH_EXPANDED = '15rem';
 
 export const HomeButtonBar = () => {
-  const isSidebarCollapsed = useUIStore((state) => state.isSidebarCollapsed);
   const theme = useUIStore((state) => state.theme);
 
   const logoSrc = theme === 'dark' ? '/HomeLogoDark.svg' : '/HomeLogo.svg';
 
   return (
-    <div
-      className={containerStyle}
-      style={{
-        left: isSidebarCollapsed ? '0' : SIDEBAR_OPEN_WIDTH,
-        width: isSidebarCollapsed
-          ? '100%'
-          : `calc(100% - ${SIDEBAR_OPEN_WIDTH})`,
-        transition:
-          'left 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-      }}
-    >
+    <div className={containerStyle}>
       <Link
         href='/'
         className={css({
@@ -35,12 +23,6 @@ export const HomeButtonBar = () => {
           cursor: 'pointer',
           textDecoration: 'none',
           display: 'inline-block',
-          transform: isSidebarCollapsed
-            ? `translateX(-${SIDEBAR_CLOSED_CENTER_OFFSET})`
-            : 'translateX(0)',
-          '@media (max-width: 82.5rem)': {
-            transform: 'translateX(0)',
-          },
         })}
       >
         <Image src={logoSrc} alt='HomeLogo' width={240} height={44} priority />
@@ -59,14 +41,21 @@ export const HomeButtonBar = () => {
 const containerStyle = css({
   position: 'fixed',
   top: 0,
+  left: SIDEBAR_WIDTH_EXPANDED,
   bg: 'bg',
   pt: '1.25rem',
   pb: '1.25rem',
-  width: '100%',
+  width: `calc(100% - ${SIDEBAR_WIDTH_EXPANDED})`,
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
   zIndex: 'sticky',
+  transition:
+    'left 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+  '[data-sidebar-collapsed="true"] &': {
+    left: 0,
+    width: '100%',
+  },
 });
 
 // 알림 버튼 Wrapper

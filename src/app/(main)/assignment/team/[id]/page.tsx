@@ -304,7 +304,7 @@ export default function TeamAssignmentDetailPage() {
 const outerContainerStyle = css({
   display: 'flex',
   justifyContent: 'center',
-  width: '100%',
+  width: 'fit-content',
   py: '2.5rem',
   pb: '3.75rem',
 });

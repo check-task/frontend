@@ -11,7 +11,6 @@ export default function AssignmentPage() {
   return (
     <div
       className={css({
-        paddingX: '1.5rem',
         marginX: 'auto',
         my: '3.25rem',
       })}

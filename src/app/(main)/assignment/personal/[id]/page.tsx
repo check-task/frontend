@@ -64,7 +64,7 @@ export default function PersonalPage() {
 const containerStyle = css({
   display: 'flex',
   justifyContent: 'center',
-  width: '100%',
+  width: 'fit-content',
   py: '3.38rem',
 });
 
