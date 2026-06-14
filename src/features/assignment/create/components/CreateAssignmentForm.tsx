@@ -176,7 +176,7 @@ const containerStyle = cva({
     pb: '14.5rem',
     transition: 'width 0.3s ease',
     marginX: 'auto',
-    paddingX: '1.5rem',
+    // paddingX: '1.5rem',
   },
   variants: {
     collapsed: {
