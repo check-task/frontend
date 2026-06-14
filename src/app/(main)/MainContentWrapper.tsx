@@ -27,10 +27,12 @@ export const MainContentWrapper = ({ children }: MainContentWrapperProps) => {
         // transition: 'margin-left 0.3s ease',
 
         // 사이드바 상태에 따라 너비를 다르게 설정
-        width: isSidebarCollapsed
-          ? '100%'
-          : `calc(100% - ${SIDEBAR_OPEN_WIDTH})`,
-        marginLeft: isSidebarCollapsed ? '0' : SIDEBAR_OPEN_WIDTH,
+        // width: isSidebarCollapsed
+        //   ? '100%'
+        //   : `calc(100% - ${SIDEBAR_OPEN_WIDTH})`,
+        width: '100%',
+        // marginLeft: isSidebarCollapsed ? '0' : SIDEBAR_OPEN_WIDTH,
+        marginX: 'auto',
 
         transition:
           'margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
