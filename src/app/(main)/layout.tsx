@@ -20,6 +20,7 @@ const layoutContainerStyle = css({
 const mainContentStyle = css({
   minWidth: 0,
   width: '100%',
+  boxSizing: 'border-box',
   minH: '100vh',
   paddingLeft: SIDEBAR_WIDTH_EXPANDED,
   display: 'flex',

@@ -18,7 +18,6 @@ export default function NoticePage() {
 const pageStyle = css(
   stack.raw({
     gap: '1.5rem',
-    paddingX: '1.5rem',
     marginX: 'auto',
   }),
 );
