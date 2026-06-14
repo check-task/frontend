@@ -40,7 +40,7 @@ const containerStyle = css(
   stack.raw({
     gap: '2.25rem',
     width: '62.25rem',
-    paddingX: '1.5rem',
+    // paddingX: '1.5rem',
     marginX: 'auto',
     marginTop: '3.25rem',
     marginBottom: '3.75rem',

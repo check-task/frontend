@@ -6,9 +6,7 @@ import { css } from '../../../styled-system/css';
 interface MainContentWrapperProps {
   children: React.ReactNode;
 }
-
-const SIDEBAR_OPEN_WIDTH = '15rem';
-const SIDEBAR_CLOSED_WIDTH = '3.75rem';
+const SIDEBAR_CLOSED_CENTER_OFFSET = '1.875rem';
 
 export const MainContentWrapper = ({ children }: MainContentWrapperProps) => {
   const isSidebarCollapsed = useUIStore((state) => state.isSidebarCollapsed);
@@ -16,7 +14,6 @@ export const MainContentWrapper = ({ children }: MainContentWrapperProps) => {
   return (
     <div
       className={css({
-        // width: '100%',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -31,11 +28,12 @@ export const MainContentWrapper = ({ children }: MainContentWrapperProps) => {
         //   ? '100%'
         //   : `calc(100% - ${SIDEBAR_OPEN_WIDTH})`,
         width: '100%',
-        // marginLeft: isSidebarCollapsed ? '0' : SIDEBAR_OPEN_WIDTH,
-        marginX: 'auto',
-
-        transition:
-          'margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+        transform: isSidebarCollapsed
+          ? `translateX(-${SIDEBAR_CLOSED_CENTER_OFFSET})`
+          : 'translateX(0)',
+        '@media (max-width: 82.5rem)': {
+          transform: 'translateX(0)',
+        },
       })}
     >
       {children}

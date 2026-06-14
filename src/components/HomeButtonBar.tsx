@@ -6,6 +6,9 @@ import { css } from 'styled-system/css';
 import { useUIStore } from '@/stores/ui-store';
 import { NotificationButton } from './NotificationButton';
 
+const SIDEBAR_CLOSED_CENTER_OFFSET = '1.875rem';
+const SIDEBAR_OPEN_WIDTH = '15rem';
+
 export const HomeButtonBar = () => {
   const isSidebarCollapsed = useUIStore((state) => state.isSidebarCollapsed);
   const theme = useUIStore((state) => state.theme);
@@ -16,9 +19,12 @@ export const HomeButtonBar = () => {
     <div
       className={containerStyle}
       style={{
-        width: isSidebarCollapsed ? 'calc(100% - 3.75rem)' : 'calc(100% - 15rem)',
-        left: isSidebarCollapsed ? '3.75rem' : '15rem',
-        transition: 'width 0.3s cubic-bezier(0.4, 0, 0.2, 1), left 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+        left: isSidebarCollapsed ? '0' : SIDEBAR_OPEN_WIDTH,
+        width: isSidebarCollapsed
+          ? '100%'
+          : `calc(100% - ${SIDEBAR_OPEN_WIDTH})`,
+        transition:
+          'left 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
       }}
     >
       <Link
@@ -29,6 +35,12 @@ export const HomeButtonBar = () => {
           cursor: 'pointer',
           textDecoration: 'none',
           display: 'inline-block',
+          transform: isSidebarCollapsed
+            ? `translateX(-${SIDEBAR_CLOSED_CENTER_OFFSET})`
+            : 'translateX(0)',
+          '@media (max-width: 82.5rem)': {
+            transform: 'translateX(0)',
+          },
         })}
       >
         <Image src={logoSrc} alt='HomeLogo' width={240} height={44} priority />
@@ -46,9 +58,11 @@ export const HomeButtonBar = () => {
 // 홈 버튼 바 컨테이너
 const containerStyle = css({
   position: 'fixed',
+  top: 0,
   bg: 'bg',
   pt: '1.25rem',
   pb: '1.25rem',
+  width: '100%',
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',

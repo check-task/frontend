@@ -3,7 +3,6 @@ import { NoticeListContainer } from '@/features/notice/components/NoticeListCont
 import { css } from 'styled-system/css';
 import { stack } from 'styled-system/patterns';
 
-
 export const metadata: Metadata = {
   title: '공지사항',
 };
@@ -21,7 +20,5 @@ const pageStyle = css(
     gap: '1.5rem',
     paddingX: '1.5rem',
     marginX: 'auto',
-    marginTop: '2rem',
-    marginBottom: '3.75rem',
   }),
 );
