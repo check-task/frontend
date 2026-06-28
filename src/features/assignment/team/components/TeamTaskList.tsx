@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { motion } from 'framer-motion';
 import { Checkbox } from '@/components/Checkbox';
 import { css, cva } from 'styled-system/css';
 import { ClockToggle } from '../../components/ClockToggle';
@@ -14,6 +15,7 @@ import type {
   TaskDetailSubTask,
   TaskDetailSubTaskComment,
   UpdateSubTaskStatusRequestStatus,
+  SubTaskStatus,
 } from '@/types/task';
 import { useQueryClient } from '@tanstack/react-query';
 import { useUpdateTeamSubTaskStatus } from './hooks/useUpdateSubTaskStatus';
@@ -29,6 +31,11 @@ import { AddTaskButton } from './AddTaskButton';
 import { getSocket, COMMENT_SEND_EVENTS, COMMENT_EVENTS } from '@/lib/socket';
 import { CloseIcon } from '@/components/icons/CloseIcon';
 import { ArrowUpCircleIcon } from '@/components/icons/ArrowUpCircleIcon';
+
+const sortByCompletion = (tasks: TaskDetailSubTask[]) => [
+  ...tasks.filter((t) => t.status !== 'COMPLETED'),
+  ...tasks.filter((t) => t.status === 'COMPLETED'),
+];
 
 const getCommentId = (
   c: TaskDetailSubTaskComment & { comment_id?: number; id?: number },
@@ -82,6 +89,11 @@ const TeamTaskList = ({
   const [alarmStateMap, setAlarmStateMap] = useState<Record<number, boolean>>(
     {},
   );
+  const [sortedSubTasks, setSortedSubTasks] = useState(() => sortByCompletion(subTasks));
+  useEffect(() => {
+    setSortedSubTasks(sortByCompletion(subTasks));
+  }, [subTasks]);
+
   const queryClient = useQueryClient();
   const { mutate: mutateStatus } = useUpdateTeamSubTaskStatus(taskId);
   const { mutate: mutateDeadline } = useUpdateTeamSubTaskDeadline(taskId);
@@ -173,12 +185,21 @@ const TeamTaskList = ({
     );
 
   const handleStatusChange = (subTaskId: number, isChecked: boolean) => {
+    const previousSubTasks = sortedSubTasks;
+    setSortedSubTasks((prev) =>
+      sortByCompletion(
+        prev.map((t) =>
+          t.subTaskId === subTaskId
+            ? { ...t, status: (isChecked ? 'COMPLETED' : 'PROGRESS') as SubTaskStatus }
+            : t,
+        ),
+      ),
+    );
     const status: UpdateSubTaskStatusRequestStatus = isChecked ? 'COMPLETED' : 'PENDING';
-    mutateStatus({
-      taskId,
-      subTaskId,
-      status,
-    });
+    mutateStatus(
+      { taskId, subTaskId, status },
+      { onError: () => setSortedSubTasks(previousSubTasks) },
+    );
   };
 
   const toYYYYMMDD = (d: Date, withTime: boolean): string => {
@@ -392,13 +413,18 @@ const TeamTaskList = ({
   return (
     <div className={teamTaskListContainerStyle}>
       <div className={teamTaskListStyle}>
-        {subTasks.length > 0 ? (
-          subTasks.map((task) => {
+        {sortedSubTasks.length > 0 ? (
+          sortedSubTasks.map((task) => {
             const isCompleted = task.status === 'COMPLETED';
             const commentOpen = openComments[task.subTaskId] ?? false;
             const comments = getDisplayComments(task);
             return (
-              <div key={task.subTaskId}>
+              <motion.div
+                key={task.subTaskId}
+                layout
+                layoutId={`team-task-${task.subTaskId}`}
+                transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
+              >
                 <div
                   className={taskItemContainerStyle({ checked: isCompleted })}
                 >
@@ -643,7 +669,7 @@ const TeamTaskList = ({
                     </div>
                   </div>
                 )}
-              </div>
+              </motion.div>
             );
           })
         ) : (
