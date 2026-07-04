@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { css } from 'styled-system/css';
 import { Input } from '@/components/TextField';
 import { Button } from '@/components/Button';
@@ -16,7 +17,9 @@ import {
 } from '@/features/assignment/components/FolderClassification';
 import { SelectTeamProjectCheckbox } from '@/features/assignment/create/components/SelectTeamProjectCheckbox';
 import { usePatchTask } from '@/hooks/mutations/usePatchTask';
+import { useUpdateTaskType } from '@/hooks/mutations/useUpdateTaskType';
 import { useModalStore } from '@/stores/modal-store';
+import { useAlertStore } from '@/stores/alert-store';
 
 interface AssignmentEditModalContentProps {
   taskId: number;
@@ -92,8 +95,13 @@ export const AssignmentEditModalContent = ({
     hasTimeSet(initialDueDate),
   );
   const { data: myInfo } = useMyInfo();
-  const { mutate: patchTask, isPending } = usePatchTask(taskId);
+  const { mutate: patchTask, isPending: isPatchPending } =
+    usePatchTask(taskId);
+  const { mutate: convertToTeam, isPending: isConvertPending } =
+    useUpdateTaskType();
   const { closeModal } = useModalStore();
+  const showAlert = useAlertStore((s) => s.showAlert);
+  const router = useRouter();
 
   // 사용자가 실제 생성한 폴더의 색상(중복 제거)
   const userColors: FolderColor[] = myInfo
@@ -128,8 +136,32 @@ export const AssignmentEditModalContent = ({
       { title: trimmedTitle, folderId, deadline },
       {
         onSuccess: () => {
-          closeModal();
-          onSuccess?.();
+          const shouldConvert = taskType === 'PERSONAL' && isTeam;
+          if (!shouldConvert) {
+            closeModal();
+            onSuccess?.();
+            return;
+          }
+
+          convertToTeam(taskId, {
+            onSuccess: () => {
+              closeModal();
+              onSuccess?.();
+              showAlert('팀 과제로 전환되었습니다.', 'check');
+              router.push(`/assignment/team/${taskId}`);
+            },
+            onError: () => {
+              closeModal();
+              onSuccess?.();
+              showAlert(
+                '과제 정보는 저장되었지만 팀 전환에 실패했습니다. 다시 시도해주세요.',
+                'x',
+              );
+            },
+          });
+        },
+        onError: () => {
+          showAlert('과제 정보 저장에 실패했습니다.', 'x');
         },
       },
     );
@@ -219,7 +251,7 @@ export const AssignmentEditModalContent = ({
         variant='fillBlue'
         size='xlarge'
         onClick={handleSave}
-        disabled={isPending || !title.trim()}
+        disabled={isPatchPending || isConvertPending || !title.trim()}
       >
         변경사항 저장
       </Button>
