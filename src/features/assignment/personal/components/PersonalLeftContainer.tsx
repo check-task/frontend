@@ -189,6 +189,7 @@ export const PersonalLeftContainer = ({
             daysLeft={daysLeft}
             deadline={deadline}
             folderColorHex={folderColorHex}
+            taskType='PERSONAL'
           />
         </div>
 
