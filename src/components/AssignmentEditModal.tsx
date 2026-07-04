@@ -153,7 +153,7 @@ export const AssignmentEditModalContent = ({
                 checked={whenToMeet}
                 onChange={() => setWhenToMeet(!whenToMeet)}
               />
-              <p>웹투밋 추가</p>
+              <p>웬투밋 추가</p>
             </div>
           </div>
           <span className={dividerStyle} />
