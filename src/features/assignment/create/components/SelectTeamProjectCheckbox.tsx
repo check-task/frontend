@@ -6,9 +6,6 @@ import { CheckMark } from '@/components/icons/CheckMark';
 
 const checkboxControl = cva({
   base: {
-    w: '1.375rem',
-    h: '1.375rem',
-    borderRadius: '0.125rem',
     borderWidth: '0.0725rem',
     borderColor: 'gray.600',
     bg: 'transparent',
@@ -34,28 +31,70 @@ const checkboxControl = cva({
       },
     },
   },
+  variants: {
+    size: {
+      default: {
+        w: '1.375rem',
+        h: '1.375rem',
+        borderRadius: '0.125rem',
+      },
+      compact: {
+        w: '1rem',
+        h: '1rem',
+        borderRadius: '0.0625rem',
+      },
+    },
+  },
+  defaultVariants: {
+    size: 'default',
+  },
+});
+
+const labelWrap = cva({
+  base: {},
+  variants: {
+    size: {
+      default: {},
+      compact: {
+        w: '1.5rem',
+        h: '1.5rem',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      },
+    },
+  },
+  defaultVariants: {
+    size: 'default',
+  },
 });
 
 type SelectTeamProjectCheckboxProps = Omit<
   InputHTMLAttributes<HTMLInputElement>,
   'size'
->;
+> & {
+  size?: 'default' | 'compact';
+};
 
 export const SelectTeamProjectCheckbox = forwardRef<
   HTMLInputElement,
   SelectTeamProjectCheckboxProps
->((props, ref) => {
+>(({ size = 'default', ...props }, ref) => {
   return (
-    <label>
+    <label className={labelWrap({ size })}>
       <input
         type='checkbox'
         className={cx('peer', hiddenInputStyle)}
         ref={ref}
         {...props}
       />
-      <div className={checkboxControl()}>
+      <div className={checkboxControl({ size })}>
         <CheckMark
-          className={css({ w: '0.83331rem', h: '0.83331rem' })}
+          className={css(
+            size === 'compact'
+              ? { w: '0.625rem', h: '0.625rem' }
+              : { w: '0.83331rem', h: '0.83331rem' },
+          )}
           variant='black'
         />
       </div>

@@ -205,7 +205,7 @@ export const createTask = async (body: CreateTaskRequest): Promise<number> => {
 export const joinTask = async (
   inviteCode: string,
   folderId?: number | null,
-) : Promise<JoinTaskResult> => {
+): Promise<JoinTaskResult> => {
   const res = await axiosInstance.post<JoinTaskResponse>('/task/join', {
     inviteCode,
     folderId: folderId ?? null,
@@ -366,3 +366,11 @@ export const expelTaskMember = async (
   }
   await axiosInstance.delete(`${TASK_BASE}/${taskId}/member/${id}`);
 };
+
+// 개인과제 -> 팀과제 변경 (Post /task/{taskId}/convert-to-team)
+export const updateTaskType = async (
+  taskId: number,
+): Promise<void> => {
+  await axiosInstance.patch(`${TASK_BASE}/${taskId}/convert-to-team`);
+};
+
