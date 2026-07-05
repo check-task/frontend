@@ -173,20 +173,22 @@ export const AssignmentEditModalContent = ({
       {taskType === 'PERSONAL' && (
         <>
           <div className={checkboxRowStyle}>
-            <div className={checkboxItemStyle}>
+            <label className={checkboxItemStyle}>
               <SelectTeamProjectCheckbox
+                size='compact'
                 checked={isTeam}
                 onChange={() => setIsTeam(!isTeam)}
               />
               <p>팀프로젝트</p>
-            </div>
-            <div className={checkboxItemStyle}>
+            </label>
+            {/* <label className={checkboxItemStyle}>
               <SelectTeamProjectCheckbox
-                checked={whenToMeet}
-                onChange={() => setWhenToMeet(!whenToMeet)}
+                size='compact'
+                checked={isTeam}
+                onChange={() => setIsTeam(!isTeam)}
               />
-              <p>웬투밋 추가</p>
-            </div>
+              <p>웬투밋</p>
+            </label> */}
           </div>
           <span className={dividerStyle} />
         </>
@@ -296,10 +298,11 @@ const checkboxItemStyle = css({
   gap: '0.25rem',
   textStyle: 'body3.m',
   color: 'gray.600',
+  cursor: 'pointer',
 });
 
 const dividerStyle = css({
   border: '0.5px solid',
-  borderColor: 'gray.200',
+  borderColor: 'gray.100',
   width: 'full',
 });
