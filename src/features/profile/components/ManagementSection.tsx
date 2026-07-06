@@ -10,7 +10,7 @@ import { SettingFolderButton } from '@/features/profile/components/SettingFolder
 import { EditFolderButton } from '@/features/profile/components/EditFolderButton';
 import { DeleteFolderButton } from '@/features/profile/components/DeleteFolderButton';
 import { AlarmTimeSelect } from '@/features/profile/components/AlarmTimeSelect';
-import { ReorderIcon } from '@/components/icons/ReorderIcon';
+import { AlignIcon } from '@/components/icons/AlignIcon';
 import { useMyInfo } from '@/hooks/queries/useMyInfo';
 import {
   useUpdateDeadlineAlarmSetting,
@@ -91,7 +91,7 @@ export const ManagementSection = () => {
                 {folder.name !== '지정안함' && (
                   <div className={folderActionsStyle}>
                     {isReorder ? (
-                      <ReorderIcon />
+                      <AlignIcon />
                     ) : (
                       <>
                         <EditFolderButton

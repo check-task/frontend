@@ -1,6 +1,6 @@
 import { css } from 'styled-system/css';
 
-export const ReorderIcon = ({ size = 28 }: { size?: number }) => {
+export const AlignIcon = ({ size = 28 }: { size?: number }) => {
   const circleStyle = css({ fill: 'gray.100' });
   const strokeStyle = css({
     stroke: 'gray.400',
