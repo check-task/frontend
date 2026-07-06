@@ -1,15 +1,18 @@
 import { token } from 'styled-system/tokens';
+import type { CSSProperties } from 'react';
 
 interface CheckCircleIconProps {
   size?: number;
   color?: string;
   filled?: boolean;
+  style?: CSSProperties;
 }
 
 export const CheckCircleIcon = ({
   size = 24,
   color = token('colors.gray.800'),
   filled = false,
+  style,
 }: CheckCircleIconProps) => (
   <svg
     width={size}
@@ -17,7 +20,7 @@ export const CheckCircleIcon = ({
     viewBox='0 0 24 24'
     fill='none'
     xmlns='http://www.w3.org/2000/svg'
-    style={{ flexShrink: 0 }}
+    style={{ flexShrink: 0, ...style }}
   >
     <circle cx='12' cy='12' r='8.5' fill={filled ? color : 'none'} stroke={color} />
     <path
