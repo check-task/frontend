@@ -65,7 +65,7 @@ const containerStyle = css({
   display: 'flex',
   justifyContent: 'center',
   width: 'fit-content',
-  py: '3.38rem',
+  py: '3.25rem',
 });
 
 // 왼쪽과 오른쪽을 가로로 배치
