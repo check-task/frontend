@@ -58,7 +58,9 @@ export const signup = async (body: SignupRequest): Promise<void> => {
     formData.append('profileImage', body.profileImage);
   }
 
-  await axiosInstance.post<ApiResponse>('/auth/signup', formData);
+  await axiosInstance.post<ApiResponse>('/auth/signup', formData, {
+    headers: { 'Content-Type': undefined } as unknown as Record<string, string>,
+  });
 };
 
 export const signin = async (
