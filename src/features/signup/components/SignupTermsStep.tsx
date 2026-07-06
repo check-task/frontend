@@ -4,8 +4,9 @@ import { useState } from 'react';
 import Image from 'next/image';
 import { css } from 'styled-system/css';
 import { hstack, stack } from 'styled-system/patterns';
+import { token } from 'styled-system/tokens';
 import { Button } from '@/components/Button';
-import { ModalCheckIcon } from '@/components/icons/ModalCheckIcon';
+import { CheckCircleIcon } from '@/components/icons/CheckCircleIcon';
 import { PrivacyPolicyContent } from '@/features/profile/components/PrivacyPolicyContent';
 import { TermsOfServiceContent } from '@/features/profile/components/TermsOfServiceContent';
 import { useModalStore } from '@/stores/modal-store';
@@ -173,12 +174,11 @@ const TermRow = ({
 
 const AgreementCheck = ({ checked }: { checked: boolean }) => {
   return (
-    <span
-      className={
-        checked ? agreementIconCheckedStyle : agreementIconUncheckedStyle
-      }
-    >
-      <ModalCheckIcon />
+    <span className={agreementIconWrapperStyle}>
+      <CheckCircleIcon
+        size={32}
+        color={token(checked ? 'colors.gray.800' : 'colors.gray.400')}
+      />
     </span>
   );
 };
@@ -269,33 +269,11 @@ const agreementToggleStyle = css({
   cursor: 'pointer',
 });
 
-const agreementIconCheckedStyle = css({
-  width: '1.5rem',
-  height: '1.5rem',
+const agreementIconWrapperStyle = css({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
   overflow: 'hidden',
-
-  '& svg': {
-    width: '1.5rem',
-    height: '1.5rem',
-  },
-});
-
-const agreementIconUncheckedStyle = css({
-  width: '1.5rem',
-  height: '1.5rem',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  overflow: 'hidden',
-  opacity: 0.45,
-
-  '& svg': {
-    width: '1.5rem',
-    height: '1.5rem',
-  },
 });
 
 const termLabelButtonStyle = css(

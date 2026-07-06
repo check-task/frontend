@@ -5,7 +5,8 @@ import { createPortal } from 'react-dom';
 import { isAxiosError } from 'axios';
 import { css } from 'styled-system/css';
 import { center } from 'styled-system/patterns';
-import { ModalCheckIcon } from '@/components/icons/ModalCheckIcon';
+import { token } from 'styled-system/tokens';
+import { CheckCircleIcon } from '@/components/icons/CheckCircleIcon';
 import { Divider } from '@/components/Divider';
 import DatePicker from '@/components/DatePicker';
 import { Textarea } from '@/components/TextField';
@@ -269,7 +270,7 @@ export const MinutesModal = ({
             aria-label='저장'
             disabled={isPending}
           >
-            <ModalCheckIcon />
+            <CheckCircleIcon size={28} color={token('colors.gray.900')} />
           </button>
         </header>
         <Divider />

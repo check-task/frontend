@@ -3,8 +3,9 @@
 import { useEffect } from 'react';
 import { css, cva } from '../../styled-system/css';
 import { stack } from '../../styled-system/patterns';
+import { token } from '../../styled-system/tokens';
 import { CloseIcon } from './icons/CloseIcon';
-import { ModalCheckIcon } from './icons/ModalCheckIcon';
+import { CheckCircleIcon } from './icons/CheckCircleIcon';
 import { useModalStore } from '@/stores/modal-store';
 import { createPortal } from 'react-dom';
 
@@ -56,7 +57,11 @@ export const Modal = () => {
           display: 'flex',
         })}
       >
-        {headerType === 'withClose' ? <CloseIcon /> : <ModalCheckIcon />}
+        {headerType === 'withClose' ? (
+          <CloseIcon />
+        ) : (
+          <CheckCircleIcon size={28} color={token('colors.gray.900')} />
+        )}
       </button>
     );
   };
