@@ -1,6 +1,23 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useMemo } from 'react';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import { css, cva } from 'styled-system/css';
 import { hstack, stack } from 'styled-system/patterns';
 import { Card } from '@/features/profile/components/Card';
@@ -16,12 +33,62 @@ import {
   useUpdateDeadlineAlarmSetting,
   useUpdateTaskAlarmSetting,
 } from '@/hooks/mutations/useUpdateAlarmTimeSetting';
+import type { Folder } from '@/types/folder';
+
+const UNASSIGNED_FOLDER_NAME = '지정안함';
+
+// 드래그 가능한 폴더 행 (정렬 아이콘을 잡고 위아래로 움직여 순서 변경)
+const SortableFolderRow = ({ folder }: { folder: Folder }) => {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
+    useSortable({ id: folder.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <div ref={setNodeRef} style={style} className={folderItemStyle}>
+      <div className={folderInfoStyle}>
+        <div className={folderColorStyle({ color: folder.color })} />
+        <span className={folderNameStyle}>{folder.name}</span>
+      </div>
+      <div className={folderActionsStyle}>
+        <button
+          {...attributes}
+          {...listeners}
+          style={{ cursor: isDragging ? 'grabbing' : 'grab' }}
+        >
+          <AlignIcon />
+        </button>
+      </div>
+    </div>
+  );
+};
 
 export const ManagementSection = () => {
   const [isReorder, setIsReorder] = useState(false);
+  const [orderedFolders, setOrderedFolders] = useState<Folder[]>([]);
+  const [snapshotFolders, setSnapshotFolders] = useState<Folder[]>([]);
   const { data, isLoading } = useMyInfo();
   const updateDeadlineAlarmSetting = useUpdateDeadlineAlarmSetting();
   const updateTaskAlarmSetting = useUpdateTaskAlarmSetting();
+  const folders = useMemo(() => data?.folders ?? [], [data?.folders]);
+
+  // 서버에서 받아온 폴더 목록을 로컬 순서 상태에 동기화
+  useEffect(() => {
+    setOrderedFolders(folders);
+  }, [folders]);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: { distance: 5 },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    }),
+  );
 
   // 알림 시간 변경 핸들러 (즉시 자동저장)
   const handleAlarmChange = (
@@ -36,11 +103,55 @@ export const ManagementSection = () => {
     updateTaskAlarmSetting.mutate(hours);
   };
 
+  // 순서 변경 모드 진입 시 되돌리기용 스냅샷 저장
+  const handleStartReorder = () => {
+    setSnapshotFolders(orderedFolders);
+    setIsReorder(true);
+  };
+
+  // 취소: 스냅샷으로 복원 후 모드 종료
+  const handleCancelReorder = () => {
+    setOrderedFolders(snapshotFolders);
+    setIsReorder(false);
+  };
+
+  // 저장: 현재 순서 유지 후 모드 종료 (순서 저장 API 연동 시 이곳에서 호출)
+  const handleSaveReorder = () => {
+    console.log(folders)
+    setIsReorder(false);
+  };
+
+  const reorderableFolders = orderedFolders.filter(
+    (folder) => folder.name !== UNASSIGNED_FOLDER_NAME,
+  );
+  const pinnedFolders = orderedFolders.filter(
+    (folder) => folder.name === UNASSIGNED_FOLDER_NAME,
+  );
+
+  // 드래그 완료 시 화면에서만 폴더 순서 재정렬 (지정안함 폴더는 항상 고정)
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (!over || active.id === over.id) {
+      return;
+    }
+
+    const oldIndex = reorderableFolders.findIndex(
+      (folder) => folder.id === active.id,
+    );
+    const newIndex = reorderableFolders.findIndex(
+      (folder) => folder.id === over.id,
+    );
+    const reordered = arrayMove(reorderableFolders, oldIndex, newIndex);
+
+    setOrderedFolders([...pinnedFolders, ...reordered]);
+  };
+
   if (isLoading || !data) {
     return null;
   }
 
-  const { user, folders } = data;
+  const { user } = data;
 
   return (
     <section className={layoutSectionStyle}>
@@ -78,39 +189,67 @@ export const ManagementSection = () => {
               {isReorder ? '폴더 순서 변경' : '폴더 설정'}
             </h3>
             <SettingFolderButton
-              onToggleReorder={() => setIsReorder((prev) => !prev)}
+              isReorder={isReorder}
+              onStartReorder={handleStartReorder}
+              onCancelReorder={handleCancelReorder}
+              onSaveReorder={handleSaveReorder}
             />
           </div>
-          <div className={folderListStyle}>
-            {folders.map((folder) => (
-              <div key={folder.id} className={folderItemStyle}>
-                <div className={folderInfoStyle}>
-                  <div className={folderColorStyle({ color: folder.color })} />
-                  <span className={folderNameStyle}>{folder.name}</span>
-                </div>
-                {folder.name !== '지정안함' && (
-                  <div className={folderActionsStyle}>
-                    {isReorder ? (
-                      <AlignIcon />
-                    ) : (
-                      <>
-                        <EditFolderButton
-                          folderId={folder.id}
-                          folderName={folder.name}
-                          folderColor={folder.color}
-                        />
-                        <DeleteFolderButton
-                          folderId={folder.id}
-                          folderName={folder.name}
-                          folderColor={folder.color}
-                        />
-                      </>
-                    )}
+          {isReorder ? (
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleDragEnd}
+            >
+              <div className={folderListStyle}>
+                {pinnedFolders.map((folder) => (
+                  <div key={folder.id} className={folderItemStyle}>
+                    <div className={folderInfoStyle}>
+                      <div
+                        className={folderColorStyle({ color: folder.color })}
+                      />
+                      <span className={folderNameStyle}>{folder.name}</span>
+                    </div>
                   </div>
-                )}
+                ))}
+                <SortableContext
+                  items={reorderableFolders.map((folder) => folder.id)}
+                  strategy={verticalListSortingStrategy}
+                >
+                  {reorderableFolders.map((folder) => (
+                    <SortableFolderRow key={folder.id} folder={folder} />
+                  ))}
+                </SortableContext>
               </div>
-            ))}
-          </div>
+            </DndContext>
+          ) : (
+            <div className={folderListStyle}>
+              {orderedFolders.map((folder) => (
+                <div key={folder.id} className={folderItemStyle}>
+                  <div className={folderInfoStyle}>
+                    <div
+                      className={folderColorStyle({ color: folder.color })}
+                    />
+                    <span className={folderNameStyle}>{folder.name}</span>
+                  </div>
+                  {folder.name !== UNASSIGNED_FOLDER_NAME && (
+                    <div className={folderActionsStyle}>
+                      <EditFolderButton
+                        folderId={folder.id}
+                        folderName={folder.name}
+                        folderColor={folder.color}
+                      />
+                      <DeleteFolderButton
+                        folderId={folder.id}
+                        folderName={folder.name}
+                        folderColor={folder.color}
+                      />
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
         </FolderSetting>
       </Card>
     </section>
