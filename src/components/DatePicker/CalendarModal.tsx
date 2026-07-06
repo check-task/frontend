@@ -109,7 +109,7 @@ export default function CalendarModal({
   const formatKoreanDate = (date: Date) =>
     `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일`;
 
-  const handleDateChange = (value: any) => {
+  const handleDateChange = (value: unknown) => {
     // 배열 말고 단일 선택만 고려
     if (value instanceof Date || value === null) {
       setSelectedDate(value);
@@ -130,6 +130,9 @@ export default function CalendarModal({
         prevLabel={<LeftIcon />}
         next2Label={null}
         prev2Label={null}
+        formatMonthYear={(_, date) =>
+          `${date.getFullYear()}년 ${date.getMonth() + 1}월`
+        }
         formatShortWeekday={(locale, date) =>
           date.toLocaleString('en', { weekday: 'narrow' })
         }
