@@ -1,12 +1,6 @@
 'use client';
 
-import {
-  ChangeEvent,
-  FormEvent,
-  useEffect,
-  // useRef,
-  useState,
-} from 'react';
+import { ChangeEvent, FormEvent, useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { isAxiosError } from 'axios';
@@ -19,7 +13,7 @@ import { CheckMark } from '@/components/icons/CheckMark';
 import { CloseIcon } from '@/components/icons/CloseIcon';
 import { EyeIcon } from '@/components/icons/EyeIcon';
 import { EyeOffIcon } from '@/components/icons/EyeOffIcon';
-// import { ProfileChangeIcon } from '@/components/icons/ProfileChangeIcon';
+import { ProfileChangeIcon } from '@/components/icons/ProfileChangeIcon';
 import {
   checkEmailDuplicate,
   resendSignupEmailCode,
@@ -34,6 +28,7 @@ const PASSWORD_MAX = 20;
 const EMAIL_CODE_TTL_SECONDS = 120;
 const EMAIL_CODE_URGENT_SECONDS = 30;
 const PASSWORD_SPECIAL_REGEX = /[!@#$%^&*(),.?":{}|<>]/;
+const PHONE_REGEX = /^01[0-9]-\d{3,4}-\d{4}$/;
 
 const hasSpecialChar = (str: string) => PASSWORD_SPECIAL_REGEX.test(str);
 
@@ -69,6 +64,13 @@ const signupSchema = z
       .max(
         NICKNAME_MAX,
         `닉네임은 최대 ${NICKNAME_MAX}자까지 입력할 수 있어요`,
+      ),
+    phone: z
+      .string()
+      .trim()
+      .refine(
+        (value) => value === '' || PHONE_REGEX.test(value),
+        '올바른 연락처 형식으로 입력해주세요 (예: 010-1234-5678)',
       ),
   })
   .refine((data) => data.password === data.passwordConfirm, {
@@ -111,8 +113,9 @@ interface SignupFormStepProps {
 
 export const SignupFormStep = ({ onCancel }: SignupFormStepProps) => {
   const router = useRouter();
-  // const fileInputRef = useRef<HTMLInputElement>(null);
-  // const [profileImage, setProfileImage] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [profileImage, setProfileImage] = useState<string | null>(null);
+  const [profileImageFile, setProfileImageFile] = useState<File | null>(null);
   const [email, setEmail] = useState('');
   const [emailCode, setEmailCode] = useState('');
   const [emailCodeSent, setEmailCodeSent] = useState(false);
@@ -128,7 +131,7 @@ export const SignupFormStep = ({ onCancel }: SignupFormStepProps) => {
   const [password, setPassword] = useState('');
   const [passwordConfirm, setPasswordConfirm] = useState('');
   const [nickname, setNickname] = useState('');
-  // const [phone, setPhone] = useState('');
+  const [phone, setPhone] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
   const [isEmailCodeSending, setIsEmailCodeSending] = useState(false);
@@ -157,6 +160,10 @@ export const SignupFormStep = ({ onCancel }: SignupFormStepProps) => {
     nickname.length > NICKNAME_MAX
       ? `닉네임은 최대 ${NICKNAME_MAX}자까지 입력할 수 있어요`
       : null;
+  const phoneError =
+    phone.trim().length > 0 && !PHONE_REGEX.test(phone.trim())
+      ? '올바른 연락처 형식으로 입력해주세요 (예: 010-1234-5678)'
+      : null;
 
   const canSubmit =
     email.trim().length > 0 &&
@@ -164,7 +171,8 @@ export const SignupFormStep = ({ onCancel }: SignupFormStepProps) => {
     isPasswordValid &&
     password === passwordConfirm &&
     nickname.length > 0 &&
-    nickname.length <= NICKNAME_MAX;
+    nickname.length <= NICKNAME_MAX &&
+    !phoneError;
 
   const emailActionButtonVariant =
     emailVerified || email.trim().length === 0
@@ -345,16 +353,18 @@ export const SignupFormStep = ({ onCancel }: SignupFormStepProps) => {
     }
   };
 
-  // const handleProfileChange = (e: ChangeEvent<HTMLInputElement>) => {
-  //   const file = e.target.files?.[0];
-  //   if (!file) return;
-  //   setProfileImage(URL.createObjectURL(file));
-  // };
+  const handleProfileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setProfileImage(URL.createObjectURL(file));
+    setProfileImageFile(file);
+  };
 
-  // const handleProfileDelete = () => {
-  //   setProfileImage(null);
-  //   if (fileInputRef.current) fileInputRef.current.value = '';
-  // };
+  const handleProfileDelete = () => {
+    setProfileImage(null);
+    setProfileImageFile(null);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -365,6 +375,7 @@ export const SignupFormStep = ({ onCancel }: SignupFormStepProps) => {
       password,
       passwordConfirm,
       nickname,
+      phone,
     });
 
     if (!parsed.success) {
@@ -387,6 +398,8 @@ export const SignupFormStep = ({ onCancel }: SignupFormStepProps) => {
         email: parsed.data.email,
         password: parsed.data.password,
         nickname: parsed.data.nickname,
+        phoneNum: parsed.data.phone || undefined,
+        profileImage: profileImageFile,
       });
       router.replace('/login');
     } catch (error) {
@@ -601,18 +614,21 @@ export const SignupFormStep = ({ onCancel }: SignupFormStepProps) => {
                 )}
               </div>
 
-              {/* <FieldRow label='전화번호'>
-                <Input
-                  type='tel'
-                  size='basic'
-                  placeholder='010-0000-0000'
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  className={inputStyle}
-                />
-              </FieldRow> */}
+              <div className={fieldWithHintStyle}>
+                <FieldRow label='전화번호'>
+                  <Input
+                    type='tel'
+                    size='basic'
+                    placeholder='010-0000-0000'
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    className={inputStyle}
+                  />
+                </FieldRow>
+                {phoneError && <p className={fieldErrorStyle}>{phoneError}</p>}
+              </div>
 
-              {/* <FieldRow label='프로필 사진' align='start'>
+              <FieldRow label='프로필 사진' align='start'>
                 {profileImage ? (
                   <div className={profilePreviewGroupStyle}>
                     <div className={profileImageWrapperStyle}>
@@ -664,7 +680,7 @@ export const SignupFormStep = ({ onCancel }: SignupFormStepProps) => {
                   className={hiddenInputStyle}
                   onChange={handleProfileChange}
                 />
-              </FieldRow> */}
+              </FieldRow>
             </div>
 
             <p className={requiredNoticeStyle}>
@@ -1003,44 +1019,44 @@ const fieldAsideErrorStyle = css({
   color: 'sub.01.100',
 });
 
-// const imageAddButtonStyle = css({
-//   width: '11.5rem',
-//   height: '2.625rem',
-// });
+const imageAddButtonStyle = css({
+  width: '11.5rem',
+  height: '2.625rem',
+});
 
-// const profilePreviewGroupStyle = css(
-//   stack.raw({
-//     alignItems: 'flex-start',
-//     gap: '0.75rem',
-//   }),
-// );
+const profilePreviewGroupStyle = css(
+  stack.raw({
+    alignItems: 'flex-start',
+    gap: '0.75rem',
+  }),
+);
 
-// const profileImageWrapperStyle = css({
-//   position: 'relative',
-//   width: '7.5rem',
-//   height: '7.5rem',
-//   borderRadius: 'full',
-//   overflow: 'hidden',
-//   bg: '#D9D9D9',
-// });
+const profileImageWrapperStyle = css({
+  position: 'relative',
+  width: '7.5rem',
+  height: '7.5rem',
+  borderRadius: 'full',
+  overflow: 'hidden',
+  bg: '#D9D9D9',
+});
 
-// const profileButtonsStyle = css(
-//   hstack.raw({
-//     alignItems: 'flex-start',
-//     gap: '0.5rem',
-//   }),
-// );
+const profileButtonsStyle = css(
+  hstack.raw({
+    alignItems: 'flex-start',
+    gap: '0.5rem',
+  }),
+);
 
-// const profileActionButtonStyle = css({
-//   display: 'inline-flex',
-//   alignItems: 'flex-start',
-//   pb: '0.125rem',
-//   borderBottom: '0.0625rem solid',
-//   borderColor: 'gray.200',
-//   textStyle: 'body4.r',
-//   color: 'gray.400',
-//   cursor: 'pointer',
-// });
+const profileActionButtonStyle = css({
+  display: 'inline-flex',
+  alignItems: 'flex-start',
+  pb: '0.125rem',
+  borderBottom: '0.0625rem solid',
+  borderColor: 'gray.200',
+  textStyle: 'body4.r',
+  color: 'gray.400',
+  cursor: 'pointer',
+});
 
 const requiredNoticeStyle = css({
   display: 'flex',
@@ -1058,9 +1074,9 @@ const submitErrorStyle = css({
   color: 'sub.01.100',
 });
 
-// const hiddenInputStyle = css({
-//   display: 'none',
-// });
+const hiddenInputStyle = css({
+  display: 'none',
+});
 
 const bottomButtonsStyle = css(
   hstack.raw({

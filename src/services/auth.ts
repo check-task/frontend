@@ -44,7 +44,21 @@ export const verifySignupEmailCode = async (
 };
 
 export const signup = async (body: SignupRequest): Promise<void> => {
-  await axiosInstance.post<ApiResponse>('/auth/signup', body);
+  const formData = new FormData();
+
+  formData.append('email', body.email);
+  formData.append('password', body.password);
+  formData.append('nickname', body.nickname);
+
+  if (body.phoneNum) {
+    formData.append('phoneNum', body.phoneNum);
+  }
+
+  if (body.profileImage) {
+    formData.append('profileImage', body.profileImage);
+  }
+
+  await axiosInstance.post<ApiResponse>('/auth/signup', formData);
 };
 
 export const signin = async (
