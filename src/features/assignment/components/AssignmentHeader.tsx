@@ -8,6 +8,7 @@ import {
 } from '@/components/AssignmentEditModal';
 import { useModalStore } from '@/stores/modal-store';
 import { resolveFolderColor } from '@/lib/folder-color';
+import type { TaskType } from '@/types/task';
 import { css, cva } from 'styled-system/css';
 
 interface AssignmentHeaderProps {
@@ -18,6 +19,8 @@ interface AssignmentHeaderProps {
   daysLeft: string;
   /** 마감일 - 수정 모달에서 사용 */
   deadline?: string;
+  /** 과제 타입 - 수정 모달에서 사용 (기본값: 팀 과제) */
+  taskType?: TaskType;
 }
 
 export const AssignmentHeader = ({
@@ -27,6 +30,7 @@ export const AssignmentHeader = ({
   title,
   daysLeft,
   deadline,
+  taskType = 'TEAM',
 }: AssignmentHeaderProps) => {
   const { openModal } = useModalStore();
   const folderColorToken = hexToFolderColor(folderColorHex) ?? null;
@@ -43,6 +47,7 @@ export const AssignmentHeader = ({
           initialTitle={title}
           initialColor={folderColorToken}
           initialDueDate={deadline}
+          taskType={taskType}
         />
       ),
       headerType: 'withClose',

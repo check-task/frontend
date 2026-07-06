@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { css } from 'styled-system/css';
 import { Input } from '@/components/TextField';
 import { Button } from '@/components/Button';
@@ -9,18 +10,24 @@ import DatePicker from '@/components/DatePicker';
 import { useMyInfo } from '@/hooks/queries/useMyInfo';
 import { resolveFolderColor } from '@/lib/folder-color';
 import type { FolderColor as FolderColorName } from '@/types/folder';
+import type { TaskType } from '@/types/task';
 import {
   colorMap,
   type FolderColor,
 } from '@/features/assignment/components/FolderClassification';
+import { SelectTeamProjectCheckbox } from '@/features/assignment/create/components/SelectTeamProjectCheckbox';
 import { usePatchTask } from '@/hooks/mutations/usePatchTask';
+import { useUpdateTaskType } from '@/hooks/mutations/useUpdateTaskType';
 import { useModalStore } from '@/stores/modal-store';
+import { useAlertStore } from '@/stores/alert-store';
 
 interface AssignmentEditModalContentProps {
   taskId: number;
   initialTitle: string;
   initialColor: FolderColor | null;
   initialDueDate?: string;
+  /** 과제 타입 - 개인 과제일 때만 팀프로젝트/웹투밋 표시 행 노출 */
+  taskType?: TaskType;
   onSuccess?: () => void;
 }
 
@@ -71,8 +78,12 @@ export const AssignmentEditModalContent = ({
   initialTitle,
   initialColor,
   initialDueDate,
+  taskType = 'TEAM',
   onSuccess,
 }: AssignmentEditModalContentProps) => {
+  const [isTeam, setIsTeam] = useState(false);
+  const [whenToMeet, setWhenToMeet] = useState(false);
+
   const [title, setTitle] = useState(initialTitle);
   const [selectedColor, setSelectedColor] = useState<FolderColor | null>(
     initialColor ?? null,
@@ -84,18 +95,23 @@ export const AssignmentEditModalContent = ({
     hasTimeSet(initialDueDate),
   );
   const { data: myInfo } = useMyInfo();
-  const { mutate: patchTask, isPending } = usePatchTask(taskId);
+  const { mutate: patchTask, isPending: isPatchPending } =
+    usePatchTask(taskId);
+  const { mutate: convertToTeam, isPending: isConvertPending } =
+    useUpdateTaskType();
   const { closeModal } = useModalStore();
+  const showAlert = useAlertStore((s) => s.showAlert);
+  const router = useRouter();
 
   // 사용자가 실제 생성한 폴더의 색상(중복 제거)
   const userColors: FolderColor[] = myInfo
     ? [
-        ...new Set(
-          myInfo.folders
-            .map((f) => NAME_TO_TOKEN[f.color])
-            .filter((c): c is FolderColor => c !== undefined),
-        ),
-      ]
+      ...new Set(
+        myInfo.folders
+          .map((f) => NAME_TO_TOKEN[f.color])
+          .filter((c): c is FolderColor => c !== undefined),
+      ),
+    ]
     : FOLDER_COLORS;
 
   // 선택된 색상에 해당하는 folderId 조회
@@ -120,8 +136,32 @@ export const AssignmentEditModalContent = ({
       { title: trimmedTitle, folderId, deadline },
       {
         onSuccess: () => {
-          closeModal();
-          onSuccess?.();
+          const shouldConvert = taskType === 'PERSONAL' && isTeam;
+          if (!shouldConvert) {
+            closeModal();
+            onSuccess?.();
+            return;
+          }
+
+          convertToTeam(taskId, {
+            onSuccess: () => {
+              closeModal();
+              onSuccess?.();
+              showAlert('팀 과제로 전환되었습니다.', 'check');
+              router.push(`/assignment/team/${taskId}`);
+            },
+            onError: () => {
+              closeModal();
+              onSuccess?.();
+              showAlert(
+                '과제 정보는 저장되었지만 팀 전환에 실패했습니다. 다시 시도해주세요.',
+                'x',
+              );
+            },
+          });
+        },
+        onError: () => {
+          showAlert('과제 정보 저장에 실패했습니다.', 'x');
         },
       },
     );
@@ -129,6 +169,31 @@ export const AssignmentEditModalContent = ({
 
   return (
     <div className={contentStyle}>
+      {/* 팀프로젝트/웹투밋 - 개인 과제 수정 시에만 현재 상태 표시 (전환 API 미지원) */}
+      {taskType === 'PERSONAL' && (
+        <>
+          <div className={checkboxRowStyle}>
+            <label className={checkboxItemStyle}>
+              <SelectTeamProjectCheckbox
+                size='compact'
+                checked={isTeam}
+                onChange={() => setIsTeam(!isTeam)}
+              />
+              <p>팀프로젝트</p>
+            </label>
+            {/* <label className={checkboxItemStyle}>
+              <SelectTeamProjectCheckbox
+                size='compact'
+                checked={isTeam}
+                onChange={() => setIsTeam(!isTeam)}
+              />
+              <p>웬투밋</p>
+            </label> */}
+          </div>
+          <span className={dividerStyle} />
+        </>
+      )}
+
       {/* 과제명 */}
       <div className={fieldStyle}>
         <label className={labelStyle}>과제명</label>
@@ -188,7 +253,7 @@ export const AssignmentEditModalContent = ({
         variant='fillBlue'
         size='xlarge'
         onClick={handleSave}
-        disabled={isPending || !title.trim()}
+        disabled={isPatchPending || isConvertPending || !title.trim()}
       >
         변경사항 저장
       </Button>
@@ -219,4 +284,25 @@ const colorRowStyle = css({
   display: 'flex',
   gap: '0.75rem', // 12px
   alignItems: 'center',
+});
+
+const checkboxRowStyle = css({
+  display: 'flex',
+  alignItems: 'center',
+  gap: '0.75rem',
+});
+
+const checkboxItemStyle = css({
+  display: 'flex',
+  alignItems: 'center',
+  gap: '0.25rem',
+  textStyle: 'body3.m',
+  color: 'gray.600',
+  cursor: 'pointer',
+});
+
+const dividerStyle = css({
+  border: '0.5px solid',
+  borderColor: 'gray.100',
+  width: 'full',
 });
