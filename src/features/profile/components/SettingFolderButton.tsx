@@ -5,7 +5,13 @@ import { hstack } from 'styled-system/patterns';
 import { useModalStore } from '@/stores/modal-store';
 import { FolderModalContent } from './FolderModalContent';
 
-export const SettingFolderButton = () => {
+interface SettingFolderButtonProps {
+  onToggleReorder: () => void;
+}
+
+export const SettingFolderButton = ({
+  onToggleReorder,
+}: SettingFolderButtonProps) => {
   const openModal = useModalStore((state) => state.openModal);
 
   const handleAddFolder = () => {
@@ -21,7 +27,9 @@ export const SettingFolderButton = () => {
       <button className={addButtonStyle} onClick={handleAddFolder}>
         폴더추가
       </button>
-      <button className={reorderButtonStyle}>순서변경</button>
+      <button className={reorderButtonStyle} onClick={onToggleReorder}>
+        순서변경
+      </button>
     </div>
   );
 };

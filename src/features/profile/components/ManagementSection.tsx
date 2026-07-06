@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { css, cva } from 'styled-system/css';
 import { hstack, stack } from 'styled-system/patterns';
 import { Card } from '@/features/profile/components/Card';
@@ -9,6 +10,7 @@ import { SettingFolderButton } from '@/features/profile/components/SettingFolder
 import { EditFolderButton } from '@/features/profile/components/EditFolderButton';
 import { DeleteFolderButton } from '@/features/profile/components/DeleteFolderButton';
 import { AlarmTimeSelect } from '@/features/profile/components/AlarmTimeSelect';
+import { ReorderIcon } from '@/components/icons/ReorderIcon';
 import { useMyInfo } from '@/hooks/queries/useMyInfo';
 import {
   useUpdateDeadlineAlarmSetting,
@@ -16,6 +18,7 @@ import {
 } from '@/hooks/mutations/useUpdateAlarmTimeSetting';
 
 export const ManagementSection = () => {
+  const [isReorder, setIsReorder] = useState(false);
   const { data, isLoading } = useMyInfo();
   const updateDeadlineAlarmSetting = useUpdateDeadlineAlarmSetting();
   const updateTaskAlarmSetting = useUpdateTaskAlarmSetting();
@@ -71,8 +74,12 @@ export const ManagementSection = () => {
         {/* 폴더 설정 */}
         <FolderSetting>
           <div className={folderHeaderStyle}>
-            <h3 className={sectionTitleStyle}>폴더 설정</h3>
-            <SettingFolderButton />
+            <h3 className={sectionTitleStyle}>
+              {isReorder ? '폴더 순서 변경' : '폴더 설정'}
+            </h3>
+            <SettingFolderButton
+              onToggleReorder={() => setIsReorder((prev) => !prev)}
+            />
           </div>
           <div className={folderListStyle}>
             {folders.map((folder) => (
@@ -83,16 +90,22 @@ export const ManagementSection = () => {
                 </div>
                 {folder.name !== '지정안함' && (
                   <div className={folderActionsStyle}>
-                    <EditFolderButton
-                      folderId={folder.id}
-                      folderName={folder.name}
-                      folderColor={folder.color}
-                    />
-                    <DeleteFolderButton
-                      folderId={folder.id}
-                      folderName={folder.name}
-                      folderColor={folder.color}
-                    />
+                    {isReorder ? (
+                      <ReorderIcon />
+                    ) : (
+                      <>
+                        <EditFolderButton
+                          folderId={folder.id}
+                          folderName={folder.name}
+                          folderColor={folder.color}
+                        />
+                        <DeleteFolderButton
+                          folderId={folder.id}
+                          folderName={folder.name}
+                          folderColor={folder.color}
+                        />
+                      </>
+                    )}
                   </div>
                 )}
               </div>
