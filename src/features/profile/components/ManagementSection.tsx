@@ -5,7 +5,7 @@ import { hstack, stack } from 'styled-system/patterns';
 import { Card } from '@/features/profile/components/Card';
 import { NotificationSetting } from '@/features/profile/components/NotificationSetting';
 import { FolderSetting } from '@/features/profile/components/FolderSetting';
-import { AddFolderButton } from '@/features/profile/components/AddFolderButton';
+import { SettingFolderButton } from '@/features/profile/components/SettingFolderButton';
 import { EditFolderButton } from '@/features/profile/components/EditFolderButton';
 import { DeleteFolderButton } from '@/features/profile/components/DeleteFolderButton';
 import { AlarmTimeSelect } from '@/features/profile/components/AlarmTimeSelect';
@@ -72,7 +72,7 @@ export const ManagementSection = () => {
         <FolderSetting>
           <div className={folderHeaderStyle}>
             <h3 className={sectionTitleStyle}>폴더 설정</h3>
-            <AddFolderButton />
+            <SettingFolderButton />
           </div>
           <div className={folderListStyle}>
             {folders.map((folder) => (
