@@ -17,6 +17,7 @@ import {
   useSortable,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
+import { restrictToParentElement } from '@dnd-kit/modifiers';
 import { CSS } from '@dnd-kit/utilities';
 import { css, cva } from 'styled-system/css';
 import { hstack, stack } from 'styled-system/patterns';
@@ -199,6 +200,7 @@ export const ManagementSection = () => {
             <DndContext
               sensors={sensors}
               collisionDetection={closestCenter}
+              modifiers={[restrictToParentElement]}
               onDragEnd={handleDragEnd}
             >
               <div className={folderListStyle}>
