@@ -68,7 +68,6 @@ export const MainContentWrapper = ({ children }: MainContentWrapperProps) => {
         width: '100%',
         px: '1.5rem',
         boxSizing: 'border-box',
-        overflowX: 'auto',
       })}
       style={{ transform: `translateX(-${centerOffset}px)` }}
     >
