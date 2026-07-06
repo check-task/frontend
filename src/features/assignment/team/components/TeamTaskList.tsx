@@ -93,6 +93,7 @@ const TeamTaskList = ({
   useEffect(() => {
     setSortedSubTasks(sortByCompletion(subTasks));
   }, [subTasks]);
+  const orderKey = sortedSubTasks.map((t) => t.subTaskId).join(',');
 
   const queryClient = useQueryClient();
   const { mutate: mutateStatus } = useUpdateTeamSubTaskStatus(taskId);
@@ -422,6 +423,7 @@ const TeamTaskList = ({
               <motion.div
                 key={task.subTaskId}
                 layout
+                layoutDependency={orderKey}
                 layoutId={`team-task-${task.subTaskId}`}
                 transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
               >

@@ -77,6 +77,7 @@ export const PersonalTaskList = ({
   useEffect(() => {
     setSortedTasks(sortByCompletion(tasks));
   }, [tasks]);
+  const orderKey = sortedTasks.map((t) => t.id).join(',');
 
   // 달력 날짜 변경 시 호출 핸들러
   const handleDeadlineChange = (subTaskId: number) => (date: Date, timeEnabled: boolean) => {
@@ -112,7 +113,7 @@ export const PersonalTaskList = ({
       {tasks.length === 0 ? (
         <div className={emptyStateStyle}>등록된 task가 없습니다.</div>
       ) : (
-        <motion.div layout className={PersonalTaskListStyle}>
+        <div className={PersonalTaskListStyle}>
           {sortedTasks.map((task) => {
             const isCompleted = task.status === 'COMPLETED';
 
@@ -120,6 +121,7 @@ export const PersonalTaskList = ({
               <motion.div
                 key={task.id}
                 layout
+                layoutDependency={orderKey}
                 layoutId={`personal-task-${task.id}`}
                 transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
                 className={PersonalTaskItemContainerStyle}
@@ -195,7 +197,7 @@ export const PersonalTaskList = ({
               </motion.div>
             );
           })}
-        </motion.div>
+        </div>
       )}
       {!isEditMode && <TaskAddForm taskId={taskId} maxDate={maxDate} />}
     </div>
