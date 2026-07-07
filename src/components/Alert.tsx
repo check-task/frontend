@@ -1,8 +1,9 @@
 'use client';
 
-import { AlertCheckIcon } from '@/components/icons/AlertCheckIcon';
+import { CheckCircleIcon } from '@/components/icons/CheckCircleIcon';
 import { AlertXIcon } from '@/components/icons/AlertXIcon';
 import { css } from 'styled-system/css';
+import { token } from 'styled-system/tokens';
 import type { ReactNode } from 'react';
 
 interface AlertProps {
@@ -14,7 +15,11 @@ export const Alert = ({ message, variant = 'check' }: AlertProps) => {
   return (
     <div className={containerStyle}>
       <span className={iconStyle}>
-        {variant === 'x' ? <AlertXIcon /> : <AlertCheckIcon />}
+        {variant === 'x' ? (
+          <AlertXIcon />
+        ) : (
+          <CheckCircleIcon size={36} color={token('colors.primary')} filled />
+        )}
       </span>
       <p className={textStyle}>{message}</p>
     </div>
