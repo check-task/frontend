@@ -401,6 +401,7 @@ export const SignupFormStep = ({ onCancel }: SignupFormStepProps) => {
         phoneNum: parsed.data.phone || undefined,
         profileImage: profileImageFile,
       });
+      window.sessionStorage.setItem('openLoginModalAfterSignup', 'true');
       router.replace('/login');
     } catch (error) {
       setSubmitError(getApiErrorMessage(error, '회원가입에 실패했습니다.'));
