@@ -18,6 +18,8 @@ import { signin } from '@/services/auth';
 import { useAuthStore } from '@/stores/auth-store';
 import { RestoreModalContent } from '@/features/login/components/RestoreModalContent';
 
+const INSTAGRAM_URL = 'https://www.instagram.com/checktask_/';
+
 const loginSchema = z.object({
   email: z.email('올바른 이메일 형식으로 입력해 주세요.'),
   password: z.string().min(1, '비밀번호를 입력해 주세요.'),
@@ -210,6 +212,17 @@ export const LoginModalContent = () => {
 
       <p className={consentStyle}>
         로그인 시 이용약관 및 개인정보 처리방침에 동의한 것으로 간주됩니다.
+        <br />
+        {'이메일 찾기 문의는 DM('}
+        <a
+          href={INSTAGRAM_URL}
+          className={instagramLinkStyle}
+          target='_blank'
+          rel='noreferrer'
+        >
+          @checktask_
+        </a>
+        {')로 부탁드립니다.'}
       </p>
     </form>
   );
@@ -348,4 +361,10 @@ const consentStyle = css({
   mt: '2rem',
   textStyle: 'body4.r',
   color: 'gray.500',
+  textAlign: 'center',
+});
+
+const instagramLinkStyle = css({
+  color: 'blue.500',
+  textDecoration: 'underline',
 });
