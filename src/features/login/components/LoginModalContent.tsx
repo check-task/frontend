@@ -17,8 +17,21 @@ import { PasswordResetModalContent } from '@/features/login/components/PasswordR
 import { signin } from '@/services/auth';
 import { useAuthStore } from '@/stores/auth-store';
 import { RestoreModalContent } from '@/features/login/components/RestoreModalContent';
+import { PrivacyPolicyContent } from '@/features/profile/components/PrivacyPolicyContent';
+import { TermsOfServiceContent } from '@/features/profile/components/TermsOfServiceContent';
 
 const INSTAGRAM_URL = 'https://www.instagram.com/checktask_/';
+
+const TERM_MODAL_CONFIG = {
+  privacy: {
+    title: '개인정보 처리방침',
+    content: <PrivacyPolicyContent />,
+  },
+  terms: {
+    title: '서비스 이용 약관',
+    content: <TermsOfServiceContent />,
+  },
+} as const;
 
 const loginSchema = z.object({
   email: z.email('올바른 이메일 형식으로 입력해 주세요.'),
@@ -102,6 +115,20 @@ export const LoginModalContent = () => {
   const handleSignupClick = () => {
     closeModal();
     router.push('/signup');
+  };
+
+  const handleTermClick = (type: keyof typeof TERM_MODAL_CONFIG) => {
+    openModal({
+      title: TERM_MODAL_CONFIG[type].title,
+      content: TERM_MODAL_CONFIG[type].content,
+      headerType: 'withBack',
+      onLeftClick: () => {
+        openModal({
+          content: <LoginModalContent />,
+          presentation: 'bare',
+        });
+      },
+    });
   };
 
   const handleEmailChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -211,7 +238,23 @@ export const LoginModalContent = () => {
       <KakaoLoginButton />
 
       <p className={consentStyle}>
-        로그인 시 이용약관 및 개인정보 처리방침에 동의한 것으로 간주됩니다.
+        로그인 시{' '}
+        <button
+          type='button'
+          className={consentLinkStyle}
+          onClick={() => handleTermClick('terms')}
+        >
+          이용약관
+        </button>
+        {' 및 '}
+        <button
+          type='button'
+          className={consentLinkStyle}
+          onClick={() => handleTermClick('privacy')}
+        >
+          개인정보 처리방침
+        </button>
+        에 동의한 것으로 간주됩니다.
         <br />
         {'이메일 찾기 문의는 DM('}
         <a
@@ -230,7 +273,7 @@ export const LoginModalContent = () => {
 
 const containerStyle = css(
   stack.raw({
-    width: '32.625rem',
+    width: '36.25rem',
     alignItems: 'center',
     overflow: 'hidden',
     pt: '3rem',
@@ -367,4 +410,9 @@ const consentStyle = css({
 const instagramLinkStyle = css({
   color: 'blue.500',
   textDecoration: 'underline',
+});
+
+const consentLinkStyle = css({
+  textDecoration: 'underline',
+  cursor: 'pointer',
 });

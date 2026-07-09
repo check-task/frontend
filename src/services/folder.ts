@@ -32,6 +32,11 @@ export const updateFolder = async (
 };
 
 // 폴더 삭제 API 호출
-export const deleteFolder = async (folderId: number): Promise<void> => {
-  await axiosInstance.delete<DeleteFolderResponse>(`/user/folder/${folderId}`);
+export const deleteFolder = async (
+  folderId: number,
+  moveTasks = false,
+): Promise<void> => {
+  await axiosInstance.delete<DeleteFolderResponse>(`/user/folder/${folderId}`, {
+    params: { moveTasks },
+  });
 };

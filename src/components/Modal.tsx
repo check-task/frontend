@@ -6,12 +6,34 @@ import { stack } from '../../styled-system/patterns';
 import { token } from '../../styled-system/tokens';
 import { CloseIcon } from './icons/CloseIcon';
 import { CheckCircleIcon } from './icons/CheckCircleIcon';
+import { LeftIcon } from './icons/LeftIcon';
 import { useModalStore } from '@/stores/modal-store';
 import { createPortal } from 'react-dom';
 
 export const Modal = () => {
   // 전역 상태 구독
   const { isOpen, options, closeModal } = useModalStore();
+  const modalOptions: NonNullable<typeof options> = options ?? {
+    content: null,
+  };
+  const {
+    title,
+    content,
+    headerType = 'withClose',
+    onLeftClick,
+    onRightClick,
+    presentation = 'default',
+  } = modalOptions;
+
+  // 왼쪽 아이콘 클릭 핸들러
+  const handleLeftClick = () => {
+    if (onLeftClick) {
+      onLeftClick();
+      return;
+    }
+
+    closeModal();
+  };
 
   // 아이콘 클릭 핸들러
   const handleRightClick = () => {
@@ -43,19 +65,39 @@ export const Modal = () => {
     return () => window.removeEventListener('keydown', handleEsc);
   }, [isOpen, closeModal]);
 
-  // 헤더 타입에 따른 아이콘 결정
-  const renderIcon = () => {
-    if (headerType === 'none') return null;
+  // 모달이 열려있지 않거나 서버에서 실행되는 경우를 차단
+  if (!isOpen || !options || typeof window === 'undefined') return null;
+
+  const renderTitle = () => {
+    if (headerType !== 'withBack') {
+      return <div className={titleStyle}>{title}</div>;
+    }
+
+    return (
+      <div className={backTitleWrapStyle}>
+        <button
+          type='button'
+          onClick={handleLeftClick}
+          aria-label='이전'
+          className={iconButtonStyle}
+        >
+          <LeftIcon />
+        </button>
+        <div className={titleStyle}>{title}</div>
+      </div>
+    );
+  };
+
+  // 헤더 타입에 따른 오른쪽 아이콘 결정
+  const renderRightIcon = () => {
+    if (headerType === 'none' || headerType === 'withBack') return null;
 
     return (
       <button
         type='button'
         onClick={handleRightClick}
         aria-label={headerType === 'withClose' ? '닫기' : '확인'}
-        className={css({
-          cursor: 'pointer',
-          display: 'flex',
-        })}
+        className={iconButtonStyle}
       >
         {headerType === 'withClose' ? (
           <CloseIcon />
@@ -65,16 +107,6 @@ export const Modal = () => {
       </button>
     );
   };
-
-  // 모달이 열려있지 않거나 서버에서 실행되는 경우를 차단
-  if (!isOpen || !options || typeof window === 'undefined') return null;
-  const {
-    title,
-    content,
-    headerType = 'withClose',
-    onRightClick,
-    presentation = 'default',
-  } = options;
 
   return createPortal(
     // 오버레이 부분
@@ -92,12 +124,8 @@ export const Modal = () => {
               <div className={stack({ gap: '1rem', width: 'full' })}>
                 {/* 모달 해더 */}
                 <header className={headerRecipe({ type: headerType })}>
-                  <div
-                    className={css({ textStyle: 'body1.m', color: 'gray.900' })}
-                  >
-                    {title}
-                  </div>
-                  {renderIcon()}
+                  {renderTitle()}
+                  {renderRightIcon()}
                 </header>
                 {/* 선 역할 */}
                 <span className={dividerStyle} />
@@ -162,6 +190,10 @@ const headerRecipe = cva({
       withCheck: {
         justifyContent: 'space-between',
       },
+      // 뒤로가기 아이콘
+      withBack: {
+        justifyContent: 'flex-start',
+      },
     },
   },
 
@@ -176,4 +208,25 @@ const dividerStyle = css({
   border: '0.5px solid',
   color: 'gray.200',
   width: 'full',
+});
+
+const titleStyle = css({
+  textStyle: 'body1.m',
+  color: 'gray.900',
+});
+
+const backTitleWrapStyle = css({
+  display: 'flex',
+  alignItems: 'center',
+  gap: '0.25rem',
+});
+
+const iconButtonStyle = css({
+  cursor: 'pointer',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  background: 'none',
+  border: 'none',
+  padding: 0,
 });

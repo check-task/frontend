@@ -7,6 +7,7 @@ import { LoginCarousel } from '@/features/login/components/LoginCarousel';
 import { MobileLoginView } from '@/features/login/components/MobileLoginView';
 import { TabletLoginView } from '@/features/login/components/TabletLoginView';
 import { WithdrawnAlert } from '@/features/login/components/WithdrawnAlert';
+import { SignupSuccessLoginModal } from '@/features/login/components/SignupSuccessLoginModal';
 import Image from 'next/image';
 
 interface LoginPageProps {
@@ -84,6 +85,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
 
         {/* 탈퇴 계정 복구 모달 */}
         {isWithdrawn && <WithdrawnAlert token={token} />}
+        <SignupSuccessLoginModal />
       </div>
     </>
   );
