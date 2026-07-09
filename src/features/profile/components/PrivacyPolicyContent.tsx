@@ -318,7 +318,7 @@ const scrollContainerStyle = css({
     paddingBottom: '0.5rem',
   }),
   width: 'calc(100% + 1.25rem)',
-  maxHeight: '30.6255rem',
+  maxHeight: '36.375rem',
   overflowY: 'auto',
   paddingRight: '1rem',
   scrollbarGutter: 'stable',

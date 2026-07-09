@@ -5,7 +5,8 @@ import { ReactNode } from 'react';
 interface ModalOptions {
   title?: string;
   content: ReactNode; // 모달 내부 내용
-  headerType?: 'none' | 'withClose' | 'withCheck';
+  headerType?: 'none' | 'withClose' | 'withCheck' | 'withBack';
+  onLeftClick?: () => void;
   onRightClick?: () => void;
   presentation?: 'default' | 'bare';
 }
