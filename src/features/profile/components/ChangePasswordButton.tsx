@@ -2,27 +2,22 @@
 
 import { css } from 'styled-system/css';
 import { useModalStore } from '@/stores/modal-store';
-import { EditProfileModalContent } from './EditProfileModalContent';
-import type { User } from '@/types/api/user';
+import { ChangePasswordModalContent } from './ChangePasswordModalContent';
 
-interface EditProfileButtonProps {
-  user: User;
-}
-
-export const EditProfileButton = ({ user }: EditProfileButtonProps) => {
+export const ChangePasswordButton = () => {
   const openModal = useModalStore((state) => state.openModal);
 
   const handleOpen = () => {
     openModal({
-      title: '프로필 변경',
-      content: <EditProfileModalContent user={user} />,
+      title: '비밀번호 변경',
+      content: <ChangePasswordModalContent />,
       headerType: 'withClose',
     });
   };
 
   return (
-    <button type='button' className={profileButtonStyle} onClick={handleOpen}>
-      프로필 변경
+    <button type='button' className={changePasswordButtonStyle} onClick={handleOpen}>
+      비밀번호 변경
     </button>
   );
 };
@@ -37,7 +32,7 @@ const actionButtonBaseStyle = {
   whiteSpace: 'nowrap',
 } as const;
 
-const profileButtonStyle = css({
+const changePasswordButtonStyle = css({
   ...actionButtonBaseStyle,
   bg: 'blue.50',
   color: 'blue.500',

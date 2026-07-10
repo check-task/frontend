@@ -6,6 +6,7 @@ import type {
   PasswordResetSendCodeRequest,
   PasswordResetVerifyCodeRequest,
   PasswordResetVerifyCodeResponseData,
+  PasswordChangeRequest,
   RestoreLocalAccountRequest,
   RestoreLocalAccountResponseData,
   SendEmailCodeRequest,
@@ -116,4 +117,10 @@ export const confirmPasswordReset = async (
   body: PasswordResetConfirmRequest,
 ): Promise<void> => {
   await axiosInstance.post<ApiResponse>('/auth/password/reset/confirm', body);
+};
+
+export const changePassword = async (
+  body: PasswordChangeRequest,
+): Promise<void> => {
+  await axiosInstance.patch<ApiResponse>('/auth/password', body);
 };

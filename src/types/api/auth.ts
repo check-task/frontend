@@ -75,3 +75,8 @@ export interface PasswordResetConfirmRequest {
   resetToken: string;
   newPassword: string;
 }
+
+export interface PasswordChangeRequest {
+  currentPassword: string;
+  newPassword: string;
+}
