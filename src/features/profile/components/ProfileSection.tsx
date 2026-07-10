@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { css } from 'styled-system/css';
 import { hstack, stack } from 'styled-system/patterns';
 import { Card } from '@/features/profile/components/Card';
+import { ChangePasswordButton } from '@/features/profile/components/ChangePasswordButton';
 import { EditProfileButton } from '@/features/profile/components/EditProfileButton';
 import { useAuthStore } from '@/stores/auth-store';
 import { useMyInfo } from '@/hooks/queries/useMyInfo';
@@ -60,7 +61,10 @@ export const ProfileSection = () => {
               ))}
             </div>
           </div>
-          <EditProfileButton user={user} />
+          <div className={profileActionGroupStyle}>
+            {user.loginType === 'LOCAL' && <ChangePasswordButton />}
+            <EditProfileButton user={user} />
+          </div>
         </div>
       </Card>
     </section>
@@ -112,15 +116,15 @@ const profileImageSectionStyle = css(
 );
 
 const profileImageDefaultStyle = css({
-  width: '10rem',
-  height: '10rem',
+  width: '9.3125rem',
+  height: '9.3125rem',
   borderRadius: '50%',
   bg: 'blue.100',
 });
 
 const profileImageActualStyle = css({
-  width: '10rem',
-  height: '10rem',
+  width: '9.3125rem',
+  height: '9.3125rem',
   borderRadius: '50%',
   objectFit: 'cover',
 });
@@ -161,10 +165,17 @@ const profileInfoRowStyle = css(
   }),
 );
 
+const profileActionGroupStyle = css(
+  hstack.raw({
+    gap: '0.75rem',
+    alignItems: 'center',
+  }),
+);
+
 // 구분선
 const dividerStyle = css({
   width: '1px',
-  height: '13.625rem',
+  height: '12.5rem',
   bg: 'gray.200',
   alignSelf: 'center',
 });

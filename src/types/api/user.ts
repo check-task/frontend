@@ -1,9 +1,10 @@
 export interface User {
   id: number;
   nickname: string;
-  phoneNum: string;
+  phoneNum: string | null;
   email: string;
-  profileImage: string;
+  profileImage: string | null;
+  loginType: 'LOCAL' | 'KAKAO';
   deadlineAlarm?: number;
   taskAlarm?: number;
 }

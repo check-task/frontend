@@ -23,6 +23,7 @@ export const getMyInfo = async (): Promise<{
       phoneNum: data.phoneNum,
       email: data.email,
       profileImage: data.profileImage,
+      loginType: data.loginType,
       deadlineAlarm: data.deadlineAlarm,
       taskAlarm: data.taskAlarm,
     },

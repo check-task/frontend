@@ -8,9 +8,10 @@ export interface GetMyInfoResponse {
 export interface GetMyInfoResponseData {
   userId: number;
   nickname: string;
-  phoneNum: string;
+  phoneNum: string | null;
   email: string;
-  profileImage: string;
+  profileImage: string | null;
+  loginType: 'LOCAL' | 'KAKAO';
   deadlineAlarm: number;
   taskAlarm: number;
   folders: Array<{
@@ -30,8 +31,8 @@ export interface UpdateProfileResponse {
 export interface UpdateProfileResponseData {
   userId: number;
   nickname: string;
-  phoneNum: string;
+  phoneNum: string | null;
   email: string;
-  profileImage: string;
+  profileImage: string | null;
   updatedAt: string;
 }
