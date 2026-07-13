@@ -1,6 +1,6 @@
 'use client';
 
-import { ChangeEvent, FormEvent, useState } from 'react';
+import { ChangeEvent, FocusEvent, FormEvent, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { isAxiosError } from 'axios';
 import { z } from 'zod';
@@ -13,6 +13,7 @@ import { CloseIcon } from '@/components/icons/CloseIcon';
 import { EyeIcon } from '@/components/icons/EyeIcon';
 import { EyeOffIcon } from '@/components/icons/EyeOffIcon';
 import { useChangePassword } from '@/hooks/mutations/useChangePassword';
+import { useVerifyCurrentPassword } from '@/hooks/mutations/useVerifyCurrentPassword';
 import { useAuthStore } from '@/stores/auth-store';
 import { useModalStore } from '@/stores/modal-store';
 
@@ -47,6 +48,8 @@ const changePasswordSchema = z
 
 type ChangePasswordField = keyof z.infer<typeof changePasswordSchema>;
 
+type CurrentPasswordVerifyStatus = 'idle' | 'pending' | 'verified' | 'invalid';
+
 const getApiErrorMessage = (error: unknown, fallback: string) => {
   if (!isAxiosError(error)) return fallback;
 
@@ -62,6 +65,7 @@ export const ChangePasswordModalContent = () => {
   const closeModal = useModalStore((state) => state.closeModal);
   const logout = useAuthStore((state) => state.logout);
   const changePassword = useChangePassword();
+  const verifyCurrentPassword = useVerifyCurrentPassword();
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [passwordConfirm, setPasswordConfirm] = useState('');
@@ -72,8 +76,11 @@ export const ChangePasswordModalContent = () => {
     Partial<Record<ChangePasswordField, string>>
   >({});
   const [submitError, setSubmitError] = useState('');
+  const [currentPasswordVerifyStatus, setCurrentPasswordVerifyStatus] =
+    useState<CurrentPasswordVerifyStatus>('idle');
+  const [verifiedCurrentPassword, setVerifiedCurrentPassword] = useState('');
+  const verifyRequestIdRef = useRef(0);
 
-  const isCurrentPasswordEntered = currentPassword.length > 0;
   const isNewPasswordStarted = newPassword.length > 0;
   const isPasswordLengthValid =
     passwordLengthSchema.safeParse(newPassword).success;
@@ -87,15 +94,103 @@ export const ChangePasswordModalContent = () => {
     newPassword === passwordConfirm;
   const isPasswordConfirmInvalid =
     isPasswordConfirmStarted && newPassword !== passwordConfirm;
+  const isCurrentPasswordVerified =
+    currentPasswordVerifyStatus === 'verified' &&
+    currentPassword.length > 0 &&
+    currentPassword === verifiedCurrentPassword;
+  const isCurrentPasswordVerifying = currentPasswordVerifyStatus === 'pending';
   const canSubmit =
-    isCurrentPasswordEntered && isNewPasswordValid && isPasswordConfirmValid;
+    isCurrentPasswordVerified &&
+    isNewPasswordValid &&
+    isPasswordConfirmValid &&
+    !isCurrentPasswordVerifying;
 
   const handleCurrentPasswordChange = (
     event: ChangeEvent<HTMLInputElement>,
   ) => {
+    verifyRequestIdRef.current += 1;
     setCurrentPassword(event.target.value);
+    setCurrentPasswordVerifyStatus('idle');
+    setVerifiedCurrentPassword('');
     setFormErrors((prev) => ({ ...prev, currentPassword: undefined }));
     setSubmitError('');
+  };
+
+  const verifyCurrentPasswordValue = async (password: string) => {
+    const parsed = currentPasswordSchema.safeParse(password);
+
+    if (!parsed.success) {
+      setCurrentPasswordVerifyStatus('idle');
+      setVerifiedCurrentPassword('');
+      setFormErrors((prev) => ({
+        ...prev,
+        currentPassword: parsed.error.issues[0]?.message,
+      }));
+      return false;
+    }
+
+    if (
+      currentPasswordVerifyStatus === 'verified' &&
+      password === verifiedCurrentPassword
+    ) {
+      return true;
+    }
+
+    const requestId = verifyRequestIdRef.current + 1;
+    verifyRequestIdRef.current = requestId;
+    setCurrentPasswordVerifyStatus('pending');
+    setFormErrors((prev) => ({ ...prev, currentPassword: undefined }));
+    setSubmitError('');
+
+    try {
+      await verifyCurrentPassword.mutateAsync({ password });
+      if (verifyRequestIdRef.current !== requestId) return false;
+      setCurrentPasswordVerifyStatus('verified');
+      setVerifiedCurrentPassword(password);
+      return true;
+    } catch (error) {
+      if (verifyRequestIdRef.current !== requestId) return false;
+
+      const errorCode = isAxiosError(error)
+        ? (error.response?.data as { errorCode?: string } | undefined)
+            ?.errorCode
+        : undefined;
+
+      setCurrentPasswordVerifyStatus('invalid');
+      setVerifiedCurrentPassword('');
+
+      if (errorCode === 'INVALID_CREDENTIALS') {
+        setFormErrors((prev) => ({
+          ...prev,
+          currentPassword: '비밀번호가 불일치합니다.',
+        }));
+        return false;
+      }
+
+      if (errorCode === 'NOT_LOCAL_USER') {
+        setFormErrors((prev) => ({
+          ...prev,
+          currentPassword:
+            '자체 로그인 사용자만 비밀번호를 변경할 수 있습니다.',
+        }));
+        return false;
+      }
+
+      setFormErrors((prev) => ({
+        ...prev,
+        currentPassword: getApiErrorMessage(
+          error,
+          '비밀번호 확인에 실패했습니다.',
+        ),
+      }));
+      return false;
+    }
+  };
+
+  const handleCurrentPasswordBlur = async (
+    event: FocusEvent<HTMLInputElement>,
+  ) => {
+    await verifyCurrentPasswordValue(event.target.value);
   };
 
   const handleNewPasswordChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -119,6 +214,11 @@ export const ChangePasswordModalContent = () => {
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (changePassword.isPending) return;
+
+    if (!isCurrentPasswordVerified) {
+      const verified = await verifyCurrentPasswordValue(currentPassword);
+      if (!verified) return;
+    }
 
     const parsed = changePasswordSchema.safeParse({
       currentPassword,
@@ -158,6 +258,8 @@ export const ChangePasswordModalContent = () => {
         setFormErrors({
           currentPassword: '비밀번호가 불일치합니다.',
         });
+        setCurrentPasswordVerifyStatus('invalid');
+        setVerifiedCurrentPassword('');
         return;
       }
 
@@ -176,9 +278,20 @@ export const ChangePasswordModalContent = () => {
           placeholder='기존 비밀번호를 입력하세요.'
           showPassword={showCurrentPassword}
           onChange={handleCurrentPasswordChange}
+          onBlur={handleCurrentPasswordBlur}
           onToggleShow={() => setShowCurrentPassword((prev) => !prev)}
         >
-          {formErrors.currentPassword && (
+          {isCurrentPasswordVerifying && (
+            <ValidationMessage tone='info'>
+              비밀번호를 확인 중입니다.
+            </ValidationMessage>
+          )}
+          {isCurrentPasswordVerified && !isCurrentPasswordVerifying && (
+            <ValidationMessage tone='success'>
+              비밀번호가 일치합니다.
+            </ValidationMessage>
+          )}
+          {formErrors.currentPassword && !isCurrentPasswordVerifying && (
             <ValidationMessage tone='error'>
               {formErrors.currentPassword}
             </ValidationMessage>
@@ -241,10 +354,16 @@ export const ChangePasswordModalContent = () => {
         type='submit'
         variant='fillBlue'
         size='xlarge'
-        disabled={!canSubmit || changePassword.isPending}
+        disabled={
+          !canSubmit || changePassword.isPending || isCurrentPasswordVerifying
+        }
         className={saveButtonStyle}
       >
-        {changePassword.isPending ? '저장 중...' : '변경사항 저장'}
+        {changePassword.isPending
+          ? '저장 중...'
+          : isCurrentPasswordVerifying
+            ? '확인 중...'
+            : '변경사항 저장'}
       </Button>
     </form>
   );
@@ -256,6 +375,7 @@ interface PasswordFieldProps {
   placeholder: string;
   showPassword: boolean;
   onChange: (event: ChangeEvent<HTMLInputElement>) => void;
+  onBlur?: (event: FocusEvent<HTMLInputElement>) => void;
   onToggleShow: () => void;
   children?: React.ReactNode;
 }
@@ -266,6 +386,7 @@ const PasswordField = ({
   placeholder,
   showPassword,
   onChange,
+  onBlur,
   onToggleShow,
   children,
 }: PasswordFieldProps) => {
@@ -280,6 +401,7 @@ const PasswordField = ({
           placeholder={placeholder}
           className={passwordInputStyle}
           onChange={onChange}
+          onBlur={onBlur}
         />
         <button
           type='button'
@@ -321,7 +443,7 @@ const ValidationMessage = ({
   tone,
   children,
 }: {
-  tone: 'success' | 'error';
+  tone: 'success' | 'error' | 'info';
   children: React.ReactNode;
 }) => {
   return <p className={validationMessageStyle({ tone })}>{children}</p>;
@@ -387,6 +509,9 @@ const validationMessageStyle = cva({
       },
       error: {
         color: 'sub.01.100',
+      },
+      info: {
+        color: 'gray.400',
       },
     },
   },
