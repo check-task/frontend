@@ -80,3 +80,7 @@ export interface PasswordChangeRequest {
   currentPassword: string;
   newPassword: string;
 }
+
+export interface PasswordVerifyRequest {
+  password: string;
+}

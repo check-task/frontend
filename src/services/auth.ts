@@ -7,6 +7,7 @@ import type {
   PasswordResetVerifyCodeRequest,
   PasswordResetVerifyCodeResponseData,
   PasswordChangeRequest,
+  PasswordVerifyRequest,
   RestoreLocalAccountRequest,
   RestoreLocalAccountResponseData,
   SendEmailCodeRequest,
@@ -123,4 +124,10 @@ export const changePassword = async (
   body: PasswordChangeRequest,
 ): Promise<void> => {
   await axiosInstance.patch<ApiResponse>('/auth/password', body);
+};
+
+export const verifyCurrentPassword = async (
+  body: PasswordVerifyRequest,
+): Promise<void> => {
+  await axiosInstance.post<ApiResponse>('/auth/password/verify', body);
 };
