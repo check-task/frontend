@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import { getCompletedTaskList } from '@/services/task';
 import { FolderColor } from '@/types/folder';
 import { resolveFolderColor } from '@/lib/folder-color';
@@ -14,11 +14,12 @@ export interface CompletedTaskListItem {
 }
 
 // 완료 과제 목록 조회 커스텀 훅
-export const useCompletedTaskList = () => {
+export const useCompletedTaskList = (folderId: number[] | null = null) => {
   return useQuery({
-    queryKey: ['completedTaskList'],
+    queryKey: ['completedTaskList', folderId],
+    placeholderData: keepPreviousData,
     queryFn: async (): Promise<CompletedTaskListItem[]> => {
-      const tasks = await getCompletedTaskList();
+      const tasks = await getCompletedTaskList(folderId ?? undefined);
 
       return tasks.map((task) => ({
         id: task.taskId,
