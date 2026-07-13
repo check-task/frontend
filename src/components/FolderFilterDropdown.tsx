@@ -12,7 +12,6 @@ import { folderColorToHex } from '@/lib/folder-color';
 
 interface FolderFilterDropdownProps {
   folders?: Folder[];
-  /** 선택된 폴더 id 목록이 바뀔 때 호출. 전체 선택 상태면 null */
   onSelectionChange?: (selectedIds: number[] | null) => void;
 }
 
@@ -21,20 +20,19 @@ export const FolderFilterDropdown = ({
   onSelectionChange,
 }: FolderFilterDropdownProps) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedIds, setSelectedIds] = useState<Set<number>>(
-    () => new Set(folders.map((f) => f.id)),
-  );
-  const isAllSelected = selectedIds.size === folders.length;
+  // null = 전체 선택 (folders 로드 시점과 무관하게 항상 "전체"를 의미)
+  const [selectedIds, setSelectedIds] = useState<Set<number> | null>(null);
+  const isAllSelected = selectedIds === null;
+  const isFolderSelected = (folderId: number) =>
+    isAllSelected || selectedIds.has(folderId);
   const triggerFolder = isAllSelected
     ? null
     : (folders.find((f) => selectedIds.has(f.id)) ?? null);
 
   const applySelection = (next: Set<number>) => {
-    const finalSet = next.size === 0 ? new Set(folders.map((f) => f.id)) : next;
+    const finalSet = next.size === 0 || next.size === folders.length ? null : next;
     setSelectedIds(finalSet);
-    onSelectionChange?.(
-      finalSet.size === folders.length ? null : Array.from(finalSet),
-    );
+    onSelectionChange?.(finalSet ? Array.from(finalSet) : null);
   };
 
   const handleSelectAll = () => {
@@ -42,7 +40,9 @@ export const FolderFilterDropdown = ({
   };
 
   const handleToggleFolder = (folderId: number) => {
-    const next = new Set(selectedIds);
+    const next = new Set(
+      selectedIds ?? folders.map((f) => f.id),
+    );
     if (next.has(folderId)) {
       next.delete(folderId);
     } else {
@@ -89,7 +89,7 @@ export const FolderFilterDropdown = ({
         </button>
 
         {folders.map((folder, index) => {
-          const isSelected = selectedIds.has(folder.id);
+          const isSelected = isFolderSelected(folder.id);
           return (
             <button
               key={folder.id}
