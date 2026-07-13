@@ -5,6 +5,7 @@ import type {
   UpdateFolderRequest,
   DeleteFolderResponse,
 } from '@/types/api/folder';
+import type { FolderRankRequest } from '@/types/folder';
 import axiosInstance from '@/lib/axiosInstance';
 import { folderColorToHex } from '@/lib/folder-color';
 
@@ -39,4 +40,11 @@ export const deleteFolder = async (
   await axiosInstance.delete<DeleteFolderResponse>(`/user/folder/${folderId}`, {
     params: { moveTasks },
   });
+};
+
+// 폴더 순서 변경 API 호출
+export const updateFolderPriority = async (
+  body: FolderRankRequest,
+): Promise<void> => {
+  await axiosInstance.patch('/user/folder/priority', body);
 };
