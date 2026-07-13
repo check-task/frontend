@@ -12,10 +12,13 @@ import { folderColorToHex } from '@/lib/folder-color';
 
 interface FolderFilterDropdownProps {
   folders?: Folder[];
+  /** 선택된 폴더 id 목록이 바뀔 때 호출. 전체 선택 상태면 null */
+  onSelectionChange?: (selectedIds: number[] | null) => void;
 }
 
 export const FolderFilterDropdown = ({
   folders = DUMMY_FOLDERS,
+  onSelectionChange,
 }: FolderFilterDropdownProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<number>>(
@@ -26,8 +29,16 @@ export const FolderFilterDropdown = ({
     ? null
     : (folders.find((f) => selectedIds.has(f.id)) ?? null);
 
+  const applySelection = (next: Set<number>) => {
+    const finalSet = next.size === 0 ? new Set(folders.map((f) => f.id)) : next;
+    setSelectedIds(finalSet);
+    onSelectionChange?.(
+      finalSet.size === folders.length ? null : Array.from(finalSet),
+    );
+  };
+
   const handleSelectAll = () => {
-    setSelectedIds(new Set(folders.map((f) => f.id)));
+    applySelection(new Set(folders.map((f) => f.id)));
   };
 
   const handleToggleFolder = (folderId: number) => {
@@ -37,7 +48,7 @@ export const FolderFilterDropdown = ({
     } else {
       next.add(folderId);
     }
-    setSelectedIds(next.size === 0 ? new Set(folders.map((f) => f.id)) : next);
+    applySelection(next);
   };
 
   return (
