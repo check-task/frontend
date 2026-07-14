@@ -9,39 +9,52 @@ import { CheckCircleIcon } from '@/components/icons/CheckCircleIcon';
 import { DUMMY_FOLDERS } from '@/constants/folders';
 import type { Folder } from '@/types/folder';
 import { folderColorToHex } from '@/lib/folder-color';
+import { useClickOutside } from '@/hooks/useClickOutside';
 
 interface FolderFilterDropdownProps {
   folders?: Folder[];
+  onSelectionChange?: (selectedIds: number[] | null) => void;
 }
 
 export const FolderFilterDropdown = ({
   folders = DUMMY_FOLDERS,
+  onSelectionChange,
 }: FolderFilterDropdownProps) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedIds, setSelectedIds] = useState<Set<number>>(
-    () => new Set(folders.map((f) => f.id)),
-  );
-  const isAllSelected = selectedIds.size === folders.length;
+  const containerRef = useClickOutside<HTMLDivElement>(() => setIsOpen(false));
+  // null = 전체 선택 (folders 로드 시점과 무관하게 항상 "전체"를 의미)
+  const [selectedIds, setSelectedIds] = useState<Set<number> | null>(null);
+  const isAllSelected = selectedIds === null;
+  const isFolderSelected = (folderId: number) =>
+    isAllSelected || selectedIds.has(folderId);
   const triggerFolder = isAllSelected
     ? null
     : (folders.find((f) => selectedIds.has(f.id)) ?? null);
 
+  const applySelection = (next: Set<number>) => {
+    const finalSet = next.size === 0 || next.size === folders.length ? null : next;
+    setSelectedIds(finalSet);
+    onSelectionChange?.(finalSet ? Array.from(finalSet) : null);
+  };
+
   const handleSelectAll = () => {
-    setSelectedIds(new Set(folders.map((f) => f.id)));
+    applySelection(new Set(folders.map((f) => f.id)));
   };
 
   const handleToggleFolder = (folderId: number) => {
-    const next = new Set(selectedIds);
+    const next = new Set(
+      selectedIds ?? folders.map((f) => f.id),
+    );
     if (next.has(folderId)) {
       next.delete(folderId);
     } else {
       next.add(folderId);
     }
-    setSelectedIds(next.size === 0 ? new Set(folders.map((f) => f.id)) : next);
+    applySelection(next);
   };
 
   return (
-    <div className={containerStyle}>
+    <div ref={containerRef} className={containerStyle}>
       <button
         type='button'
         className={triggerStyle}
@@ -78,7 +91,7 @@ export const FolderFilterDropdown = ({
         </button>
 
         {folders.map((folder, index) => {
-          const isSelected = selectedIds.has(folder.id);
+          const isSelected = isFolderSelected(folder.id);
           return (
             <button
               key={folder.id}

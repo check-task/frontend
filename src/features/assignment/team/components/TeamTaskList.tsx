@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Checkbox } from '@/components/Checkbox';
 import { css, cva } from 'styled-system/css';
@@ -93,7 +93,10 @@ const TeamTaskList = ({
   useEffect(() => {
     setSortedSubTasks(sortByCompletion(subTasks));
   }, [subTasks]);
-  const orderKey = sortedSubTasks.map((t) => t.subTaskId).join(',');
+
+  // 체크박스 토글일 때만 layout 애니메이션 적용 (추가/삭제 등 다른 변경은 건드리지 않음)
+  const [shouldAnimate, setShouldAnimate] = useState(false);
+  const animateTimeoutRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   const queryClient = useQueryClient();
   const { mutate: mutateStatus } = useUpdateTeamSubTaskStatus(taskId);
@@ -187,6 +190,9 @@ const TeamTaskList = ({
 
   const handleStatusChange = (subTaskId: number, isChecked: boolean) => {
     const previousSubTasks = sortedSubTasks;
+    setShouldAnimate(true);
+    clearTimeout(animateTimeoutRef.current);
+    animateTimeoutRef.current = setTimeout(() => setShouldAnimate(false), 400);
     setSortedSubTasks((prev) =>
       sortByCompletion(
         prev.map((t) =>
@@ -423,9 +429,8 @@ const TeamTaskList = ({
               <motion.div
                 key={task.subTaskId}
                 layout
-                layoutDependency={orderKey}
                 layoutId={`team-task-${task.subTaskId}`}
-                transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
+                transition={{ duration: shouldAnimate ? 0.35 : 0, ease: [0.4, 0, 0.2, 1] }}
               >
                 <div
                   className={taskItemContainerStyle({ checked: isCompleted })}
