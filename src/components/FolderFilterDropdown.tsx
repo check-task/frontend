@@ -9,6 +9,7 @@ import { CheckCircleIcon } from '@/components/icons/CheckCircleIcon';
 import { DUMMY_FOLDERS } from '@/constants/folders';
 import type { Folder } from '@/types/folder';
 import { folderColorToHex } from '@/lib/folder-color';
+import { useClickOutside } from '@/hooks/useClickOutside';
 
 interface FolderFilterDropdownProps {
   folders?: Folder[];
@@ -20,6 +21,7 @@ export const FolderFilterDropdown = ({
   onSelectionChange,
 }: FolderFilterDropdownProps) => {
   const [isOpen, setIsOpen] = useState(false);
+  const containerRef = useClickOutside<HTMLDivElement>(() => setIsOpen(false));
   // null = 전체 선택 (folders 로드 시점과 무관하게 항상 "전체"를 의미)
   const [selectedIds, setSelectedIds] = useState<Set<number> | null>(null);
   const isAllSelected = selectedIds === null;
@@ -52,7 +54,7 @@ export const FolderFilterDropdown = ({
   };
 
   return (
-    <div className={containerStyle}>
+    <div ref={containerRef} className={containerStyle}>
       <button
         type='button'
         className={triggerStyle}
