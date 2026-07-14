@@ -4,6 +4,8 @@ import type {
   CreateFolderResponseData,
   UpdateFolderRequest,
   DeleteFolderResponse,
+  FolderTaskGroup,
+  GetFolderTasksResponse,
 } from '@/types/api/folder';
 import type { FolderRankRequest } from '@/types/folder';
 import axiosInstance from '@/lib/axiosInstance';
@@ -47,4 +49,13 @@ export const updateFolderPriority = async (
   body: FolderRankRequest,
 ): Promise<void> => {
   await axiosInstance.patch('/user/folder/priority', body);
+
+// 폴더별 과제 목록 조회 API 호출 
+export const getFolderTasks = async (
+  folderId: number[],
+): Promise<FolderTaskGroup[]> => {
+  const res = await axiosInstance.get<GetFolderTasksResponse>(
+    `/user/folder/${folderId.join(',')}`,
+  );
+  return res.data?.data ?? [];
 };

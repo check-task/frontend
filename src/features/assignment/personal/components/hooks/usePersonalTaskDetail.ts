@@ -28,8 +28,7 @@ const mapToPersonalView = (data: TaskDetail): PersonalTaskDetailView => {
       fileName: ref.url != null ? undefined : (ref.fileName ?? undefined),
     }));
 
-  const tasks: PersonalTaskItem[] = [...data.subTasks]
-    .sort((a, b) => a.subTaskId - b.subTaskId)
+  const tasks: PersonalTaskItem[] = data.subTasks
     .map((task) => ({
       id: task.subTaskId,
       title: task.title,

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Checkbox } from '@/components/Checkbox';
 import { Input } from '@/components/TextField';
@@ -77,7 +77,10 @@ export const PersonalTaskList = ({
   useEffect(() => {
     setSortedTasks(sortByCompletion(tasks));
   }, [tasks]);
-  const orderKey = sortedTasks.map((t) => t.id).join(',');
+
+  // 체크박스 토글일 때만 layout 애니메이션 적용 (추가/삭제 등 다른 변경은 건드리지 않음)
+  const [shouldAnimate, setShouldAnimate] = useState(false);
+  const animateTimeoutRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   // 달력 날짜 변경 시 호출 핸들러
   const handleDeadlineChange = (subTaskId: number) => (date: Date, timeEnabled: boolean) => {
@@ -87,6 +90,9 @@ export const PersonalTaskList = ({
   // 체크박스 선택 시 호출 핸들러
   const handleStatusChange = (subTaskId: number, isChecked: boolean) => {
     const previousTasks = sortedTasks;
+    setShouldAnimate(true);
+    clearTimeout(animateTimeoutRef.current);
+    animateTimeoutRef.current = setTimeout(() => setShouldAnimate(false), 400);
     setSortedTasks((prev) =>
       sortByCompletion(
         prev.map((t) =>
@@ -121,9 +127,8 @@ export const PersonalTaskList = ({
               <motion.div
                 key={task.id}
                 layout
-                layoutDependency={orderKey}
                 layoutId={`personal-task-${task.id}`}
-                transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
+                transition={{ duration: shouldAnimate ? 0.35 : 0, ease: [0.4, 0, 0.2, 1] }}
                 className={PersonalTaskItemContainerStyle}
               >
                 {/* 왼쪽: [일반] 체크박스 + 제목 / [수정] Input */}
