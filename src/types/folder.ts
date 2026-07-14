@@ -16,3 +16,15 @@ export interface Folder {
   name: string;
   color: FolderColor;
 }
+
+export interface FolderRankRequest {
+  orderedFolders: {
+    folderId: number;
+    rank: number
+  }[];
+}
+
+export interface FolderRankResponse {
+  success: boolean;
+  message: string;
+}

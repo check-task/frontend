@@ -34,6 +34,8 @@ import {
   useUpdateDeadlineAlarmSetting,
   useUpdateTaskAlarmSetting,
 } from '@/hooks/mutations/useUpdateAlarmTimeSetting';
+import { useUpdateFolderRank } from '@/hooks/mutations/useUpdateFolderRank';
+import { useAlertStore } from '@/stores/alert-store';
 import type { Folder } from '@/types/folder';
 
 const UNASSIGNED_FOLDER_NAME = '지정안함';
@@ -75,6 +77,8 @@ export const ManagementSection = () => {
   const { data, isLoading } = useMyInfo();
   const updateDeadlineAlarmSetting = useUpdateDeadlineAlarmSetting();
   const updateTaskAlarmSetting = useUpdateTaskAlarmSetting();
+  const updateFolderRank = useUpdateFolderRank();
+  const { showAlert } = useAlertStore();
   const folders = useMemo(() => data?.folders ?? [], [data?.folders]);
 
   // 서버에서 받아온 폴더 목록을 로컬 순서 상태에 동기화
@@ -116,18 +120,27 @@ export const ManagementSection = () => {
     setIsReorder(false);
   };
 
-  // 저장: 현재 순서 유지 후 모드 종료 (순서 저장 API 연동 시 이곳에서 호출)
-  const handleSaveReorder = () => {
-    console.log(folders)
-    setIsReorder(false);
-  };
-
   const reorderableFolders = orderedFolders.filter(
     (folder) => folder.name !== UNASSIGNED_FOLDER_NAME,
   );
   const pinnedFolders = orderedFolders.filter(
     (folder) => folder.name === UNASSIGNED_FOLDER_NAME,
   );
+
+  // 저장: 지정안함 폴더를 항상 1순위로 고정하고, 그 아래 순서만 서버에 반영
+  const handleSaveReorder = () => {
+    const payload = [...pinnedFolders, ...reorderableFolders].map(
+      (folder, index) => ({ folderId: folder.id, rank: index + 1 }),
+    );
+
+    updateFolderRank.mutate(payload, {
+      onSuccess: () => setIsReorder(false),
+      onError: () => {
+        setOrderedFolders(snapshotFolders);
+        showAlert('폴더 순서 변경에 실패했습니다.', 'x');
+      },
+    });
+  };
 
   // 드래그 완료 시 화면에서만 폴더 순서 재정렬 (지정안함 폴더는 항상 고정)
   const handleDragEnd = (event: DragEndEvent) => {
@@ -194,6 +207,7 @@ export const ManagementSection = () => {
               onStartReorder={handleStartReorder}
               onCancelReorder={handleCancelReorder}
               onSaveReorder={handleSaveReorder}
+              isSaving={updateFolderRank.isPending}
             />
           </div>
           {isReorder ? (

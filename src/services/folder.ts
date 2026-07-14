@@ -7,6 +7,7 @@ import type {
   FolderTaskGroup,
   GetFolderTasksResponse,
 } from '@/types/api/folder';
+import type { FolderRankRequest } from '@/types/folder';
 import axiosInstance from '@/lib/axiosInstance';
 import { folderColorToHex } from '@/lib/folder-color';
 
@@ -14,10 +15,10 @@ import { folderColorToHex } from '@/lib/folder-color';
 export const createFolder = async (
   body: CreateFolderRequest,
 ): Promise<CreateFolderResponseData> => {
-  const res = await axiosInstance.post<CreateFolderResponse>(
-    '/user/folder',
-    { ...body, color: folderColorToHex(body.color) },
-  );
+  const res = await axiosInstance.post<CreateFolderResponse>('/user/folder', {
+    ...body,
+    color: folderColorToHex(body.color),
+  });
 
   return res.data.data;
 };
@@ -43,7 +44,14 @@ export const deleteFolder = async (
   });
 };
 
-// 폴더별 과제 목록 조회 API 호출 
+// 폴더 순서 변경 API 호출
+export const updateFolderPriority = async (
+  body: FolderRankRequest,
+): Promise<void> => {
+  await axiosInstance.patch('/user/folder/priority', body);
+};
+
+// 폴더별 과제 목록 조회 API 호출
 export const getFolderTasks = async (
   folderId: number[],
 ): Promise<FolderTaskGroup[]> => {

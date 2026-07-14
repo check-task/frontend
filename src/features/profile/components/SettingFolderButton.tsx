@@ -12,6 +12,7 @@ interface SettingFolderButtonProps {
   onStartReorder: () => void;
   onCancelReorder: () => void;
   onSaveReorder: () => void;
+  isSaving?: boolean;
 }
 
 export const SettingFolderButton = ({
@@ -19,6 +20,7 @@ export const SettingFolderButton = ({
   onStartReorder,
   onCancelReorder,
   onSaveReorder,
+  isSaving = false,
 }: SettingFolderButtonProps) => {
   const openModal = useModalStore((state) => state.openModal);
 
@@ -33,11 +35,19 @@ export const SettingFolderButton = ({
   if (isReorder) {
     return (
       <div className={containerStyle}>
-        <button className={cancelPillStyle} onClick={onCancelReorder}>
+        <button
+          className={cancelPillStyle}
+          onClick={onCancelReorder}
+          disabled={isSaving}
+        >
           <CloseIcon size='1.25rem' color='gray.600' />
           취소
         </button>
-        <button className={savePillStyle} onClick={onSaveReorder}>
+        <button
+          className={savePillStyle}
+          onClick={onSaveReorder}
+          disabled={isSaving}
+        >
           <SaveIcon />
           저장
         </button>
