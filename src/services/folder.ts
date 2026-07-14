@@ -4,6 +4,8 @@ import type {
   CreateFolderResponseData,
   UpdateFolderRequest,
   DeleteFolderResponse,
+  FolderTaskGroup,
+  GetFolderTasksResponse,
 } from '@/types/api/folder';
 import axiosInstance from '@/lib/axiosInstance';
 import { folderColorToHex } from '@/lib/folder-color';
@@ -39,4 +41,14 @@ export const deleteFolder = async (
   await axiosInstance.delete<DeleteFolderResponse>(`/user/folder/${folderId}`, {
     params: { moveTasks },
   });
+};
+
+// 폴더별 과제 목록 조회 API 호출 
+export const getFolderTasks = async (
+  folderId: number[],
+): Promise<FolderTaskGroup[]> => {
+  const res = await axiosInstance.get<GetFolderTasksResponse>(
+    `/user/folder/${folderId.join(',')}`,
+  );
+  return res.data?.data ?? [];
 };
