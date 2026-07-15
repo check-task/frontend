@@ -7,6 +7,7 @@ import { Modal } from '@/components/Modal';
 import { AlertContainer } from '@/components/AlertContainer';
 import { MainContentWrapper } from './MainContentWrapper';
 import { AuthProvider } from '@/providers/auth-provider';
+import { KakaoAgreementModalTrigger } from '@/features/login/components/KakaoAgreementModalTrigger';
 
 // 레이아웃 스타일
 const SIDEBAR_WIDTH_COLLAPSED = '3.75rem';
@@ -53,6 +54,7 @@ export default async function MainLayout({
           <HomeButtonBar />
           <MainContentWrapper>{children}</MainContentWrapper>
         </main>
+        <KakaoAgreementModalTrigger />
         <Modal />
         <AlertContainer />
       </div>

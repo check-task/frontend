@@ -84,3 +84,9 @@ export interface PasswordChangeRequest {
 export interface PasswordVerifyRequest {
   password: string;
 }
+
+export interface SocialAgreementRequest {
+  isTermsAgreed: boolean;
+  isThirdParty: boolean;
+  isMarketing?: boolean;
+}

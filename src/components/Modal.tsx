@@ -23,6 +23,8 @@ export const Modal = () => {
     onLeftClick,
     onRightClick,
     presentation = 'default',
+    closeOnOverlay = true,
+    closeOnEsc = true,
   } = modalOptions;
 
   // 왼쪽 아이콘 클릭 핸들러
@@ -57,13 +59,13 @@ export const Modal = () => {
   useEffect(() => {
     if (!isOpen) return;
     const handleEsc = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
+      if (e.key === 'Escape' && closeOnEsc) {
         closeModal();
       }
     };
     window.addEventListener('keydown', handleEsc);
     return () => window.removeEventListener('keydown', handleEsc);
-  }, [isOpen, closeModal]);
+  }, [isOpen, closeModal, closeOnEsc]);
 
   // 모달이 열려있지 않거나 서버에서 실행되는 경우를 차단
   if (!isOpen || !options || typeof window === 'undefined') return null;
@@ -110,7 +112,10 @@ export const Modal = () => {
 
   return createPortal(
     // 오버레이 부분
-    <div className={overlayStyle} onClick={closeModal}>
+    <div
+      className={overlayStyle}
+      onClick={closeOnOverlay ? closeModal : undefined}
+    >
       <div className={innerWrapStyle}>
         {/* 모달 본체 */}
         <div
