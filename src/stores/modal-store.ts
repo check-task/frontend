@@ -9,6 +9,8 @@ interface ModalOptions {
   onLeftClick?: () => void;
   onRightClick?: () => void;
   presentation?: 'default' | 'bare';
+  closeOnOverlay?: boolean;
+  closeOnEsc?: boolean;
 }
 
 // 모달 상태

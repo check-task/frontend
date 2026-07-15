@@ -13,6 +13,7 @@ import type {
   SendEmailCodeRequest,
   SigninRequest,
   SigninResponseData,
+  SocialAgreementRequest,
   SignupRequest,
   VerifyEmailCodeRequest,
 } from '@/types/api/auth';
@@ -130,4 +131,10 @@ export const verifyCurrentPassword = async (
   body: PasswordVerifyRequest,
 ): Promise<void> => {
   await axiosInstance.post<ApiResponse>('/auth/password/verify', body);
+};
+
+export const submitSocialAgreement = async (
+  body: SocialAgreementRequest,
+): Promise<void> => {
+  await axiosInstance.post<ApiResponse>('/auth/agreement', body);
 };

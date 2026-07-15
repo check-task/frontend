@@ -1,4 +1,4 @@
-import { css } from 'styled-system/css';
+import { css, cva } from 'styled-system/css';
 import { stack } from 'styled-system/patterns';
 
 const legalIntroText = {
@@ -16,10 +16,16 @@ const legalBodyText = {
   color: 'gray.600',
 };
 
-export const PrivacyPolicyContent = () => {
+interface PrivacyPolicyContentProps {
+  embedded?: boolean;
+}
+
+export const PrivacyPolicyContent = ({
+  embedded = false,
+}: PrivacyPolicyContentProps) => {
   return (
-    <div className={wrapperStyle}>
-      <div className={scrollContainerStyle}>
+    <div className={wrapperStyle({ embedded })}>
+      <div className={scrollContainerStyle({ embedded })}>
         <p className={introStyle}>
           본 서비스는 「개인정보 보호법」 및 「위치정보의 보호 및 이용 등에 관한
           법률」을 준수하며, 이용자의 개인정보를 안전하게 보호하고 권익을
@@ -305,36 +311,58 @@ export const PrivacyPolicyContent = () => {
   );
 };
 
-const wrapperStyle = css(
-  stack.raw({
+const wrapperStyle = cva({
+  base: stack.raw({
     marginTop: '1rem',
     maxWidth: '36.25rem',
   }),
-);
-
-const scrollContainerStyle = css({
-  ...stack.raw({
-    gap: '0.75rem',
-    paddingBottom: '0.5rem',
-  }),
-  width: 'calc(100% + 1.25rem)',
-  maxHeight: '36.375rem',
-  overflowY: 'auto',
-  paddingRight: '1rem',
-  scrollbarGutter: 'stable',
-  boxSizing: 'border-box',
-
-  '&::-webkit-scrollbar': {
-    width: '0.25rem',
+  variants: {
+    embedded: {
+      true: {
+        marginTop: 0,
+        maxWidth: 'none',
+        width: 'full',
+      },
+    },
   },
-  '&::-webkit-scrollbar-button': {
-    width: 0,
-    height: 0,
-    display: 'none !important',
+});
+
+const scrollContainerStyle = cva({
+  base: {
+    ...stack.raw({
+      gap: '0.75rem',
+      paddingBottom: '0.5rem',
+    }),
+    width: 'calc(100% + 1.25rem)',
+    maxHeight: '36.375rem',
+    overflowY: 'auto',
+    paddingRight: '1rem',
+    scrollbarGutter: 'stable',
+    boxSizing: 'border-box',
+
+    '&::-webkit-scrollbar': {
+      width: '0.25rem',
+    },
+    '&::-webkit-scrollbar-button': {
+      width: 0,
+      height: 0,
+      display: 'none !important',
+    },
+    '&::-webkit-scrollbar-thumb': {
+      background: 'gray.200',
+      borderRadius: '6.25rem',
+    },
   },
-  '&::-webkit-scrollbar-thumb': {
-    background: 'gray.200',
-    borderRadius: '6.25rem',
+  variants: {
+    embedded: {
+      true: {
+        width: '100%',
+        maxHeight: 'none',
+        overflowY: 'visible',
+        paddingRight: 0,
+        scrollbarGutter: 'auto',
+      },
+    },
   },
 });
 

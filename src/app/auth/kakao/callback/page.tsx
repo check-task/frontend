@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { css } from 'styled-system/css';
 import axiosInstance from '@/lib/axiosInstance';
 import { useAuthStore } from '@/stores/auth-store';
+import { KAKAO_AGREEMENT_REQUIRED_KEY } from '@/features/login/constants/kakaoAgreement';
 
 export default function AuthCallbackPage() {
   return <CallbackHandler />;
@@ -25,6 +26,10 @@ function CallbackHandler() {
 
       if (accessToken) {
         login(accessToken); // 토큰 저장
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('isNewUser') === 'true') {
+          window.sessionStorage.setItem(KAKAO_AGREEMENT_REQUIRED_KEY, 'true');
+        }
         router.replace('/');
       } else {
         console.error('accessToken이 응답에 없습니다');
