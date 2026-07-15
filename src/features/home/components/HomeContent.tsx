@@ -1,12 +1,13 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { css } from 'styled-system/css';
 import { hstack } from 'styled-system/patterns';
 import { FilterChipGroup } from '@/features/home/components/FilterChipGroup';
 import { Calendar } from '@/features/home/components/Calendar';
 import { AssignmentSection } from '@/features/home/components/AssignmentSection';
 import { useHomeTaskList } from '@/hooks/queries/useHomeTaskList';
+import { useHomeFilterStore } from '@/stores/home-filter-store';
 import type { SortType } from '@/features/home/components/SortTabs';
 import type { TaskSort } from '@/types/task';
 
@@ -22,17 +23,18 @@ export const HomeContent = () => {
   const { data } = useHomeTaskList(SORT_MAP[sortType]);
   const assignments = useMemo(() => data?.assignments ?? [], [data]);
   const subTasks = useMemo(() => data?.subTasks ?? [], [data]);
+  const selectedFolderIds = useHomeFilterStore(
+    (state) => state.selectedFolderIds,
+  );
+  const setSelectedFolderIds = useHomeFilterStore(
+    (state) => state.setSelectedFolderIds,
+  );
 
   // 처음에는 모든 폴더가 선택되어 있음
   const allFolderIds = useMemo(
     () => [...new Set(assignments.map((a) => a.folderId))],
     [assignments],
   );
-  // 유저가 직접 토글한 선택 상태
-  const [selectedFolderIds, setSelectedFolderIds] = useState<number[] | null>(
-    null,
-  );
-
   // 정렬 변경 시 기존 선택 유지, 초기 로드 시 전체 선택
   const effectiveSelectedIds = useMemo(() => {
     if (selectedFolderIds === null) return allFolderIds;
@@ -40,6 +42,21 @@ export const HomeContent = () => {
     const kept = selectedFolderIds.filter((id) => validIds.has(id));
     return kept.length > 0 ? kept : allFolderIds;
   }, [selectedFolderIds, allFolderIds]);
+
+  useEffect(() => {
+    if (selectedFolderIds === null) return;
+    if (!data || allFolderIds.length === 0) return;
+
+    const validIds = new Set(allFolderIds);
+    const kept = selectedFolderIds.filter((id) => validIds.has(id));
+    const hasChanged =
+      kept.length !== selectedFolderIds.length ||
+      kept.some((id, index) => id !== selectedFolderIds[index]);
+
+    if (hasChanged) {
+      setSelectedFolderIds(kept.length > 0 ? kept : null);
+    }
+  }, [data, selectedFolderIds, allFolderIds, setSelectedFolderIds]);
 
   return (
     <>

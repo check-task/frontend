@@ -21,6 +21,8 @@ export interface SignupRequest {
   email: string;
   password: string;
   nickname: string;
+  phoneNum?: string;
+  profileImage?: File | null;
 }
 
 export interface SigninRequest {
@@ -72,4 +74,19 @@ export interface PasswordResetVerifyCodeResponseData {
 export interface PasswordResetConfirmRequest {
   resetToken: string;
   newPassword: string;
+}
+
+export interface PasswordChangeRequest {
+  currentPassword: string;
+  newPassword: string;
+}
+
+export interface PasswordVerifyRequest {
+  password: string;
+}
+
+export interface SocialAgreementRequest {
+  isTermsAgreed: boolean;
+  isThirdParty: boolean;
+  isMarketing?: boolean;
 }

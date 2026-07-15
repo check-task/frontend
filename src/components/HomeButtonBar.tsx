@@ -6,8 +6,9 @@ import { css } from 'styled-system/css';
 import { useUIStore } from '@/stores/ui-store';
 import { NotificationButton } from './NotificationButton';
 
+const SIDEBAR_WIDTH_EXPANDED = '15rem';
+
 export const HomeButtonBar = () => {
-  const isSidebarCollapsed = useUIStore((state) => state.isSidebarCollapsed);
   const theme = useUIStore((state) => state.theme);
 
   const logoSrc = theme === 'dark' ? '/HomeLogoDark.svg' : '/HomeLogo.svg';
@@ -22,10 +23,6 @@ export const HomeButtonBar = () => {
           cursor: 'pointer',
           textDecoration: 'none',
           display: 'inline-block',
-          // 사이드바가 접혀있을 때는 전체 화면 기준으로 중앙 정렬하기 위해 사이드바 너비만큼 왼쪽으로 이동
-          // 사이드바가 펼쳐져있을 때는 main 영역 기준으로 중앙 정렬
-          marginLeft: isSidebarCollapsed ? '0' : '14.75rem',
-          transition: 'margin-left 0.3s ease',
         })}
       >
         <Image src={logoSrc} alt='HomeLogo' width={240} height={44} priority />
@@ -43,14 +40,22 @@ export const HomeButtonBar = () => {
 // 홈 버튼 바 컨테이너
 const containerStyle = css({
   position: 'fixed',
+  top: 0,
+  left: SIDEBAR_WIDTH_EXPANDED,
   bg: 'bg',
   pt: '1.25rem',
   pb: '1.25rem',
-  width: '100%',
+  width: `calc(100% - ${SIDEBAR_WIDTH_EXPANDED})`,
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
   zIndex: 'sticky',
+  transition:
+    'left 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+  '[data-sidebar-collapsed="true"] &': {
+    left: 0,
+    width: '100%',
+  },
 });
 
 // 알림 버튼 Wrapper

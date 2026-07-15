@@ -21,28 +21,24 @@ export const EditProfileButton = ({ user }: EditProfileButtonProps) => {
   };
 
   return (
-    <button className={underlineLinkStyle} onClick={handleOpen}>
-      <span className={profileLinkStyle}>프로필 변경</span>
-      <span className={underlineStyle} />
+    <button type='button' className={profileButtonStyle} onClick={handleOpen}>
+      프로필 변경
     </button>
   );
 };
 
-const underlineLinkStyle = css({
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '0.25rem',
-  cursor: 'pointer',
-  alignSelf: 'flex-start',
-});
-
-const profileLinkStyle = css({
+const actionButtonBaseStyle = {
+  height: '1.625rem',
+  px: '0.75rem',
+  py: '0.25rem',
+  borderRadius: '0.25rem',
   textStyle: 'body4.m',
-  color: 'blue.500',
-});
+  cursor: 'pointer',
+  whiteSpace: 'nowrap',
+} as const;
 
-const underlineStyle = css({
-  width: '100%',
-  height: '0.0625rem',
-  bg: 'blue.500',
+const profileButtonStyle = css({
+  ...actionButtonBaseStyle,
+  bg: 'blue.50',
+  color: 'blue.500',
 });

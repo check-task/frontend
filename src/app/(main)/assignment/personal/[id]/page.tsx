@@ -64,8 +64,8 @@ export default function PersonalPage() {
 const containerStyle = css({
   display: 'flex',
   justifyContent: 'center',
-  width: '100%',
-  py: '3.38rem',
+  width: 'fit-content',
+  py: '3.25rem',
 });
 
 // 왼쪽과 오른쪽을 가로로 배치

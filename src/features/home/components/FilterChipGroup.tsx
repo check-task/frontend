@@ -9,6 +9,7 @@ interface Assignment {
   folderId: number;
   folderName: string;
   folderColor: FolderColor;
+  folderRank: number | null;
 }
 
 interface FilterChipGroupProps {
@@ -22,7 +23,7 @@ export const FilterChipGroup = ({
   selectedIds,
   onSelectionChange,
 }: FilterChipGroupProps) => {
-  // 중복 제거 + folderId 기준 고정 순서 정렬
+  // 중복 제거 + 폴더 순서 기준 정렬
   const folders = useMemo(() => {
     const seen = new Set<number>();
     return assignments
@@ -31,7 +32,13 @@ export const FilterChipGroup = ({
         seen.add(a.folderId);
         return true;
       })
-      .sort((a, b) => a.folderId - b.folderId);
+      .sort((a, b) => {
+        const rankA = a.folderRank ?? Number.MAX_SAFE_INTEGER;
+        const rankB = b.folderRank ?? Number.MAX_SAFE_INTEGER;
+
+        if (rankA !== rankB) return rankA - rankB;
+        return a.folderId - b.folderId;
+      });
   }, [assignments]);
 
   // 폴더 선택/해제 토글

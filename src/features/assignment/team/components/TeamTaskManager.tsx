@@ -56,7 +56,7 @@ export const TeamTaskManager = ({
   const myNickname = myInfo?.user?.nickname ?? '나';
 
   const getProfileImageForNickname = (nickname: string): string | undefined => {
-    if (nickname === myNickname) return myInfo?.user?.profileImage;
+    if (nickname === myNickname) return myInfo?.user?.profileImage ?? undefined;
     return members.find((m) => m.nickname === nickname)?.profileImage;
   };
 
@@ -109,7 +109,7 @@ export const TeamTaskManager = ({
       {isOpen && (
         <TeamTaskManagerDropdown
           myNickname={myNickname}
-          myProfileImage={myInfo?.user?.profileImage}
+          myProfileImage={myInfo?.user?.profileImage ?? undefined}
           members={members}
           selectedManager={display.name !== 'none' ? display.name : undefined}
           onSelect={handleSelect}

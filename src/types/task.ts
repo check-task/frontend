@@ -25,6 +25,7 @@ export interface Task {
   folderId?: number;
   folderTitle?: string;
   foldercolor?: string;
+  folderRank?: number | null;
   title: string;
   type: TaskType; // PERSONAL | TEAM
   status?: TaskStatus; // 과제 상세 조회 시 반환 (PROGRESS | COMPLETED)

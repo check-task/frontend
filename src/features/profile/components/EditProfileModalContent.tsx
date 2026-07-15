@@ -55,7 +55,10 @@ export const EditProfileModalContent = ({
     resolver: zodResolver(schema),
     defaultValues: {
       nickname: user.nickname,
-      phone: user.phoneNum === '전화번호를 입력해 주세요.' ? '' : user.phoneNum,
+      phone:
+        !user.phoneNum || user.phoneNum === '전화번호를 입력해 주세요.'
+          ? ''
+          : user.phoneNum,
       email: user.email,
     },
     mode: 'onChange',

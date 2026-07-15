@@ -10,7 +10,6 @@ export const useTeamTaskDetail = (taskId: number) => {
     enabled: taskId > 0,
     select: (data): TaskDetail => ({
       ...data,
-      subTasks: [...data.subTasks].sort((a, b) => a.subTaskId - b.subTaskId),
       references: [...data.references].sort(
         (a, b) => (a.referenceId ?? 0) - (b.referenceId ?? 0),
       ),

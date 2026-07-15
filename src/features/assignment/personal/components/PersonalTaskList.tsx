@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { motion } from 'framer-motion';
 import { Checkbox } from '@/components/Checkbox';
 import { Input } from '@/components/TextField';
 import { css, cva } from 'styled-system/css';
@@ -31,6 +32,11 @@ interface PersonalTaskListProps {
 
 /** 시간 미설정 시 사용할 기본 시간 */
 const DEFAULT_DEADLINE_TIME = 'T23:59:59';
+
+const sortByCompletion = (tasks: PersonalTaskItem[]) => [
+  ...tasks.filter((t) => t.status !== 'COMPLETED'),
+  ...tasks.filter((t) => t.status === 'COMPLETED'),
+];
 
 // 시간 설정 여부에 따라 YYYY-MM-DDTHH:mm:ss 반환
 const formatDate = (date: Date, withTime: boolean) => {
@@ -67,6 +73,15 @@ export const PersonalTaskList = ({
     {},
   );
 
+  const [sortedTasks, setSortedTasks] = useState(() => sortByCompletion(tasks));
+  useEffect(() => {
+    setSortedTasks(sortByCompletion(tasks));
+  }, [tasks]);
+
+  // 체크박스 토글일 때만 layout 애니메이션 적용 (추가/삭제 등 다른 변경은 건드리지 않음)
+  const [shouldAnimate, setShouldAnimate] = useState(false);
+  const animateTimeoutRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+
   // 달력 날짜 변경 시 호출 핸들러
   const handleDeadlineChange = (subTaskId: number) => (date: Date, timeEnabled: boolean) => {
     mutateDeadline({ subTaskId, endDate: formatDate(date, timeEnabled) });
@@ -74,10 +89,23 @@ export const PersonalTaskList = ({
 
   // 체크박스 선택 시 호출 핸들러
   const handleStatusChange = (subTaskId: number, isChecked: boolean) => {
-    mutateStatus({
-      subTaskId,
-      status: isChecked ? 'COMPLETED' : 'PENDING',
-    });
+    const previousTasks = sortedTasks;
+    setShouldAnimate(true);
+    clearTimeout(animateTimeoutRef.current);
+    animateTimeoutRef.current = setTimeout(() => setShouldAnimate(false), 400);
+    setSortedTasks((prev) =>
+      sortByCompletion(
+        prev.map((t) =>
+          t.id === subTaskId
+            ? { ...t, status: (isChecked ? 'COMPLETED' : 'PROGRESS') as SubTaskStatus }
+            : t,
+        ),
+      ),
+    );
+    mutateStatus(
+      { subTaskId, status: isChecked ? 'COMPLETED' : 'PENDING' },
+      { onError: () => setSortedTasks(previousTasks) },
+    );
   };
 
   // 알림 설정 변경 핸들러
@@ -92,11 +120,17 @@ export const PersonalTaskList = ({
         <div className={emptyStateStyle}>등록된 task가 없습니다.</div>
       ) : (
         <div className={PersonalTaskListStyle}>
-          {tasks.map((task) => {
+          {sortedTasks.map((task) => {
             const isCompleted = task.status === 'COMPLETED';
 
             return (
-              <div key={task.id} className={PersonalTaskItemContainerStyle}>
+              <motion.div
+                key={task.id}
+                layout
+                layoutId={`personal-task-${task.id}`}
+                transition={{ duration: shouldAnimate ? 0.35 : 0, ease: [0.4, 0, 0.2, 1] }}
+                className={PersonalTaskItemContainerStyle}
+              >
                 {/* 왼쪽: [일반] 체크박스 + 제목 / [수정] Input */}
                 <div className={PersonalTaskItemLeftStyle}>
                   {isEditMode ? (
@@ -165,7 +199,7 @@ export const PersonalTaskList = ({
                     </button>
                   )}
                 </div>
-              </div>
+              </motion.div>
             );
           })}
         </div>

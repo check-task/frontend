@@ -7,19 +7,30 @@ import { Modal } from '@/components/Modal';
 import { AlertContainer } from '@/components/AlertContainer';
 import { MainContentWrapper } from './MainContentWrapper';
 import { AuthProvider } from '@/providers/auth-provider';
+import { KakaoAgreementModalTrigger } from '@/features/login/components/KakaoAgreementModalTrigger';
 
 // 레이아웃 스타일
+const SIDEBAR_WIDTH_COLLAPSED = '3.75rem';
+const SIDEBAR_WIDTH_EXPANDED = '15rem';
+
 const layoutContainerStyle = css({
-  display: 'flex',
   minH: '100vh',
   bg: 'bg',
 });
 
 const mainContentStyle = css({
-  flex: 1,
+  minWidth: 0,
+  width: '100%',
+  boxSizing: 'border-box',
+  minH: '100vh',
+  paddingLeft: SIDEBAR_WIDTH_EXPANDED,
   display: 'flex',
   flexDirection: 'column',
   overflow: 'auto',
+  transition: 'padding-left 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+  '[data-sidebar-collapsed="true"] &': {
+    paddingLeft: SIDEBAR_WIDTH_COLLAPSED,
+  },
 });
 
 export default async function MainLayout({
@@ -43,6 +54,7 @@ export default async function MainLayout({
           <HomeButtonBar />
           <MainContentWrapper>{children}</MainContentWrapper>
         </main>
+        <KakaoAgreementModalTrigger />
         <Modal />
         <AlertContainer />
       </div>

@@ -21,31 +21,42 @@ const checkboxControl = cva({
       transition: 'opacity 0.2s ease-in-out, transform 0.2s ease-in-out', // 체크 시에만 애니메이션
     },
 
-    //  체크되었을 때 스타일
-    // 체크 되엇을 때 색상도 추가하였습니다. -김예원
     _peerChecked: {
-      borderColor: 'gray.400',
       '& svg': {
         opacity: 1,
         transform: 'scale(1)',
       },
-      '& svg path': {
-        stroke: 'gray.400',
-      },
     },
   },
 
-  // 체크박스 색상 변경
   variants: {
     variant: {
       gray: { borderColor: 'gray.600' },
       black: { borderColor: 'gray.900' },
     },
+    checkedVariant: {
+      gray400: {
+        _peerChecked: {
+          borderColor: 'gray.400',
+          '& svg path': {
+            stroke: 'gray.400',
+          },
+        },
+      },
+      black: {
+        _peerChecked: {
+          borderColor: 'gray.900',
+          '& svg path': {
+            stroke: 'gray.900',
+          },
+        },
+      },
+    },
   },
 
-  // 기본 색상
   defaultVariants: {
     variant: 'black',
+    checkedVariant: 'gray400',
   },
 });
 
@@ -54,10 +65,11 @@ interface CheckboxProps extends Omit<
   'size'
 > {
   variant?: 'gray' | 'black';
+  checkedVariant?: 'gray400' | 'black';
 }
 
 export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
-  ({ variant, ...props }, ref) => {
+  ({ variant, checkedVariant, ...props }, ref) => {
     return (
       <label>
         <input
@@ -68,7 +80,7 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
         />
 
         {/* 체크마크 UI */}
-        <div className={checkboxControl({ variant })}>
+        <div className={checkboxControl({ variant, checkedVariant })}>
           <CheckMark
             className={css({ w: '0.83331rem', h: '0.83331rem' })}
             variant={variant}

@@ -8,6 +8,7 @@ const iconStyle = cva({
     size: {
       md: { width: '1.5rem', height: '1.5rem' }, // 기존 datePicker용
       lg: { width: '2.25rem', height: '2.25rem', strokeWidth: '1.5' }, // 추가 MonthPicker용
+      xl: { width: '2.5rem', height: '2.5rem' },
     },
     stroke: {
       default: { stroke: 'gray.900' },
@@ -22,7 +23,7 @@ const iconStyle = cva({
 });
 
 interface IconProps {
-  size?: 'md' | 'lg';
+  size?: 'md' | 'lg' | 'xl';
   stroke?: 'default' | 'login' | 'tablet';
 }
 

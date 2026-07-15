@@ -10,6 +10,7 @@ export interface HomeAssignment {
   folderId: number;
   folderName: string;
   folderColor: FolderColor;
+  folderRank: number | null;
   dDay: string;
   dueDate: string;
   deadlineTime?: string; // 시간이 있는 경우 "HH:mm:ss"
@@ -45,6 +46,7 @@ export const useHomeTaskList = (sort?: TaskSort) => {
         folderId: task.folderId ?? 0,
         folderName: task.folderTitle ?? '',
         folderColor: resolveFolderColor(task.foldercolor ?? ''),
+        folderRank: task.folderRank ?? null,
         dDay: task.dDay,
         dueDate: task.deadline ? task.deadline.split('T')[0] : '', // 시간 제거 (ISO 8601)
         deadlineTime: task.deadline?.includes('T')

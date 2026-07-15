@@ -1,4 +1,4 @@
-import { css } from 'styled-system/css';
+import { css, cva } from 'styled-system/css';
 import { stack } from 'styled-system/patterns';
 
 const legalIntroText = {
@@ -16,10 +16,16 @@ const legalBodyText = {
   color: 'gray.600',
 };
 
-export const TermsOfServiceContent = () => {
+interface TermsOfServiceContentProps {
+  embedded?: boolean;
+}
+
+export const TermsOfServiceContent = ({
+  embedded = false,
+}: TermsOfServiceContentProps) => {
   return (
-    <div className={wrapperStyle}>
-      <div className={scrollContainerStyle}>
+    <div className={wrapperStyle({ embedded })}>
+      <div className={scrollContainerStyle({ embedded })}>
         <p className={introStyle}>
           본 약관은 &#39;채택(CHECKTASK)&#39;(이하 &quot;서비스&quot;)이
           제공하는 웹 기반 경량 과제 관리 서비스의 이용과 관련하여, 서비스와
@@ -257,35 +263,57 @@ export const TermsOfServiceContent = () => {
   );
 };
 
-const wrapperStyle = css(
-  stack.raw({
+const wrapperStyle = cva({
+  base: stack.raw({
     marginTop: '1rem',
     maxWidth: '36.25rem',
   }),
-);
+  variants: {
+    embedded: {
+      true: {
+        marginTop: 0,
+        maxWidth: 'none',
+        width: 'full',
+      },
+    },
+  },
+});
 
-const scrollContainerStyle = css({
-  ...stack.raw({
-    gap: '0.75rem',
-    paddingBottom: '0.5rem',
-  }),
-  width: 'calc(100% + 1.25rem)',
-  maxHeight: '30.6255rem',
-  overflowY: 'auto',
-  paddingRight: '1rem',
-  scrollbarGutter: 'stable',
-  boxSizing: 'border-box',
-  '&::-webkit-scrollbar': {
-    width: '0.25rem',
+const scrollContainerStyle = cva({
+  base: {
+    ...stack.raw({
+      gap: '0.75rem',
+      paddingBottom: '0.5rem',
+    }),
+    width: 'calc(100% + 1.25rem)',
+    maxHeight: '36.375rem',
+    overflowY: 'auto',
+    paddingRight: '1rem',
+    scrollbarGutter: 'stable',
+    boxSizing: 'border-box',
+    '&::-webkit-scrollbar': {
+      width: '0.25rem',
+    },
+    '&::-webkit-scrollbar-button': {
+      width: 0,
+      height: 0,
+      display: 'none !important',
+    },
+    '&::-webkit-scrollbar-thumb': {
+      background: 'gray.200',
+      borderRadius: '6.25rem',
+    },
   },
-  '&::-webkit-scrollbar-button': {
-    width: 0,
-    height: 0,
-    display: 'none !important',
-  },
-  '&::-webkit-scrollbar-thumb': {
-    background: 'gray.200',
-    borderRadius: '6.25rem',
+  variants: {
+    embedded: {
+      true: {
+        width: '100%',
+        maxHeight: 'none',
+        overflowY: 'visible',
+        paddingRight: 0,
+        scrollbarGutter: 'auto',
+      },
+    },
   },
 });
 

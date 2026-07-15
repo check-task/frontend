@@ -304,9 +304,8 @@ export default function TeamAssignmentDetailPage() {
 const outerContainerStyle = css({
   display: 'flex',
   justifyContent: 'center',
-  width: '100%',
-  py: '2.5rem',
-  pb: '3.75rem',
+  width: 'fit-content',
+  py: '3.25rem',
 });
 
 // 개인 페이지 contentGridStyle에 대응: 고정 너비 + 세로 스택
@@ -322,7 +321,7 @@ const headerContainerStyle = css({
 });
 
 const taskContainerStyle = css({
-  pt: '2.25rem',
+  pt: '3.25rem',
   display: 'flex',
   flexDirection: 'column',
   gap: '1.25rem',

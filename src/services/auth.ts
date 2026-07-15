@@ -6,11 +6,14 @@ import type {
   PasswordResetSendCodeRequest,
   PasswordResetVerifyCodeRequest,
   PasswordResetVerifyCodeResponseData,
+  PasswordChangeRequest,
+  PasswordVerifyRequest,
   RestoreLocalAccountRequest,
   RestoreLocalAccountResponseData,
   SendEmailCodeRequest,
   SigninRequest,
   SigninResponseData,
+  SocialAgreementRequest,
   SignupRequest,
   VerifyEmailCodeRequest,
 } from '@/types/api/auth';
@@ -44,7 +47,23 @@ export const verifySignupEmailCode = async (
 };
 
 export const signup = async (body: SignupRequest): Promise<void> => {
-  await axiosInstance.post<ApiResponse>('/auth/signup', body);
+  const formData = new FormData();
+
+  formData.append('email', body.email);
+  formData.append('password', body.password);
+  formData.append('nickname', body.nickname);
+
+  if (body.phoneNum) {
+    formData.append('phoneNum', body.phoneNum);
+  }
+
+  if (body.profileImage) {
+    formData.append('profileImage', body.profileImage);
+  }
+
+  await axiosInstance.post<ApiResponse>('/auth/signup', formData, {
+    headers: { 'Content-Type': undefined } as unknown as Record<string, string>,
+  });
 };
 
 export const signin = async (
@@ -100,4 +119,22 @@ export const confirmPasswordReset = async (
   body: PasswordResetConfirmRequest,
 ): Promise<void> => {
   await axiosInstance.post<ApiResponse>('/auth/password/reset/confirm', body);
+};
+
+export const changePassword = async (
+  body: PasswordChangeRequest,
+): Promise<void> => {
+  await axiosInstance.patch<ApiResponse>('/auth/password', body);
+};
+
+export const verifyCurrentPassword = async (
+  body: PasswordVerifyRequest,
+): Promise<void> => {
+  await axiosInstance.post<ApiResponse>('/auth/password/verify', body);
+};
+
+export const submitSocialAgreement = async (
+  body: SocialAgreementRequest,
+): Promise<void> => {
+  await axiosInstance.post<ApiResponse>('/auth/agreement', body);
 };

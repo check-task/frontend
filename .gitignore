@@ -43,3 +43,12 @@ next-env.d.ts
 ## Panda
 styled-system
 styled-system-studio
+
+# claude
+.omc
+.claude*
+claude*/
+CLAUDE*.md
+claude*.md
+.anthropic/
+AGENTS*.md

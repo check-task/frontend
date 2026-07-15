@@ -41,10 +41,18 @@ export const getTaskList = async (
   };
 };
 
-// 완료 과제 목록 조회 api 호출
-export const getCompletedTaskList = async (): Promise<CompletedTask[]> => {
+// 완료 과제 목록 조회 api 호출 (folderId 전달 시 쉼표로 구분하여 해당 폴더만 필터링)
+export const getCompletedTaskList = async (
+  folderId?: number[],
+): Promise<CompletedTask[]> => {
   const res = await axiosInstance.get<GetCompletedTaskListResponse>(
     `${TASK_BASE}/completed`,
+    {
+      params:
+        folderId && folderId.length > 0
+          ? { folderId: folderId.join(',') }
+          : undefined,
+    },
   );
   return res.data?.data?.tasks ?? [];
 };
@@ -205,7 +213,7 @@ export const createTask = async (body: CreateTaskRequest): Promise<number> => {
 export const joinTask = async (
   inviteCode: string,
   folderId?: number | null,
-) : Promise<JoinTaskResult> => {
+): Promise<JoinTaskResult> => {
   const res = await axiosInstance.post<JoinTaskResponse>('/task/join', {
     inviteCode,
     folderId: folderId ?? null,
@@ -366,3 +374,11 @@ export const expelTaskMember = async (
   }
   await axiosInstance.delete(`${TASK_BASE}/${taskId}/member/${id}`);
 };
+
+// 개인과제 -> 팀과제 변경 (Post /task/{taskId}/convert-to-team)
+export const updateTaskType = async (
+  taskId: number,
+): Promise<void> => {
+  await axiosInstance.patch(`${TASK_BASE}/${taskId}/convert-to-team`);
+};
+
