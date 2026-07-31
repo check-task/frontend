@@ -9,6 +9,7 @@ import { css, cx } from 'styled-system/css';
 import { hstack, stack } from 'styled-system/patterns';
 import { Button } from '@/components/Button';
 import { Input } from '@/components/TextField';
+import { AppleLoginButton } from '@/features/login/components/AppleLoginButton';
 import { KakaoLoginButton } from '@/features/login/components/KakaoLoginButton';
 import { EyeIcon } from '@/components/icons/EyeIcon';
 import { EyeOffIcon } from '@/components/icons/EyeOffIcon';
@@ -235,7 +236,10 @@ export const LoginModalContent = () => {
         <span className={horizontalDividerStyle} />
       </div>
 
-      <KakaoLoginButton />
+      <div className={socialLoginGroupStyle}>
+        <KakaoLoginButton />
+        <AppleLoginButton />
+      </div>
 
       <p className={consentStyle}>
         로그인 시{' '}
@@ -399,6 +403,12 @@ const orTextStyle = css({
   textStyle: 'body3.r',
   color: 'gray.400',
 });
+
+const socialLoginGroupStyle = css(
+  stack.raw({
+    gap: '1rem',
+  }),
+);
 
 const consentStyle = css({
   mt: '2rem',
