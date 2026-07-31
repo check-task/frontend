@@ -1,33 +1,31 @@
 'use client';
 
+import Image from 'next/image';
 import { css } from 'styled-system/css';
 import { hstack } from 'styled-system/patterns';
-import Image from 'next/image';
 
-export const KakaoLoginButton = () => {
+export const AppleLoginButton = () => {
   const handleClick = () => {
     const isLocal = process.env.NODE_ENV === 'development';
     const state = isLocal ? 'local' : 'prod';
-    window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/auth/kakao?state=${state}`;
+    window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/auth/apple?state=${state}`;
   };
 
   return (
     <button type='button' className={buttonStyle} onClick={handleClick}>
-      <Image src='/kakao-icon.svg' alt='kakaoicon' width={16} height={18} />
-      <span className={buttonTextStyle}>카카오 로그인</span>
+      <Image src='/apple-icon.png' alt='Apple logo' width={24} height={24} />
+      <span className={buttonTextStyle}>Apple로 로그인</span>
     </button>
   );
 };
 
 const buttonStyle = css(
   hstack.raw({
-    paddingX: '0.875rem',
-    paddingY: '0.6875rem',
     justifyContent: 'center',
-    gap: '0.5rem',
+    gap: '0.25rem',
     width: '24.125rem',
     height: '3.375rem',
-    bg: '#FEE500',
+    bg: 'bg',
     borderRadius: '0.5rem',
     cursor: 'pointer',
   }),
