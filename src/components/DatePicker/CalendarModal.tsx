@@ -24,8 +24,6 @@ interface CalenderModalProps {
   initialTimeEnabled?: boolean;
   // 시간 추가 토글 상태 변경 콜백
   onTimeToggle?: (enabled: boolean) => void;
-  // 저장된 날짜 지정안함 선택 상태
-  initialUnspecifiedSelected?: boolean;
   // 날짜 지정안함 옵션 노출 여부
   allowUnspecified?: boolean;
 }
@@ -37,14 +35,13 @@ export default function CalendarModal({
   maxDate,
   initialTimeEnabled = false,
   onTimeToggle,
-  initialUnspecifiedSelected = false,
   allowUnspecified = false,
 }: CalenderModalProps) {
   // 선택된 날짜
   const { showAlert } = useAlertStore();
   const [selectedDate, setSelectedDate] = useState<Date | null>(initialDate);
   const [isUnspecifiedSelected, setIsUnspecifiedSelected] = useState(
-    initialUnspecifiedSelected,
+    allowUnspecified && !initialDate,
   );
   // 시간 추가 토글 상태
   const [timeEnabled, setTimeEnabled] = useState(
@@ -133,7 +130,7 @@ export default function CalendarModal({
 
   const handleSelectUnspecified = () => {
     setSelectedDate(null);
-    setIsUnspecifiedSelected((prev) => !prev);
+    setIsUnspecifiedSelected(true);
     setTimeEnabled(false);
     onTimeToggle?.(false);
   };

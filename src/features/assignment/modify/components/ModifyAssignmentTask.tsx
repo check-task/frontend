@@ -180,7 +180,6 @@ export const ModifyAssignmentTask = ({
                 allowUnspecified
                 value={task.dueDate}
                 onChange={(date) => handleDateChange(task.id, date)}
-                initialUnspecifiedSelected={task.dueDate === null}
                 maxDate={maxDate ?? undefined}
               />
               <button

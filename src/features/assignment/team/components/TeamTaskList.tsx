@@ -480,7 +480,6 @@ const TeamTaskList = ({
                           muted={isCompleted}
                           maxDate={maxDate}
                           initialTimeEnabled={hasTimeSet(task.deadline)}
-                          initialUnspecifiedSelected={task.deadline == null}
                         />
                         <ClockToggle
                           muted={isCompleted}
