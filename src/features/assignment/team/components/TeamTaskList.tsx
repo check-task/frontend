@@ -43,7 +43,7 @@ const getCommentId = (
 
 const DEFAULT_DEADLINE_TIME = 'T23:59:59';
 
-const hasTimeSet = (deadline?: string | Date): boolean => {
+const hasTimeSet = (deadline?: string | Date | null): boolean => {
   if (typeof deadline !== 'string') return false;
   return deadline.includes('T') && !deadline.endsWith(':59');
 };
@@ -218,8 +218,16 @@ const TeamTaskList = ({
     return `${base}${DEFAULT_DEADLINE_TIME}`;
   };
 
-  const handleDeadlineChange = (subTaskId: number, date: Date, timeEnabled: boolean) => {
-    mutateDeadline({ taskId, subTaskId, endDate: toYYYYMMDD(date, timeEnabled) });
+  const handleDeadlineChange = (
+    subTaskId: number,
+    date: Date | null,
+    timeEnabled: boolean,
+  ) => {
+    mutateDeadline({
+      taskId,
+      subTaskId,
+      endDate: date ? toYYYYMMDD(date, timeEnabled) : null,
+    });
   };
 
   // 알림 설정 변경 핸들러
@@ -464,6 +472,7 @@ const TeamTaskList = ({
                         style={isEditMode ? { opacity: 0.4, pointerEvents: 'none' } : undefined}
                       >
                         <DatePicker
+                          allowUnspecified
                           value={task.deadline}
                           onChange={(date, timeEnabled) =>
                             handleDeadlineChange(task.subTaskId, date, timeEnabled)

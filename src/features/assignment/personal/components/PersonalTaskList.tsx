@@ -15,7 +15,7 @@ import { CloseIcon } from '@/components/icons/CloseIcon';
 export interface PersonalTaskItem {
   id: number;
   title: string;
-  deadline: string;
+  deadline: string | null;
   isAlarm: boolean;
   status: SubTaskStatus;
 }
@@ -48,7 +48,7 @@ const formatDate = (date: Date, withTime: boolean) => {
   return `${base}${DEFAULT_DEADLINE_TIME}`;
 };
 
-const hasTimeSet = (deadline?: string | Date): boolean => {
+const hasTimeSet = (deadline?: string | Date | null): boolean => {
   if (typeof deadline !== 'string') return false;
   return deadline.includes('T') && !deadline.endsWith(':59');
 };
@@ -83,9 +83,13 @@ export const PersonalTaskList = ({
   const animateTimeoutRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   // 달력 날짜 변경 시 호출 핸들러
-  const handleDeadlineChange = (subTaskId: number) => (date: Date, timeEnabled: boolean) => {
-    mutateDeadline({ subTaskId, endDate: formatDate(date, timeEnabled) });
-  };
+  const handleDeadlineChange =
+    (subTaskId: number) => (date: Date | null, timeEnabled: boolean) => {
+      mutateDeadline({
+        subTaskId,
+        endDate: date ? formatDate(date, timeEnabled) : null,
+      });
+    };
 
   // 체크박스 선택 시 호출 핸들러
   const handleStatusChange = (subTaskId: number, isChecked: boolean) => {
@@ -171,6 +175,7 @@ export const PersonalTaskList = ({
                   >
                   <div className={datePickerWrapperStyle}>
                     <DatePicker
+                      allowUnspecified
                       value={task.deadline}
                       onChange={handleDeadlineChange(task.id)}
                       muted={isCompleted}

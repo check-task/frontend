@@ -40,7 +40,7 @@ export interface SubTaskListItem {
   taskId: number;
   title: string;
   status: string;
-  deadline: string;
+  deadline: string | null;
 }
 
 // 과제 목록 조회 응답
@@ -73,7 +73,7 @@ export interface TaskDetailSubTaskComment {
 export interface TaskDetailSubTask {
   subTaskId: number;
   title: string;
-  deadline: string; // YYYY-MM-DD
+  deadline: string | null; // YYYY-MM-DD
   status: SubTaskStatus;
   isAlarm: boolean;
   commentCount: number;
@@ -183,7 +183,7 @@ export interface DeleteTaskResponse {
 // ============================
 export interface CreateTaskSubTaskRequest {
   title: string;
-  endDate: string; // YYYY-MM-DD
+  endDate: string | null; // YYYY-MM-DD
 }
 
 export interface CreateTaskReferenceRequest {
@@ -209,7 +209,7 @@ export interface CreateTaskResponse {
 // 과제 수정 요청 (PATCH /task/{taskId})
 export interface UpdateTaskSubTaskItem {
   title: string;
-  endDate: string; // YYYY-MM-DD
+  endDate: string | null; // YYYY-MM-DD
   status: 'PROGRESS' | 'COMPLETED';
   isAlarm: boolean;
   assigneeId: number;
@@ -259,7 +259,7 @@ export interface GetCompletedTaskListResponse {
 // ============================
 
 export interface UpdateSubTaskDeadlineRequest {
-  endDate: string; // YYYY-MM-DD
+  endDate: string | null; // YYYY-MM-DD
 }
 
 export interface UpdateSubTaskDeadlineResponse {
@@ -267,7 +267,7 @@ export interface UpdateSubTaskDeadlineResponse {
   message: string;
   data: {
     sub_task_id: number;
-    end_date: string; // YYYY-MM-DD
+    end_date: string | null; // YYYY-MM-DD
   };
 }
 
@@ -365,7 +365,7 @@ export interface UpdateSubTaskAssigneeResponse {
 // ============================
 export interface CreateSubTaskRequest {
   title: string;
-  deadline: string; // YYYY-MM-DDTHH:mm:ss
+  deadline: string | null; // YYYY-MM-DDTHH:mm:ss
   isAlarm: boolean;
 }
 
@@ -375,7 +375,7 @@ export interface CreateSubTaskResponse {
   data: {
     subTaskId: number;
     title: string;
-    deadline: string;
+    deadline: string | null;
     status: string;
     assigneeName: string;
   };
@@ -450,7 +450,7 @@ export interface DeleteSubTasksBulkResponse {
 export interface UpdateSubTasksBatchItem {
   subTaskId: number;
   title: string;
-  deadline: string;
+  deadline: string | null;
   isAlarm: boolean;
 }
 

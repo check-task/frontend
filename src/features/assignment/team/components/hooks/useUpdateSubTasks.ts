@@ -7,7 +7,7 @@ import { updateSubTasksBatch } from '@/services/subtask';
 interface SubTaskUpdateItem {
   subTaskId: number;
   title?: string;
-  endDate?: string;
+  endDate?: string | null;
   isAlarm?: boolean;
 }
 
@@ -37,7 +37,7 @@ export const useUpdateSubTasks = (taskId: number) => {
         subTasks: data.map((item) => ({
           subTaskId: item.subTaskId,
           title: item.title ?? '',
-          deadline: item.endDate ?? '',
+          deadline: item.endDate ?? null,
           isAlarm: item.isAlarm ?? false,
         })),
       });

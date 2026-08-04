@@ -10,7 +10,7 @@ import { css } from 'styled-system/css';
 export interface SubTaskInput {
   id: number;
   title: string;
-  endDate: Date;
+  endDate: Date | null;
 }
 
 interface AddAssignmentTaskProps {
@@ -25,13 +25,12 @@ export const AddAssignmentTask = ({
   maxDate,
 }: AddAssignmentTaskProps) => {
   const handleAddTask = () => {
-    const defaultEndDate = new Date();
     onSubTasksChange([
       ...subTasks,
       {
         id: Date.now(),
         title: '',
-        endDate: defaultEndDate,
+        endDate: null,
       },
     ]);
   };
@@ -39,7 +38,7 @@ export const AddAssignmentTask = ({
   const handleUpdate = (
     id: number,
     field: 'title' | 'endDate',
-    value: string | Date,
+    value: string | Date | null,
   ) => {
     onSubTasksChange(
       subTasks.map((t) => (t.id === id ? { ...t, [field]: value } : t)),
@@ -97,6 +96,7 @@ export const AddAssignmentTask = ({
               })}
             >
               <DatePicker
+                allowUnspecified
                 value={task.endDate}
                 onChange={(d) => handleUpdate(task.id, 'endDate', d)}
                 maxDate={maxDate ?? new Date()}

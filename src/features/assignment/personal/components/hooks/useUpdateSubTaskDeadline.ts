@@ -3,7 +3,7 @@ import { updateSubTaskDeadline } from '@/services/subtask';
 
 interface UpdateSubTaskDeadlineInput {
   subTaskId: number;
-  endDate: string; // YYYY-MM-DD
+  endDate: string | null; // YYYY-MM-DD
 }
 
 // 세부 TASK 마감일 변경 훅
