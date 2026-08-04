@@ -458,7 +458,7 @@ const modalWrapper = css({
 const timeSection = css({
   display: 'flex',
   flexDirection: 'column',
-  gap: '0.5rem',
+  gap: '0.75rem',
   mt: '0.75rem',
 });
 
