@@ -24,6 +24,8 @@ interface CalenderModalProps {
   initialTimeEnabled?: boolean;
   // 시간 추가 토글 상태 변경 콜백
   onTimeToggle?: (enabled: boolean) => void;
+  // 저장된 날짜 지정안함 선택 상태
+  initialUnspecifiedSelected?: boolean;
   // 날짜 지정안함 옵션 노출 여부
   allowUnspecified?: boolean;
 }
@@ -35,11 +37,15 @@ export default function CalendarModal({
   maxDate,
   initialTimeEnabled = false,
   onTimeToggle,
+  initialUnspecifiedSelected = false,
   allowUnspecified = false,
 }: CalenderModalProps) {
   // 선택된 날짜
   const { showAlert } = useAlertStore();
   const [selectedDate, setSelectedDate] = useState<Date | null>(initialDate);
+  const [isUnspecifiedSelected, setIsUnspecifiedSelected] = useState(
+    initialUnspecifiedSelected,
+  );
   // 시간 추가 토글 상태
   const [timeEnabled, setTimeEnabled] = useState(
     initialDate ? initialTimeEnabled : false,
@@ -121,11 +127,13 @@ export default function CalendarModal({
     // 배열 말고 단일 선택만 고려
     if (value instanceof Date || value === null) {
       setSelectedDate(value);
+      setIsUnspecifiedSelected(false);
     }
   };
 
   const handleSelectUnspecified = () => {
     setSelectedDate(null);
+    setIsUnspecifiedSelected(true);
     setTimeEnabled(false);
     onTimeToggle?.(false);
   };
@@ -164,11 +172,11 @@ export default function CalendarModal({
             <CheckCircleIcon
               size={24}
               color={
-                selectedDate
-                  ? token('colors.gray.300')
-                  : token('colors.gray.900')
+                isUnspecifiedSelected
+                  ? token('colors.gray.900')
+                  : token('colors.gray.300')
               }
-              filled={!selectedDate}
+              filled={isUnspecifiedSelected}
             />
           </button>
         )}

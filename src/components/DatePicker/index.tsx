@@ -11,6 +11,7 @@ type BaseDatePickerProps = {
   muted?: boolean; // 데이트 피커는 공용이니까 불리언으로 처리
   showTimeDisplay?: boolean; // 시간 표시 여부
   initialTimeEnabled?: boolean; // 시간 토글 초기 상태
+  initialUnspecifiedSelected?: boolean; // 저장된 날짜 미지정 상태 표시 여부
 };
 
 type RequiredDatePickerProps = BaseDatePickerProps & {
@@ -43,6 +44,7 @@ export default function DatePicker({
   muted = false,
   showTimeDisplay = false,
   initialTimeEnabled = false,
+  initialUnspecifiedSelected = false,
   allowUnspecified = false,
 }: DatePickerProps) {
   // ======= 상태 정의 =======
@@ -51,6 +53,8 @@ export default function DatePicker({
   const [confirmedDate, setConfirmedDate] = useState<Date | null>(
     parseDate(value) ?? (allowUnspecified ? null : new Date()),
   );
+  const [confirmedUnspecifiedSelected, setConfirmedUnspecifiedSelected] =
+    useState(allowUnspecified && initialUnspecifiedSelected);
   // 시간 추가 여부
   const [timeEnabled, setTimeEnabled] = useState(initialTimeEnabled);
 
@@ -63,17 +67,20 @@ export default function DatePicker({
     if (next) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setConfirmedDate(next);
+      setConfirmedUnspecifiedSelected(false);
       return;
     }
 
     if (allowUnspecified) {
       setConfirmedDate(null);
+      setConfirmedUnspecifiedSelected(Boolean(initialUnspecifiedSelected));
     }
-  }, [allowUnspecified, value]);
+  }, [allowUnspecified, initialUnspecifiedSelected, value]);
 
   // 선택한 날짜 저장
   const handleSave = (date: Date | null, withTime: boolean) => {
     setConfirmedDate(date);
+    setConfirmedUnspecifiedSelected(allowUnspecified && date === null);
     setTimeEnabled(date ? withTime : false);
 
     if (allowUnspecified) {
@@ -157,6 +164,7 @@ export default function DatePicker({
           initialDate={confirmedDate}
           maxDate={parsedMaxDate ?? undefined}
           initialTimeEnabled={timeEnabled}
+          initialUnspecifiedSelected={confirmedUnspecifiedSelected}
           allowUnspecified={allowUnspecified}
         />
       )}

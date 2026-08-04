@@ -181,6 +181,7 @@ export const PersonalTaskList = ({
                       muted={isCompleted}
                       maxDate={maxDate}
                       initialTimeEnabled={hasTimeSet(task.deadline)}
+                      initialUnspecifiedSelected={task.deadline == null}
                     />
                     </div>
                     <ClockToggle

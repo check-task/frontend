@@ -6,14 +6,19 @@ export const useUpdateSubTaskDeadlineForCalendar = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ subTaskId, endDate }: { subTaskId: number; endDate: string }) =>
-      updateSubTaskDeadline(subTaskId, { endDate }),
+    mutationFn: ({
+      subTaskId,
+      endDate,
+    }: {
+      subTaskId: number;
+      endDate: string | null;
+    }) => updateSubTaskDeadline(subTaskId, { endDate }),
     onMutate: async ({ subTaskId, endDate }) => {
       await queryClient.cancelQueries({ queryKey: ['taskList'] });
       // 모든 sort 변형의 캐시를 즉시 업데이트
       queryClient.setQueriesData<{
         assignments: unknown[];
-        subTasks: { subTaskId: number; dueDate: string }[];
+        subTasks: { subTaskId: number; dueDate: string | null }[];
       }>({ queryKey: ['taskList'] }, (old) => {
         if (!old) return old;
         return {
