@@ -2,7 +2,7 @@
 
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
-import { css } from 'styled-system/css';
+import { css, cva } from 'styled-system/css';
 import { flex } from 'styled-system/patterns';
 import { RightIcon } from '../icons/RightIcon';
 import { LeftIcon } from '../icons/LeftIcon';
@@ -10,18 +10,22 @@ import { useState } from 'react';
 import { Button } from '../Button';
 import { TimeToggle } from '../TimeToggle';
 import { useAlertStore } from '@/stores/alert-store';
+import { CheckCircleIcon } from '../icons/CheckCircleIcon';
+import { token } from 'styled-system/tokens';
 
 interface CalenderModalProps {
   onClose: () => void;
-  onSave: (date: Date, timeEnabled: boolean) => void;
+  onSave: (date: Date | null, timeEnabled: boolean) => void;
   // 초기 날짜를 받기 위함
-  initialDate: Date;
+  initialDate: Date | null;
   // 세부 목록 날짜 선택시 이후 날짜 제한을 위해 추가
   maxDate?: Date;
   // 시간 추가 토글 초기값
   initialTimeEnabled?: boolean;
   // 시간 추가 토글 상태 변경 콜백
   onTimeToggle?: (enabled: boolean) => void;
+  // 날짜 지정안함 옵션 노출 여부
+  allowUnspecified?: boolean;
 }
 
 export default function CalendarModal({
@@ -31,19 +35,25 @@ export default function CalendarModal({
   maxDate,
   initialTimeEnabled = false,
   onTimeToggle,
+  allowUnspecified = false,
 }: CalenderModalProps) {
   // 선택된 날짜
   const { showAlert } = useAlertStore();
   const [selectedDate, setSelectedDate] = useState<Date | null>(initialDate);
+  const [isUnspecifiedSelected, setIsUnspecifiedSelected] = useState(
+    allowUnspecified && !initialDate,
+  );
   // 시간 추가 토글 상태
-  const [timeEnabled, setTimeEnabled] = useState(initialTimeEnabled);
+  const [timeEnabled, setTimeEnabled] = useState(
+    initialDate ? initialTimeEnabled : false,
+  );
   // 시간 입력 상태 — 모달을 다시 열 때 저장된 시간 복원
   const [period, setPeriod] = useState<'오전' | '오후'>(() => {
-    if (!initialTimeEnabled) return '오전';
+    if (!initialDate || !initialTimeEnabled) return '오전';
     return initialDate.getHours() < 12 ? '오전' : '오후';
   });
   const [timeValue, setTimeValue] = useState(() => {
-    if (!initialTimeEnabled) return '00:00';
+    if (!initialDate || !initialTimeEnabled) return '00:00';
     const h = initialDate.getHours() % 12 || 12;
     const m = initialDate.getMinutes();
     return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
@@ -102,6 +112,7 @@ export default function CalendarModal({
   };
 
   const handleTimeToggle = (enabled: boolean) => {
+    if (!selectedDate) return;
     setTimeEnabled(enabled);
     onTimeToggle?.(enabled);
   };
@@ -113,7 +124,15 @@ export default function CalendarModal({
     // 배열 말고 단일 선택만 고려
     if (value instanceof Date || value === null) {
       setSelectedDate(value);
+      setIsUnspecifiedSelected(false);
     }
+  };
+
+  const handleSelectUnspecified = () => {
+    setSelectedDate(null);
+    setIsUnspecifiedSelected(true);
+    setTimeEnabled(false);
+    onTimeToggle?.(false);
   };
 
   return (
@@ -140,9 +159,32 @@ export default function CalendarModal({
         showFixedNumberOfWeeks={true} // 6주를 보여주는 프롭이 있음
       />
       <div className={timeSection}>
+        {allowUnspecified && (
+          <button
+            type='button'
+            className={unspecifiedDateRow}
+            onClick={handleSelectUnspecified}
+          >
+            <span className={timeToggleLabel()}>날짜 지정안함</span>
+            <CheckCircleIcon
+              size={24}
+              color={
+                isUnspecifiedSelected
+                  ? token('colors.gray.900')
+                  : token('colors.gray.300')
+              }
+            />
+          </button>
+        )}
         <div className={timeToggleRow}>
-          <span className={timeToggleLabel}>시간 추가</span>
-          <TimeToggle checked={timeEnabled} onChange={handleTimeToggle} />
+          <span className={timeToggleLabel({ disabled: !selectedDate })}>
+            시간 추가
+          </span>
+          <TimeToggle
+            checked={timeEnabled}
+            onChange={handleTimeToggle}
+            disabled={!selectedDate}
+          />
         </div>
         {timeEnabled && selectedDate && (
           <div className={dateTimeRow}>
@@ -192,6 +234,13 @@ export default function CalendarModal({
           variant='fillBlue'
           size='small'
           onClick={() => {
+            if (!selectedDate) {
+              if (allowUnspecified) {
+                onSave(null, false);
+              }
+              return;
+            }
+
             if (selectedDate) {
               if (timeEnabled) {
                 const [hStr, mStr] = timeValue.split(':');
@@ -406,8 +455,17 @@ const modalWrapper = css({
 const timeSection = css({
   display: 'flex',
   flexDirection: 'column',
-  gap: '0.5rem',
+  gap: '0.75rem',
   mt: '0.75rem',
+});
+
+const unspecifiedDateRow = flex({
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  bg: 'transparent',
+  border: 'none',
+  p: '0',
+  cursor: 'pointer',
 });
 
 // 시간 추가 토글 행
@@ -416,9 +474,19 @@ const timeToggleRow = flex({
   justifyContent: 'space-between',
 });
 
-const timeToggleLabel = css({
-  textStyle: 'body3.m',
-  color: 'gray.900',
+const timeToggleLabel = cva({
+  base: {
+    textStyle: 'body3.m',
+    color: 'gray.900',
+  },
+  variants: {
+    disabled: {
+      true: { color: 'gray.400' },
+    },
+  },
+  defaultVariants: {
+    disabled: false,
+  },
 });
 
 // 날짜 + 시간 입력 행

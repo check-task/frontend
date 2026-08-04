@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Button } from '@/components/Button';
 import { Divider } from '@/components/Divider';
 import { CheckboxHeader } from '../../create/components/CheckboxHeader'; // create있는거 그대로 사용
@@ -48,7 +48,7 @@ export const ModifyAssignmentForm = () => {
   const taskId = Number(searchParams?.get('taskId'));
   const { data } = useTeamTaskDetail(taskId);
   const { data: myInfo } = useMyInfo();
-  const folders = myInfo?.folders ?? [];
+  const folders = useMemo(() => myInfo?.folders ?? [], [myInfo?.folders]);
   const initializedTaskIdRef = useRef<number | null>(null);
   const updateTaskId = Number.isFinite(taskId) ? taskId : 0;
   const { mutateAsync: updateTask, isPending } = useUpdateTask(updateTaskId);
@@ -68,6 +68,7 @@ export const ModifyAssignmentForm = () => {
     if (data.folderId == null && folders.length === 0) return;
     const resolvedFolderId =
       data.folderId ?? getFolderIdFromColor(data.foldercolor, folders);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setAssignmentName(data.title ?? '');
     setSelectedFolderId(resolvedFolderId);
     setDueDate(data.deadline ? new Date(`${data.deadline}T00:00:00`) : null);
@@ -171,7 +172,7 @@ export const ModifyAssignmentForm = () => {
       .filter((task) => task.title.trim() !== '')
       .map((task) => ({
         title: task.title.trim(),
-        endDate: task.dueDate ?? '',
+        endDate: task.dueDate ?? null,
         status: ensureStatus(task.status),
         isAlarm: task.isAlarm ?? false,
         assigneeId:

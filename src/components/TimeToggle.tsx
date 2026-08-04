@@ -1,20 +1,28 @@
 'use client';
 
-import { cva, css } from 'styled-system/css';
+import { cva } from 'styled-system/css';
 
 interface TimeToggleProps {
   checked: boolean;
   onChange: (checked: boolean) => void;
+  disabled?: boolean;
 }
 
-export function TimeToggle({ checked, onChange }: TimeToggleProps) {
+export function TimeToggle({
+  checked,
+  onChange,
+  disabled = false,
+}: TimeToggleProps) {
   return (
     <button
       type='button'
       role='switch'
       aria-checked={checked}
-      onClick={() => onChange(!checked)}
-      className={trackStyle({ checked })}
+      disabled={disabled}
+      onClick={() => {
+        if (!disabled) onChange(!checked);
+      }}
+      className={trackStyle({ checked, disabled })}
     >
       <span className={thumbStyle({ checked })} />
     </button>
@@ -38,8 +46,11 @@ const trackStyle = cva({
       true: { bg: 'primary' },
       false: { bg: 'gray.300' },
     },
+    disabled: {
+      true: { bg: 'gray.100', cursor: 'not-allowed' },
+    },
   },
-  defaultVariants: { checked: false },
+  defaultVariants: { checked: false, disabled: false },
 });
 
 const thumbStyle = cva({

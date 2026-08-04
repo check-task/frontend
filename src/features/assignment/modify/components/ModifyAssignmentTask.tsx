@@ -12,7 +12,7 @@ import { ConfirmDeleteAssignmentDataModal } from '../../components/ConfirmDelete
 export interface ModifyTaskItem {
   id: number;
   title: string;
-  dueDate?: string; // 서버에서 strig 형태로 받음
+  dueDate?: string | null; // 서버에서 string 형태로 받음
   status?: 'PROGRESS' | 'COMPLETED';
   isAlarm?: boolean;
   assigneeId?: number;
@@ -98,7 +98,16 @@ export const ModifyAssignmentTask = ({
   };
 
   // 마감기한 변경 핸들러
-  const handleDateChange = (id: number, date: Date) => {
+  const handleDateChange = (id: number, date: Date | null) => {
+    if (!date) {
+      setTasks((prev) =>
+        prev.map((task) =>
+          task.id === id ? { ...task, dueDate: null } : task,
+        ),
+      );
+      return;
+    }
+
     // 받은 date를 로컬 YYYY-MM-DD 형태로
     // 기존 toISOString 쓰면 UTC 기준이라서 전날이 나올 수 있어 변경
     const yyyy = date.getFullYear();
@@ -168,6 +177,7 @@ export const ModifyAssignmentTask = ({
                 }}
               />
               <DatePicker
+                allowUnspecified
                 value={task.dueDate}
                 onChange={(date) => handleDateChange(task.id, date)}
                 maxDate={maxDate ?? undefined}

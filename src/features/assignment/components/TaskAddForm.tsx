@@ -25,18 +25,12 @@ const formatDeadline = (date: Date, withTime: boolean) => {
   return `${base}${DEFAULT_DEADLINE_TIME}`;
 };
 
-const todayAtMidnight = () => {
-  const d = new Date();
-  d.setHours(0, 0, 0, 0);
-  return d;
-};
-
 export const TaskAddForm = ({ taskId, maxDate }: TaskAddFormProps) => {
   const [isAdding, setIsAdding] = useState(false);
   const [taskName, setTaskName] = useState('');
 
   // 선택된 날짜 상태 추가
-  const [selectedDate, setSelectedDate] = useState<Date>(todayAtMidnight());
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [timeEnabled, setTimeEnabled] = useState(false);
   // 세부과제 생성 훅 호출
   const { mutate: createSubTask, isPending } = useCreateSubTask(taskId);
@@ -46,7 +40,7 @@ export const TaskAddForm = ({ taskId, maxDate }: TaskAddFormProps) => {
   const handleCancelTask = () => {
     setIsAdding(false);
     setTaskName('');
-    setSelectedDate(todayAtMidnight());
+    setSelectedDate(null);
     setTimeEnabled(false);
   };
 
@@ -58,13 +52,15 @@ export const TaskAddForm = ({ taskId, maxDate }: TaskAddFormProps) => {
     }
 
     // 즉시 폼 닫기 + onMutate 낙관적 업데이트로 task 동시 노출 → 깜빡임 방지
-    const deadline = formatDeadline(selectedDate, timeEnabled);
+    const deadline = selectedDate
+      ? formatDeadline(selectedDate, timeEnabled)
+      : null;
     setIsAdding(false);
     setTaskName('');
-    setSelectedDate(todayAtMidnight());
+    setSelectedDate(null);
     setTimeEnabled(false);
 
-    createSubTask({ title, deadline, isAlarm: true });
+    createSubTask({ title, deadline, isAlarm: Boolean(deadline) });
   };
 
   return (
@@ -89,6 +85,7 @@ export const TaskAddForm = ({ taskId, maxDate }: TaskAddFormProps) => {
             </div>
             <div className={datePickerWrapperStyle}>
               <DatePicker
+                allowUnspecified
                 value={selectedDate}
                 onChange={(date, withTime) => {
                   setSelectedDate(date);
