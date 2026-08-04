@@ -131,7 +131,7 @@ export default function DatePicker({
           // 숫자부분도 클릭시 열리도록
           onClick={() => setIsOpen(!isOpen)}
         >
-          {confirmedDate ? formatDate(confirmedDate) : '날짜 지정안함'}
+          {confirmedDate ? formatDate(confirmedDate) : '지정안함'}
         </button>
       </div>
 
