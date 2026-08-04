@@ -223,11 +223,12 @@ const TeamTaskList = ({
     date: Date | null,
     timeEnabled: boolean,
   ) => {
-    mutateDeadline({
-      taskId,
-      subTaskId,
-      endDate: date ? toYYYYMMDD(date, timeEnabled) : null,
-    });
+    const endDate = date ? toYYYYMMDD(date, timeEnabled) : null;
+    if (endDate === null) {
+      setAlarmStateMap((prev) => ({ ...prev, [subTaskId]: false }));
+    }
+
+    mutateDeadline({ taskId, subTaskId, endDate });
   };
 
   // 알림 설정 변경 핸들러

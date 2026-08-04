@@ -85,10 +85,12 @@ export const PersonalTaskList = ({
   // 달력 날짜 변경 시 호출 핸들러
   const handleDeadlineChange =
     (subTaskId: number) => (date: Date | null, timeEnabled: boolean) => {
-      mutateDeadline({
-        subTaskId,
-        endDate: date ? formatDate(date, timeEnabled) : null,
-      });
+      const endDate = date ? formatDate(date, timeEnabled) : null;
+      if (endDate === null) {
+        setAlarmStateMap((prev) => ({ ...prev, [subTaskId]: false }));
+      }
+
+      mutateDeadline({ subTaskId, endDate });
     };
 
   // 체크박스 선택 시 호출 핸들러
