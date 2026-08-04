@@ -133,7 +133,7 @@ export default function CalendarModal({
 
   const handleSelectUnspecified = () => {
     setSelectedDate(null);
-    setIsUnspecifiedSelected(true);
+    setIsUnspecifiedSelected((prev) => !prev);
     setTimeEnabled(false);
     onTimeToggle?.(false);
   };
@@ -176,7 +176,6 @@ export default function CalendarModal({
                   ? token('colors.gray.900')
                   : token('colors.gray.300')
               }
-              filled={isUnspecifiedSelected}
             />
           </button>
         )}
