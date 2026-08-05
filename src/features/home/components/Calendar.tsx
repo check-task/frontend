@@ -6,12 +6,18 @@ import type { EventClickArg, EventDropArg } from '@fullcalendar/core';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import '@/styles/fullcalendar.css';
+import { css } from 'styled-system/css';
+import { stack } from 'styled-system/patterns';
 import { token } from 'styled-system/tokens';
 import type { FolderColor } from '@/types/folder';
 import { useRouter } from 'next/navigation';
 import { useCalendarStore } from '@/stores/calendar-store';
 import { useUpdateTaskDeadline } from '@/hooks/mutations/useUpdateTaskDeadline';
 import { useUpdateSubTaskDeadlineForCalendar } from '@/hooks/mutations/useUpdateSubTaskDeadlineForCalendar';
+import {
+  UnspecifiedTaskSection,
+  type UnspecifiedSubTask,
+} from './UnspecifiedTaskSection';
 
 // FolderColor → Panda CSS 토큰 매핑
 const FOLDER_COLOR_MAP: Record<FolderColor, string> = {
@@ -93,6 +99,14 @@ export const Calendar = ({
 
   // 세부과제를 캘린더 이벤트로 변환
   const filteredTaskIds = new Set(taskEvents.map((e) => Number(e.id)));
+  const unspecifiedSubTasks: UnspecifiedSubTask[] = subItems
+    .filter((st) => filteredTaskIds.has(st.taskId) && st.dueDate === null)
+    .map((st) => ({
+      subTaskId: st.subTaskId,
+      taskId: st.taskId,
+      title: st.title,
+      folderColor: st.folderColor,
+    }));
   const datedSubItems = subItems.filter(
     (st): st is SubTask & { dueDate: string } =>
       filteredTaskIds.has(st.taskId) && st.dueDate !== null,
@@ -222,21 +236,30 @@ export const Calendar = ({
   };
 
   return (
-    <FullCalendar
-      ref={calendarRef}
-      plugins={[dayGridPlugin, interactionPlugin]}
-      initialView='dayGridMonth'
-      events={filteredEvents}
-      editable={true}
-      droppable={true}
-      eventAllow={handleEventAllow}
-      eventDrop={handleEventDrop}
-      eventClick={handleEventClick}
-      headerToolbar={false}
-      height='auto'
-      displayEventTime={false}
-      // 6주 고정
-      fixedWeekCount={true}
-    />
+    <div className={calendarContentStyle}>
+      <UnspecifiedTaskSection tasks={unspecifiedSubTasks} />
+      <FullCalendar
+        ref={calendarRef}
+        plugins={[dayGridPlugin, interactionPlugin]}
+        initialView='dayGridMonth'
+        events={filteredEvents}
+        editable={true}
+        droppable={true}
+        eventAllow={handleEventAllow}
+        eventDrop={handleEventDrop}
+        eventClick={handleEventClick}
+        headerToolbar={false}
+        height='auto'
+        displayEventTime={false}
+        // 6주 고정
+        fixedWeekCount={true}
+      />
+    </div>
   );
 };
+
+const calendarContentStyle = css(
+  stack.raw({
+    gap: '1rem',
+  }),
+);
