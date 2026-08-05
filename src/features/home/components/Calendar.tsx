@@ -40,7 +40,7 @@ interface SubTask {
   taskId: number;
   title: string;
   status: string;
-  dueDate: string;
+  dueDate: string | null;
   deadlineTime?: string;
   folderColor: FolderColor;
 }
@@ -93,23 +93,25 @@ export const Calendar = ({
 
   // 세부과제를 캘린더 이벤트로 변환
   const filteredTaskIds = new Set(taskEvents.map((e) => Number(e.id)));
-  const subTaskEvents = subItems
-    .filter((st) => filteredTaskIds.has(st.taskId))
-    .map((st) => {
-      const parentTask = items.find((a) => a.id === st.taskId);
-      const type = parentTask?.assignmentType === '팀' ? 'team' : 'personal';
-      return {
-        id: `sub-${st.subTaskId}`,
-        title: st.title,
-        start: st.dueDate,
-        allDay: true,
-        url: `/assignment/${type}/${st.taskId}`,
-        backgroundColor: 'transparent',
-        borderColor: FOLDER_COLOR_MAP[st.folderColor],
-        textColor: FOLDER_COLOR_MAP[st.folderColor],
-        classNames: ['fc-subtask-event'],
-      };
-    });
+  const datedSubItems = subItems.filter(
+    (st): st is SubTask & { dueDate: string } =>
+      filteredTaskIds.has(st.taskId) && st.dueDate !== null,
+  );
+  const subTaskEvents = datedSubItems.map((st) => {
+    const parentTask = items.find((a) => a.id === st.taskId);
+    const type = parentTask?.assignmentType === '팀' ? 'team' : 'personal';
+    return {
+      id: `sub-${st.subTaskId}`,
+      title: st.title,
+      start: st.dueDate,
+      allDay: true,
+      url: `/assignment/${type}/${st.taskId}`,
+      backgroundColor: 'transparent',
+      borderColor: FOLDER_COLOR_MAP[st.folderColor],
+      textColor: FOLDER_COLOR_MAP[st.folderColor],
+      classNames: ['fc-subtask-event'],
+    };
+  });
 
   const filteredEvents = [...taskEvents, ...subTaskEvents];
 
@@ -159,11 +161,13 @@ export const Calendar = ({
       const childSubs = subItems.filter((s) => s.taskId === taskId);
       if (childSubs.length === 0) return true;
       // 세부과제 중 가장 늦은 마감일 이전으로는 이동 불가
-      const latestSubDate = childSubs
+      const childDueDates = childSubs
         .map((s) => s.dueDate)
-        .filter(Boolean)
-        .sort()
-        .at(-1)!;
+        .filter((dueDate): dueDate is string => dueDate !== null)
+        .sort();
+      const latestSubDate = childDueDates.at(-1);
+      if (!latestSubDate) return true;
+
       return dropInfo.startStr >= latestSubDate;
     }
 
