@@ -66,6 +66,7 @@ export const UnspecifiedTaskSection = ({
           <button
             type='button'
             className={expandButtonStyle}
+            aria-expanded={expanded}
             onClick={() => setExpanded((prev) => !prev)}
           >
             <span>펼치기</span>
