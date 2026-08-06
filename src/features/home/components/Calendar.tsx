@@ -136,6 +136,7 @@ export const Calendar = ({
 
     const parent = items.find((a) => a.id === sub.taskId);
     if (!parent) return false;
+    if (!parent.dueDate) return true;
 
     return date <= parent.dueDate;
   };
