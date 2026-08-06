@@ -1,6 +1,7 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { Draggable } from '@fullcalendar/interaction';
 import { css, cva } from 'styled-system/css';
 import { hstack, stack } from 'styled-system/patterns';
 import { ChevronLineDownIcon } from '@/components/icons/ChevronLineDownIcon';
@@ -23,6 +24,7 @@ const MAX_COLLAPSED_COUNT = 5;
 export const UnspecifiedTaskSection = ({
   tasks,
 }: UnspecifiedTaskSectionProps) => {
+  const taskWrapRef = useRef<HTMLDivElement>(null);
   const [expanded, setExpanded] = useState(false);
   const canExpand = tasks.length > MAX_COLLAPSED_COUNT;
   const visibleTasks = useMemo(
@@ -30,6 +32,29 @@ export const UnspecifiedTaskSection = ({
       canExpand && !expanded ? tasks.slice(0, MAX_COLLAPSED_COUNT) : tasks,
     [canExpand, expanded, tasks],
   );
+
+  useEffect(() => {
+    const taskWrap = taskWrapRef.current;
+    if (!taskWrap) return;
+
+    const draggable = new Draggable(taskWrap, {
+      itemSelector: '.unspecified-task-draggable',
+      eventData: (eventEl) => ({
+        id: `sub-${eventEl.dataset.subTaskId}`,
+        title: eventEl.dataset.title ?? '',
+        allDay: true,
+        backgroundColor: 'transparent',
+        classNames: ['fc-subtask-event'],
+        extendedProps: {
+          subTaskId: Number(eventEl.dataset.subTaskId),
+          taskId: Number(eventEl.dataset.taskId),
+          folderColor: eventEl.dataset.folderColor,
+        },
+      }),
+    });
+
+    return () => draggable.destroy();
+  }, [visibleTasks]);
 
   if (tasks.length === 0) return null;
 
@@ -51,7 +76,7 @@ export const UnspecifiedTaskSection = ({
         )}
       </div>
 
-      <div className={taskWrapStyle}>
+      <div ref={taskWrapRef} className={taskWrapStyle}>
         {visibleTasks.map((task) => (
           <button
             key={task.subTaskId}

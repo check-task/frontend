@@ -5,6 +5,7 @@ import FullCalendar from '@fullcalendar/react';
 import type { EventClickArg, EventDropArg } from '@fullcalendar/core';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
+import type { EventReceiveArg } from '@fullcalendar/interaction';
 import '@/styles/fullcalendar.css';
 import { css } from 'styled-system/css';
 import { stack } from 'styled-system/patterns';
@@ -129,6 +130,16 @@ export const Calendar = ({
 
   const filteredEvents = [...taskEvents, ...subTaskEvents];
 
+  const canDropSubTaskOnDate = (subTaskId: number, date: string) => {
+    const sub = subItems.find((s) => s.subTaskId === subTaskId);
+    if (!sub) return false;
+
+    const parent = items.find((a) => a.id === sub.taskId);
+    if (!parent) return false;
+
+    return date <= parent.dueDate;
+  };
+
   // 스토어 날짜가 변경되면 캘린더 이동
   useEffect(() => {
     const calendarApi = calendarRef.current?.getApi();
@@ -187,13 +198,43 @@ export const Calendar = ({
 
     // 세부과제 이동: 상위 과제 마감일 이후로는 이동 불가
     const subTaskId = Number(eventId.replace('sub-', ''));
-    const sub = subItems.find((s) => s.subTaskId === subTaskId);
-    if (!sub) return false;
+    return canDropSubTaskOnDate(subTaskId, dropInfo.startStr);
+  };
 
-    const parent = items.find((a) => a.id === sub.taskId);
-    if (!parent) return false;
+  // 날짜 미지정 세부과제를 캘린더로 드롭하면 마감일 지정
+  const handleEventReceive = (info: EventReceiveArg) => {
+    const subTaskId = Number(info.event.extendedProps.subTaskId);
+    const newDate = info.event.startStr;
 
-    return dropInfo.startStr <= parent.dueDate;
+    if (!subTaskId || !newDate || !canDropSubTaskOnDate(subTaskId, newDate)) {
+      info.revert();
+      return;
+    }
+
+    info.event.remove();
+
+    const endDate = `${newDate}T23:59:59`;
+    setSubItems((prev) =>
+      prev.map((item) =>
+        item.subTaskId === subTaskId
+          ? { ...item, dueDate: newDate, deadlineTime: '23:59:59' }
+          : item,
+      ),
+    );
+    updateSubTaskDeadline.mutate(
+      { subTaskId, endDate },
+      {
+        onError: () => {
+          setSubItems((prev) =>
+            prev.map((item) =>
+              item.subTaskId === subTaskId
+                ? { ...item, dueDate: null, deadlineTime: undefined }
+                : item,
+            ),
+          );
+        },
+      },
+    );
   };
 
   // 캘린더에서 이벤트 드래그 시 마감일 변경 (과제 / 세부과제 구분)
@@ -245,7 +286,9 @@ export const Calendar = ({
         events={filteredEvents}
         editable={true}
         droppable={true}
+        dropAccept='.unspecified-task-draggable'
         eventAllow={handleEventAllow}
+        eventReceive={handleEventReceive}
         eventDrop={handleEventDrop}
         eventClick={handleEventClick}
         headerToolbar={false}
