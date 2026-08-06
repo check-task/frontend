@@ -1,6 +1,8 @@
 /* 캘린더 전체 컨테이너 */
 .fc {
+  border: 0.0625rem solid var(--colors-gray-200);
   border-radius: 0.75rem;
+  box-shadow: -1px 1px 4px 0 rgba(0, 0, 0, 0.08);
   overflow: hidden;
   width: 100%;
 }
