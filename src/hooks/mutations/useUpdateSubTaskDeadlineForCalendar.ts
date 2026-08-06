@@ -44,6 +44,11 @@ export const useUpdateSubTaskDeadlineForCalendar = () => {
         predicate: (query) => isHomeTaskListQueryKey(query.queryKey),
       });
 
+      const previousHomeTaskLists =
+        queryClient.getQueriesData<HomeTaskListCache>({
+          predicate: (query) => isHomeTaskListQueryKey(query.queryKey),
+        });
+
       queryClient.setQueriesData<HomeTaskListCache>(
         { predicate: (query) => isHomeTaskListQueryKey(query.queryKey) },
         (old) => {
@@ -59,8 +64,19 @@ export const useUpdateSubTaskDeadlineForCalendar = () => {
           };
         },
       );
+
+      return { previousHomeTaskLists };
     },
     onSuccess: () => {
+      queryClient.invalidateQueries({
+        predicate: (query) => isHomeTaskListQueryKey(query.queryKey),
+      });
+    },
+    onError: (_error, _variables, context) => {
+      context?.previousHomeTaskLists.forEach(([queryKey, data]) => {
+        queryClient.setQueryData(queryKey, data);
+      });
+
       queryClient.invalidateQueries({
         predicate: (query) => isHomeTaskListQueryKey(query.queryKey),
       });
