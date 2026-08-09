@@ -38,11 +38,11 @@ export const TeamMemberProfileModalItem = ({
         <div className={infoRowsStyle}>
           <div className={infoRowStyle}>
             <span className={infoLabelStyle}>연락처</span>
-            <span className={infoValueStyle}>{phoneNum ?? '-'}</span>
+            <span className={infoValueStyle}>{phoneNum || '-'}</span>
           </div>
           <div className={infoRowStyle}>
             <span className={infoLabelStyle}>이메일</span>
-            <span className={infoValueStyle}>{email ?? '-'}</span>
+            <span className={infoValueStyle}>{email || '-'}</span>
           </div>
         </div>
       </div>
