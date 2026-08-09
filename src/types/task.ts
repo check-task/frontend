@@ -457,3 +457,19 @@ export interface UpdateSubTasksBatchItem {
 export interface UpdateSubTasksBatchRequest {
   subTasks: UpdateSubTasksBatchItem[];
 }
+
+// ============================
+// 팀과제 특정 팀원 프로필 조회 타입 정의
+// ============================
+export interface TaskMemberProfile {
+  nickname: string;
+  phoneNum?: string | null;
+  email?: string | null;
+  profileImage?: string | null;
+}
+
+export interface GetTaskMemberProfileResponse {
+  resultType: 'SUCCESS' | 'FAIL';
+  message: string;
+  data: TaskMemberProfile;
+}

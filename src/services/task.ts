@@ -20,6 +20,8 @@ import {
   UpdateTaskRequest,
   PatchTaskRequest,
   JoinTaskResult,
+  TaskMemberProfile,
+  GetTaskMemberProfileResponse,
 } from '@/types/task';
 import axiosInstance from '@/lib/axiosInstance';
 
@@ -349,6 +351,17 @@ export interface GetTaskMembersResponse {
     count: number;
   };
 }
+
+// 팀과제 특정 팀원 프로필 조회 api 호출 (GET /task/{taskId}/members/{userId})
+export const getTaskMemberProfile = async (
+  taskId: number,
+  userId: number,
+): Promise<TaskMemberProfile> => {
+  const res = await axiosInstance.get<GetTaskMemberProfileResponse>(
+    `${TASK_BASE}/${taskId}/members/${userId}`,
+  );
+  return res.data.data;
+};
 
 // 팀원 역할 수정 (PATCH /task/{taskId}/member/{userId})
 export const updateMemberRole = async (
