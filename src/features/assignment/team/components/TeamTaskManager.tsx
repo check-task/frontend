@@ -37,11 +37,13 @@ export const TeamTaskManager = ({
   manager,
   profileImage,
   members = [],
-  onSelectMember,
 }: TeamTaskManagerProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [display, setDisplay] = useState(() =>
     getDisplayFromProps(manager, profileImage),
+  );
+  const [selectedNicknames, setSelectedNicknames] = useState<string[]>(() =>
+    display.name !== 'none' ? [display.name] : [],
   );
   const { data: myInfo } = useMyInfo();
   const ref = useClickOutside<HTMLDivElement>(() => setIsOpen(false));
@@ -50,35 +52,24 @@ export const TeamTaskManager = ({
     setDisplay(getDisplayFromProps(manager, profileImage));
   }, [manager, profileImage]);
 
+  useEffect(() => {
+    setSelectedNicknames(display.name !== 'none' ? [display.name] : []);
+  }, [display]);
+
   const hasManager = display.name !== 'none';
   const isEmpty = display.name === 'none';
 
   const myNickname = myInfo?.user?.nickname ?? '나';
 
-  const getProfileImageForNickname = (nickname: string): string | undefined => {
-    if (nickname === myNickname) return myInfo?.user?.profileImage ?? undefined;
-    return members.find((m) => m.nickname === nickname)?.profileImage;
+  const handleToggleMember = (nickname: string) => {
+    setSelectedNicknames((prev) =>
+      prev.includes(nickname)
+        ? prev.filter((n) => n !== nickname)
+        : [...prev, nickname],
+    );
   };
 
-  const getAssigneeIdForNickname = (nickname: string): number | undefined => {
-    if (nickname === myNickname) return myInfo?.user?.id;
-    return members.find((m) => m.nickname === nickname)?.id;
-  };
-
-  const handleSelect = (nickname: string) => {
-    if (nickname === 'none') {
-      setDisplay({ name: 'none', profileImage: undefined });
-      onSelectMember?.('none', null);
-      setIsOpen(false);
-      return;
-    }
-    setDisplay({
-      name: nickname,
-      profileImage: getProfileImageForNickname(nickname),
-    });
-    onSelectMember?.(nickname, getAssigneeIdForNickname(nickname));
-    setIsOpen(false);
-  };
+  const handleClearAll = () => setSelectedNicknames([]);
 
   return (
     <div ref={ref} className={wrapperStyle}>
@@ -111,8 +102,9 @@ export const TeamTaskManager = ({
           myNickname={myNickname}
           myProfileImage={myInfo?.user?.profileImage ?? undefined}
           members={members}
-          selectedManager={display.name !== 'none' ? display.name : undefined}
-          onSelect={handleSelect}
+          selectedNicknames={selectedNicknames}
+          onToggle={handleToggleMember}
+          onClearAll={handleClearAll}
         />
       )}
     </div>
