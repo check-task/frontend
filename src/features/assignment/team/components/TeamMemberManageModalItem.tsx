@@ -61,13 +61,7 @@ export const TeamMemberManageModalItem = ({
                 }
               : undefined
           }
-        >
-          {!profileImage && (
-            <span className={profilePlaceholderTextStyle}>
-              {name.slice(0, 1).toUpperCase()}
-            </span>
-          )}
-        </div>
+        />
         <p>{name}</p>
       </button>
 
@@ -126,11 +120,6 @@ const modalContentItemTitleIconStyle = css({
   alignItems: 'center',
   justifyContent: 'center',
   overflow: 'hidden',
-});
-
-const profilePlaceholderTextStyle = css({
-  textStyle: 'body4.m',
-  color: 'gray.600',
 });
 
 const modalContentItemMemberStyle = css({
