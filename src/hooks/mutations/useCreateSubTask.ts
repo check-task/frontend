@@ -23,7 +23,14 @@ export const useCreateSubTask = (taskId: number) => {
       }
       return createSubTask(taskId, body);
     },
-    onMutate: (body: CreateSubTaskRequest) => {
+    onMutate: async (body: CreateSubTaskRequest) => {
+      await queryClient.cancelQueries({ queryKey: ['taskDetail', taskId] });
+
+      const previousTaskDetail = queryClient.getQueryData<TaskDetail>([
+        'taskDetail',
+        taskId,
+      ]);
+
       // 임시 ID로 즉시 캐시에 추가 → 폼 닫힘과 동시에 목록에 노출
       queryClient.setQueryData<TaskDetail>(['taskDetail', taskId], (old) => {
         if (!old) return old;
@@ -43,10 +50,18 @@ export const useCreateSubTask = (taskId: number) => {
           ],
         };
       });
+
+      return { previousTaskDetail };
     },
     onSuccess: () => {
       // 백그라운드에서 서버와 동기화 (임시 ID → 실제 ID)
       queryClient.invalidateQueries({ queryKey: ['taskDetail', taskId] });
+    },
+    onError: (_error, _variables, context) => {
+      // 생성 실패 시 낙관적으로 추가했던 임시 항목 롤백
+      if (context?.previousTaskDetail) {
+        queryClient.setQueryData(['taskDetail', taskId], context.previousTaskDetail);
+      }
     },
   });
 };
