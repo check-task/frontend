@@ -1,6 +1,9 @@
 import { css } from 'styled-system/css';
 import { useTaskMemberProfile } from '@/hooks/queries/useTaskMemberProfile';
 
+// 백엔드가 연락처 미설정 사용자에게 null 대신 내려주는 안내 문구
+const PHONE_PLACEHOLDER = '전화번호를 입력해 주세요.';
+
 interface TeamMemberProfileModalItemProps {
   taskId: number;
   userId?: number;
@@ -11,6 +14,10 @@ export const TeamMemberProfileModalItem = ({
   userId,
 }: TeamMemberProfileModalItemProps) => {
   const { data: profile } = useTaskMemberProfile(taskId, userId);
+  const phoneNum =
+    profile?.phoneNum && profile.phoneNum !== PHONE_PLACEHOLDER
+      ? profile.phoneNum
+      : '';
 
   return (
     <div className={cardStyle}>
@@ -37,7 +44,7 @@ export const TeamMemberProfileModalItem = ({
         <div className={infoRowsStyle}>
           <div className={infoRowStyle}>
             <span className={infoLabelStyle}>연락처</span>
-            <span className={infoValueStyle}>{profile?.phoneNum || '-'}</span>
+            <span className={infoValueStyle}>{phoneNum || '-'}</span>
           </div>
           <div className={infoRowStyle}>
             <span className={infoLabelStyle}>이메일</span>
