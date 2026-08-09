@@ -137,10 +137,7 @@ export const TeamMemberManageModal = ({
           content: <TeamMemberManageModal taskId={taskId} />,
         }),
       content: (
-        <TeamMemberProfileModalItem
-          name={member.name}
-          profileImage={member.profileImage}
-        />
+        <TeamMemberProfileModalItem taskId={taskId} userId={member.userId} />
       ),
     });
   };

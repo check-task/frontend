@@ -1,34 +1,33 @@
 import { css } from 'styled-system/css';
+import { useTaskMemberProfile } from '@/hooks/queries/useTaskMemberProfile';
 
 interface TeamMemberProfileModalItemProps {
-  name: string;
-  profileImage?: string | null;
-  phoneNum?: string | null;
-  email?: string | null;
+  taskId: number;
+  userId?: number;
 }
 
 export const TeamMemberProfileModalItem = ({
-  name,
-  profileImage,
-  phoneNum,
-  email,
+  taskId,
+  userId,
 }: TeamMemberProfileModalItemProps) => {
+  const { data: profile } = useTaskMemberProfile(taskId, userId);
+
   return (
     <div className={cardStyle}>
       <div className={profileColumnStyle}>
         <div
           className={avatarStyle}
           style={
-            profileImage
+            profile?.profileImage
               ? {
-                  backgroundImage: `url(${profileImage})`,
+                  backgroundImage: `url(${profile.profileImage})`,
                   backgroundSize: 'cover',
                   backgroundPosition: 'center',
                 }
               : undefined
           }
         />
-        <p className={nameStyle}>{name}</p>
+        <p className={nameStyle}>{profile?.nickname ?? ''}</p>
       </div>
 
       <div className={verticalDividerStyle} />
@@ -38,11 +37,11 @@ export const TeamMemberProfileModalItem = ({
         <div className={infoRowsStyle}>
           <div className={infoRowStyle}>
             <span className={infoLabelStyle}>연락처</span>
-            <span className={infoValueStyle}>{phoneNum || '-'}</span>
+            <span className={infoValueStyle}>{profile?.phoneNum || '-'}</span>
           </div>
           <div className={infoRowStyle}>
             <span className={infoLabelStyle}>이메일</span>
-            <span className={infoValueStyle}>{email || '-'}</span>
+            <span className={infoValueStyle}>{profile?.email || '-'}</span>
           </div>
         </div>
       </div>
