@@ -53,7 +53,6 @@ const cardStyle = css({
   display: 'flex',
   alignItems: 'center',
   gap: '1.75rem',
-  width: '27.25rem',
   padding: '1.25rem 1.75rem',
   marginTop: '1.75rem',
   marginBottom: '1.125rem',
@@ -120,6 +119,8 @@ const infoRowStyle = css({
 const infoLabelStyle = css({
   textStyle: 'body2.r',
   color: 'gray.400',
+  whiteSpace: 'nowrap',
+  flexShrink: 0,
 });
 
 const infoValueStyle = css({
