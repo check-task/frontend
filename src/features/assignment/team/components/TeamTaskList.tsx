@@ -833,11 +833,14 @@ const managerContainerStyle = css({
   display: 'flex',
   alignItems: 'center',
   gap: '0.5rem',
+  flex: 1,
+  minWidth: 0,
 });
 
 const managerLabelStyle = css({
   textStyle: 'body3.r',
   color: 'gray.600',
+  flexShrink: 0,
 });
 
 // 댓글 섹션 스타일
