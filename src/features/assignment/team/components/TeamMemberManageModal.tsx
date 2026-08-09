@@ -6,6 +6,7 @@ import {
   TeamMemberManageModalItem,
   type MemberRole,
 } from './TeamMemberManageModalItem';
+import { TeamMemberProfileModalItem } from './TeamMemberProfileModalItem';
 import { Divider } from '@/components/Divider';
 import { Input } from '@/components/TextField';
 import { useCreateInvitationLink } from '@/hooks/mutations/useCreateInvitationLink';
@@ -14,6 +15,7 @@ import { useTaskMembers } from '@/hooks/queries/useTaskMembers';
 import { useUpdateMemberRole } from '@/hooks/mutations/useUpdateMemberRole';
 import { useMyInfo } from '@/hooks/queries/useMyInfo';
 import { useAlertStore } from '@/stores/alert-store';
+import { useModalStore } from '@/stores/modal-store';
 
 interface TeamMemberManageModalProps {
   taskId: number;
@@ -59,6 +61,7 @@ export const TeamMemberManageModal = ({
   const [roleError, setRoleError] = useState<string | null>(null);
   const { data: myInfo } = useMyInfo();
   const { showAlert } = useAlertStore();
+  const { openModal } = useModalStore();
   const { data: membersData } = useTaskMembers(taskId);
   const { mutateAsync: createInvitation, isPending } =
     useCreateInvitationLink(taskId);
@@ -123,6 +126,25 @@ export const TeamMemberManageModal = ({
     );
   };
 
+  const handleProfileClick = (member: (typeof members)[number]) => {
+    openModal({
+      title: '팀원 목록',
+      headerType: 'withBack',
+      onLeftClick: () =>
+        openModal({
+          title: '팀원 관리',
+          headerType: 'withClose',
+          content: <TeamMemberManageModal taskId={taskId} />,
+        }),
+      content: (
+        <TeamMemberProfileModalItem
+          name={member.name}
+          profileImage={member.profileImage}
+        />
+      ),
+    });
+  };
+
   const handleExpelMember = (memberId: number, memberName: string) => {
     const confirmed = window.confirm(
       `${memberName}을(를) 팀에서 삭제하시겠습니까?`,
@@ -166,6 +188,7 @@ export const TeamMemberManageModal = ({
               onExpelMember={() =>
                 handleExpelMember(member.memberId, member.name)
               }
+              onProfileClick={() => handleProfileClick(member)}
             />
           ))
         )}
@@ -201,6 +224,7 @@ const modalContentStyle = css({
   display: 'flex',
   flexDirection: 'column',
   gap: '1.75rem',
+  width: '27.25rem',
 });
 
 const modalContentItemStyle = css({
