@@ -1,17 +1,23 @@
 'use client';
 
-import { useState } from 'react';
+import { Suspense, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { css } from 'styled-system/css';
 import { AssignmentList } from '@/components/AssignmentList';
 import { FolderFilterDropdown } from '@/components/FolderFilterDropdown';
 import { useTaskList } from '@/features/assignment/hooks/useTaskList';
 import { useMyInfo } from '@/hooks/queries/useMyInfo';
 
-export default function AssignmentPage() {
+function AssignmentPageContent() {
+  const searchParams = useSearchParams();
+  const folderIdParam = searchParams.get('folderId');
+  const initialFolderId = folderIdParam ? Number(folderIdParam) : null;
+
   const { data: myInfo } = useMyInfo();
   const folders = myInfo?.folders ?? [];
+  // 마이페이지에서 폴더 클릭 시 넘어온 folderId로 초기 필터 지정
   const [selectedFolderIds, setSelectedFolderIds] = useState<number[] | null>(
-    null,
+    () => (initialFolderId != null ? [initialFolderId] : null),
   );
   // 과제 목록 데이터 가져오기
   const { data = [], isLoading } = useTaskList(selectedFolderIds);
@@ -27,6 +33,7 @@ export default function AssignmentPage() {
         <h3 className={titleStyle}>내 과제</h3>
         <FolderFilterDropdown
           folders={folders}
+          initialFolderId={initialFolderId}
           onSelectionChange={setSelectedFolderIds}
         />
       </div>
@@ -36,6 +43,14 @@ export default function AssignmentPage() {
         <AssignmentList assignments={data} />
       )}
     </div>
+  );
+}
+
+export default function AssignmentPage() {
+  return (
+    <Suspense>
+      <AssignmentPageContent />
+    </Suspense>
   );
 }
 
