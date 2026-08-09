@@ -49,7 +49,7 @@ export const TeamTaskManagerChipGroup = ({
   const containerRef = useRef<HTMLButtonElement | null>(null);
   const [visibleCount, setVisibleCount] = useState(members.length);
   // 각 담당자 chip의 폭을 측정하기 위한 ref
-  const chipRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const chipRefs = useRef<(HTMLSpanElement | null)[]>([]);
   // 외 N 라벨의 폭을 측정하기 위한 ref
   const overflowMeasureRef = useRef<HTMLSpanElement | null>(null);
 
@@ -100,9 +100,9 @@ export const TeamTaskManagerChipGroup = ({
       aria-expanded={isOpen}
       aria-haspopup='listbox'
     >
-      <div className={chipRowStyle}>
+      <span className={chipRowStyle}>
         {visibleMembers.map((m) => (
-          <div key={m.nickname} className={teamTaskManagerStyle({ empty: false })}>
+          <span key={m.nickname} className={teamTaskManagerStyle({ empty: false })}>
             <span
               className={teamTaskManagerIconStyle({ empty: false })}
               style={
@@ -116,17 +116,17 @@ export const TeamTaskManagerChipGroup = ({
               }
             />
             <span className={chipNameStyle({ empty: false })}>{m.nickname}</span>
-          </div>
+          </span>
         ))}
-      </div>
+      </span>
       {overflowCount > 0 && (
         <span className={overflowLabelStyle}>외 {overflowCount}</span>
       )}
 
       {/* 너비 측정 전용으로 숨겨진 DOM */}
-      <div className={hiddenMeasureStyle} aria-hidden='true'>
+      <span className={hiddenMeasureStyle} aria-hidden='true'>
         {members.map((m, index) => (
-          <div
+          <span
             key={m.nickname}
             ref={(el) => {
               chipRefs.current[index] = el;
@@ -135,12 +135,12 @@ export const TeamTaskManagerChipGroup = ({
           >
             <span className={teamTaskManagerIconStyle({ empty: false })} />
             <span className={chipNameStyle({ empty: false })}>{m.nickname}</span>
-          </div>
+          </span>
         ))}
         <span ref={overflowMeasureRef} className={overflowLabelStyle}>
           외 {members.length}
         </span>
-      </div>
+      </span>
     </button>
   );
 };
