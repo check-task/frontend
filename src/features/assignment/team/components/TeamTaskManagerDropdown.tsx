@@ -108,7 +108,12 @@ export const TeamTaskManagerDropdown = ({
   ];
 
   return (
-    <div className={dropdownStyle} role='listbox' aria-label='담당자 선택'>
+    <div
+      className={dropdownStyle}
+      role='listbox'
+      aria-label='담당자 선택'
+      aria-multiselectable='true'
+    >
       {rows.map((row, index) => (
         <Fragment key={row.key}>
           {row}
