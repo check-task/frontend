@@ -69,7 +69,15 @@ export interface TaskDetailSubTaskComment {
   createdAt: string;
 }
 
-// Task 목록에 보여지는 세부 과제 항목
+// 세부 TASK 각 담당자 (상세 조회 응답) 
+export interface TaskDetailSubTaskAssignee {
+  memberId: number;
+  userId: number;
+  nickname: string;
+  profileImage: string | null;
+}
+
+// subTasks 목록에 보여지는 항목
 export interface TaskDetailSubTask {
   subTaskId: number;
   title: string;
@@ -78,10 +86,7 @@ export interface TaskDetailSubTask {
   isAlarm: boolean;
   commentCount: number;
   comments?: TaskDetailSubTaskComment[];
-  /** 담당자 사용자 ID (과제 수정 API용) */
-  assigneeId?: number | null;
-  assigneeName: string;
-  assigneeProfileImage?: string | null;
+  assignees: TaskDetailSubTaskAssignee[];
 }
 
 // 자료 모음집 참조 항목 (과제 상세·자료 생성 응답)
@@ -348,7 +353,7 @@ export interface UpdateSubTaskStatusResponse {
 // 세부 TASK 담당자 설정 타입 정의
 // ============================
 export interface UpdateSubTaskAssigneeRequest {
-  assigneeId: number | null;
+  assigneeIds: number[];
 }
 
 export interface UpdateSubTaskAssigneeResponse {
@@ -356,7 +361,7 @@ export interface UpdateSubTaskAssigneeResponse {
   message: string;
   data: {
     sub_task_id: number;
-    assignee_id: number;
+    assignees: TaskDetailSubTaskAssignee[];
   };
 }
 

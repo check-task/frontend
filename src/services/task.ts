@@ -100,30 +100,15 @@ export const getTaskDetail = async (taskId: number): Promise<TaskDetail> => {
     );
   }
 
-  // subTasks: API는 camelCase(assigneeId 등), assigneeId가 null일 수 있음
-  const rawSubTasks =
-    data.subTasks ?? (data as { sub_tasks?: unknown[] }).sub_tasks;
+  // subTasks: API는 camelCase(assignees 등)
+  const rawSubTasks = data.subTasks;
   if (rawSubTasks?.length) {
     data.subTasks = rawSubTasks.map(
-      (
-        st: TaskDetailSubTask & {
-          sub_task_id?: number;
-          assignee_id?: number | null;
-          assignee_name?: string;
-          assignee_profile_image?: string | null;
-        },
-      ) => {
-        const rawAssigneeId = st.assigneeId ?? st.assignee_id;
-        return {
-          ...st,
-          subTaskId: st.subTaskId ?? st.sub_task_id ?? 0,
-          assigneeId: rawAssigneeId != null ? rawAssigneeId : undefined,
-          assigneeName:
-            st.assigneeName ?? st.assignee_name ?? st.assigneeName ?? '',
-          assigneeProfileImage:
-            st.assigneeProfileImage ?? st.assignee_profile_image ?? undefined,
-        };
-      },
+      (st: TaskDetailSubTask & { sub_task_id?: number }) => ({
+        ...st,
+        subTaskId: st.subTaskId ?? st.sub_task_id ?? 0,
+        assignees: st.assignees ?? [],
+      }),
     );
   }
 
