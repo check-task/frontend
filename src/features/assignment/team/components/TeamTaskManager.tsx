@@ -1,83 +1,69 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { css } from 'styled-system/css';
 import { useClickOutside } from '@/hooks/useClickOutside';
 import { useMyInfo } from '@/hooks/queries/useMyInfo';
+import type { TaskDetailSubTaskAssignee } from '@/types/task';
 import { TeamTaskManagerDropdown } from './TeamTaskManagerDropdown';
 import type { TeamTaskManagerDropdownMember } from './TeamTaskManagerDropdown';
 import { TeamTaskManagerChipGroup } from './TeamTaskManagerChipGroup';
 
 export type TeamTaskManagerMember = TeamTaskManagerDropdownMember;
 
-const getDisplayFromProps = (
-  manager?: string,
-  profileImage?: string,
-): { name: string; profileImage?: string } => {
-  const value = (manager ?? '').trim();
-  const isEmpty =
-    value === '' ||
-    value === 'none' ||
-    value.toUpperCase() === 'PENDING' ||
-    value === '미지정';
-  return isEmpty
-    ? { name: 'none', profileImage: undefined }
-    : { name: manager!, profileImage };
-};
-
 interface TeamTaskManagerProps {
-  manager?: string;
-  profileImage?: string;
-  /** 드롭다운에 표시할 팀원 목록 (내 정보 제외, id 있으면 과제 수정 API에 사용) */
+  assignees?: TaskDetailSubTaskAssignee[];
+  /** 드롭다운에 표시할 팀원 목록 (내 정보 제외) */
   members?: TeamTaskManagerMember[];
-  /** 선택 시 (닉네임, 담당자 사용자 ID). null이면 담당자 없음(none) */
-  onSelectMember?: (nickname: string, assigneeId?: number | null) => void;
+  /** 선택된 담당자 user id 목록. 빈 배열이면 담당자 없음(none) */
+  onSelectMember?: (assigneeIds: number[]) => void;
 }
 
 export const TeamTaskManager = ({
-  manager,
-  profileImage,
+  assignees = [],
   members = [],
+  onSelectMember,
 }: TeamTaskManagerProps) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [display, setDisplay] = useState(() =>
-    getDisplayFromProps(manager, profileImage),
-  );
-  const [selectedNicknames, setSelectedNicknames] = useState<string[]>(() =>
-    display.name !== 'none' ? [display.name] : [],
+  const [prevAssignees, setPrevAssignees] = useState(assignees);
+  // 현재 선택되어 있는 담당자들의 userId 목록
+  const [selectedIds, setSelectedIds] = useState<number[]>(() =>
+    assignees.map((a) => a.userId),
   );
   const { data: myInfo } = useMyInfo();
   const ref = useClickOutside<HTMLDivElement>(() => setIsOpen(false));
 
-  useEffect(() => {
-    setDisplay(getDisplayFromProps(manager, profileImage));
-  }, [manager, profileImage]);
-
-  useEffect(() => {
-    setSelectedNicknames(display.name !== 'none' ? [display.name] : []);
-  }, [display]);
+  // assignees prop이 바뀌면(서버 재조회 등) 렌더 중 즉시 로컬 선택 상태를 동기화
+  if (assignees !== prevAssignees) {
+    setPrevAssignees(assignees);
+    setSelectedIds(assignees.map((a) => a.userId));
+  }
 
   const myNickname = myInfo?.user?.nickname ?? '나';
+  const myId = myInfo?.user?.id ?? 0;
 
-  const handleToggleMember = (nickname: string) => {
-    setSelectedNicknames((prev) =>
-      prev.includes(nickname)
-        ? prev.filter((n) => n !== nickname)
-        : [...prev, nickname],
-    );
+  const handleToggleMember = (id: number) => {
+    const next = selectedIds.includes(id)
+      ? selectedIds.filter((i) => i !== id)
+      : [...selectedIds, id];
+    setSelectedIds(next);
+    onSelectMember?.(next);
   };
 
-  const handleClearAll = () => setSelectedNicknames([]);
+  const handleClearAll = () => {
+    setSelectedIds([]);
+    onSelectMember?.([]);
+  };
 
-  const canonicalOrder = [myNickname, ...members.map((m) => m.nickname)];
+  const canonicalOrder = [
+    { id: myId, nickname: myNickname, profileImage: myInfo?.user?.profileImage },
+    ...members,
+  ];
   const chipMembers = canonicalOrder
-    .filter((nickname) => selectedNicknames.includes(nickname))
-    .map((nickname) => ({
+    .filter((m) => selectedIds.includes(m.id))
+    .map(({ nickname, profileImage }) => ({
       nickname,
-      profileImage:
-        nickname === myNickname
-          ? (myInfo?.user?.profileImage ?? undefined)
-          : members.find((m) => m.nickname === nickname)?.profileImage,
+      profileImage: profileImage ?? undefined,
     }));
 
   return (
@@ -90,10 +76,11 @@ export const TeamTaskManager = ({
 
       {isOpen && (
         <TeamTaskManagerDropdown
+          myId={myId}
           myNickname={myNickname}
           myProfileImage={myInfo?.user?.profileImage ?? undefined}
           members={members}
-          selectedNicknames={selectedNicknames}
+          selectedIds={selectedIds}
           onToggle={handleToggleMember}
           onClearAll={handleClearAll}
         />

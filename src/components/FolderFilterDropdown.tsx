@@ -13,17 +13,28 @@ import { useClickOutside } from '@/hooks/useClickOutside';
 
 interface FolderFilterDropdownProps {
   folders?: Folder[];
+  /** 진입 시 미리 선택해둘 폴더 id */
+  initialFolderId?: number | null;
   onSelectionChange?: (selectedIds: number[] | null) => void;
 }
 
 export const FolderFilterDropdown = ({
   folders = DUMMY_FOLDERS,
+  initialFolderId = null,
   onSelectionChange,
 }: FolderFilterDropdownProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useClickOutside<HTMLDivElement>(() => setIsOpen(false));
+  const [prevInitialFolderId, setPrevInitialFolderId] = useState(initialFolderId);
   // null = 전체 선택 (folders 로드 시점과 무관하게 항상 "전체"를 의미)
-  const [selectedIds, setSelectedIds] = useState<Set<number> | null>(null);
+  const [selectedIds, setSelectedIds] = useState<Set<number> | null>(() =>
+    initialFolderId != null ? new Set([initialFolderId]) : null,
+  );
+  // 같은 페이지에서 URL의 folderId만 바뀌는 경우 대비, 렌더 중 동기화
+  if (initialFolderId !== prevInitialFolderId) {
+    setPrevInitialFolderId(initialFolderId);
+    setSelectedIds(initialFolderId != null ? new Set([initialFolderId]) : null);
+  }
   const isAllSelected = selectedIds === null;
   const isFolderSelected = (folderId: number) =>
     isAllSelected || selectedIds.has(folderId);

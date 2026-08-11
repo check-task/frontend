@@ -82,7 +82,7 @@ export const ModifyAssignmentForm = () => {
     dueDate: task.deadline,
     status: task.status,
     isAlarm: task.isAlarm,
-    assigneeId: task.assigneeId ?? 0,
+    assigneeId: task.assignees?.[0]?.userId ?? 0,
   }));
 
   const initialDataItems = data?.references?.map((ref, index) => ({

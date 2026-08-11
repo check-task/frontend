@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { css } from 'styled-system/css';
 import {
   TeamMemberManageModalItem,
@@ -14,6 +15,7 @@ import { useExpelTaskMember } from '@/hooks/mutations/useExpelTaskMember';
 import { useTaskMembers } from '@/hooks/queries/useTaskMembers';
 import { useUpdateMemberRole } from '@/hooks/mutations/useUpdateMemberRole';
 import { useMyInfo } from '@/hooks/queries/useMyInfo';
+import { getTaskMemberProfile } from '@/services/task';
 import { useAlertStore } from '@/stores/alert-store';
 import { useModalStore } from '@/stores/modal-store';
 
@@ -62,6 +64,7 @@ export const TeamMemberManageModal = ({
   const { data: myInfo } = useMyInfo();
   const { showAlert } = useAlertStore();
   const { openModal } = useModalStore();
+  const queryClient = useQueryClient();
   const { data: membersData } = useTaskMembers(taskId);
   const { mutateAsync: createInvitation, isPending } =
     useCreateInvitationLink(taskId);
@@ -69,6 +72,19 @@ export const TeamMemberManageModal = ({
   const { mutate: expelMember } = useExpelTaskMember(taskId);
 
   const members = membersData ?? [];
+
+  useEffect(() => {
+    // 목록이 보이는 동안 미리 프로필을 캐싱해둬서, 클릭 시 깜빡임 없이 바로 보이도록 함
+    members.forEach((member) => {
+      if (member.userId == null) return;
+      queryClient.prefetchQuery({
+        queryKey: ['taskMemberProfile', taskId, member.userId],
+        queryFn: () => getTaskMemberProfile(taskId, member.userId as number),
+      });
+    });
+    // members 배열은 매 렌더마다 새로 생성되므로 memberId 조합으로만 재실행 여부 판단
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [taskId, members.map((m) => m.memberId).join(',')]);
   const currentUserId = myInfo?.user?.id;
   const myNickname = myInfo?.user?.nickname;
   // API가 user_id를 주면 숫자 비교(문자열 응답 대비 Number() 사용), 없으면 닉네임으로 현재 사용자 행 보완
@@ -137,10 +153,7 @@ export const TeamMemberManageModal = ({
           content: <TeamMemberManageModal taskId={taskId} />,
         }),
       content: (
-        <TeamMemberProfileModalItem
-          name={member.name}
-          profileImage={member.profileImage}
-        />
+        <TeamMemberProfileModalItem taskId={taskId} userId={member.userId} />
       ),
     });
   };

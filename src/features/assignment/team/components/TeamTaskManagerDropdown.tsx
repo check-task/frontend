@@ -5,29 +5,31 @@ import { css, cva } from 'styled-system/css';
 import { CheckMark } from '@/components/icons/CheckMark';
 
 export interface TeamTaskManagerDropdownMember {
-  id?: number;
+  id: number;
   nickname: string;
   profileImage?: string;
 }
 
 interface TeamTaskManagerDropdownProps {
+  myId: number;
   myNickname: string;
   myProfileImage?: string;
   members: TeamTaskManagerDropdownMember[];
-  selectedNicknames: string[];
-  onToggle: (nickname: string) => void;
+  selectedIds: number[];
+  onToggle: (id: number) => void;
   onClearAll: () => void;
 }
 
 export const TeamTaskManagerDropdown = ({
+  myId,
   myNickname,
   myProfileImage,
   members,
-  selectedNicknames,
+  selectedIds,
   onToggle,
   onClearAll,
 }: TeamTaskManagerDropdownProps) => {
-  const isNoneSelected = selectedNicknames.length === 0;
+  const isNoneSelected = selectedIds.length === 0;
 
   const rows = [
     <button
@@ -43,14 +45,14 @@ export const TeamTaskManagerDropdown = ({
       {isNoneSelected && <CheckMark variant='blue' size={10} className={checkIconStyle} />}
     </button>,
     <button
-      key={myNickname}
+      key={myId}
       type='button'
       className={dropdownItemStyle({
-        selected: selectedNicknames.includes(myNickname),
+        selected: selectedIds.includes(myId),
       })}
-      onClick={() => onToggle(myNickname)}
+      onClick={() => onToggle(myId)}
       role='option'
-      aria-selected={selectedNicknames.includes(myNickname)}
+      aria-selected={selectedIds.includes(myId)}
     >
       <span
         className={profileCircleStyle}
@@ -66,23 +68,23 @@ export const TeamTaskManagerDropdown = ({
       />
       <span
         className={nicknameStyle({
-          selected: selectedNicknames.includes(myNickname),
+          selected: selectedIds.includes(myId),
         })}
       >
         {myNickname}(you)
       </span>
-      {selectedNicknames.includes(myNickname) && (
+      {selectedIds.includes(myId) && (
         <CheckMark variant='blue' size={10} className={checkIconStyle} />
       )}
     </button>,
     ...members.map((m) => {
-      const isSelected = selectedNicknames.includes(m.nickname);
+      const isSelected = selectedIds.includes(m.id);
       return (
         <button
-          key={m.nickname}
+          key={m.id}
           type='button'
           className={dropdownItemStyle({ selected: isSelected })}
-          onClick={() => onToggle(m.nickname)}
+          onClick={() => onToggle(m.id)}
           role='option'
           aria-selected={isSelected}
         >

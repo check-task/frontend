@@ -1,34 +1,40 @@
 import { css } from 'styled-system/css';
+import { useTaskMemberProfile } from '@/hooks/queries/useTaskMemberProfile';
+
+// 백엔드가 연락처 미설정 사용자에게 null 대신 내려주는 안내 문구
+const PHONE_PLACEHOLDER = '전화번호를 입력해 주세요.';
 
 interface TeamMemberProfileModalItemProps {
-  name: string;
-  profileImage?: string | null;
-  phoneNum?: string | null;
-  email?: string | null;
+  taskId: number;
+  userId?: number;
 }
 
 export const TeamMemberProfileModalItem = ({
-  name,
-  profileImage,
-  phoneNum,
-  email,
+  taskId,
+  userId,
 }: TeamMemberProfileModalItemProps) => {
+  const { data: profile } = useTaskMemberProfile(taskId, userId);
+  const phoneNum =
+    profile?.phoneNum && profile.phoneNum !== PHONE_PLACEHOLDER
+      ? profile.phoneNum
+      : '';
+
   return (
     <div className={cardStyle}>
       <div className={profileColumnStyle}>
         <div
           className={avatarStyle}
           style={
-            profileImage
+            profile?.profileImage
               ? {
-                  backgroundImage: `url(${profileImage})`,
+                  backgroundImage: `url(${profile.profileImage})`,
                   backgroundSize: 'cover',
                   backgroundPosition: 'center',
                 }
               : undefined
           }
         />
-        <p className={nameStyle}>{name}</p>
+        <p className={nameStyle}>{profile?.nickname ?? ''}</p>
       </div>
 
       <div className={verticalDividerStyle} />
@@ -42,7 +48,7 @@ export const TeamMemberProfileModalItem = ({
           </div>
           <div className={infoRowStyle}>
             <span className={infoLabelStyle}>이메일</span>
-            <span className={infoValueStyle}>{email || '-'}</span>
+            <span className={infoValueStyle}>{profile?.email || '-'}</span>
           </div>
         </div>
       </div>
@@ -54,7 +60,6 @@ const cardStyle = css({
   display: 'flex',
   alignItems: 'center',
   gap: '1.75rem',
-  width: '27.25rem',
   padding: '1.25rem 1.75rem',
   marginTop: '1.75rem',
   marginBottom: '1.125rem',
@@ -121,6 +126,8 @@ const infoRowStyle = css({
 const infoLabelStyle = css({
   textStyle: 'body2.r',
   color: 'gray.400',
+  whiteSpace: 'nowrap',
+  flexShrink: 0,
 });
 
 const infoValueStyle = css({

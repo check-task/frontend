@@ -111,9 +111,9 @@ const TeamTaskList = ({
   const currentUserId = myInfo?.user?.id;
   const myNickname = myInfo?.user?.nickname ?? '';
   const teamMembersForDropdown = taskMembers
-    .filter((m) => m.memberId !== currentUserId && m.name !== myNickname)
+    .filter((m) => m.userId !== currentUserId && m.name !== myNickname)
     .map((m) => ({
-      id: m.memberId,
+      id: m.userId ?? m.memberId,
       nickname: m.name,
       profileImage: m.profileImage ?? undefined,
     }));
@@ -143,8 +143,8 @@ const TeamTaskList = ({
     };
   }, [clearPendingAndRefetch]);
 
-  const handleSelectAssignee = (subTaskId: number, assigneeId: number | null) => {
-    updateAssignee({ taskId, subTaskId, assigneeId });
+  const handleSelectAssignee = (subTaskId: number, assigneeIds: number[]) => {
+    updateAssignee({ taskId, subTaskId, assigneeIds });
   };
 
   // createdAt을 yy.mm.dd, hh:mm 으로 분리 (각각 0.25rem 간격용)
@@ -505,13 +505,11 @@ const TeamTaskList = ({
                     >
                       <p className={managerLabelStyle}>담당:</p>
                       <TeamTaskManager
-                        manager={task.assigneeName}
-                        profileImage={task.assigneeProfileImage ?? undefined}
+                        assignees={task.assignees}
                         members={teamMembersForDropdown}
-                        onSelectMember={(_, assigneeId) => {
-                          if (assigneeId !== undefined)
-                            handleSelectAssignee(task.subTaskId, assigneeId);
-                        }}
+                        onSelectMember={(assigneeIds) =>
+                          handleSelectAssignee(task.subTaskId, assigneeIds)
+                        }
                       />
                     </div>
                     {isEditMode && (
