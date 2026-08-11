@@ -144,7 +144,7 @@ export const TASK_UPDATED_EVENT = 'task:updated';
 export const SOCKET_UPDATE_SUBTASK = 'updateSubtaskStatus';
 /** 클라이언트 → 서버: 세부과제 마감일 (백엔드 taskEvents.UPDATE_DEADLINE) payload: { taskId, subTaskId, endDate } */
 export const SOCKET_UPDATE_DEADLINE = 'updateDeadline';
-/** 클라이언트 → 서버: 세부과제 담당자 (백엔드 taskEvents.SET_ASSIGNEE) payload: { taskId, subTaskId, assigneeId } */
+/** 클라이언트 → 서버: 세부과제 담당자 (백엔드 taskEvents.SET_ASSIGNEE) payload: { taskId, subTaskId, assigneeIds } */
 export const SOCKET_SET_ASSIGNEE = 'setSubTaskAssignee';
 /** 클라이언트 → 서버: 단일 세부과제 생성 (백엔드 taskEvents.CREATE_SUBTASK) payload: { taskId, title?, deadline?, isAlarm? } */
 export const SOCKET_CREATE_SUBTASK = 'subtask:create';

@@ -45,7 +45,7 @@ export const useCreateSubTask = (taskId: number) => {
               status: 'PROGRESS' as const,
               isAlarm: body.isAlarm,
               commentCount: 0,
-              assigneeName: '',
+              assignees: [],
             },
           ],
         };
