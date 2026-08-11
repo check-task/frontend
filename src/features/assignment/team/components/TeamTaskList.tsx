@@ -111,9 +111,9 @@ const TeamTaskList = ({
   const currentUserId = myInfo?.user?.id;
   const myNickname = myInfo?.user?.nickname ?? '';
   const teamMembersForDropdown = taskMembers
-    .filter((m) => m.memberId !== currentUserId && m.name !== myNickname)
+    .filter((m) => m.userId !== currentUserId && m.name !== myNickname)
     .map((m) => ({
-      id: m.memberId,
+      id: m.userId ?? m.memberId,
       nickname: m.name,
       profileImage: m.profileImage ?? undefined,
     }));
