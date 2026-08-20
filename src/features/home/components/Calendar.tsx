@@ -5,13 +5,20 @@ import FullCalendar from '@fullcalendar/react';
 import type { EventClickArg, EventDropArg } from '@fullcalendar/core';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
+import type { EventReceiveArg } from '@fullcalendar/interaction';
 import '@/styles/fullcalendar.css';
+import { css } from 'styled-system/css';
+import { stack } from 'styled-system/patterns';
 import { token } from 'styled-system/tokens';
 import type { FolderColor } from '@/types/folder';
 import { useRouter } from 'next/navigation';
 import { useCalendarStore } from '@/stores/calendar-store';
 import { useUpdateTaskDeadline } from '@/hooks/mutations/useUpdateTaskDeadline';
 import { useUpdateSubTaskDeadlineForCalendar } from '@/hooks/mutations/useUpdateSubTaskDeadlineForCalendar';
+import {
+  UnspecifiedTaskSection,
+  type UnspecifiedSubTask,
+} from './UnspecifiedTaskSection';
 
 // FolderColor → Panda CSS 토큰 매핑
 const FOLDER_COLOR_MAP: Record<FolderColor, string> = {
@@ -40,7 +47,7 @@ interface SubTask {
   taskId: number;
   title: string;
   status: string;
-  dueDate: string;
+  dueDate: string | null;
   deadlineTime?: string;
   folderColor: FolderColor;
 }
@@ -93,25 +100,46 @@ export const Calendar = ({
 
   // 세부과제를 캘린더 이벤트로 변환
   const filteredTaskIds = new Set(taskEvents.map((e) => Number(e.id)));
-  const subTaskEvents = subItems
-    .filter((st) => filteredTaskIds.has(st.taskId))
-    .map((st) => {
-      const parentTask = items.find((a) => a.id === st.taskId);
-      const type = parentTask?.assignmentType === '팀' ? 'team' : 'personal';
-      return {
-        id: `sub-${st.subTaskId}`,
-        title: st.title,
-        start: st.dueDate,
-        allDay: true,
-        url: `/assignment/${type}/${st.taskId}`,
-        backgroundColor: 'transparent',
-        borderColor: FOLDER_COLOR_MAP[st.folderColor],
-        textColor: FOLDER_COLOR_MAP[st.folderColor],
-        classNames: ['fc-subtask-event'],
-      };
-    });
+  const unspecifiedSubTasks: UnspecifiedSubTask[] = subItems
+    .filter((st) => filteredTaskIds.has(st.taskId) && st.dueDate === null)
+    .map((st) => ({
+      subTaskId: st.subTaskId,
+      taskId: st.taskId,
+      title: st.title,
+      folderColor: st.folderColor,
+    }));
+  const datedSubItems = subItems.filter(
+    (st): st is SubTask & { dueDate: string } =>
+      filteredTaskIds.has(st.taskId) && st.dueDate !== null,
+  );
+  const subTaskEvents = datedSubItems.map((st) => {
+    const parentTask = items.find((a) => a.id === st.taskId);
+    const type = parentTask?.assignmentType === '팀' ? 'team' : 'personal';
+    return {
+      id: `sub-${st.subTaskId}`,
+      title: st.title,
+      start: st.dueDate,
+      allDay: true,
+      url: `/assignment/${type}/${st.taskId}`,
+      backgroundColor: 'transparent',
+      borderColor: FOLDER_COLOR_MAP[st.folderColor],
+      textColor: FOLDER_COLOR_MAP[st.folderColor],
+      classNames: ['fc-subtask-event'],
+    };
+  });
 
   const filteredEvents = [...taskEvents, ...subTaskEvents];
+
+  const canDropSubTaskOnDate = (subTaskId: number, date: string) => {
+    const sub = subItems.find((s) => s.subTaskId === subTaskId);
+    if (!sub) return false;
+
+    const parent = items.find((a) => a.id === sub.taskId);
+    if (!parent) return false;
+    if (!parent.dueDate) return true;
+
+    return date <= parent.dueDate;
+  };
 
   // 스토어 날짜가 변경되면 캘린더 이동
   useEffect(() => {
@@ -159,23 +187,55 @@ export const Calendar = ({
       const childSubs = subItems.filter((s) => s.taskId === taskId);
       if (childSubs.length === 0) return true;
       // 세부과제 중 가장 늦은 마감일 이전으로는 이동 불가
-      const latestSubDate = childSubs
+      const childDueDates = childSubs
         .map((s) => s.dueDate)
-        .filter(Boolean)
-        .sort()
-        .at(-1)!;
+        .filter((dueDate): dueDate is string => dueDate !== null)
+        .sort();
+      const latestSubDate = childDueDates.at(-1);
+      if (!latestSubDate) return true;
+
       return dropInfo.startStr >= latestSubDate;
     }
 
     // 세부과제 이동: 상위 과제 마감일 이후로는 이동 불가
     const subTaskId = Number(eventId.replace('sub-', ''));
-    const sub = subItems.find((s) => s.subTaskId === subTaskId);
-    if (!sub) return false;
+    return canDropSubTaskOnDate(subTaskId, dropInfo.startStr);
+  };
 
-    const parent = items.find((a) => a.id === sub.taskId);
-    if (!parent) return false;
+  // 날짜 미지정 세부과제를 캘린더로 드롭하면 마감일 지정
+  const handleEventReceive = (info: EventReceiveArg) => {
+    const subTaskId = Number(info.event.extendedProps.subTaskId);
+    const newDate = info.event.startStr;
 
-    return dropInfo.startStr <= parent.dueDate;
+    if (!subTaskId || !newDate || !canDropSubTaskOnDate(subTaskId, newDate)) {
+      info.revert();
+      return;
+    }
+
+    info.event.remove();
+
+    const endDate = `${newDate}T23:59:59`;
+    setSubItems((prev) =>
+      prev.map((item) =>
+        item.subTaskId === subTaskId
+          ? { ...item, dueDate: newDate, deadlineTime: '23:59:59' }
+          : item,
+      ),
+    );
+    updateSubTaskDeadline.mutate(
+      { subTaskId, endDate },
+      {
+        onError: () => {
+          setSubItems((prev) =>
+            prev.map((item) =>
+              item.subTaskId === subTaskId
+                ? { ...item, dueDate: null, deadlineTime: undefined }
+                : item,
+            ),
+          );
+        },
+      },
+    );
   };
 
   // 캘린더에서 이벤트 드래그 시 마감일 변경 (과제 / 세부과제 구분)
@@ -218,21 +278,32 @@ export const Calendar = ({
   };
 
   return (
-    <FullCalendar
-      ref={calendarRef}
-      plugins={[dayGridPlugin, interactionPlugin]}
-      initialView='dayGridMonth'
-      events={filteredEvents}
-      editable={true}
-      droppable={true}
-      eventAllow={handleEventAllow}
-      eventDrop={handleEventDrop}
-      eventClick={handleEventClick}
-      headerToolbar={false}
-      height='auto'
-      displayEventTime={false}
-      // 6주 고정
-      fixedWeekCount={true}
-    />
+    <div className={calendarContentStyle}>
+      <UnspecifiedTaskSection tasks={unspecifiedSubTasks} />
+      <FullCalendar
+        ref={calendarRef}
+        plugins={[dayGridPlugin, interactionPlugin]}
+        initialView='dayGridMonth'
+        events={filteredEvents}
+        editable={true}
+        droppable={true}
+        dropAccept='.unspecified-task-draggable'
+        eventAllow={handleEventAllow}
+        eventReceive={handleEventReceive}
+        eventDrop={handleEventDrop}
+        eventClick={handleEventClick}
+        headerToolbar={false}
+        height='auto'
+        displayEventTime={false}
+        // 6주 고정
+        fixedWeekCount={true}
+      />
+    </div>
   );
 };
+
+const calendarContentStyle = css(
+  stack.raw({
+    gap: '1rem',
+  }),
+);

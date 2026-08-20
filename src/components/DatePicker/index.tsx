@@ -6,17 +6,29 @@ import { css, cva } from 'styled-system/css';
 import CalendarModal from './CalendarModal';
 import { useClickOutside } from '@/hooks/useClickOutside';
 
-interface DatePickerProps {
-  value?: string | Date;
-  onChange?: (date: Date, timeEnabled: boolean) => void;
+type BaseDatePickerProps = {
   maxDate?: string | Date;
   muted?: boolean; // 데이트 피커는 공용이니까 불리언으로 처리
   showTimeDisplay?: boolean; // 시간 표시 여부
   initialTimeEnabled?: boolean; // 시간 토글 초기 상태
-}
+};
+
+type RequiredDatePickerProps = BaseDatePickerProps & {
+  allowUnspecified?: false;
+  value?: string | Date;
+  onChange?: (date: Date, timeEnabled: boolean) => void;
+};
+
+type NullableDatePickerProps = BaseDatePickerProps & {
+  allowUnspecified: true;
+  value?: string | Date | null;
+  onChange?: (date: Date | null, timeEnabled: boolean) => void;
+};
+
+type DatePickerProps = RequiredDatePickerProps | NullableDatePickerProps;
 
 // 날짜 문자열로 온거 Date 객체로 변환 처리
-const parseDate = (value?: string | Date) => {
+const parseDate = (value?: string | Date | null) => {
   if (!value) return null;
   if (value instanceof Date) return value;
   // 이미 시간이 포함된 문자열(YYYY-MM-DDTHH:mm:ss)은 그대로 파싱
@@ -31,12 +43,13 @@ export default function DatePicker({
   muted = false,
   showTimeDisplay = false,
   initialTimeEnabled = false,
+  allowUnspecified = false,
 }: DatePickerProps) {
   // ======= 상태 정의 =======
   const [isOpen, setIsOpen] = useState(false);
-  // 확정된 날짜 (기본값: 오늘)
-  const [confirmedDate, setConfirmedDate] = useState<Date>(
-    parseDate(value) ?? new Date(),
+  // 확정된 날짜 (기본값: 오늘, 날짜 미지정 허용 시 null 가능)
+  const [confirmedDate, setConfirmedDate] = useState<Date | null>(
+    parseDate(value) ?? (allowUnspecified ? null : new Date()),
   );
   // 시간 추가 여부
   const [timeEnabled, setTimeEnabled] = useState(initialTimeEnabled);
@@ -48,15 +61,30 @@ export default function DatePicker({
   useEffect(() => {
     const next = parseDate(value);
     if (next) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setConfirmedDate(next);
+      return;
     }
-  }, [value]);
+
+    if (allowUnspecified) {
+      setConfirmedDate(null);
+    }
+  }, [allowUnspecified, value]);
 
   // 선택한 날짜 저장
-  const handleSave = (date: Date, withTime: boolean) => {
+  const handleSave = (date: Date | null, withTime: boolean) => {
     setConfirmedDate(date);
-    setTimeEnabled(withTime);
-    onChange?.(date, withTime);
+    setTimeEnabled(date ? withTime : false);
+
+    if (allowUnspecified) {
+      (onChange as NullableDatePickerProps['onChange'])?.(
+        date,
+        date ? withTime : false,
+      );
+    } else if (date) {
+      (onChange as RequiredDatePickerProps['onChange'])?.(date, withTime);
+    }
+
     setIsOpen(false);
   };
 
@@ -103,12 +131,12 @@ export default function DatePicker({
           // 숫자부분도 클릭시 열리도록
           onClick={() => setIsOpen(!isOpen)}
         >
-          {formatDate(confirmedDate)}
+          {confirmedDate ? formatDate(confirmedDate) : '지정안함'}
         </button>
       </div>
 
       {/* 시간 추가 시 구분선 + 시간 텍스트 표시 (showTimeDisplay=true인 페이지에서만) */}
-      {showTimeDisplay && timeEnabled && (
+      {showTimeDisplay && timeEnabled && confirmedDate && (
         <>
           <span className={separatorStyle} />
           <button
@@ -129,6 +157,7 @@ export default function DatePicker({
           initialDate={confirmedDate}
           maxDate={parsedMaxDate ?? undefined}
           initialTimeEnabled={timeEnabled}
+          allowUnspecified={allowUnspecified}
         />
       )}
     </div>

@@ -24,6 +24,7 @@ interface TeamMemberManageModalItemProps {
   ) => void;
   onDeleteMember?: () => void;
   onExpelMember?: () => void;
+  onProfileClick?: () => void;
 }
 
 export const TeamMemberManageModalItem = ({
@@ -37,13 +38,18 @@ export const TeamMemberManageModalItem = ({
   canChangeRole,
   onRoleChange,
   onExpelMember,
+  onProfileClick,
 }: TeamMemberManageModalItemProps) => {
   const roleLabel = isCurrentUser ? `${role}(you)` : role;
   const showDropdown = !isCurrentUser && canChangeRole;
 
   return (
     <div className={modalContentItemStyle}>
-      <div className={modalContentItemTitleStyle}>
+      <button
+        type='button'
+        onClick={onProfileClick}
+        className={modalContentItemTitleStyle}
+      >
         <div
           className={modalContentItemTitleIconStyle}
           style={
@@ -55,15 +61,9 @@ export const TeamMemberManageModalItem = ({
                 }
               : undefined
           }
-        >
-          {!profileImage && (
-            <span className={profilePlaceholderTextStyle}>
-              {name.slice(0, 1).toUpperCase()}
-            </span>
-          )}
-        </div>
+        />
         <p>{name}</p>
-      </div>
+      </button>
 
       <div className={modalContentItemMemberStyle}>
         {showDropdown ? (
@@ -95,7 +95,7 @@ const modalContentItemStyle = css({
   display: 'flex',
   justifyContent: 'space-between',
   alignItems: 'center',
-  width: '27.25rem',
+  width: '100%',
 });
 
 const modalContentItemTitleStyle = css({
@@ -104,6 +104,10 @@ const modalContentItemTitleStyle = css({
   gap: '0.75rem',
   display: 'flex',
   alignItems: 'center',
+  background: 'none',
+  border: 'none',
+  padding: 0,
+  cursor: 'pointer',
 });
 
 const modalContentItemTitleIconStyle = css({
@@ -116,11 +120,6 @@ const modalContentItemTitleIconStyle = css({
   alignItems: 'center',
   justifyContent: 'center',
   overflow: 'hidden',
-});
-
-const profilePlaceholderTextStyle = css({
-  textStyle: 'body4.m',
-  color: 'gray.600',
 });
 
 const modalContentItemMemberStyle = css({

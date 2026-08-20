@@ -25,22 +25,11 @@ interface AddTaskButtonProps {
   maxDate?: string | Date;
 }
 
-const getDefaultDeadline = (maxDate?: string | Date): Date => {
-  const today = new Date();
-  if (!maxDate) return today;
-  const max = typeof maxDate === 'string' ? new Date(maxDate) : maxDate;
-  if (Number.isNaN(max.getTime())) return today;
-  return today > max ? max : today;
-};
-
 export const AddTaskButton = ({ taskId, maxDate }: AddTaskButtonProps) => {
   const [isInputVisible, setIsInputVisible] = useState(false);
   const [value, setValue] = useState('');
-  const [deadline, setDeadline] = useState<Date>(() =>
-    getDefaultDeadline(maxDate),
-  );
+  const [deadline, setDeadline] = useState<Date | null>(null);
   const [timeEnabled, setTimeEnabled] = useState(false);
-  const isAlarm = true;
   const inputRef = useRef<HTMLInputElement>(null);
   const { mutate: createSubTask, isPending } = useCreateSubTask(taskId);
   const showAlert = useAlertStore((state) => state.showAlert);
@@ -54,7 +43,7 @@ export const AddTaskButton = ({ taskId, maxDate }: AddTaskButtonProps) => {
   const closeAndClear = () => {
     setIsInputVisible(false);
     setValue('');
-    setDeadline(getDefaultDeadline(maxDate));
+    setDeadline(null);
     setTimeEnabled(false);
   };
 
@@ -67,8 +56,8 @@ export const AddTaskButton = ({ taskId, maxDate }: AddTaskButtonProps) => {
     createSubTask(
       {
         title,
-        deadline: formatDeadline(deadline, timeEnabled),
-        isAlarm,
+        deadline: deadline ? formatDeadline(deadline, timeEnabled) : null,
+        isAlarm: Boolean(deadline),
       },
       {
         onSuccess: closeAndClear,
@@ -102,6 +91,7 @@ export const AddTaskButton = ({ taskId, maxDate }: AddTaskButtonProps) => {
             onChange={(e) => setValue(e.target.value)}
           />
           <DatePicker
+            allowUnspecified
             value={deadline}
             onChange={(d, withTime) => {
               setDeadline(d);
@@ -127,7 +117,7 @@ export const AddTaskButton = ({ taskId, maxDate }: AddTaskButtonProps) => {
       type='button'
       className={addTaskButtonStyle}
       onClick={() => {
-        setDeadline(getDefaultDeadline(maxDate));
+        setDeadline(null);
         setIsInputVisible(true);
       }}
     >

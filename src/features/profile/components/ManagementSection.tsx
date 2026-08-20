@@ -19,7 +19,8 @@ import {
 } from '@dnd-kit/sortable';
 import { restrictToParentElement } from '@dnd-kit/modifiers';
 import { CSS } from '@dnd-kit/utilities';
-import { css, cva } from 'styled-system/css';
+import { useRouter } from 'next/navigation';
+import { css, cva, cx } from 'styled-system/css';
 import { hstack, stack } from 'styled-system/patterns';
 import { Card } from '@/features/profile/components/Card';
 import { NotificationSetting } from '@/features/profile/components/NotificationSetting';
@@ -71,6 +72,7 @@ const SortableFolderRow = ({ folder }: { folder: Folder }) => {
 };
 
 export const ManagementSection = () => {
+  const router = useRouter();
   const [isReorder, setIsReorder] = useState(false);
   const [orderedFolders, setOrderedFolders] = useState<Folder[]>([]);
   const [snapshotFolders, setSnapshotFolders] = useState<Folder[]>([]);
@@ -126,6 +128,11 @@ export const ManagementSection = () => {
   const pinnedFolders = orderedFolders.filter(
     (folder) => folder.name === UNASSIGNED_FOLDER_NAME,
   );
+
+  // 폴더 클릭 시 진행중 개인 과제 목록 페이지로 이동, 해당 폴더로 필터링
+  const handleFolderClick = (folderId: number) => {
+    router.push(`/assignment?type=personal&folderId=${folderId}`);
+  };
 
   // 저장: 지정안함 폴더를 항상 1순위로 고정하고, 그 아래 순서만 서버에 반영
   const handleSaveReorder = () => {
@@ -242,12 +249,16 @@ export const ManagementSection = () => {
             <div className={folderListStyle}>
               {orderedFolders.map((folder) => (
                 <div key={folder.id} className={folderItemStyle}>
-                  <div className={folderInfoStyle}>
+                  <button
+                    type='button'
+                    className={cx(folderInfoStyle, folderInfoButtonStyle)}
+                    onClick={() => handleFolderClick(folder.id)}
+                  >
                     <div
                       className={folderColorStyle({ color: folder.color })}
                     />
                     <span className={folderNameStyle}>{folder.name}</span>
-                  </div>
+                  </button>
                   {folder.name !== UNASSIGNED_FOLDER_NAME && (
                     <div className={folderActionsStyle}>
                       <EditFolderButton
@@ -341,6 +352,14 @@ const folderInfoStyle = css(
     flex: 1,
   }),
 );
+
+const folderInfoButtonStyle = css({
+  border: 'none',
+  background: 'none',
+  padding: 0,
+  cursor: 'pointer',
+  textAlign: 'left',
+});
 
 const folderColorStyle = cva({
   base: {

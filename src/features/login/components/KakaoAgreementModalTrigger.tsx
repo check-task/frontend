@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import { KakaoAgreementModalContent } from '@/features/login/components/KakaoAgreementModalContent';
-import { KAKAO_AGREEMENT_REQUIRED_KEY } from '@/features/login/constants/kakaoAgreement';
+import { SOCIAL_AGREEMENT_REQUIRED_KEY } from '@/features/login/constants/socialAgreement';
 import { useModalStore } from '@/stores/modal-store';
 
 export const KakaoAgreementModalTrigger = () => {
@@ -15,7 +15,7 @@ export const KakaoAgreementModalTrigger = () => {
     if (typeof window === 'undefined') return;
 
     const shouldOpen =
-      window.sessionStorage.getItem(KAKAO_AGREEMENT_REQUIRED_KEY) === 'true';
+      window.sessionStorage.getItem(SOCIAL_AGREEMENT_REQUIRED_KEY) === 'true';
 
     if (!shouldOpen) return;
 
@@ -25,7 +25,7 @@ export const KakaoAgreementModalTrigger = () => {
       content: (
         <KakaoAgreementModalContent
           onCompleted={() => {
-            window.sessionStorage.removeItem(KAKAO_AGREEMENT_REQUIRED_KEY);
+            window.sessionStorage.removeItem(SOCIAL_AGREEMENT_REQUIRED_KEY);
             closeModal();
           }}
         />

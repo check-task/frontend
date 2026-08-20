@@ -1,52 +1,50 @@
 'use client';
 
-import { useEffect, useRef, useCallback } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { css } from 'styled-system/css';
 import axiosInstance from '@/lib/axiosInstance';
-import { useAuthStore } from '@/stores/auth-store';
 import { SOCIAL_AGREEMENT_REQUIRED_KEY } from '@/features/login/constants/socialAgreement';
+import { useAuthStore } from '@/stores/auth-store';
 
-export default function AuthCallbackPage() {
+export default function AppleAuthCallbackPage() {
   return <CallbackHandler />;
 }
 
 function CallbackHandler() {
   const router = useRouter();
   const login = useAuthStore((state) => state.login);
-  const isProcessing = useRef(false); // API 중복 호출 방지
+  const isProcessing = useRef(false);
 
-  // accessToken 발급 요청
   const getAccessToken = useCallback(async () => {
     try {
-      // refreshToken 쿠키로 accessToken 발급
       const response = await axiosInstance.post('/auth/refresh');
-
       const { accessToken } = response.data.data;
 
       if (accessToken) {
-        login(accessToken); // 토큰 저장
+        login(accessToken);
+
         const params = new URLSearchParams(window.location.search);
         if (params.get('isNewUser') === 'true') {
           window.sessionStorage.setItem(SOCIAL_AGREEMENT_REQUIRED_KEY, 'true');
         }
+
         router.replace('/');
-      } else {
-        console.error('accessToken이 응답에 없습니다');
-        router.replace('/login');
+        return;
       }
+
+      console.error('accessToken이 응답에 없습니다');
+      router.replace('/login');
     } catch (error) {
-      console.error('토큰 발급 실패:', error);
+      console.error('Apple 로그인 토큰 발급 실패:', error);
       router.replace('/login');
     }
   }, [router, login]);
 
-  // 페이지 로드 시 토큰 발급
   useEffect(() => {
-    if (!isProcessing.current) {
-      isProcessing.current = true;
-      getAccessToken();
-    }
+    if (isProcessing.current) return;
+    isProcessing.current = true;
+    getAccessToken();
   }, [getAccessToken]);
 
   return <div className={loadingStyle}>로그인 처리 중...</div>;

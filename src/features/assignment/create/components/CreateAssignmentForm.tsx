@@ -77,7 +77,7 @@ export const CreateAssignmentForm = () => {
         .filter((t) => t.title.trim() !== '')
         .map((t) => ({
           title: t.title.trim(),
-          endDate: formatDate(t.endDate),
+          endDate: t.endDate ? formatDate(t.endDate) : null,
         })),
       references: dataItems
         .filter((r) => r.type === 0)

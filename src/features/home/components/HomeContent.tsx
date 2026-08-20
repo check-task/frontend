@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { css } from 'styled-system/css';
-import { hstack } from 'styled-system/patterns';
+import { hstack, stack } from 'styled-system/patterns';
 import { FilterChipGroup } from '@/features/home/components/FilterChipGroup';
 import { Calendar } from '@/features/home/components/Calendar';
 import { AssignmentSection } from '@/features/home/components/AssignmentSection';
@@ -59,7 +59,7 @@ export const HomeContent = () => {
   }, [data, selectedFolderIds, allFolderIds, setSelectedFolderIds]);
 
   return (
-    <>
+    <div className={containerStyle}>
       {/* 폴더 필터 바 */}
       <FilterChipGroup
         assignments={assignments}
@@ -85,9 +85,15 @@ export const HomeContent = () => {
           onSortChange={setSortType}
         />
       </div>
-    </>
+    </div>
   );
 };
+
+const containerStyle = css(
+  stack.raw({
+    gap: '1rem',
+  }),
+);
 
 const mainStyle = css(
   hstack.raw({
@@ -100,8 +106,4 @@ const mainStyle = css(
 const calendarStyle = css({
   width: '45.9375rem',
   minHeight: '44rem',
-  border: '0.0625rem solid',
-  borderColor: 'gray.200',
-  borderRadius: '0.75rem',
-  boxShadow: '-1px 1px 4px 0 rgba(0, 0, 0, 0.08)',
 });

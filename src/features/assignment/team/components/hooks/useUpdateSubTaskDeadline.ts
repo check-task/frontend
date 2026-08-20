@@ -7,7 +7,7 @@ import { updateSubTaskDeadline } from '@/services/subtask';
 interface UpdateSubTaskDeadlineInput {
   taskId: number;
   subTaskId: number;
-  endDate: string; // YYYY-MM-DD
+  endDate: string | null; // YYYY-MM-DD
 }
 
 /** 팀 과제 세부 TASK 마감일 변경 (소켓 우선, 미연결 시 REST 폴백) */

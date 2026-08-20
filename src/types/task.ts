@@ -40,7 +40,7 @@ export interface SubTaskListItem {
   taskId: number;
   title: string;
   status: string;
-  deadline: string;
+  deadline: string | null;
 }
 
 // 과제 목록 조회 응답
@@ -69,19 +69,24 @@ export interface TaskDetailSubTaskComment {
   createdAt: string;
 }
 
-// Task 목록에 보여지는 세부 과제 항목
+// 세부 TASK 각 담당자 (상세 조회 응답) 
+export interface TaskDetailSubTaskAssignee {
+  memberId: number;
+  userId: number;
+  nickname: string;
+  profileImage: string | null;
+}
+
+// subTasks 목록에 보여지는 항목
 export interface TaskDetailSubTask {
   subTaskId: number;
   title: string;
-  deadline: string; // YYYY-MM-DD
+  deadline: string | null; // YYYY-MM-DD
   status: SubTaskStatus;
   isAlarm: boolean;
   commentCount: number;
   comments?: TaskDetailSubTaskComment[];
-  /** 담당자 사용자 ID (과제 수정 API용) */
-  assigneeId?: number | null;
-  assigneeName: string;
-  assigneeProfileImage?: string | null;
+  assignees: TaskDetailSubTaskAssignee[];
 }
 
 // 자료 모음집 참조 항목 (과제 상세·자료 생성 응답)
@@ -183,7 +188,7 @@ export interface DeleteTaskResponse {
 // ============================
 export interface CreateTaskSubTaskRequest {
   title: string;
-  endDate: string; // YYYY-MM-DD
+  endDate: string | null; // YYYY-MM-DD
 }
 
 export interface CreateTaskReferenceRequest {
@@ -209,7 +214,7 @@ export interface CreateTaskResponse {
 // 과제 수정 요청 (PATCH /task/{taskId})
 export interface UpdateTaskSubTaskItem {
   title: string;
-  endDate: string; // YYYY-MM-DD
+  endDate: string | null; // YYYY-MM-DD
   status: 'PROGRESS' | 'COMPLETED';
   isAlarm: boolean;
   assigneeId: number;
@@ -259,7 +264,7 @@ export interface GetCompletedTaskListResponse {
 // ============================
 
 export interface UpdateSubTaskDeadlineRequest {
-  endDate: string; // YYYY-MM-DD
+  endDate: string | null; // YYYY-MM-DD
 }
 
 export interface UpdateSubTaskDeadlineResponse {
@@ -267,7 +272,7 @@ export interface UpdateSubTaskDeadlineResponse {
   message: string;
   data: {
     sub_task_id: number;
-    end_date: string; // YYYY-MM-DD
+    end_date: string | null; // YYYY-MM-DD
   };
 }
 
@@ -348,7 +353,7 @@ export interface UpdateSubTaskStatusResponse {
 // 세부 TASK 담당자 설정 타입 정의
 // ============================
 export interface UpdateSubTaskAssigneeRequest {
-  assigneeId: number | null;
+  assigneeIds: number[];
 }
 
 export interface UpdateSubTaskAssigneeResponse {
@@ -356,7 +361,7 @@ export interface UpdateSubTaskAssigneeResponse {
   message: string;
   data: {
     sub_task_id: number;
-    assignee_id: number;
+    assignees: TaskDetailSubTaskAssignee[];
   };
 }
 
@@ -365,7 +370,7 @@ export interface UpdateSubTaskAssigneeResponse {
 // ============================
 export interface CreateSubTaskRequest {
   title: string;
-  deadline: string; // YYYY-MM-DDTHH:mm:ss
+  deadline: string | null; // YYYY-MM-DDTHH:mm:ss
   isAlarm: boolean;
 }
 
@@ -375,7 +380,7 @@ export interface CreateSubTaskResponse {
   data: {
     subTaskId: number;
     title: string;
-    deadline: string;
+    deadline: string | null;
     status: string;
     assigneeName: string;
   };
@@ -450,10 +455,26 @@ export interface DeleteSubTasksBulkResponse {
 export interface UpdateSubTasksBatchItem {
   subTaskId: number;
   title: string;
-  deadline: string;
+  deadline: string | null;
   isAlarm: boolean;
 }
 
 export interface UpdateSubTasksBatchRequest {
   subTasks: UpdateSubTasksBatchItem[];
+}
+
+// ============================
+// 팀과제 특정 팀원 프로필 조회 타입 정의
+// ============================
+export interface TaskMemberProfile {
+  nickname: string;
+  phoneNum?: string | null;
+  email?: string | null;
+  profileImage?: string | null;
+}
+
+export interface GetTaskMemberProfileResponse {
+  resultType: 'SUCCESS' | 'FAIL';
+  message: string;
+  data: TaskMemberProfile;
 }

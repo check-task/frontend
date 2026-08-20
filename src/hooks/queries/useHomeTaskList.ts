@@ -25,7 +25,7 @@ export interface HomeSubTask {
   taskId: number;
   title: string;
   status: string;
-  dueDate: string;
+  dueDate: string | null;
   deadlineTime?: string;
   folderColor: FolderColor;
 }
@@ -70,7 +70,7 @@ export const useHomeTaskList = (sort?: TaskSort) => {
           taskId: st.taskId,
           title: st.title,
           status: st.status,
-          dueDate: st.deadline ? st.deadline.split('T')[0] : '',
+          dueDate: st.deadline ? st.deadline.split('T')[0] : null,
           deadlineTime: st.deadline?.includes('T')
             ? st.deadline.split('T')[1]
             : undefined,
